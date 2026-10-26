@@ -1,0 +1,40 @@
+# Cloudflare Pages response headers.
+# JS/CSS/data URLs are content-hashed by tools/stamp-assets.js (?v=<hash>), so a
+# changed file always gets a new URL and these can be cached as immutable.
+# HTML stays revalidated so a deploy is picked up immediately.
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval' 'unsafe-inline' blob: https://www.googletagmanager.com https://static.cloudflareinsights.com https://cdn.jsdelivr.net https://unpkg.com https://esm.sh; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; img-src 'self' data: https://img.youtube.com https://i.ytimg.com https://www.googletagmanager.com; font-src 'self' data: https://cdn.jsdelivr.net https://unpkg.com; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://*.google-analytics.com https://*.analytics.google.com https://cloudflareinsights.com https://*.cloudflareinsights.com https://cdn.jsdelivr.net https://data.jsdelivr.com https://unpkg.com https://esm.sh https://registry.npmjs.org https://api.github.com https://raw.githubusercontent.com; frame-src 'self' https://www.youtube-nocookie.com https://www.youtube.com; worker-src 'self' blob: https://cdn.jsdelivr.net; media-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self';
+
+/*.wasm
+  Content-Type: application/wasm
+  Cache-Control: public, max-age=31536000, immutable
+
+/js/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/css/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/data/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/
+  Cache-Control: public, max-age=0, must-revalidate
+
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/.well-known/*
+  Content-Type: application/json
+
+/preview-sw.js
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable

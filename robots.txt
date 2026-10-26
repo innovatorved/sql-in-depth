@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://sql-in-depth.vedgupta.in/sitemap.xml

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>404 — Page Not Found | SQL In Depth</title>
+  <meta name="description" content="The SQL lesson, table visualizer, or database build lab you are looking for cannot be found. Explore our 6 tracks, 180 units, interactive visualizers, and from-scratch builds.">
+  <meta property="og:image" content="https://sql-in-depth.vedgupta.in/assets/og-image.png">
+  <meta name="twitter:image" content="https://sql-in-depth.vedgupta.in/assets/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="robots" content="noindex, follow">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#000000">
+
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preload" href="fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/variables.css?v=ad04c4a441">
+  <link rel="stylesheet" href="css/layout.css?v=a384f455dc">
+  <link rel="stylesheet" href="css/components.css?v=58f14d9639">
+  <link rel="stylesheet" href="css/content.css?v=98b657b5e4">
+  <link rel="stylesheet" href="css/simulators.css?v=f6ec29cd93">
+
+  <!-- Core scripts: head initializer & asset manifest -->
+  <script src="js/init.js?v=59c953e95f"></script>
+  <script src="js/manifest.js?v=f99ef6551e"></script>
+
+  <style>
+    .not-found-wrapper {
+      min-height: 100vh;
+      padding-top: var(--topbar-height, 52px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: var(--bg-primary);
+      color: var(--fg-primary);
+    }
+    .not-found-main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px;
+    }
+    .not-found-card {
+      max-width: 680px;
+      width: 100%;
+      text-align: center;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg, 12px);
+      padding: 48px 36px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+    .not-found-card__badge {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(239, 68, 68, 0.12);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      margin-bottom: 20px;
+    }
+    .not-found-card__title {
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1.2;
+      margin: 0 0 12px 0;
+      letter-spacing: -0.02em;
+    }
+    .not-found-card__desc {
+      font-size: 15px;
+      color: var(--fg-muted);
+      line-height: 1.6;
+      margin: 0 auto 28px auto;
+      max-width: 520px;
+    }
+    .not-found-search {
+      max-width: 440px;
+      margin: 0 auto 32px auto;
+      display: flex;
+      gap: 8px;
+    }
+    .not-found-search input {
+      flex: 1;
+      padding: 10px 14px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md, 8px);
+      color: var(--fg-primary);
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+    .not-found-search input:focus {
+      border-color: var(--accent);
+    }
+    .not-found-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 36px;
+    }
+    .not-found-popular {
+      text-align: left;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 24px;
+    }
+    .not-found-popular__title {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--fg-faint);
+      margin-bottom: 12px;
+    }
+    .not-found-popular__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+    }
+    .not-found-popular__link {
+      display: block;
+      padding: 10px 14px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm, 6px);
+      color: var(--fg-primary);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.15s ease;
+    }
+    .not-found-popular__link:hover {
+      border-color: var(--accent);
+      background: var(--bg-primary);
+    }
+    .not-found-footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+      color: var(--fg-faint);
+      border-top: 1px solid var(--border-subtle);
+    }
+    .not-found-footer a {
+      color: var(--fg-muted);
+      text-decoration: none;
+    }
+    .not-found-footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <!-- Skip to content -->
+  <a href="#main-content" class="skip-link">Skip to content</a>
+
+  <!-- Standard Top Bar -->
+  <header class="topbar">
+    <a href="/" class="topbar__brand" data-nav="home">
+      <span class="topbar__brand-icon">SQL</span>
+      <span class="topbar__brand-text">SQL</span>
+      <span class="topbar__track-badge">In Depth</span>
+    </a>
+
+    <div class="topbar__search">
+      <button class="topbar__search-trigger" id="search-trigger" aria-label="Search topics">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <span>Search topics…</span>
+        <span class="topbar__search-kbd">⌘K</span>
+      </button>
+    </div>
+
+    <div class="topbar__actions">
+      <nav class="topbar__nav" style="display:flex; gap:0.4rem; margin-right:0.5rem;">
+        <a href="/#/glossary" class="btn btn--sm btn--outline" style="font-size:11px; padding:4px 8px; text-decoration:none; white-space:nowrap;">📖 Glossary</a>
+      </nav>
+
+      <div class="topbar__progress-pill" id="progress-pill" title="Overall progress">
+        <svg class="topbar__progress-ring" viewBox="0 0 20 20">
+          <circle class="track" cx="10" cy="10" r="8"/>
+          <circle class="fill" cx="10" cy="10" r="8" stroke-dasharray="50.27" stroke-dashoffset="50.27" id="progress-ring-fill"/>
+        </svg>
+        <span id="progress-text">0%</span>
+      </div>
+
+      <a href="https://github.com/innovatorved/sql-in-depth" target="_blank" rel="noopener noreferrer" class="topbar__btn topbar__btn--github" id="github-repo-btn" aria-label="GitHub Repository" title="GitHub Repository" data-repo-placement="topbar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+      </a>
+
+      <button class="topbar__btn" id="theme-toggle" aria-label="Toggle theme" title="Toggle dark/light mode">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-sun"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-moon" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="not-found-wrapper">
+    <!-- Main Content -->
+    <main class="not-found-main" id="main-content">
+      <div class="not-found-card">
+        <div class="not-found-card__badge">404 Error</div>
+        <h1 class="not-found-card__title">Page Not Found</h1>
+        <p class="not-found-card__desc">
+          The SQL lesson, table visualizer, or database coding lab you are looking for has been moved, renamed, or does not exist.
+        </p>
+
+        <!-- Quick Search Form -->
+        <form class="not-found-search">
+          <input type="text" id="error-search-input" placeholder="Search 180 topics &amp; 18 builds (e.g. Window Functions, B+Tree, MVCC)…" autocomplete="off" spellcheck="false">
+          <button type="submit" class="btn btn--primary" style="padding:0 16px;">Search</button>
+        </form>
+
+        <!-- Primary Action Links -->
+        <div class="not-found-actions">
+          <a class="btn btn--primary" href="/">← Return to Home</a>
+          <a class="btn btn--outline" href="/topic/why-databases-exist/">Start Curriculum</a>
+          <a class="btn btn--outline" href="/build/build-sql-query-interpreter/">18 Build Labs</a>
+          <a class="btn btn--outline" href="/projects">Projects</a>
+        </div>
+
+        <!-- Popular Topics -->
+        <div class="not-found-popular">
+          <div class="not-found-popular__title">Popular Topics, Visualizers &amp; Build Labs</div>
+          <div class="not-found-popular__grid">
+            <a class="not-found-popular__link" href="/topic/join-where-vs-on-filter-trap/">LEFT JOIN ON vs WHERE Filter Trap →</a>
+            <a class="not-found-popular__link" href="/topic/window-frames-rows-range-groups/">Window Frames: ROWS vs RANGE →</a>
+            <a class="not-found-popular__link" href="/topic/btree-bplustree-internal-anatomy/">B+Tree Page Splits &amp; Seek Internals →</a>
+            <a class="not-found-popular__link" href="/topic/reading-explain-and-explain-analyze/">Reading EXPLAIN &amp; EXPLAIN ANALYZE →</a>
+            <a class="not-found-popular__link" href="/topic/multi-version-concurrency-control-mvcc/">MVCC &amp; Snapshot Isolation →</a>
+            <a class="not-found-popular__link" href="/build/build-mvcc-snapshot-storage-engine/">MVCC Storage Engine Build Lab →</a>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="not-found-footer">
+      <span>SQL In Depth &copy; 2024–2026 Ved Gupta. <a href="/">Curriculum</a> &bull; <a href="/build/build-sql-query-interpreter/">18 Builds</a> &bull; <a href="/projects">Projects</a> &bull; <a href="https://github.com/innovatorved/sql-in-depth" target="_blank" rel="noopener">GitHub</a></span>
+    </footer>
+  </div>
+
+  <script src="js/404.js?v=d111711fa6"></script>
+</body>
+</html>

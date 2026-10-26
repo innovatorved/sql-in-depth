@@ -1,0 +1,1082 @@
+{
+  "why-databases-exist": {
+    "hash": "93678bbffb7a5d8888c4e37d3f9cc958bbc7479e7e938d4c6167566454c9565e",
+    "voice": "en-US-GuyNeural",
+    "size": 1290000,
+    "chars": 2850
+  },
+  "tables-rows-columns-types": {
+    "hash": "4b91dfb7af43ce8c409f01bca49276eeaf97b2023845aa3dd753616203d42109",
+    "voice": "en-US-GuyNeural",
+    "size": 1464000,
+    "chars": 2893
+  },
+  "select-projection-aliases": {
+    "hash": "d10eca157c20e219559b244735e73cc5187fa5bb413c7fc2a7a20aad2fe4e072",
+    "voice": "en-US-GuyNeural",
+    "size": 1638000,
+    "chars": 2936
+  },
+  "where-filtering-predicates": {
+    "hash": "f825310a95480fadaa23c5c5b4b318f67736493a7682ef297008cc4a3225ef0b",
+    "voice": "en-US-GuyNeural",
+    "size": 1812000,
+    "chars": 2979
+  },
+  "boolean-logic-three-valued-null": {
+    "hash": "4ed0ec838b2166c8de53f24deced6444f06f51748071c0d8f55134b191ab0bd4",
+    "voice": "en-US-GuyNeural",
+    "size": 1356000,
+    "chars": 3022
+  },
+  "null-semantics-coalesce-nullif": {
+    "hash": "3736994d5c605f185bf3425a00c5fdac66004949b1fada02fc5af8416f7dc90e",
+    "voice": "en-US-GuyNeural",
+    "size": 1530000,
+    "chars": 3065
+  },
+  "order-by-limit-offset-distinct": {
+    "hash": "1f79898467885c414e024346022a91989a82b4672cb808bd1750d6faa268d8a0",
+    "voice": "en-US-GuyNeural",
+    "size": 1704000,
+    "chars": 3108
+  },
+  "case-expressions-type-casting": {
+    "hash": "7957f77ed2398a90cc225e0b7513157bf86179d780ce66a138d0dda89f165ff1",
+    "voice": "en-US-GuyNeural",
+    "size": 1878000,
+    "chars": 3151
+  },
+  "case-stripe-ledger-precision": {
+    "hash": "c799d9511b26626e94922a27665439e4ef4694335ab3cc4518899a0a100918b7",
+    "voice": "en-US-GuyNeural",
+    "size": 1422000,
+    "chars": 3194
+  },
+  "build-sql-query-interpreter": {
+    "hash": "cba182663e5b9fe2dfc66fffa98d5f0489d15dc17b14a6abd8a51915025d7254",
+    "voice": "en-US-GuyNeural",
+    "size": 1596000,
+    "chars": 3237
+  },
+  "create-table-ddl-anatomy": {
+    "hash": "f9c8eba38a730bd2c9317502304ddc902d128678f94a197088c73a09f35e0820",
+    "voice": "en-US-GuyNeural",
+    "size": 1770000,
+    "chars": 3280
+  },
+  "primary-keys-surrogate-vs-natural": {
+    "hash": "cf499a7f80cc68d6174e81ef1aa993245c97ca7d037ea94d3c53d2abbafcbf8c",
+    "voice": "en-US-GuyNeural",
+    "size": 1314000,
+    "chars": 3323
+  },
+  "foreign-keys-referential-integrity": {
+    "hash": "bada58a4cb9f14e4ee25785ac5d46a5cbcb2855443a67a5ddee67c1bc8ef5326",
+    "voice": "en-US-GuyNeural",
+    "size": 1488000,
+    "chars": 3366
+  },
+  "check-unique-not-null-defaults": {
+    "hash": "b761b62d0a3749aa8f41fc065324674026778d7ccd9f63453a5da68121980605",
+    "voice": "en-US-GuyNeural",
+    "size": 1662000,
+    "chars": 3409
+  },
+  "insert-bulk-loading-returning": {
+    "hash": "ea229bbec1f9a8fe088b19203ab5349e5277fb961cf8811c487534bd8ca6891c",
+    "voice": "en-US-GuyNeural",
+    "size": 1836000,
+    "chars": 3452
+  },
+  "upsert-on-conflict-merge": {
+    "hash": "6fe0b1082b0771cb08d0fa6c55b8b86e8e61295f51166e3356b8c73d60e25ec5",
+    "voice": "en-US-GuyNeural",
+    "size": 1380000,
+    "chars": 3495
+  },
+  "update-delete-safe-mutations": {
+    "hash": "7f2ab73681c2299b7983307a6e501b936e2995515a3a94206ca6796c8623c0a5",
+    "voice": "en-US-GuyNeural",
+    "size": 1554000,
+    "chars": 2888
+  },
+  "views-temp-tables-ctas": {
+    "hash": "099f4412be19539fa6c6fb5d7883d600e3e29944e1d5274a3587dea235a1c01e",
+    "voice": "en-US-GuyNeural",
+    "size": 1728000,
+    "chars": 2931
+  },
+  "case-github-zero-downtime-migrations": {
+    "hash": "4e8ba58c3d97e4fee47b921432f7391f33d015ebaa0ec2b3f56ee5535df867fc",
+    "voice": "en-US-GuyNeural",
+    "size": 1902000,
+    "chars": 2974
+  },
+  "build-ecommerce-schema-ddl": {
+    "hash": "38140f6d5b5f56db96ae86fa69653b9f6456e180c2c981e61e32df39a7cb8d77",
+    "voice": "en-US-GuyNeural",
+    "size": 1446000,
+    "chars": 3017
+  },
+  "relational-algebra-set-theory": {
+    "hash": "a1a35ac47da8dab8e4a221c5c33caa879f9cb90b8578ea87d01d5305573d52a9",
+    "voice": "en-US-GuyNeural",
+    "size": 1620000,
+    "chars": 3060
+  },
+  "inner-join-equi-joins": {
+    "hash": "017e3ca07d8a7d34d1d8f2240167aad9f867454b479f55a5fd4ad5f707c982b2",
+    "voice": "en-US-GuyNeural",
+    "size": 1794000,
+    "chars": 3103
+  },
+  "left-right-full-outer-joins": {
+    "hash": "2a8d9ebeaf8dd2266ad7946828bb402ad9fa61c9b940270058dbbd59959f58bc",
+    "voice": "en-US-GuyNeural",
+    "size": 1338000,
+    "chars": 3146
+  },
+  "join-where-vs-on-filter-trap": {
+    "hash": "df3f09f8982870f29c35c4a8e1b0811f20e32f5701cac36806691913810fa949",
+    "voice": "en-US-GuyNeural",
+    "size": 1512000,
+    "chars": 3189
+  },
+  "self-joins-non-equi-joins": {
+    "hash": "af1263a281bc6df9fae94206571a965979e5ef04dbac6221ff29b83bdd5e5904",
+    "voice": "en-US-GuyNeural",
+    "size": 1686000,
+    "chars": 3232
+  },
+  "cross-join-cartesian-products": {
+    "hash": "8e499aef652c0eb18d39dd104e96b37d7b02bcfd539a5b50cd45ca72b39186d1",
+    "voice": "en-US-GuyNeural",
+    "size": 1860000,
+    "chars": 3275
+  },
+  "semi-joins-anti-joins": {
+    "hash": "c19a2c7085b827cf3c6bfe5eb7536f3470c96c67d7be3606e0a7a1d812927f35",
+    "voice": "en-US-GuyNeural",
+    "size": 1404000,
+    "chars": 3318
+  },
+  "set-operations-union-intersect-except": {
+    "hash": "73ec986a4af1a177c8f252451bc06c31408f7713e932a5bb7c13e42f54890462",
+    "voice": "en-US-GuyNeural",
+    "size": 1578000,
+    "chars": 3361
+  },
+  "case-missing-null-notin-outage": {
+    "hash": "70fcf86d0e2c81b78fad3a067728bc3453a0ff6ac2fb98676bb7e19d3e524ec8",
+    "voice": "en-US-GuyNeural",
+    "size": 1752000,
+    "chars": 3404
+  },
+  "build-multi-table-order-reconciler": {
+    "hash": "baa3a89417991df24c76fde6e2c32d989c17731eac900c314a30c534a419491c",
+    "voice": "en-US-GuyNeural",
+    "size": 1296000,
+    "chars": 3447
+  },
+  "aggregate-functions-internals": {
+    "hash": "44b6f4e8777c0942674cfad5c3a0ba98e04a7874dc2cdad4eab93dbf5f612a35",
+    "voice": "en-US-GuyNeural",
+    "size": 1470000,
+    "chars": 3490
+  },
+  "group-by-execution-mechanics": {
+    "hash": "129dfd6cbe876285eafdf16e5a0f6774c106a067eb89b9050da4c340d9fe6137",
+    "voice": "en-US-GuyNeural",
+    "size": 1644000,
+    "chars": 2883
+  },
+  "having-vs-where-pipeline": {
+    "hash": "b5555741ff43ec7bb21420939c70d7be6d086831e78b64fa45f7fb7afe423242",
+    "voice": "en-US-GuyNeural",
+    "size": 1818000,
+    "chars": 2926
+  },
+  "conditional-aggregation-filter": {
+    "hash": "3d92dc7132f4ec18bc170c3381a30a62a0ef3dc0a8c0d1ec2d48c641717e4c1b",
+    "voice": "en-US-GuyNeural",
+    "size": 1362000,
+    "chars": 2969
+  },
+  "string-json-array-aggregation": {
+    "hash": "855582fee82ec9f88dc990f16cb945c239ea96fb20a69b8dfd253c3997e1e647",
+    "voice": "en-US-GuyNeural",
+    "size": 1536000,
+    "chars": 3012
+  },
+  "grouping-sets-rollup-cube": {
+    "hash": "6a1565fb27c2f0b9ca31b311227406b599efa5345b42d52f150e638f8f7e8c2c",
+    "voice": "en-US-GuyNeural",
+    "size": 1710000,
+    "chars": 3055
+  },
+  "join-fanout-chasm-traps": {
+    "hash": "6ab7fc56800cb0b223cf319e111d6d39b24d52bff5da551b0ab13017dc683e44",
+    "voice": "en-US-GuyNeural",
+    "size": 1884000,
+    "chars": 3098
+  },
+  "histograms-percentiles-medians": {
+    "hash": "5fd6f79c4354d997b446bad28bce082359b4465f720e9937089969360cd536b6",
+    "voice": "en-US-GuyNeural",
+    "size": 1428000,
+    "chars": 3141
+  },
+  "case-analytics-double-counting-bug": {
+    "hash": "8acd26edb6c4c899d531b49e67f1463e76b0f084b072dbf12ba48d47c4df9a0d",
+    "voice": "en-US-GuyNeural",
+    "size": 1602000,
+    "chars": 3184
+  },
+  "build-executive-kpi-aggregation-suite": {
+    "hash": "48536d7a5cfddc675eafbff3c85e5223232f78f703b580bb263038bf7de5f09c",
+    "voice": "en-US-GuyNeural",
+    "size": 1776000,
+    "chars": 3227
+  },
+  "scalar-row-table-subqueries": {
+    "hash": "9da5d05ee000944065404247b37859034e666a16deb2c60f3435d298dc8c87a9",
+    "voice": "en-US-GuyNeural",
+    "size": 1320000,
+    "chars": 3270
+  },
+  "correlated-subqueries-mechanics": {
+    "hash": "f24e23832cb181113b09c7b8308ca7888eeba2a079c824d9b4c51bf2faebd4d8",
+    "voice": "en-US-GuyNeural",
+    "size": 1494000,
+    "chars": 3313
+  },
+  "exists-not-exists-null-safety": {
+    "hash": "f288abbfa8e16b8ebfec0337006cc734b8ef97e29495f774cb454fb96422aa4b",
+    "voice": "en-US-GuyNeural",
+    "size": 1668000,
+    "chars": 3356
+  },
+  "lateral-joins-cross-apply": {
+    "hash": "f12f442589123ea440fb72e87161947200cf5aa18230362e6a4fe814dc291046",
+    "voice": "en-US-GuyNeural",
+    "size": 1842000,
+    "chars": 3399
+  },
+  "common-table-expressions-with": {
+    "hash": "4258bbce55af8f8480e8dd83669b16ceb60fb253f34505526b29b95256279b24",
+    "voice": "en-US-GuyNeural",
+    "size": 1386000,
+    "chars": 3442
+  },
+  "cte-materialization-optimization-fence": {
+    "hash": "a2ebcdabe7db8761971acd79ffdf18a2d47e8f708b8f19b5d395838e665ac33a",
+    "voice": "en-US-GuyNeural",
+    "size": 1560000,
+    "chars": 3485
+  },
+  "recursive-ctes-hierarchies": {
+    "hash": "9ff639f650b1ee7fea531aadf891a4ebc09adf9d82218dbff8062cda4025719b",
+    "voice": "en-US-GuyNeural",
+    "size": 1734000,
+    "chars": 2878
+  },
+  "graph-traversal-cycle-detection-sql": {
+    "hash": "bd7427d21f38e36b1dba09eb86c6dab28ebe44a93d8dcaa982aded51e1013314",
+    "voice": "en-US-GuyNeural",
+    "size": 1908000,
+    "chars": 2921
+  },
+  "case-recursive-org-permission-engine": {
+    "hash": "84dd0cb083ccd0df7bd48b02670551c1ae442ba580338281da85c4f7775658eb",
+    "voice": "en-US-GuyNeural",
+    "size": 1452000,
+    "chars": 2964
+  },
+  "build-hierarchical-graph-query-engine": {
+    "hash": "f57057938ee4411d77702e2e177f7c4c62a4395bc407b4c1e1ec6a3d5ea1ab8e",
+    "voice": "en-US-GuyNeural",
+    "size": 1626000,
+    "chars": 3007
+  },
+  "window-functions-mental-model": {
+    "hash": "834b9cbdded38f2f46377789077a817a9cadea1ad4695d3d7ad3b501bba6b847",
+    "voice": "en-US-GuyNeural",
+    "size": 1800000,
+    "chars": 3050
+  },
+  "partition-by-order-by-mechanics": {
+    "hash": "5f1eeb73eed232fe030e53d63e85ed427b37b14d0fa056ca589ac8ed28cb6f1b",
+    "voice": "en-US-GuyNeural",
+    "size": 1344000,
+    "chars": 3093
+  },
+  "ranking-functions-row-number-rank": {
+    "hash": "5b11b60fb8c18587aeb2672c0d841483ca5f2bb01474d198f35224bda820267d",
+    "voice": "en-US-GuyNeural",
+    "size": 1518000,
+    "chars": 3136
+  },
+  "top-n-per-group-deduplication": {
+    "hash": "e9acb741cab1ae9d627e2f7835984082f5f10acc2e31f3b0cc7a6096300a2d44",
+    "voice": "en-US-GuyNeural",
+    "size": 1692000,
+    "chars": 3179
+  },
+  "offset-functions-lag-lead-first-last": {
+    "hash": "91095589fd13328cdb819301562923ec5fc2e8c0401257d2a3bd185d56c682ef",
+    "voice": "en-US-GuyNeural",
+    "size": 1866000,
+    "chars": 3222
+  },
+  "window-frames-rows-range-groups": {
+    "hash": "96a78b3b312f105335fa22b45e531f72ddd03ef92f27c361893b63e32a2eaf3f",
+    "voice": "en-US-GuyNeural",
+    "size": 1410000,
+    "chars": 3265
+  },
+  "running-totals-cumulative-shares": {
+    "hash": "cdf3a69f5e27de423b38d8ce877540acca3f5b7ea5e02e5fb8f0671767189853",
+    "voice": "en-US-GuyNeural",
+    "size": 1584000,
+    "chars": 3308
+  },
+  "gaps-and-islands-sessionization": {
+    "hash": "f0e8567346e4ed730dbc6ae73a46c876eaf7867e3765172e526fde3565013867",
+    "voice": "en-US-GuyNeural",
+    "size": 1758000,
+    "chars": 3351
+  },
+  "case-fintech-velocity-fraud-window": {
+    "hash": "9155528435cc08a13e82151ffde8de72a236d31b3dd376783e287b42dcc48915",
+    "voice": "en-US-GuyNeural",
+    "size": 1302000,
+    "chars": 3394
+  },
+  "build-sessionization-retention-engine": {
+    "hash": "41764d0103bc5b5e9659674656034f010a19829cc90bbc4c7348055e89f37e9e",
+    "voice": "en-US-GuyNeural",
+    "size": 1476000,
+    "chars": 3437
+  },
+  "entity-relationship-modeling": {
+    "hash": "cfb42ab4e86b2e5fd6c63996a23fec43f2e34332dcbaa86545d7789d54916b4d",
+    "voice": "en-US-GuyNeural",
+    "size": 1650000,
+    "chars": 3480
+  },
+  "functional-dependencies-keys": {
+    "hash": "8014f8467acfb8b1453aa436949bc2ffb97263cfaa6b78c6b52b20d7f1db2659",
+    "voice": "en-US-GuyNeural",
+    "size": 1824000,
+    "chars": 2873
+  },
+  "first-normal-form-atomicity": {
+    "hash": "2a5c00e44b87e1f7fb302e8c706d972426c9a2cdb59ceb9da12c77e6572af8e4",
+    "voice": "en-US-GuyNeural",
+    "size": 1368000,
+    "chars": 2916
+  },
+  "second-third-normal-form": {
+    "hash": "de3e448c7fa9db1d27a903d3310ab76b9e6a64edeab8785f6bf4d6c780bebd14",
+    "voice": "en-US-GuyNeural",
+    "size": 1542000,
+    "chars": 2959
+  },
+  "boyce-codd-fourth-fifth-normal-form": {
+    "hash": "444631736a692760f794536e4c173c0e302e3c519b48d246c69bd3dbe985bad5",
+    "voice": "en-US-GuyNeural",
+    "size": 1716000,
+    "chars": 3002
+  },
+  "update-insertion-deletion-anomalies": {
+    "hash": "a10fda105ccf7fd7e995229289bba7b1b57c0dd41deef049a6dedfe02dc2a5db",
+    "voice": "en-US-GuyNeural",
+    "size": 1890000,
+    "chars": 3045
+  },
+  "strategic-denormalization-tradeoffs": {
+    "hash": "d844c9efeadc2a5b4d9c09be2d91be827a212e92f59d18dea32a85422ead5db2",
+    "voice": "en-US-GuyNeural",
+    "size": 1434000,
+    "chars": 3088
+  },
+  "schema-anti-patterns-eav-god-tables": {
+    "hash": "c9f0b0959e9b95622302e3cec381e719ed4d7caa8a795bc8f9641a5aae7eaab3",
+    "voice": "en-US-GuyNeural",
+    "size": 1608000,
+    "chars": 3131
+  },
+  "case-shopify-multi-tenant-schema": {
+    "hash": "4c592c5c5fe6ac0ddc08ceab8f1891a4b3c2661b7cac57b62ed9a98f5e7d30a1",
+    "voice": "en-US-GuyNeural",
+    "size": 1782000,
+    "chars": 3174
+  },
+  "build-normalized-booking-schema": {
+    "hash": "aa7884ac5759ee77b3fb78e8e65e31519b085d70b6ac8197c45bf183b3655c03",
+    "voice": "en-US-GuyNeural",
+    "size": 1326000,
+    "chars": 3217
+  },
+  "oltp-vs-olap-workload-physics": {
+    "hash": "d6498ef49ea644d0977f7296b4b5b441d418cbf2d42833bd6a5e256394da0891",
+    "voice": "en-US-GuyNeural",
+    "size": 1500000,
+    "chars": 3260
+  },
+  "star-schema-facts-dimensions": {
+    "hash": "9702993b09323807b7d965e8cb47641586a6fe7308896550e63866dc9038bd7b",
+    "voice": "en-US-GuyNeural",
+    "size": 1674000,
+    "chars": 3303
+  },
+  "snowflake-vs-star-vs-obt": {
+    "hash": "6585b98f861e28ce0aa087bad4d5d195397117e26d57c052e8aa1d13b50d9ad7",
+    "voice": "en-US-GuyNeural",
+    "size": 1848000,
+    "chars": 3346
+  },
+  "slowly-changing-dimensions-scd": {
+    "hash": "af3a1d421dd10565e349c29d06a7bc066a856e09633b7ab7f371b0f63313be4f",
+    "voice": "en-US-GuyNeural",
+    "size": 1392000,
+    "chars": 3389
+  },
+  "bridge-tables-junk-role-dimensions": {
+    "hash": "7364bff41455b65a9a8b6f33ce70f1f3bfa7aeeedc914cfbe6aebebb53a0ab1a",
+    "voice": "en-US-GuyNeural",
+    "size": 1566000,
+    "chars": 3432
+  },
+  "temporal-tables-bitemporal-sql": {
+    "hash": "b3c5ebd0fa20d28b0eacda14b55f34e7525fe219150360f275bef921989d5728",
+    "voice": "en-US-GuyNeural",
+    "size": 1740000,
+    "chars": 3475
+  },
+  "json-semi-structured-hybrid-schemas": {
+    "hash": "c4b2d8c742a576890e0b4335ae9161aad9412a364afa2695a44b3c44bfa9eade",
+    "voice": "en-US-GuyNeural",
+    "size": 1914000,
+    "chars": 2868
+  },
+  "idempotency-audit-logs-event-tables": {
+    "hash": "55a737a74859b59e52945d4e322b78a5cf0a12c455e1137b054371cd46887007",
+    "voice": "en-US-GuyNeural",
+    "size": 1458000,
+    "chars": 2911
+  },
+  "case-airbnb-minerva-metric-layer": {
+    "hash": "c18ccbe3dfc8ac657833d726db9db270f2c052ee97be9146238bb6e93b49a674",
+    "voice": "en-US-GuyNeural",
+    "size": 1632000,
+    "chars": 2954
+  },
+  "build-scd-type2-warehouse-pipeline": {
+    "hash": "58798757741ba83249274e5c4bcb710916e0596ea912feea5ddda02c24945bb8",
+    "voice": "en-US-GuyNeural",
+    "size": 1806000,
+    "chars": 2997
+  },
+  "calendar-tables-date-spines": {
+    "hash": "f73eeb9fc61c5c45940c88a6810c7cf4783b207d1e803f7465c4ef5dae774b7b",
+    "voice": "en-US-GuyNeural",
+    "size": 1350000,
+    "chars": 3040
+  },
+  "cohort-retention-matrix-sql": {
+    "hash": "e255037bbc159d0464fdd07e485f8b7e88bf5f42f5b583a1d4442ac9b9957d8d",
+    "voice": "en-US-GuyNeural",
+    "size": 1524000,
+    "chars": 3083
+  },
+  "funnel-conversion-attribution-sql": {
+    "hash": "71a58045dc54ca3a076e2c1ac72e802ac4cfe3767c6909577b971268565a083a",
+    "voice": "en-US-GuyNeural",
+    "size": 1698000,
+    "chars": 3126
+  },
+  "interval-overlap-allen-algebra": {
+    "hash": "35831011d6a3828ccf4e3c24ac33854ae1ba6093dc1d1625440a4aec29f91a39",
+    "voice": "en-US-GuyNeural",
+    "size": 1872000,
+    "chars": 3169
+  },
+  "pivoting-unpivoting-cross-tabs": {
+    "hash": "c963752780de0ecadd1bade63f48d392edd6d3c1d54370b5c65baafc3f15b6eb",
+    "voice": "en-US-GuyNeural",
+    "size": 1416000,
+    "chars": 3212
+  },
+  "triggers-stored-procedures-udfs": {
+    "hash": "8743355eb9f42608dfb5ab591436574ce1d0b3cb4e930068199b1f58cf0ffc84",
+    "voice": "en-US-GuyNeural",
+    "size": 1590000,
+    "chars": 3255
+  },
+  "materialized-views-incremental-refresh": {
+    "hash": "e4cde5bd150373421d4d1c3887365ee7ae60109a04585af935eba386011b2a23",
+    "voice": "en-US-GuyNeural",
+    "size": 1764000,
+    "chars": 3298
+  },
+  "sql-injection-parameterized-security": {
+    "hash": "4d496f7ab2475f04aadd48dccb2f1c1b52e1347d21b448b080e9d63a6f9aa41e",
+    "voice": "en-US-GuyNeural",
+    "size": 1308000,
+    "chars": 3341
+  },
+  "case-double-booking-hotel-inventory": {
+    "hash": "942449abf7866ccc322be17de46ebec52e5d1eaf8c649551b2f3b591a89f559f",
+    "voice": "en-US-GuyNeural",
+    "size": 1482000,
+    "chars": 3384
+  },
+  "build-saas-cohort-funnel-workbench": {
+    "hash": "39fb128b85d8cbe9fe8fdaf6e42ba6a8d3dc9f352a7b91c21b2e7e053dbb0080",
+    "voice": "en-US-GuyNeural",
+    "size": 1656000,
+    "chars": 3427
+  },
+  "why-indexes-work-io-cost-model": {
+    "hash": "10ca053cf608b60e7478482089e04fd2b9c2bddd5f385ba8786d4132725c1730",
+    "voice": "en-US-GuyNeural",
+    "size": 1830000,
+    "chars": 3470
+  },
+  "btree-bplustree-internal-anatomy": {
+    "hash": "12f16d352df4eefacea548b0a8d6904fcda110b006f0aa56cbe5f3ec66253158",
+    "voice": "en-US-GuyNeural",
+    "size": 1374000,
+    "chars": 2863
+  },
+  "clustered-vs-secondary-indexes": {
+    "hash": "12ae9687dcb7625821bed07904e6bc6c35fc17934a4c5834de3eea5c5bad0698",
+    "voice": "en-US-GuyNeural",
+    "size": 1548000,
+    "chars": 2906
+  },
+  "composite-indexes-leftmost-prefix": {
+    "hash": "0a0299cce2029cbc7dafd495ecdb3337cc3a188a29399e54948d6b61cc040a83",
+    "voice": "en-US-GuyNeural",
+    "size": 1722000,
+    "chars": 2949
+  },
+  "covering-indexes-index-only-scans": {
+    "hash": "1e3326e567fc6b5d8d588d907d693b2c4d16ea58a177e530dfaed16a13d056a4",
+    "voice": "en-US-GuyNeural",
+    "size": 1896000,
+    "chars": 2992
+  },
+  "partial-filtered-expression-indexes": {
+    "hash": "1df2568021d86d3d148e45360d4d07b5532bf23dc02da05956f395c3f4ee4ea2",
+    "voice": "en-US-GuyNeural",
+    "size": 1440000,
+    "chars": 3035
+  },
+  "hash-gin-gist-brin-bloom-indexes": {
+    "hash": "fa1b9acaf6df76d856369e3d2ab8aad0c8f41149abfd5fb7084f322c349a7794",
+    "voice": "en-US-GuyNeural",
+    "size": 1614000,
+    "chars": 3078
+  },
+  "index-bloat-write-amplification-traps": {
+    "hash": "3c84ed21e58fd3ff731874985b152428cb9c05dcf59af0611c26e8084ddcf0a4",
+    "voice": "en-US-GuyNeural",
+    "size": 1788000,
+    "chars": 3121
+  },
+  "case-slack-composite-index-incident": {
+    "hash": "7a3d9ba0b515a0eb8782804a960d0572fb23a833fee8f43e2915e0db69c2cb3e",
+    "voice": "en-US-GuyNeural",
+    "size": 1332000,
+    "chars": 3164
+  },
+  "build-btree-index-advisor": {
+    "hash": "8b682a7c16c318fb66afc39fae15332a38cec03f39846de218668d3060bcd218",
+    "voice": "en-US-GuyNeural",
+    "size": 1506000,
+    "chars": 3207
+  },
+  "life-of-a-sql-query-pipeline": {
+    "hash": "7dbb772dd00fe6a651d07fa66588084fe295cdd839ba879dd9549a9fa4b9ae00",
+    "voice": "en-US-GuyNeural",
+    "size": 1680000,
+    "chars": 3250
+  },
+  "reading-explain-and-explain-analyze": {
+    "hash": "c6812d20fe57ee45ed90d93cc769da48b2a09eb171ab9ed666279610da2cec91",
+    "voice": "en-US-GuyNeural",
+    "size": 1854000,
+    "chars": 3293
+  },
+  "table-statistics-histograms-cardinality": {
+    "hash": "c012af04062da0adb7e776b60ba5e0cdc2f770c294f785591bf8f0d13c853212",
+    "voice": "en-US-GuyNeural",
+    "size": 1398000,
+    "chars": 3336
+  },
+  "selectivity-estimation-correlated-columns": {
+    "hash": "e6fe07658ec22dc4fb8bf120085ae0271b8f1971392b61c7bcac183c1c63dcec",
+    "voice": "en-US-GuyNeural",
+    "size": 1572000,
+    "chars": 3379
+  },
+  "scan-operators-seq-index-bitmap": {
+    "hash": "edf84769a6e29237c2ac89ea031cc82db6443588b4d32355d0fe4d94e6d32246",
+    "voice": "en-US-GuyNeural",
+    "size": 1746000,
+    "chars": 3422
+  },
+  "sargability-functions-on-columns": {
+    "hash": "18364a04b32aaef0572d0c05da3bfa1538e12701838a5880e73c52c3a1813edc",
+    "voice": "en-US-GuyNeural",
+    "size": 1290000,
+    "chars": 3465
+  },
+  "or-conditions-in-lists-union-rewrites": {
+    "hash": "64418fb5ac8adc2130ef378288ad7985580687cf5bf9bcd3fb350a823020372d",
+    "voice": "en-US-GuyNeural",
+    "size": 1464000,
+    "chars": 2858
+  },
+  "sorting-spill-to-disk-top-n-heapsort": {
+    "hash": "2d8831c0cfe13b548ea2a86d66637e0c2a5d418ac0fda234c1c24c88fd9a663d",
+    "voice": "en-US-GuyNeural",
+    "size": 1638000,
+    "chars": 2901
+  },
+  "case-stale-statistics-plan-flip": {
+    "hash": "1e48d41c54f553adc6fef4cb7b7ef2a9d7182d70120dd3a8cb267d297f75fa5a",
+    "voice": "en-US-GuyNeural",
+    "size": 1812000,
+    "chars": 2944
+  },
+  "build-visual-explain-plan-analyzer": {
+    "hash": "25815d35403b24c88a325a7ffc2314477f78d8cc3507d6192c771ab5f0b9bda9",
+    "voice": "en-US-GuyNeural",
+    "size": 1356000,
+    "chars": 2987
+  },
+  "nested-loop-join-indexed-nlj": {
+    "hash": "df7fb96b0bfc40bbee57d3054cfa3f26d61a18e187107e6f7079edfb49505413",
+    "voice": "en-US-GuyNeural",
+    "size": 1530000,
+    "chars": 3030
+  },
+  "hash-join-build-probe-grace": {
+    "hash": "aa991c1cade99fcd4f2a03e46ce3da98f4e293c44f34d28c5e133bd2199ce0c4",
+    "voice": "en-US-GuyNeural",
+    "size": 1704000,
+    "chars": 3073
+  },
+  "sort-merge-join-zipper-mechanics": {
+    "hash": "42ee475ab0cd173c693cf8e5c615cd5ee3da5852a4cc63ea8df9ba22c6cbd4f2",
+    "voice": "en-US-GuyNeural",
+    "size": 1878000,
+    "chars": 3116
+  },
+  "join-order-search-dynamic-programming": {
+    "hash": "55da69edbd257f033e936c50e3f3de8070cd950844fd2e7fc18019aea77565c7",
+    "voice": "en-US-GuyNeural",
+    "size": 1422000,
+    "chars": 3159
+  },
+  "predicate-pushdown-projection-pruning": {
+    "hash": "4197675312ccb4b16d9cc337d17562007e1284d509fb10905ebbbf3e1108e4d5",
+    "voice": "en-US-GuyNeural",
+    "size": 1596000,
+    "chars": 3202
+  },
+  "subquery-unnesting-semi-anti-physical": {
+    "hash": "df801ada5865c4a29e4d8b9bf0007ffa8e093d0c887caf4fd576d6f92f565f7b",
+    "voice": "en-US-GuyNeural",
+    "size": 1770000,
+    "chars": 3245
+  },
+  "execution-models-volcano-vectorized": {
+    "hash": "9c835211dc81e801a892a80744ed8a811a7bb1fe178e8ce7c2b0ee1a7638a0cf",
+    "voice": "en-US-GuyNeural",
+    "size": 1314000,
+    "chars": 3288
+  },
+  "parallel-query-execution-workers": {
+    "hash": "c0a69c33b9eb5b018d8795492f2c962035989306b50bf7356138ce75dfd6ffef",
+    "voice": "en-US-GuyNeural",
+    "size": 1488000,
+    "chars": 3331
+  },
+  "case-hash-join-oom-work-mem-spill": {
+    "hash": "ac332dc04bf7937c3fd4d0bf11dab5fe6dc65fa9cfb0242791c522295e5d4aa6",
+    "voice": "en-US-GuyNeural",
+    "size": 1662000,
+    "chars": 3374
+  },
+  "build-physical-join-execution-engine": {
+    "hash": "49c4b7a5f7c1932fb2128d6511d2ba60a9f455b92be9636a38ccffceee174ce5",
+    "voice": "en-US-GuyNeural",
+    "size": 1836000,
+    "chars": 3417
+  },
+  "acid-properties-under-the-hood": {
+    "hash": "ffd724e4b8f7a782c2658aa802399872f5b2eb85633165112f5042f5c941c349",
+    "voice": "en-US-GuyNeural",
+    "size": 1380000,
+    "chars": 3460
+  },
+  "transaction-lifecycle-savepoints": {
+    "hash": "cc1c5d211b969eff594c109030ac4d0f81d37dc9f74414d8f16a249908b4e735",
+    "voice": "en-US-GuyNeural",
+    "size": 1554000,
+    "chars": 2853
+  },
+  "read-phenomena-dirty-nonrepeatable-phantom": {
+    "hash": "21a8d7d533eb78f74c3f570897c10bbdc100d3f5ee38d8e9949f49d1cd529e24",
+    "voice": "en-US-GuyNeural",
+    "size": 1728000,
+    "chars": 2896
+  },
+  "write-anomalies-lost-update-write-skew": {
+    "hash": "45c47aeb4f2a6471c14757db6ce8cf3d9cab6216606c1cd102375f65e5c8ba45",
+    "voice": "en-US-GuyNeural",
+    "size": 1902000,
+    "chars": 2939
+  },
+  "read-uncommitted-read-committed": {
+    "hash": "76c2c4e75e7de25ffcf9af4d7bb12363fd8b80b834d50145dd20a1f7a9f4de1e",
+    "voice": "en-US-GuyNeural",
+    "size": 1446000,
+    "chars": 2982
+  },
+  "repeatable-read-snapshot-isolation": {
+    "hash": "1775412affd2e35673dbb2d5aa0d2e361cd2304b83c799e811835dff38e82e34",
+    "voice": "en-US-GuyNeural",
+    "size": 1620000,
+    "chars": 3025
+  },
+  "serializable-2pl-vs-ssi": {
+    "hash": "126fa727d88811af8fd055ce460b62f8caba252fe68c8b0a3b69fe65fc356f9d",
+    "voice": "en-US-GuyNeural",
+    "size": 1794000,
+    "chars": 3068
+  },
+  "optimistic-vs-pessimistic-concurrency": {
+    "hash": "95847f75bcd3a3c1cb012feabb2ab1be5a98bd7e678055549c39fa03217ef11d",
+    "voice": "en-US-GuyNeural",
+    "size": 1338000,
+    "chars": 3111
+  },
+  "case-fintech-double-spend-race-condition": {
+    "hash": "21970ee5aab47693093200925f8ff50db24bcdc2c877c7ec0100a3aea8091b79",
+    "voice": "en-US-GuyNeural",
+    "size": 1512000,
+    "chars": 3154
+  },
+  "build-transaction-anomaly-simulator": {
+    "hash": "c5e8a28878b1a50bb4e6859a975ed1af7582c15d15deb3238dbe94e7f1a53b19",
+    "voice": "en-US-GuyNeural",
+    "size": 1686000,
+    "chars": 3197
+  },
+  "multi-version-concurrency-control-mvcc": {
+    "hash": "74d0976cfd0c3c30971448e7aadc122c9992d251d7d314a365d2d6ee93920504",
+    "voice": "en-US-GuyNeural",
+    "size": 1860000,
+    "chars": 3240
+  },
+  "tuple-headers-xmin-xmax-visibility": {
+    "hash": "450bf27eae0f2fcbbd7cd74037b6d56cf94894ecd263f8f1fffeef5a3992bd5c",
+    "voice": "en-US-GuyNeural",
+    "size": 1404000,
+    "chars": 3283
+  },
+  "transaction-snapshots-visibility-rules": {
+    "hash": "e708b02df453f8b66d6998c8d6a767d4ab894c6925eba7b9d42937bd43ab6316",
+    "voice": "en-US-GuyNeural",
+    "size": 1578000,
+    "chars": 3326
+  },
+  "row-level-locks-for-update-skip-locked": {
+    "hash": "08b6ceed958ad59b407c0f6e0a58f9568338b19d513f240cd4f5954ff462d354",
+    "voice": "en-US-GuyNeural",
+    "size": 1752000,
+    "chars": 3369
+  },
+  "table-locks-intention-locks-ddl-hazards": {
+    "hash": "ccca93bc651e0bb4ed5d6bdcfa94347a6e2c51f189be7fc5e80bdf828dc3ed33",
+    "voice": "en-US-GuyNeural",
+    "size": 1296000,
+    "chars": 3412
+  },
+  "gap-locks-next-key-locks-innodb": {
+    "hash": "df78f18e3f09ba18d93f2d9e0d73333ccb5d8ebc765d4cd801aa51add890e852",
+    "voice": "en-US-GuyNeural",
+    "size": 1470000,
+    "chars": 3455
+  },
+  "deadlocks-wait-for-graphs-detection": {
+    "hash": "68a517ea8156512b1a703766fee69398562a95569cfbdbb276b49190fd688729",
+    "voice": "en-US-GuyNeural",
+    "size": 1644000,
+    "chars": 3498
+  },
+  "dead-tuples-bloat-autovacuum-txid-wraparound": {
+    "hash": "8f077502717932080c05020779ac87126c2dca8152a041f2d19d5611becdd19b",
+    "voice": "en-US-GuyNeural",
+    "size": 1818000,
+    "chars": 2891
+  },
+  "case-sentry-transaction-id-wraparound": {
+    "hash": "17c41f897309325e11ba1015360a3bb248e8380a9b876c0a9dc4c519dccd702a",
+    "voice": "en-US-GuyNeural",
+    "size": 1362000,
+    "chars": 2934
+  },
+  "build-mvcc-snapshot-storage-engine": {
+    "hash": "f8ecb249962c9f490b6db010c1732896e570e5b522b2359e8f446e5f38b5e24a",
+    "voice": "en-US-GuyNeural",
+    "size": 1536000,
+    "chars": 2977
+  },
+  "slotted-page-layout-8kb-anatomy": {
+    "hash": "b85711c644b3386d91a44c31188aa3d82808a3dd1e5bc0dccad73ab7b0d80976",
+    "voice": "en-US-GuyNeural",
+    "size": 1710000,
+    "chars": 3020
+  },
+  "heap-files-hot-updates-fillfactor": {
+    "hash": "6e13e7c20987ab8ddb289a7f941ceb6b20bb408bdce805ebc2db767d26ea5c1e",
+    "voice": "en-US-GuyNeural",
+    "size": 1884000,
+    "chars": 3063
+  },
+  "buffer-pool-clock-sweep-lru-k": {
+    "hash": "585869499fe689231bf7ee3f8e78ea5a8ba972af5cc90afc6fe77e036d834eca",
+    "voice": "en-US-GuyNeural",
+    "size": 1428000,
+    "chars": 3106
+  },
+  "write-ahead-logging-wal-lsn": {
+    "hash": "c226746a589b603a05696172dd2ef7b071e6adefeb31966bf05f8003d7bbbdb0",
+    "voice": "en-US-GuyNeural",
+    "size": 1602000,
+    "chars": 3149
+  },
+  "checkpoints-dirty-page-flushing": {
+    "hash": "0bb0920879f5cf4e2317ade3c8204a7cd038a7353a71d348bd9e606b2933be78",
+    "voice": "en-US-GuyNeural",
+    "size": 1776000,
+    "chars": 3192
+  },
+  "aries-crash-recovery-analysis-redo-undo": {
+    "hash": "c95cab7bf8ecdb95cd79d50d5eb7896ce3af5d906d6b283283f3ae554498c5be",
+    "voice": "en-US-GuyNeural",
+    "size": 1320000,
+    "chars": 3235
+  },
+  "lsm-trees-memtable-sstable-compaction": {
+    "hash": "79196925a33f676122d08b8e39912a46eb125382b482227d80f39cdb69531d5e",
+    "voice": "en-US-GuyNeural",
+    "size": 1494000,
+    "chars": 3278
+  },
+  "btree-vs-lsm-read-write-space-amplification": {
+    "hash": "23e986414810d87911e6ce92683171b18a4fb673174e37d6801610fe98ed6f59",
+    "voice": "en-US-GuyNeural",
+    "size": 1668000,
+    "chars": 3321
+  },
+  "case-uber-postgres-to-mysql-storage": {
+    "hash": "4eb4f1471f4277cc9896a99d329aa5b753497d794404db2f52d0eb97f4073bd9",
+    "voice": "en-US-GuyNeural",
+    "size": 1842000,
+    "chars": 3364
+  },
+  "build-slotted-page-wal-engine": {
+    "hash": "c54b611f137dede2f1bef442be107968649df98b0208c2af70901517abf0fc9c",
+    "voice": "en-US-GuyNeural",
+    "size": 1386000,
+    "chars": 3407
+  },
+  "columnar-storage-layout-parquet": {
+    "hash": "80b95755d2c9913cf5ae89bed9eec87d1301bd4a6a5907c7cb752646fc413271",
+    "voice": "en-US-GuyNeural",
+    "size": 1560000,
+    "chars": 3450
+  },
+  "columnar-compression-rle-dictionary-delta": {
+    "hash": "5b7c409608ead0956b51cf1b4ccd06057f2e54e71456deeeacf50cf02644a578",
+    "voice": "en-US-GuyNeural",
+    "size": 1734000,
+    "chars": 3493
+  },
+  "late-materialization-simd-vectorization": {
+    "hash": "c86017c5fd56ca0b6b7bd7edb7dd301a268432a35fa85588bbfd771fa182ed8a",
+    "voice": "en-US-GuyNeural",
+    "size": 1908000,
+    "chars": 2886
+  },
+  "zone-maps-min-max-pruning-bloom": {
+    "hash": "11820d5fd4ea462720ef57fac214e7d0cf3851f5110e0d1e20ae358a4bc0b83a",
+    "voice": "en-US-GuyNeural",
+    "size": 1452000,
+    "chars": 2929
+  },
+  "embedded-olap-duckdb-architecture": {
+    "hash": "362929c1f7223fb20f88f420e0d9d43a6cc82130ae8761167212d7841d9ca5bc",
+    "voice": "en-US-GuyNeural",
+    "size": 1626000,
+    "chars": 2972
+  },
+  "realtime-olap-clickhouse-mergetree": {
+    "hash": "8dea9428793f3677993774c1e0919b1fcd29e0816811e2634fe4b1cbcdf93397",
+    "voice": "en-US-GuyNeural",
+    "size": 1800000,
+    "chars": 3015
+  },
+  "cloud-warehouses-snowflake-bigquery": {
+    "hash": "e674d0cae115baa3594d74ca783725cf7189a29bfb56effb5ebf4477a264d063",
+    "voice": "en-US-GuyNeural",
+    "size": 1344000,
+    "chars": 3058
+  },
+  "open-table-formats-iceberg-delta": {
+    "hash": "0cf0f648d882d434fd3a9e1e3d7f206bb720c5948bc6cbb2f64f3b443e39317d",
+    "voice": "en-US-GuyNeural",
+    "size": 1518000,
+    "chars": 3101
+  },
+  "case-cloudflare-clickhouse-log-analytics": {
+    "hash": "dc21574302fc73e54ee3630ed98e95755c78a867aaf37e99e6abd4a6f4183ae2",
+    "voice": "en-US-GuyNeural",
+    "size": 1692000,
+    "chars": 3144
+  },
+  "build-columnar-compression-query-engine": {
+    "hash": "f105359010348e485b8a30011f14e4daca8cd6972d101a3d8e40b9b1a92df516",
+    "voice": "en-US-GuyNeural",
+    "size": 1866000,
+    "chars": 3187
+  },
+  "single-leader-replication-sync-async": {
+    "hash": "f9a1a7fc83557d32aa09b8c578ec880126e6a47327c2be87277c07ecf77308fa",
+    "voice": "en-US-GuyNeural",
+    "size": 1410000,
+    "chars": 3230
+  },
+  "read-replicas-consistency-models": {
+    "hash": "ca1907b12b1e3b7eabb57239f04b88d659d7b1f8b83601c5edf1fc330d767c13",
+    "voice": "en-US-GuyNeural",
+    "size": 1584000,
+    "chars": 3273
+  },
+  "failover-split-brain-fencing-tokens": {
+    "hash": "57bf07b164f20c2163fe4b4ddacbb125aaf3fd886491ae6323807a86e9784638",
+    "voice": "en-US-GuyNeural",
+    "size": 1758000,
+    "chars": 3316
+  },
+  "declarative-table-partitioning": {
+    "hash": "a5563edecac212f5364283a30f44102a268550d1a3c06ede082e4c2a949774d5",
+    "voice": "en-US-GuyNeural",
+    "size": 1302000,
+    "chars": 3359
+  },
+  "horizontal-sharding-routing-keys": {
+    "hash": "51318217660a2602cf29c533957f2342ff1869e786a722039ff63594491718e4",
+    "voice": "en-US-GuyNeural",
+    "size": 1476000,
+    "chars": 3402
+  },
+  "distributed-transactions-2pc-saga": {
+    "hash": "73acd8fcb52bc3ceca5a55b84535482a6e03838ff17c9bf572f4ff54b1069663",
+    "voice": "en-US-GuyNeural",
+    "size": 1650000,
+    "chars": 3445
+  },
+  "distributed-sql-spanner-cockroachdb": {
+    "hash": "835795660c4542b8d8ed652d07df5926bf1db631195c5d38716fdaddce14c92f",
+    "voice": "en-US-GuyNeural",
+    "size": 1824000,
+    "chars": 3488
+  },
+  "connection-pooling-pgbouncer-proxies": {
+    "hash": "5bf351ffedce83cff7851022bf5341bc1bf91354ea75acbd7f20aec37b9c56bd",
+    "voice": "en-US-GuyNeural",
+    "size": 1368000,
+    "chars": 2881
+  },
+  "case-figma-postgres-horizontal-sharding": {
+    "hash": "e1b6532c16499d8cf9b60a4dd4886699165ec1612a0690d224f9d9c7d843c39c",
+    "voice": "en-US-GuyNeural",
+    "size": 1542000,
+    "chars": 2924
+  },
+  "build-sharded-query-router": {
+    "hash": "4a2b7998988e96eb343bdcb0040bcb7ed16f44b76d343f8321df3b45e36ba9e6",
+    "voice": "en-US-GuyNeural",
+    "size": 1716000,
+    "chars": 2967
+  },
+  "keyset-cursor-pagination-vs-offset": {
+    "hash": "95331203a471a50fe63998a724909354ea830da8162ab00e7f79856066a23903",
+    "voice": "en-US-GuyNeural",
+    "size": 1890000,
+    "chars": 3010
+  },
+  "solving-n-plus-one-orm-queries": {
+    "hash": "cec57a3fa1ce0114a05421e758f41d54758eb657c126d97424f9b3ea970f37e6",
+    "voice": "en-US-GuyNeural",
+    "size": 1434000,
+    "chars": 3053
+  },
+  "full-text-search-trigrams-inverted-index": {
+    "hash": "a83e538115a3122daa67bd0fad71c7dbe0e96ba1e1feb895df7e0d6081a39d53",
+    "voice": "en-US-GuyNeural",
+    "size": 1608000,
+    "chars": 3096
+  },
+  "queue-processing-skip-locked-patterns": {
+    "hash": "2091fb40a89a7e6cff8a276e81a4768af53e56ef4201ea3c89710cb2452f2e18",
+    "voice": "en-US-GuyNeural",
+    "size": 1782000,
+    "chars": 3139
+  },
+  "bulk-ingestion-batching-unlogged-tables": {
+    "hash": "b58c50c3adef21f68d790234d51477cb496a3dd7f4856d417422bfa6b5f694b0",
+    "voice": "en-US-GuyNeural",
+    "size": 1326000,
+    "chars": 3182
+  },
+  "pg-stat-statements-slow-query-triage": {
+    "hash": "e1a2f5a7fc00678771510945e5d902b96a468b4211cadf75e958a273dfcccec7",
+    "voice": "en-US-GuyNeural",
+    "size": 1500000,
+    "chars": 3225
+  },
+  "lock-contention-zero-downtime-ddl": {
+    "hash": "3f5c41f9be79fefab16353f6a4b3152656b892099907017cbab6d4278bdb4df7",
+    "voice": "en-US-GuyNeural",
+    "size": 1674000,
+    "chars": 3268
+  },
+  "backup-pitr-wal-archiving-drills": {
+    "hash": "8aa83a41756280539cdf9f22ad77ef480d494659d700666374e5db7fc8bdf689",
+    "voice": "en-US-GuyNeural",
+    "size": 1848000,
+    "chars": 3311
+  },
+  "case-gitlab-database-incident-postmortem": {
+    "hash": "ae081129efc498a293d2c404ffe2496db939137d5f25dfed3d127283d328951f",
+    "voice": "en-US-GuyNeural",
+    "size": 1392000,
+    "chars": 3354
+  },
+  "build-production-sql-tuning-clinic": {
+    "hash": "ce593b81bb40e4e8c06c3a38acd198eeceb2551044662f635d81254c1ced2216",
+    "voice": "en-US-GuyNeural",
+    "size": 1566000,
+    "chars": 3397
+  }
+}

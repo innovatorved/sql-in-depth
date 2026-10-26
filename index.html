@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SQL In Depth — Relational Databases, Query Optimization &amp; Storage Internals</title>
+  <meta name="description" content="A free, interactive, first-principles curriculum for SQL &amp; Database Internals — 6 tracks, 180 topics, browser WASM SQLite execution, table-level relational visualizers, and from-scratch builds.">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#000000">
+  
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="SQL In Depth — Relational Databases, Query Optimization &amp; Storage Internals">
+  <meta property="og:description" content="A free, interactive, first-principles curriculum for SQL &amp; Database Internals — 6 tracks, 180 topics, browser WASM SQLite execution, table-level relational visualizers, and from-scratch builds.">
+  <meta property="og:url" content="https://sql-in-depth.vedgupta.in/">
+  <meta property="og:image" content="https://sql-in-depth.vedgupta.in/assets/og-image.png">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SQL In Depth — Relational Databases, Query Optimization &amp; Storage Internals">
+  <meta name="twitter:description" content="A free, interactive, first-principles curriculum for SQL &amp; Database Internals — 6 tracks, 180 topics, browser WASM SQLite execution, table-level relational visualizers, and from-scratch builds.">
+  <meta name="twitter:image" content="https://sql-in-depth.vedgupta.in/assets/og-image.png">
+  
+  <!-- Canonical -->
+  <link rel="canonical" href="https://sql-in-depth.vedgupta.in/">
+  
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+  <link rel="preload" href="fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+  <link rel="stylesheet" href="css/variables.css?v=ad04c4a441">
+  <link rel="stylesheet" href="css/layout.css?v=a384f455dc">
+  <link rel="stylesheet" href="css/components.css?v=58f14d9639">
+  <link rel="stylesheet" href="css/content.css?v=98b657b5e4">
+  <link rel="stylesheet" href="css/landing.css?v=14b77b8c3d">
+  <link rel="stylesheet" href="css/simulators.css?v=f6ec29cd93">
+
+  <!-- Core scripts: head initializer & asset manifest -->
+  <script src="js/init.js?v=59c953e95f"></script>
+  <script src="js/manifest.js?v=f99ef6551e"></script>
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://sql-in-depth.vedgupta.in/#website",
+      "url": "https://sql-in-depth.vedgupta.in/",
+      "name": "SQL In Depth",
+      "description": "A free, interactive, first-principles curriculum for SQL & Database Systems — 6 tracks, 180 topics, live browser WASM SQLite engine, interactive table-level visualizers, and 18 from-scratch build labs.",
+      "author": {
+        "@type": "Person",
+        "name": "Ved Gupta",
+        "url": "https://vedgupta.in"
+      }
+    },
+    {
+      "@type": "Course",
+      "@id": "https://sql-in-depth.vedgupta.in/#course",
+      "name": "SQL & Database Internals In Depth",
+      "description": "An interactive, storage-grounded primary-source textbook, table-level query visualizer, and WASM SQL lab platform.",
+      "provider": {
+        "@type": "Organization",
+        "name": "SQL In Depth",
+        "url": "https://sql-in-depth.vedgupta.in"
+      }
+    }
+  ]
+}
+  </script>
+</head>
+<body>
+  <!-- Skip to content -->
+  <a href="#main-content" class="skip-link">Skip to content</a>
+
+  <!-- Top Bar -->
+  <header class="topbar">
+    <button class="topbar__hamburger" aria-label="Toggle sidebar" id="hamburger-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+    </button>
+
+    <a href="/" class="topbar__brand" data-nav="home">
+      <span class="topbar__brand-icon">SQL</span>
+      <span class="topbar__brand-text">SQL</span>
+      <span class="topbar__track-badge">In Depth</span>
+    </a>
+
+    <div class="topbar__search">
+      <button class="topbar__search-trigger" id="search-trigger" aria-label="Search topics">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <span>Search 180 SQL topics &amp; labs…</span>
+        <span class="topbar__search-kbd">⌘K</span>
+      </button>
+    </div>
+
+    <div class="topbar__actions">
+      <nav class="topbar__nav" aria-label="Primary navigation">
+        <a href="/roadmap" class="topbar__nav-link" data-nav="roadmap">Roadmap</a>
+        <a href="/challenges" class="topbar__nav-link" data-nav="challenges">Challenges</a>
+        <a href="/dashboard" class="topbar__nav-link" data-nav="dashboard">Dashboard</a>
+        <a href="/sandbox" class="topbar__nav-link" data-nav="sandbox">Workbench</a>
+        <a href="/glossary/" class="topbar__nav-link" data-nav="glossary">Glossary</a>
+      </nav>
+
+      <div class="topbar__progress-pill" id="progress-pill" title="Overall progress">
+        <svg class="topbar__progress-ring" viewBox="0 0 20 20">
+          <circle class="track" cx="10" cy="10" r="8"/>
+          <circle class="fill" cx="10" cy="10" r="8" stroke-dasharray="50.27" stroke-dashoffset="50.27" id="progress-ring-fill"/>
+        </svg>
+        <span id="progress-text">0%</span>
+      </div>
+
+      <a href="https://github.com/innovatorved/sql-in-depth" target="_blank" rel="noopener noreferrer" class="topbar__btn topbar__btn--github" id="github-repo-btn" aria-label="GitHub Repository" title="GitHub Repository" data-repo-placement="topbar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+      </a>
+
+      <button class="topbar__btn" id="theme-toggle" aria-label="Toggle theme" title="Toggle dark/light mode">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-sun"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-moon" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+    <nav class="sidebar__tabs" role="tablist">
+      <button class="sidebar__tab active" data-tab="curriculum" role="tab" aria-selected="true">Curriculum</button>
+    </nav>
+    <div class="sidebar__content" id="sidebar-content">
+<div style="padding:4px 16px 4px;font-size:11px;font-weight:600;color:var(--fg-faint);text-transform:uppercase;letter-spacing:0.05em;">Relational Foundations &amp; Core Querying</div><div class="module-group expanded" data-module="m01">
+        <div class="module-group__header">
+          <span class="module-group__chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+          <span class="module-group__number">1.1</span>
+          <span class="module-group__title">The Relational Model, Tables &amp; SELECT Foundations</span>
+          <div class="module-group__progress"><div class="module-group__progress-fill" style="width:0%"></div></div>
+        </div>
+        <div class="module-group__units"><a class="unit-item" data-slug="why-databases-exist" href="/topic/why-databases-exist/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Filesystems vs. Relational DBMS, Codd&#39;s 12 Rules &amp; Declarative SQL</span>
+        </a><a class="unit-item" data-slug="tables-rows-columns-types" href="/topic/tables-rows-columns-types/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Relations, Tuples, Attributes, Domains &amp; SQL Data Types</span>
+        </a><a class="unit-item" data-slug="select-projection-aliases" href="/topic/select-projection-aliases/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">SELECT Projection, Expressions, Aliases &amp; Logical Execution Order</span>
+        </a><a class="unit-item" data-slug="where-filtering-predicates" href="/topic/where-filtering-predicates/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">WHERE Clause, Comparison Operators, BETWEEN, IN, LIKE &amp; SARGability</span>
+        </a><a class="unit-item" data-slug="boolean-logic-three-valued-null" href="/topic/boolean-logic-three-valued-null/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Boolean Logic, Operator Precedence &amp; Three-Valued Logic (3VL)</span>
+        </a><a class="unit-item" data-slug="null-semantics-coalesce-nullif" href="/topic/null-semantics-coalesce-nullif/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">NULL Semantics: IS NULL, IS DISTINCT FROM, COALESCE &amp; NULLIF</span>
+        </a><a class="unit-item" data-slug="order-by-limit-offset-distinct" href="/topic/order-by-limit-offset-distinct/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Sorting &amp; Deduplication: ORDER BY, NULLS FIRST/LAST, DISTINCT &amp; LIMIT</span>
+        </a><a class="unit-item" data-slug="case-expressions-type-casting" href="/topic/case-expressions-type-casting/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Conditional SQL: CASE Expressions, CAST / :: &amp; Data Cleaning</span>
+        </a><a class="unit-item" data-slug="case-stripe-ledger-precision" href="/topic/case-stripe-ledger-precision/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Production Case Study: Why Floating-Point Corrupts Financial Ledgers</span>
+        </a><a class="unit-item" data-slug="build-sql-query-interpreter" href="/topic/build-sql-query-interpreter/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Hands-On Build: Mini Relational Tuple Filter &amp; Projection Engine</span>
+        </a></div></div><div class="module-group collapsed" data-module="m02">
+        <div class="module-group__header">
+          <span class="module-group__chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+          <span class="module-group__number">1.2</span>
+          <span class="module-group__title">DDL, Schema Constraints &amp; DML Mutations</span>
+          <div class="module-group__progress"><div class="module-group__progress-fill" style="width:0%"></div></div>
+        </div>
+        <div class="module-group__units"><a class="unit-item" data-slug="create-table-ddl-anatomy" href="/topic/create-table-ddl-anatomy/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">CREATE TABLE, ALTER TABLE, DROP, TRUNCATE vs DELETE &amp; Catalogs</span>
+        </a><a class="unit-item" data-slug="primary-keys-surrogate-vs-natural" href="/topic/primary-keys-surrogate-vs-natural/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Primary Keys: Composite Keys, IDENTITY &amp; UUIDv4 vs UUIDv7 Locality</span>
+        </a><a class="unit-item" data-slug="foreign-keys-referential-integrity" href="/topic/foreign-keys-referential-integrity/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Foreign Keys, Parent/Child Tables &amp; Referential Actions (CASCADE / RESTRICT)</span>
+        </a><a class="unit-item" data-slug="check-unique-not-null-defaults" href="/topic/check-unique-not-null-defaults/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Domain Integrity: CHECK, UNIQUE, NOT NULL, DEFAULT &amp; Generated Columns</span>
+        </a><a class="unit-item" data-slug="insert-bulk-loading-returning" href="/topic/insert-bulk-loading-returning/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Single &amp; Multi-Row INSERT, INSERT ... SELECT, COPY &amp; RETURNING</span>
+        </a><a class="unit-item" data-slug="upsert-on-conflict-merge" href="/topic/upsert-on-conflict-merge/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Idempotent Writes: ON CONFLICT DO UPDATE (Upsert) &amp; MERGE</span>
+        </a><a class="unit-item" data-slug="update-delete-safe-mutations" href="/topic/update-delete-safe-mutations/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Safe Mutations: UPDATE, UPDATE ... FROM, DELETE &amp; Soft-Delete Tradeoffs</span>
+        </a><a class="unit-item" data-slug="views-temp-tables-ctas" href="/topic/views-temp-tables-ctas/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Virtual &amp; Ephemeral Relations: Views, Updatable Views, CTAS &amp; Temp Tables</span>
+        </a><a class="unit-item" data-slug="case-github-zero-downtime-migrations" href="/topic/case-github-zero-downtime-migrations/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Production Case Study: Zero-Downtime Schema Migrations (Expand &amp; Contract)</span>
+        </a><a class="unit-item" data-slug="build-ecommerce-schema-ddl" href="/topic/build-ecommerce-schema-ddl/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Hands-On Build: E-Commerce Schema with Referential Integrity &amp; Upsert Pipeline</span>
+        </a></div></div><div class="module-group collapsed" data-module="m03">
+        <div class="module-group__header">
+          <span class="module-group__chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+          <span class="module-group__number">1.3</span>
+          <span class="module-group__title">Relational Algebra &amp; Multi-Table Joins</span>
+          <div class="module-group__progress"><div class="module-group__progress-fill" style="width:0%"></div></div>
+        </div>
+        <div class="module-group__units"><a class="unit-item" data-slug="relational-algebra-set-theory" href="/topic/relational-algebra-set-theory/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Relational Algebra: Selection (σ), Projection (π), Product (×) &amp; Rename (ρ)</span>
+        </a><a class="unit-item" data-slug="inner-join-equi-joins" href="/topic/inner-join-equi-joins/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">INNER JOIN, Equi-Joins, ON vs USING &amp; Foreign-Key Graph Traversal</span>
+        </a><a class="unit-item" data-slug="left-right-full-outer-joins" href="/topic/left-right-full-outer-joins/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Outer Joins: LEFT, RIGHT &amp; FULL OUTER JOIN with NULL Extension</span>
+        </a><a class="unit-item" data-slug="join-where-vs-on-filter-trap" href="/topic/join-where-vs-on-filter-trap/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">The Classic Outer Join Trap: Filtering in ON vs Filtering in WHERE</span>
+        </a><a class="unit-item" data-slug="self-joins-non-equi-joins" href="/topic/self-joins-non-equi-joins/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Self-Joins, Hierarchical Pairs &amp; Non-Equi Range Joins (&lt;, &gt;, BETWEEN)</span>
+        </a><a class="unit-item" data-slug="cross-join-cartesian-products" href="/topic/cross-join-cartesian-products/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">CROSS JOIN, Combinatorial Grids &amp; Accidental Cartesian Explosions</span>
+        </a><a class="unit-item" data-slug="semi-joins-anti-joins" href="/topic/semi-joins-anti-joins/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Relational Semi-Join (EXISTS / IN) &amp; Anti-Join (NOT EXISTS / LEFT JOIN IS NULL)</span>
+        </a><a class="unit-item" data-slug="set-operations-union-intersect-except" href="/topic/set-operations-union-intersect-except/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Set Operations: UNION vs UNION ALL, INTERSECT &amp; EXCEPT</span>
+        </a><a class="unit-item" data-slug="case-missing-null-notin-outage" href="/topic/case-missing-null-notin-outage/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Production Case Study: How a Single NULL in NOT IN Returned Zero Rows</span>
+        </a><a class="unit-item" data-slug="build-multi-table-order-reconciler" href="/topic/build-multi-table-order-reconciler/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Hands-On Build: Multi-Table Order, Payment &amp; Shipment Reconciliation Engine</span>
+        </a></div></div><div style="padding:8px 16px 4px;font-size:11px;font-weight:600;color:var(--fg-faint);text-transform:uppercase;letter-spacing:0.05em;">Aggregations, Subqueries, CTEs &amp; Window Functions</div><div class="module-group collapsed" data-module="m04">
+        <div class="module-group__header">
+          <span class="module-group__chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+          <span class="module-group__number">2.1</span>
+          <span class="module-group__title">Grouping, Aggregations &amp; Multi-Dimensional Rollups</span>
+          <div class="module-group__progress"><div class="module-group__progress-fill" style="width:0%"></div></div>
+        </div>
+        <div class="module-group__units"><a class="unit-item" data-slug="aggregate-functions-internals" href="/topic/aggregate-functions-internals/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Aggregate Internals: COUNT(*) vs COUNT(col), COUNT(DISTINCT), SUM &amp; AVG</span>
+        </a><a class="unit-item" data-slug="group-by-execution-mechanics" href="/topic/group-by-execution-mechanics/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">GROUP BY Execution Mechanics, HashAggregate vs GroupAggregate &amp; Functional Dependency</span>
+        </a><a class="unit-item" data-slug="having-vs-where-pipeline" href="/topic/having-vs-where-pipeline/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Pre-Filter (WHERE) vs Post-Aggregate Filter (HAVING) Pipeline</span>
+        </a><a class="unit-item" data-slug="conditional-aggregation-filter" href="/topic/conditional-aggregation-filter/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Pivoting &amp; Conditional Aggregation: SUM(CASE WHEN) &amp; FILTER (WHERE ...)</span>
+        </a><a class="unit-item" data-slug="string-json-array-aggregation" href="/topic/string-json-array-aggregation/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">List &amp; Document Rollups: GROUP_CONCAT, STRING_AGG &amp; JSON Aggregation</span>
+        </a><a class="unit-item" data-slug="grouping-sets-rollup-cube" href="/topic/grouping-sets-rollup-cube/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Multi-Dimensional OLAP: GROUPING SETS, ROLLUP, CUBE &amp; GROUPING()</span>
+        </a><a class="unit-item" data-slug="join-fanout-chasm-traps" href="/topic/join-fanout-chasm-traps/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">The One-to-Many Join Fanout &amp; Chasm Traps (Why SUM Double-Counts)</span>
+        </a><a class="unit-item" data-slug="histograms-percentiles-medians" href="/topic/histograms-percentiles-medians/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Statistical SQL: Equi-Width Histograms, Percentiles &amp; Medians</span>
+        </a><a class="unit-item" data-slug="case-analytics-double-counting-bug" href="/topic/case-analytics-double-counting-bug/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Production Case Study: Diagnosing a 3x Revenue Over-Reporting Fanout Bug</span>
+        </a><a class="unit-item" data-slug="build-executive-kpi-aggregation-suite" href="/topic/build-executive-kpi-aggregation-suite/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Hands-On Build: Multi-Dimensional Revenue, Cohort &amp; Funnel Aggregation Suite</span>
+        </a></div></div><div class="module-group collapsed" data-module="m05">
+        <div class="module-group__header">
+          <span class="module-group__chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+          <span class="module-group__number">2.2</span>
+          <span class="module-group__title">Subqueries, Correlated Queries, Lateral Joins &amp; CTEs</span>
+          <div class="module-group__progress"><div class="module-group__progress-fill" style="width:0%"></div></div>
+        </div>
+        <div class="module-group__units"><a class="unit-item" data-slug="scalar-row-table-subqueries" href="/topic/scalar-row-table-subqueries/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Subquery Taxonomy: Scalar, Row, Array &amp; Derived Table Subqueries</span>
+        </a><a class="unit-item" data-slug="correlated-subqueries-mechanics" href="/topic/correlated-subqueries-mechanics/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Correlated Subqueries: Outer Reference Binding &amp; Optimizer Unnesting</span>
+        </a><a class="unit-item" data-slug="exists-not-exists-null-safety" href="/topic/exists-not-exists-null-safety/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">EXISTS &amp; NOT EXISTS: Short-Circuit Semi-Joins &amp; Complete NULL Safety</span>
+        </a><a class="unit-item" data-slug="lateral-joins-cross-apply" href="/topic/lateral-joins-cross-apply/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">LATERAL Subqueries (CROSS APPLY / OUTER APPLY) &amp; Top-N-Per-Group</span>
+        </a><a class="unit-item" data-slug="common-table-expressions-with" href="/topic/common-table-expressions-with/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Common Table Expressions (WITH): Modular Multi-Stage SQL Pipelines</span>
+        </a><a class="unit-item" data-slug="cte-materialization-optimization-fence" href="/topic/cte-materialization-optimization-fence/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">CTE Inlining vs Materialization: Optimization Fences &amp; MATERIALIZED Hints</span>
+        </a><a class="unit-item" data-slug="recursive-ctes-hierarchies" href="/topic/recursive-ctes-hierarchies/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Recursive CTEs (WITH RECURSIVE): Anchor, Recursive Member &amp; Fixpoint</span>
+        </a><a class="unit-item" data-slug="graph-traversal-cycle-detection-sql" href="/topic/graph-traversal-cycle-detection-sql/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Graph Traversal, Bill-of-Materials (BOM) &amp; Cycle Detection in SQL</span>
+        </a><a class="unit-item" data-slug="case-recursive-org-permission-engine" href="/topic/case-recursive-org-permission-engine/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Production Case Study: Hierarchical RBAC Permission Inheritance in SQL</span>
+        </a><a class="unit-item" data-slug="build-hierarchical-graph-query-engine" href="/topic/build-hierarchical-graph-query-engine/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Hands-On Build: Bill-of-Materials &amp; Social Graph Reachability Engine</span>
+        </a></div></div><div class="module-group collapsed" data-module="m06">
+        <div class="module-group__header">
+          <span class="module-group__chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+          <span class="module-group__number">2.3</span>
+          <span class="module-group__title">Window Functions &amp; Analytical SQL Mastery</span>
+          <div class="module-group__progress"><div class="module-group__progress-fill" style="width:0%"></div></div>
+        </div>
+        <div class="module-group__units"><a class="unit-item" data-slug="window-functions-mental-model" href="/topic/window-functions-mental-model/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">The Window Function Mental Model: Preserving Row Identity + Context</span>
+        </a><a class="unit-item" data-slug="partition-by-order-by-mechanics" href="/topic/partition-by-order-by-mechanics/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">PARTITION BY, ORDER BY &amp; The Default RANGE Frame Trap</span>
+        </a><a class="unit-item" data-slug="ranking-functions-row-number-rank" href="/topic/ranking-functions-row-number-rank/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Ranking Functions: ROW_NUMBER, RANK, DENSE_RANK, NTILE &amp; CUME_DIST</span>
+        </a><a class="unit-item" data-slug="top-n-per-group-deduplication" href="/topic/top-n-per-group-deduplication/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Canonical Top-N-Per-Group, Stream Deduplication &amp; QUALIFY</span>
+        </a><a class="unit-item" data-slug="offset-functions-lag-lead-first-last" href="/topic/offset-functions-lag-lead-first-last/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Navigational Offset Functions: LAG, LEAD, FIRST_VALUE &amp; The LAST_VALUE Trap</span>
+        </a><a class="unit-item" data-slug="window-frames-rows-range-groups" href="/topic/window-frames-rows-range-groups/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Window Frames Deep Dive: ROWS vs RANGE vs GROUPS &amp; Moving Averages</span>
+        </a><a class="unit-item" data-slug="running-totals-cumulative-shares" href="/topic/running-totals-cumulative-shares/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Running Totals, Pareto (80/20) Curves &amp; Named WINDOW Clauses</span>
+        </a><a class="unit-item" data-slug="gaps-and-islands-sessionization" href="/topic/gaps-and-islands-sessionization/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Solving Classic Gaps and Islands, Streaks &amp; Clickstream Sessionization</span>
+        </a><a class="unit-item" data-slug="case-fintech-velocity-fraud-window" href="/topic/case-fintech-velocity-fraud-window/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Production Case Study: Real-Time Sliding-Window Card Velocity Fraud Detection</span>
+        </a><a class="unit-item" data-slug="build-sessionization-retention-engine" href="/topic/build-sessionization-retention-engine/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Hands-On Build: Clickstream Sessionizer, Streak Tracker &amp; Rolling Window Analyzer</span>
+        </a></div></div><div style="padding:8px 16px 4px;font-size:11px;font-weight:600;color:var(--fg-faint);text-transform:uppercase;letter-spacing:0.05em;">Data Modeling, Normalization &amp; Schema Architecture</div><div class="module-group collapsed" data-module="m07">
+        <div class="module-group__header">
+          <span class="module-group__chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+          <span class="module-group__number">3.1</span>
+          <span class="module-group__title">Relational Data Modeling &amp; Normalization (1NF to BCNF/5NF)</span>
+          <div class="module-group__progress"><div class="module-group__progress-fill" style="width:0%"></div></div>
+        </div>
+        <div class="module-group__units"><a class="unit-item" data-slug="entity-relationship-modeling" href="/topic/entity-relationship-modeling/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Entity-Relationship Modeling: Cardinality (1:1, 1:N, M:N) &amp; Junction Tables</span>
+        </a><a class="unit-item" data-slug="functional-dependencies-keys" href="/topic/functional-dependencies-keys/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Functional Dependencies (X → Y), Superkeys, Candidate Keys &amp; Closure</span>
+        </a><a class="unit-item" data-slug="first-normal-form-atomicity" href="/topic/first-normal-form-atomicity/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">First Normal Form (1NF): Atomic Domains &amp; Repeating Group Anti-Patterns</span>
+        </a><a class="unit-item" data-slug="second-third-normal-form" href="/topic/second-third-normal-form/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Second &amp; Third Normal Form (2NF &amp; 3NF): Eliminating Partial &amp; Transitive Dependencies</span>
+        </a><a class="unit-item" data-slug="boyce-codd-fourth-fifth-normal-form" href="/topic/boyce-codd-fourth-fifth-normal-form/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Boyce-Codd Normal Form (BCNF), Multi-Valued (4NF) &amp; Join Dependencies (5NF)</span>
+        </a><a class="unit-item" data-slug="update-insertion-deletion-anomalies" href="/topic/update-insertion-deletion-anomalies/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Visualizing Update, Insertion &amp; Deletion Anomalies in Unnormalized Schemas</span>
+        </a><a class="unit-item" data-slug="strategic-denormalization-tradeoffs" href="/topic/strategic-denormalization-tradeoffs/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Strategic Denormalization: Read vs Write Amplification &amp; Cached Counters</span>
+        </a><a class="unit-item" data-slug="schema-anti-patterns-eav-god-tables" href="/topic/schema-anti-patterns-eav-god-tables/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Schema Anti-Patterns: Entity-Attribute-Value (EAV), Polymorphic FKs &amp; God Tables</span>
+        </a><a class="unit-item" data-slug="case-shopify-multi-tenant-schema" href="/topic/case-shopify-multi-tenant-schema/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Production Case Study: Multi-Tenant Schema Architecture at Scale</span>
+        </a><a class="unit-item" data-slug="build-normalized-booking-schema" href="/topic/build-normalized-booking-schema/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Hands-On Build: Normalize a Legacy Flat Spreadsheet into a 3NF/BCNF System</span>
+        </a></div></div><div class="module-group collapsed" data-module="m08">
+        <div class="module-group__header">
+          <span class="module-group__chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+          <span class="module-group__number">3.2</span>
+          <span class="module-group__title">Dimensional Modeling &amp; Analytical Schema Design</span>
+          <div class="module-group__progress"><div class="module-group__progress-fill" style="width:0%"></div></div>
+        </div>
+        <div class="module-group__units"><a class="unit-item" data-slug="oltp-vs-olap-workload-physics" href="/topic/oltp-vs-olap-workload-physics/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">OLTP vs OLAP Workload Physics: Point Lookups vs Billion-Row Scans</span>
+        </a><a class="unit-item" data-slug="star-schema-facts-dimensions" href="/topic/star-schema-facts-dimensions/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Kimball Star Schema: Fact Table Grain, Additive Measures &amp; Conformed Dimensions</span>
+        </a><a class="unit-item" data-slug="snowflake-vs-star-vs-obt" href="/topic/snowflake-vs-star-vs-obt/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Snowflake Schema vs Star Schema vs One Big Table (OBT) in Cloud Warehouses</span>
+        </a><a class="unit-item" data-slug="slowly-changing-dimensions-scd" href="/topic/slowly-changing-dimensions-scd/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Slowly Changing Dimensions: SCD Type 0, 1, 2 (Effective Dates), 3 &amp; 6</span>
+        </a><a class="unit-item" data-slug="bridge-tables-junk-role-dimensions" href="/topic/bridge-tables-junk-role-dimensions/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Role-Playing Dimensions, Junk Dimensions &amp; Many-to-Many Bridge Tables</span>
+        </a><a class="unit-item" data-slug="temporal-tables-bitemporal-sql" href="/topic/temporal-tables-bitemporal-sql/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Temporal &amp; Bitemporal SQL: System Time vs Valid Application Time</span>
+        </a><a class="unit-item" data-slug="json-semi-structured-hybrid-schemas" href="/topic/json-semi-structured-hybrid-schemas/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Hybrid Relational + JSONB Schemas, Generated Columns &amp; Schema Evolution</span>
+        </a><a class="unit-item" data-slug="idempotency-audit-logs-event-tables" href="/topic/idempotency-audit-logs-event-tables/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Immutable Ledger Tables, Append-Only Audit Logs &amp; Transactional Outbox</span>
+        </a><a class="unit-item" data-slug="case-airbnb-minerva-metric-layer" href="/topic/case-airbnb-minerva-metric-layer/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Production Case Study: Designing a Canonical Metric Store at Petabyte Scale</span>
+        </a><a class="unit-item" data-slug="build-scd-type2-warehouse-pipeline" href="/topic/build-scd-type2-warehouse-pipeline/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Hands-On Build: Star Schema with Automated SCD Type 2 Dimension Pipeline</span>
+        </a></div></div><div class="module-group collapsed" data-module="m09">
+        <div class="module-group__header">
+          <span class="module-group__chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+          <span class="module-group__number">3.3</span>
+          <span class="module-group__title">Advanced SQL Patterns, Temporal Queries &amp; Programmability</span>
+          <div class="module-group__progress"><div class="module-group__progress-fill" style="width:0%"></div></div>
+        </div>
+        <div class="module-group__units"><a class="unit-item" data-slug="calendar-tables-date-spines" href="/topic/calendar-tables-date-spines/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Calendar Tables &amp; Date Spines: Filling Missing Zero-Activity Time Buckets</span>
+        </a><a class="unit-item" data-slug="cohort-retention-matrix-sql" href="/topic/cohort-retention-matrix-sql/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Triangle Cohort Retention &amp; Net Dollar Retention (NDR) Matrices in SQL</span>
+        </a><a class="unit-item" data-slug="funnel-conversion-attribution-sql" href="/topic/funnel-conversion-attribution-sql/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Multi-Step Ordered Funnel Conversion &amp; First/Last-Touch Attribution</span>
+        </a><a class="unit-item" data-slug="interval-overlap-allen-algebra" href="/topic/interval-overlap-allen-algebra/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Temporal Interval Overlap (Allen&#39;s Algebra) &amp; Packing Contiguous Intervals</span>
+        </a><a class="unit-item" data-slug="pivoting-unpivoting-cross-tabs" href="/topic/pivoting-unpivoting-cross-tabs/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpivoting Patterns</span>
+        </a><a class="unit-item" data-slug="triggers-stored-procedures-udfs" href="/topic/triggers-stored-procedures-udfs/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Database Programmability: Triggers (OLD/NEW), Stored Procedures &amp; UDF Overhead</span>
+        </a><a class="unit-item" data-slug="materialized-views-incremental-refresh" href="/topic/materialized-views-incremental-refresh/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Materialized Views, Refresh Strategies &amp; Incremental View Maintenance (IVM)</span>
+        </a><a class="unit-item" data-slug="sql-injection-parameterized-security" href="/topic/sql-injection-parameterized-security/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">SQL Injection AST Mechanics, Prepared Statements &amp; Row-Level Security (RLS)</span>
+        </a><a class="unit-item" data-slug="case-double-booking-hotel-inventory" href="/topic/case-double-booking-hotel-inventory/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Production Case Study: Preventing Concurrent Calendar Double-Bookings</span>
+        </a><a class="unit-item" data-slug="build-saas-cohort-funnel-workbench" href="/topic/build-saas-cohort-funnel-workbench/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Hands-On Build: Complete SaaS Analytics Engine (MRR, Cohorts &amp; Funnels)</span>
+        </a></div></div><div style="padding:8px 16px 4px;font-size:11px;font-weight:600;color:var(--fg-faint);text-transform:uppercase;letter-spacing:0.05em;">Indexing, Query Planner &amp; Execution Engine</div><div class="module-group collapsed" data-module="m10">
+        <div class="module-group__header">
+          <span class="module-group__chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+          <span class="module-group__number">4.1</span>
+          <span class="module-group__title">B+Tree Indexes &amp; Access Path Mechanics</span>
+          <div class="module-group__progress"><div class="module-group__progress-fill" style="width:0%"></div></div>
+        </div>
+        <div class="module-group__units"><a class="unit-item" data-slug="why-indexes-work-io-cost-model" href="/topic/why-indexes-work-io-cost-model/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Why Indexes Work: Full Table Scan O(N) vs Index Seek O(log_B N) I/O Physics</span>
+        </a><a class="unit-item" data-slug="btree-bplustree-internal-anatomy" href="/topic/btree-bplustree-internal-anatomy/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">B-Tree vs B+Tree Internal Anatomy: High Fanout, Routing Keys &amp; Leaf Links</span>
+        </a><a class="unit-item" data-slug="clustered-vs-secondary-indexes" href="/topic/clustered-vs-secondary-indexes/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Clustered Indexes (InnoDB / WITHOUT ROWID) vs Heap + Secondary Index (Postgres)</span>
+        </a><a class="unit-item" data-slug="composite-indexes-leftmost-prefix" href="/topic/composite-indexes-leftmost-prefix/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Composite Indexes (a, b, c): Leftmost Prefix Rule &amp; Equality-Before-Range</span>
+        </a><a class="unit-item" data-slug="covering-indexes-index-only-scans" href="/topic/covering-indexes-index-only-scans/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Covering Indexes, INCLUDE Columns &amp; Index-Only Scans (Visibility Map)</span>
+        </a><a class="unit-item" data-slug="partial-filtered-expression-indexes" href="/topic/partial-filtered-expression-indexes/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Partial (Filtered) Indexes &amp; Functional / Expression Indexes</span>
+        </a><a class="unit-item" data-slug="hash-gin-gist-brin-bloom-indexes" href="/topic/hash-gin-gist-brin-bloom-indexes/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Specialized Indexes: Hash, GIN (Inverted), GiST, BRIN (Block Range) &amp; Bitmap</span>
+        </a><a class="unit-item" data-slug="index-bloat-write-amplification-traps" href="/topic/index-bloat-write-amplification-traps/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">When Indexes Hurt: Write Amplification, Page Splits &amp; Selectivity Thresholds</span>
+        </a><a class="unit-item" data-slug="case-slack-composite-index-incident" href="/topic/case-slack-composite-index-incident/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Production Case Study: How Reordering Two Index Columns Cut Latency by 99.4%</span>
+        </a><a class="unit-item" data-slug="build-btree-index-advisor" href="/topic/build-btree-index-advisor/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Hands-On Build: B+Tree Page Simulator &amp; Automated Workload Index Advisor</span>
+        </a></div></div><div class="module-group collapsed" data-module="m11">
+        <div class="module-group__header">
+          <span class="module-group__chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+          <span class="module-group__number">4.2</span>
+          <span class="module-group__title">The Query Planner, Cost-Based Optimizer &amp; EXPLAIN</span>
+          <div class="module-group__progress"><div class="module-group__progress-fill" style="width:0%"></div></div>
+        </div>
+        <div class="module-group__units"><a class="unit-item" data-slug="life-of-a-sql-query-pipeline" href="/topic/life-of-a-sql-query-pipeline/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Life of a SQL Query: Parser, Binder, Logical Plan, Cost Optimizer &amp; Executor</span>
+        </a><a class="unit-item" data-slug="reading-explain-and-explain-analyze" href="/topic/reading-explain-and-explain-analyze/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Mastering EXPLAIN &amp; EXPLAIN ANALYZE: Cost Units, Actual Rows, Loops &amp; Buffers</span>
+        </a><a class="unit-item" data-slug="table-statistics-histograms-cardinality" href="/topic/table-statistics-histograms-cardinality/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Table Statistics (ANALYZE): Null Fraction, NDV, Most Common Values &amp; Histograms</span>
+        </a><a class="unit-item" data-slug="selectivity-estimation-correlated-columns" href="/topic/selectivity-estimation-correlated-columns/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Selectivity Math, Independence Assumption Failures &amp; Extended Statistics</span>
+        </a><a class="unit-item" data-slug="scan-operators-seq-index-bitmap" href="/topic/scan-operators-seq-index-bitmap/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Physical Scan Operators: Seq Scan, Index Scan, Index-Only &amp; Bitmap Heap Scan</span>
+        </a><a class="unit-item" data-slug="sargability-functions-on-columns" href="/topic/sargability-functions-on-columns/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">SARGability: Why Functions, Arithmetic &amp; Implicit Casts on Columns Defeat Indexes</span>
+        </a><a class="unit-item" data-slug="or-conditions-in-lists-union-rewrites" href="/topic/or-conditions-in-lists-union-rewrites/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Optimizing OR Predicates, Large IN Lists, BitmapOr &amp; UNION ALL Rewrites</span>
+        </a><a class="unit-item" data-slug="sorting-spill-to-disk-top-n-heapsort" href="/topic/sorting-spill-to-disk-top-n-heapsort/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Physical Sorting: QuickSort, Bounded Top-N Heap Sort, Incremental Sort &amp; Disk Spills</span>
+        </a><a class="unit-item" data-slug="case-stale-statistics-plan-flip" href="/topic/case-stale-statistics-plan-flip/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Production Case Study: Anatomy of a Query Plan Flip from Stale Statistics</span>
+        </a><a class="unit-item" data-slug="build-visual-explain-plan-analyzer" href="/topic/build-visual-explain-plan-analyzer/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Hands-On Build: Interactive EXPLAIN Plan Bottleneck Detector &amp; Query Rewriter</span>
+        </a></div></div><div class="module-group collapsed" data-module="m12">
+        <div class="module-group__header">
+          <span class="module-group__chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+          <span class="module-group__number">4.3</span>
+          <span class="module-group__title">Physical Join Algorithms &amp; Execution Pipelines</span>
+          <div class="module-group__progress"><div class="module-group__progress-fill" style="width:0%"></div></div>
+        </div>
+        <div class="module-group__units"><a class="unit-item" data-slug="nested-loop-join-indexed-nlj" href="/topic/nested-loop-join-indexed-nlj/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Nested Loop Join: Naive O(N×M) vs Block Nested Loop vs Indexed NLJ</span>
+        </a><a class="unit-item" data-slug="hash-join-build-probe-grace" href="/topic/hash-join-build-probe-grace/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Hash Join Internals: In-Memory Build/Probe Phases, Skew &amp; Grace Hash Disk Spills</span>
+        </a><a class="unit-item" data-slug="sort-merge-join-zipper-mechanics" href="/topic/sort-merge-join-zipper-mechanics/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Sort-Merge Join: Dual Sorted Streams, Zipper Merge &amp; Duplicate Rewinding</span>
+        </a><a class="unit-item" data-slug="join-order-search-dynamic-programming" href="/topic/join-order-search-dynamic-programming/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Join Ordering Search Space (N!): Selinger Dynamic Programming &amp; Left-Deep vs Bushy Trees</span>
+        </a><a class="unit-item" data-slug="predicate-pushdown-projection-pruning" href="/topic/predicate-pushdown-projection-pruning/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Logical Plan Rewrites: Predicate Pushdown, Projection Pruning &amp; Join Elimination</span>
+        </a><a class="unit-item" data-slug="subquery-unnesting-semi-anti-physical" href="/topic/subquery-unnesting-semi-anti-physical/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Subquery Unnesting: Physical Hash Semi-Join &amp; Merge Anti-Join Operators</span>
+        </a><a class="unit-item" data-slug="execution-models-volcano-vectorized" href="/topic/execution-models-volcano-vectorized/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Execution Models: Volcano Iterator (Next) vs Vectorized Batches vs LLVM JIT</span>
+        </a><a class="unit-item" data-slug="parallel-query-execution-workers" href="/topic/parallel-query-execution-workers/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Parallel Query Execution: Parallel Seq Scan, Parallel Hash Join &amp; Gather Nodes</span>
+        </a><a class="unit-item" data-slug="case-hash-join-oom-work-mem-spill" href="/topic/case-hash-join-oom-work-mem-spill/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Production Case Study: Diagnosing Multi-Gigabyte Hash Join Temp File Spills</span>
+        </a><a class="unit-item" data-slug="build-physical-join-execution-engine" href="/topic/build-physical-join-execution-engine/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Hands-On Build: Implement &amp; Benchmark Nested Loop, Hash Join &amp; Sort-Merge Join</span>
+        </a></div></div><div style="padding:8px 16px 4px;font-size:11px;font-weight:600;color:var(--fg-faint);text-transform:uppercase;letter-spacing:0.05em;">Transactions, Concurrency Control, MVCC &amp; Storage Internals</div><div class="module-group collapsed" data-module="m13">
+        <div class="module-group__header">
+          <span class="module-group__chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+          <span class="module-group__number">5.1</span>
+          <span class="module-group__title">ACID Transactions, Concurrency Anomalies &amp; Isolation Levels</span>
+          <div class="module-group__progress"><div class="module-group__progress-fill" style="width:0%"></div></div>
+        </div>
+        <div class="module-group__units"><a class="unit-item" data-slug="acid-properties-under-the-hood" href="/topic/acid-properties-under-the-hood/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">ACID Under the Hood: Atomicity (Undo), Consistency, Isolation &amp; Durability (WAL)</span>
+        </a><a class="unit-item" data-slug="transaction-lifecycle-savepoints" href="/topic/transaction-lifecycle-savepoints/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Transaction Lifecycle: BEGIN, COMMIT, ROLLBACK, SAVEPOINT &amp; Autocommit Hazards</span>
+        </a><a class="unit-item" data-slug="read-phenomena-dirty-nonrepeatable-phantom" href="/topic/read-phenomena-dirty-nonrepeatable-phantom/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Read Anomalies: Dirty Reads, Non-Repeatable Reads &amp; Phantom Reads Visualized</span>
+        </a><a class="unit-item" data-slug="write-anomalies-lost-update-write-skew" href="/topic/write-anomalies-lost-update-write-skew/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Write Anomalies: Dirty Writes, Lost Updates, Read Skew &amp; Write Skew</span>
+        </a><a class="unit-item" data-slug="read-uncommitted-read-committed" href="/topic/read-uncommitted-read-committed/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">READ UNCOMMITTED &amp; READ COMMITTED: Statement-Level Snapshots in Practice</span>
+        </a><a class="unit-item" data-slug="repeatable-read-snapshot-isolation" href="/topic/repeatable-read-snapshot-isolation/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">REPEATABLE READ &amp; Snapshot Isolation (SI): First-Committer-Wins &amp; Write Skew</span>
+        </a><a class="unit-item" data-slug="serializable-2pl-vs-ssi" href="/topic/serializable-2pl-vs-ssi/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">True Serializability: Strict Two-Phase Locking (2PL) vs Serializable Snapshot Isolation (SSI)</span>
+        </a><a class="unit-item" data-slug="optimistic-vs-pessimistic-concurrency" href="/topic/optimistic-vs-pessimistic-concurrency/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Optimistic Concurrency (Compare-and-Swap Version) vs Pessimistic SELECT FOR UPDATE</span>
+        </a><a class="unit-item" data-slug="case-fintech-double-spend-race-condition" href="/topic/case-fintech-double-spend-race-condition/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Production Case Study: Exploiting &amp; Fixing a Concurrent Balance Double-Spend</span>
+        </a><a class="unit-item" data-slug="build-transaction-anomaly-simulator" href="/topic/build-transaction-anomaly-simulator/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Hands-On Build: Dual-Session Concurrency Anomaly &amp; Isolation Verifier</span>
+        </a></div></div><div class="module-group collapsed" data-module="m14">
+        <div class="module-group__header">
+          <span class="module-group__chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+          <span class="module-group__number">5.2</span>
+          <span class="module-group__title">Locking, MVCC Internals &amp; Vacuuming</span>
+          <div class="module-group__progress"><div class="module-group__progress-fill" style="width:0%"></div></div>
+        </div>
+        <div class="module-group__units"><a class="unit-item" data-slug="multi-version-concurrency-control-mvcc" href="/topic/multi-version-concurrency-control-mvcc/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">MVCC Architecture: Why Readers Never Block Writers and Writers Never Block Readers</span>
+        </a><a class="unit-item" data-slug="tuple-headers-xmin-xmax-visibility" href="/topic/tuple-headers-xmin-xmax-visibility/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Tuple Headers Under the Microscope: xmin, xmax, ctid &amp; Infomask Hint Bits</span>
+        </a><a class="unit-item" data-slug="transaction-snapshots-visibility-rules" href="/topic/transaction-snapshots-visibility-rules/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Transaction Snapshots (xmin:xmax:xip_list) &amp; Tuple Visibility Resolution</span>
+        </a><a class="unit-item" data-slug="row-level-locks-for-update-skip-locked" href="/topic/row-level-locks-for-update-skip-locked/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Row-Level Locks: FOR UPDATE, FOR NO KEY UPDATE, FOR SHARE, NOWAIT &amp; SKIP LOCKED</span>
+        </a><a class="unit-item" data-slug="table-locks-intention-locks-ddl-hazards" href="/topic/table-locks-intention-locks-ddl-hazards/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Table Lock Hierarchy, Intention Locks &amp; Why ALTER TABLE Stalls Traffic</span>
+        </a><a class="unit-item" data-slug="gap-locks-next-key-locks-innodb" href="/topic/gap-locks-next-key-locks-innodb/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Preventing Phantoms with Locks: Record Locks, Gap Locks &amp; Next-Key Locks</span>
+        </a><a class="unit-item" data-slug="deadlocks-wait-for-graphs-detection" href="/topic/deadlocks-wait-for-graphs-detection/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Deadlocks: Wait-For Graph Cycles, Lock Ordering &amp; Deadlock Detection</span>
+        </a><a class="unit-item" data-slug="dead-tuples-bloat-autovacuum-txid-wraparound" href="/topic/dead-tuples-bloat-autovacuum-txid-wraparound/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Dead Tuples, Table Bloat, Autovacuum, Free Space Map &amp; XID Wraparound</span>
+        </a><a class="unit-item" data-slug="case-sentry-transaction-id-wraparound" href="/topic/case-sentry-transaction-id-wraparound/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Production Case Study: Anatomy of a Transaction ID (XID) Wraparound Outage</span>
+        </a><a class="unit-item" data-slug="build-mvcc-snapshot-storage-engine" href="/topic/build-mvcc-snapshot-storage-engine/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Hands-On Build: Multi-Version Tuple Store with Snapshot Isolation &amp; Vacuum GC</span>
+        </a></div></div><div class="module-group collapsed" data-module="m15">
+        <div class="module-group__header">
+          <span class="module-group__chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+          <span class="module-group__number">5.3</span>
+          <span class="module-group__title">Storage Engine Internals: Pages, Buffer Pool, WAL &amp; LSM-Trees</span>
+          <div class="module-group__progress"><div class="module-group__progress-fill" style="width:0%"></div></div>
+        </div>
+        <div class="module-group__units"><a class="unit-item" data-slug="slotted-page-layout-8kb-anatomy" href="/topic/slotted-page-layout-8kb-anatomy/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Inside an 8KB Slotted Database Page: Header, Line Pointers, Tuples &amp; TOAST</span>
+        </a><a class="unit-item" data-slug="heap-files-hot-updates-fillfactor" href="/topic/heap-files-hot-updates-fillfactor/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Heap Files, Index Write Amplification, PostgreSQL HOT Updates &amp; fillfactor</span>
+        </a><a class="unit-item" data-slug="buffer-pool-clock-sweep-lru-k" href="/topic/buffer-pool-clock-sweep-lru-k/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Buffer Pool Manager: Pin Counts, Dirty Pages, Clock-Sweep &amp; LRU-K Eviction</span>
+        </a><a class="unit-item" data-slug="write-ahead-logging-wal-lsn" href="/topic/write-ahead-logging-wal-lsn/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Write-Ahead Logging (WAL), Log Sequence Numbers (LSN) &amp; Group Commit</span>
+        </a><a class="unit-item" data-slug="checkpoints-dirty-page-flushing" href="/topic/checkpoints-dirty-page-flushing/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Checkpoints, Dirty Page Flushing &amp; Torn-Page Protection (Full Page Writes)</span>
+        </a><a class="unit-item" data-slug="aries-crash-recovery-analysis-redo-undo" href="/topic/aries-crash-recovery-analysis-redo-undo/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">ARIES Crash Recovery: Steal/No-Force Policy, Analysis, Redo &amp; Undo Passes</span>
+        </a><a class="unit-item" data-slug="lsm-trees-memtable-sstable-compaction" href="/topic/lsm-trees-memtable-sstable-compaction/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">LSM-Trees (RocksDB / Cassandra): MemTable, Immutable SSTables, Bloom Filters &amp; Compaction</span>
+        </a><a class="unit-item" data-slug="btree-vs-lsm-read-write-space-amplification" href="/topic/btree-vs-lsm-read-write-space-amplification/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">The RUM Conjecture: B+Tree vs LSM-Tree Read, Write &amp; Space Amplification</span>
+        </a><a class="unit-item" data-slug="case-uber-postgres-to-mysql-storage" href="/topic/case-uber-postgres-to-mysql-storage/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Production Case Study: PostgreSQL Heap+ctid vs MySQL InnoDB Clustered Storage</span>
+        </a><a class="unit-item" data-slug="build-slotted-page-wal-engine" href="/topic/build-slotted-page-wal-engine/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Hands-On Build: 8KB Slotted Page + Write-Ahead Log Crash Recovery Simulator</span>
+        </a></div></div><div style="padding:8px 16px 4px;font-size:11px;font-weight:600;color:var(--fg-faint);text-transform:uppercase;letter-spacing:0.05em;">Analytical Engines (OLAP), Distributed SQL &amp; Production Operations</div><div class="module-group collapsed" data-module="m16">
+        <div class="module-group__header">
+          <span class="module-group__chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+          <span class="module-group__number">6.1</span>
+          <span class="module-group__title">Columnar Storage, Vectorized OLAP &amp; Modern Lakehouses</span>
+          <div class="module-group__progress"><div class="module-group__progress-fill" style="width:0%"></div></div>
+        </div>
+        <div class="module-group__units"><a class="unit-item" data-slug="columnar-storage-layout-parquet" href="/topic/columnar-storage-layout-parquet/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Row-Store (NSM) vs Column-Store (DSM) &amp; Apache Parquet PAX Hybrid Layout</span>
+        </a><a class="unit-item" data-slug="columnar-compression-rle-dictionary-delta" href="/topic/columnar-compression-rle-dictionary-delta/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Columnar Compression: Run-Length (RLE), Dictionary, Bit-Packing &amp; Delta Encoding</span>
+        </a><a class="unit-item" data-slug="late-materialization-simd-vectorization" href="/topic/late-materialization-simd-vectorization/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Late Materialization &amp; SIMD Vectorized Execution on Compressed Columns</span>
+        </a><a class="unit-item" data-slug="zone-maps-min-max-pruning-bloom" href="/topic/zone-maps-min-max-pruning-bloom/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Zone Maps (Min/Max Skipping Indexes), Partition Pruning &amp; Z-Order Clustering</span>
+        </a><a class="unit-item" data-slug="embedded-olap-duckdb-architecture" href="/topic/embedded-olap-duckdb-architecture/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Embedded Analytical SQL (DuckDB): Morsel-Driven Parallelism &amp; Out-of-Core Execution</span>
+        </a><a class="unit-item" data-slug="realtime-olap-clickhouse-mergetree" href="/topic/realtime-olap-clickhouse-mergetree/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Real-Time OLAP (ClickHouse): Sparse Primary Indexes &amp; MergeTree Engines</span>
+        </a><a class="unit-item" data-slug="cloud-warehouses-snowflake-bigquery" href="/topic/cloud-warehouses-snowflake-bigquery/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Cloud Data Warehouses (Snowflake &amp; BigQuery): Disaggregated Storage &amp; Compute</span>
+        </a><a class="unit-item" data-slug="open-table-formats-iceberg-delta" href="/topic/open-table-formats-iceberg-delta/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Open Lakehouse Table Formats (Apache Iceberg &amp; Delta Lake): ACID on Object Storage</span>
+        </a><a class="unit-item" data-slug="case-cloudflare-clickhouse-log-analytics" href="/topic/case-cloudflare-clickhouse-log-analytics/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Production Case Study: Querying Millions of HTTP Events/Sec with Columnar MergeTree</span>
+        </a><a class="unit-item" data-slug="build-columnar-compression-query-engine" href="/topic/build-columnar-compression-query-engine/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Hands-On Build: Columnar RLE/Dictionary Encoder with Zone-Map Predicate Pushdown</span>
+        </a></div></div><div class="module-group collapsed" data-module="m17">
+        <div class="module-group__header">
+          <span class="module-group__chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+          <span class="module-group__number">6.2</span>
+          <span class="module-group__title">Replication, Partitioning, Sharding &amp; Distributed NewSQL</span>
+          <div class="module-group__progress"><div class="module-group__progress-fill" style="width:0%"></div></div>
+        </div>
+        <div class="module-group__units"><a class="unit-item" data-slug="single-leader-replication-sync-async" href="/topic/single-leader-replication-sync-async/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Single-Leader Replication: Physical WAL Streaming vs Logical Replication &amp; Sync/Async</span>
+        </a><a class="unit-item" data-slug="read-replicas-consistency-models" href="/topic/read-replicas-consistency-models/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Scaling Reads with Replicas: Read-Your-Writes, Monotonic Reads &amp; Lag Anomalies</span>
+        </a><a class="unit-item" data-slug="failover-split-brain-fencing-tokens" href="/topic/failover-split-brain-fencing-tokens/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Automated High-Availability Failover, Split-Brain Hazards &amp; Fencing Tokens</span>
+        </a><a class="unit-item" data-slug="declarative-table-partitioning" href="/topic/declarative-table-partitioning/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Declarative Table Partitioning (Range, List, Hash) &amp; Instant Retention Drops</span>
+        </a><a class="unit-item" data-slug="horizontal-sharding-routing-keys" href="/topic/horizontal-sharding-routing-keys/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Horizontal Sharding (Vitess / Citus): Shard Keys, Consistent Hashing &amp; Scatter-Gather</span>
+        </a><a class="unit-item" data-slug="distributed-transactions-2pc-saga" href="/topic/distributed-transactions-2pc-saga/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Distributed Transactions: Two-Phase Commit (2PC) Blocking vs Saga Pattern</span>
+        </a><a class="unit-item" data-slug="distributed-sql-spanner-cockroachdb" href="/topic/distributed-sql-spanner-cockroachdb/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Distributed NewSQL Internals (Spanner &amp; CockroachDB): Raft Ranges, TrueTime &amp; HLC</span>
+        </a><a class="unit-item" data-slug="connection-pooling-pgbouncer-proxies" href="/topic/connection-pooling-pgbouncer-proxies/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Connection Pooling Architecture: Process-Per-Connection Overhead &amp; PgBouncer Modes</span>
+        </a><a class="unit-item" data-slug="case-figma-postgres-horizontal-sharding" href="/topic/case-figma-postgres-horizontal-sharding/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Production Case Study: Evolving from a Single Postgres Primary to Sharded Clusters</span>
+        </a><a class="unit-item" data-slug="build-sharded-query-router" href="/topic/build-sharded-query-router/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Hands-On Build: Consistent-Hash Shard Router with Partition Pruning &amp; Scatter-Gather</span>
+        </a></div></div><div class="module-group collapsed" data-module="m18">
+        <div class="module-group__header">
+          <span class="module-group__chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+          <span class="module-group__number">6.3</span>
+          <span class="module-group__title">Production Query Tuning, Observability &amp; Database Reliability</span>
+          <div class="module-group__progress"><div class="module-group__progress-fill" style="width:0%"></div></div>
+        </div>
+        <div class="module-group__units"><a class="unit-item" data-slug="keyset-cursor-pagination-vs-offset" href="/topic/keyset-cursor-pagination-vs-offset/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Keyset (Seek) Cursor Pagination vs Why OFFSET 100000 Destroys Latency</span>
+        </a><a class="unit-item" data-slug="solving-n-plus-one-orm-queries" href="/topic/solving-n-plus-one-orm-queries/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Eliminating ORM N+1 Query Storms: Batching, Eager Joins &amp; JSON Aggregation</span>
+        </a><a class="unit-item" data-slug="full-text-search-trigrams-inverted-index" href="/topic/full-text-search-trigrams-inverted-index/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Full-Text &amp; Fuzzy Search: Why LIKE &#39;%term%&#39; Fails vs Trigrams (pg_trgm) &amp; BM25</span>
+        </a><a class="unit-item" data-slug="queue-processing-skip-locked-patterns" href="/topic/queue-processing-skip-locked-patterns/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">High-Throughput Transactional Job Queues in SQL with FOR UPDATE SKIP LOCKED</span>
+        </a><a class="unit-item" data-slug="bulk-ingestion-batching-unlogged-tables" href="/topic/bulk-ingestion-batching-unlogged-tables/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">High-Speed Bulk Ingestion: Multi-Row Batches, Index Drop/Rebuild, UNLOGGED &amp; COPY</span>
+        </a><a class="unit-item" data-slug="pg-stat-statements-slow-query-triage" href="/topic/pg-stat-statements-slow-query-triage/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Production Query Telemetry: pg_stat_statements, Total vs Mean Time &amp; Buffer Hit Ratio</span>
+        </a><a class="unit-item" data-slug="lock-contention-zero-downtime-ddl" href="/topic/lock-contention-zero-downtime-ddl/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Zero-Downtime Production DDL: CREATE INDEX CONCURRENTLY, lock_timeout &amp; NOT VALID</span>
+        </a><a class="unit-item" data-slug="backup-pitr-wal-archiving-drills" href="/topic/backup-pitr-wal-archiving-drills/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Backups &amp; Point-in-Time Recovery (PITR): Logical Dumps vs Base Backup + WAL Replay</span>
+        </a><a class="unit-item" data-slug="case-gitlab-database-incident-postmortem" href="/topic/case-gitlab-database-incident-postmortem/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Production Case Study: Lessons from High-Severity Database Outages &amp; Recovery Drills</span>
+        </a><a class="unit-item" data-slug="build-production-sql-tuning-clinic" href="/topic/build-production-sql-tuning-clinic/">
+          <span class="unit-item__status unit-item__status--pending"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/></svg></span>
+          <span class="unit-item__title">Hands-On Build: End-to-End Slow Query Diagnostic &amp; Optimization Clinic (100x Speedup)</span>
+        </a></div></div>
+    </div>
+  </aside>
+
+  <!-- Sidebar overlay (mobile) -->
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- Main Content -->
+  <main class="main" id="main-content">
+    <div class="main__content" id="reader">
+      <!-- landing:start (generated by tools/stamp-assets.js from js/landing.js) -->
+<div class="landing landing-shell">
+      <section class="landing-hero">
+        <div class="landing-hero__eyebrow"><span class="landing-dot"></span>Free &amp; open source</div>
+        <h1 class="landing-hero__title">SQL &amp; database<br>internals, in depth.</h1>
+        <p class="landing-hero__subtitle">Read it, watch it, visualize every table step, run real SQL in WebAssembly.</p>
+        <div class="landing-hero__actions">
+          <a class="btn btn--primary landing-btn" href="/topic/why-databases-exist/">Start learning →</a>
+          <button class="btn btn--outline landing-btn" type="button" data-landing-scroll="landing-curriculum">Browse curriculum</button>
+          <button class="landing-search" type="button" data-landing-search>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            Search <kbd>⌘K</kbd>
+          </button>
+        </div>
+        <dl class="landing-stats">
+          <div><dt>180</dt><dd>Topics</dd></div>
+          <div><dt>36</dt><dd>Simulators</dd></div>
+          <div><dt>18</dt><dd>Builds</dd></div>
+          <div><dt>36</dt><dd>Videos</dd></div>
+          <div><dt>720</dt><dd>Questions</dd></div>
+        </dl>
+      </section>
+      <section class="landing-section" id="landing-demos">
+        <h2 class="landing-section__title">Try it live</h2>
+        <div class="landing-tabs" role="tablist">
+          <button class="landing-tab is-active" role="tab" aria-selected="true" data-demo="0">Clause Pipeline</button><button class="landing-tab" role="tab" aria-selected="false" data-demo="1">Relational Joins ⋈</button><button class="landing-tab" role="tab" aria-selected="false" data-demo="2">Window Frames</button><button class="landing-tab" role="tab" aria-selected="false" data-demo="3">B+Tree Pages</button><button class="landing-tab" role="tab" aria-selected="false" data-demo="4">MVCC Snapshots</button>
+        </div>
+        <div class="landing-demo" id="landing-demo-stage">
+          <div class="dsa-sim simulator-card" id="sim-select-where-pipeline" data-sim-id="sim-select-where-pipeline">
+            <div class="dsa-sim__header simulator-card__header">
+              <div class="dsa-sim__title simulator-card__title">
+                <span>Logical Query Execution Pipeline (FROM → WHERE → SELECT → ORDER BY → LIMIT)</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                <button type="button" class="dsa-sim__audio-btn is-on" data-role="sfx-toggle" title="Toggle Step Sound Effects (Web Audio Synth)">
+                  🔊 SFX On
+                </button>
+                <button type="button" class="dsa-sim__audio-btn is-on" data-role="voice-toggle" title="Toggle Step Voice Narration (Speech Synthesis)">
+                  🗣️ Voice On
+                </button>
+                <span class="badge-o1">Clause Pipeline</span>
+              </div>
+            </div>
+            <p class="dsa-sim__subtitle simulator-card__description">Step through a multi-clause SQL query at the table level. Watch rows flow from the base table through predicate filtering, expression projection, sorting, and Top-N pagination.</p>
+
+            <div class="dsa-sim__controls simulator-card__controls">
+              <label style="font-size:12px;color:var(--fg-muted);display:inline-flex;align-items:center;gap:6px;">
+                Preset
+                <select class="simulator-card__input sim-select" data-role="preset" style="padding:4px 8px;font-size:12px;">
+                  <option value="0">Paid Orders ≥ $120 Ordered by Total DESC LIMIT 3</option><option value="1">High-Value Orders ≥ $250 with Alias Projection</option>
+                </select>
+              </label>
+              <button type="button" class="btn btn--secondary btn--sm" data-role="prev" title="Step Back">◀ Prev</button>
+              <button type="button" class="btn btn--primary btn--sm" data-role="next" title="Step Forward">Step ▶</button>
+              <button type="button" class="btn btn--secondary btn--sm" data-role="play" title="Play / Pause">⏵ Play</button>
+              <button type="button" class="btn btn--sm" data-role="reset" title="Reset">↺ Reset</button>
+              <label style="font-size:12px;color:var(--fg-muted);display:inline-flex;align-items:center;gap:4px;margin-left:auto;">
+                Speed
+                <select class="simulator-card__input sim-select" data-role="speed" style="padding:3px 6px;font-size:11.5px;">
+                  <option value="1200">0.5×</option>
+                  <option value="750" selected>1×</option>
+                  <option value="380">2×</option>
+                  <option value="180">4×</option>
+                </select>
+              </label>
+              <span class="simulator-card__status" data-role="step-status" style="font-family:var(--font-mono,monospace);font-size:12px;font-weight:600;">
+                Step 1 / 8
+              </span>
+            </div>
+
+            <div class="dsa-sim__custom-bar">
+              <span class="dsa-sim__custom-label">Custom Input:</span>
+              <input
+                type="text"
+                class="simulator-card__input dsa-sim__custom-input"
+                data-role="custom-input"
+                value="38, 27, 43, 3, 9, 82, 10, 19"
+                placeholder="e.g. 38, 27, 43, 3, 9, 82, 10 or target=42 | 10, 20, 42, 50"
+                aria-label="Custom simulator input values"
+              />
+              <button type="button" class="btn btn--primary btn--sm" data-role="apply-custom" title="Run simulator with your custom values">
+                ▶ Run Custom
+              </button>
+              <button type="button" class="btn btn--secondary btn--sm" data-role="randomize" title="Generate random input values and run">
+                🎲 Randomize
+              </button>
+            </div>
+
+            <div class="dsa-sim__scrubber-row">
+              <span style="font-size:11px;font-family:var(--font-mono,monospace);color:var(--fg-muted);">Timeline</span>
+              <input
+                type="range"
+                class="dsa-sim__scrubber"
+                data-role="scrubber"
+                min="0"
+                max="7"
+                value="0"
+                aria-label="Step timeline scrubber"
+              />
+            </div>
+
+            <div class="invariant-box" style="margin:0 0 0.75rem 0;padding:0.6rem 0.9rem;">
+              <h4 style="margin:0 0 0.25rem 0;font-size:12px;">Invariant &amp; State</h4>
+              <div data-role="invariant" style="font-size:12.5px;font-family:var(--font-mono,monospace);color:var(--fg-primary);">Relation initialized with 6 tuples across schema (order_id, customer, status, total_cents, created_at) — preset: Paid Orders ≥ $120 Ordered by Total DESC LIMIT 3.</div>
+            </div>
+            <div class="dsa-sim__stage" data-role="stage">
+      <div class="dsa-sim__visual-canvas">
+        <div class="dsa-sim__visual-label">
+          <span>🔗 Live Pointer &amp; State Transition Graph — Logical Query Execution Pipeline (FROM → WHERE → SELECT → ORDER BY → LIMIT)</span>
+          <span class="dsa-sim__legend">
+            <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:#3b82f6"></span>Active Pointer</span>
+            <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:#8b5cf6"></span>Jump/Transition</span>
+            <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:#10b981"></span>Matched/Optimal</span>
+          </span>
+        </div>
+        <svg viewBox="0 0 680 175" style="width:100%;max-height:185px;display:block;overflow:visible;">
+          
+          
+        <g>
+          <line x1="58" y1="96" x2="133" y2="96" stroke="var(--border-color, #94a3b8)" stroke-width="1.6" />
+          <polygon points="135,96 128,92 128,100" fill="var(--border-color, #94a3b8)" />
+        </g>
+      
+        <g>
+          <line x1="179" y1="96" x2="254" y2="96" stroke="var(--border-color, #94a3b8)" stroke-width="1.6" />
+          <polygon points="256,96 249,92 249,100" fill="var(--border-color, #94a3b8)" />
+        </g>
+      
+        <g>
+          <line x1="300" y1="96" x2="375" y2="96" stroke="var(--border-color, #94a3b8)" stroke-width="1.6" />
+          <polygon points="377,96 370,92 370,100" fill="var(--border-color, #94a3b8)" />
+        </g>
+      
+        <g>
+          <line x1="421" y1="96" x2="496" y2="96" stroke="var(--border-color, #94a3b8)" stroke-width="1.6" />
+          <polygon points="498,96 491,92 491,100" fill="var(--border-color, #94a3b8)" />
+        </g>
+      
+        <g>
+          <line x1="542" y1="96" x2="617" y2="96" stroke="var(--border-color, #94a3b8)" stroke-width="1.6" />
+          <polygon points="619,96 612,92 612,100" fill="var(--border-color, #94a3b8)" />
+        </g>
+      
+          
+        <g>
+          <g transform="translate(36, 62)">
+             <rect x="-24" y="-10" width="48" height="15" rx="4" fill="#3b82f6" opacity="0.16" stroke="#3b82f6" stroke-width="1"/>
+             <text x="0" y="1" text-anchor="middle" font-size="9.5" font-weight="700" fill="#3b82f6" font-family="var(--font-mono, monospace)">Tuple #</text>
+           </g>
+          <rect x="14" y="76" width="44" height="40" rx="8" fill="rgba(59, 130, 246, 0.26)" stroke="#3b82f6" stroke-width="2.4" />
+          <text x="36" y="100" text-anchor="middle" font-size="11" font-weight="700" fill="#3b82f6" font-family="var(--font-mono, monospace)">101:p…</text>
+          <text x="36" y="130" text-anchor="middle" font-size="9.5" fill="var(--fg-muted, #64748b)" font-family="var(--font-mono, monospace)">[0]</text>
+        </g>
+      
+        <g>
+          
+          <rect x="135" y="76" width="44" height="40" rx="8" fill="var(--bg-secondary, #f1f5f9)" stroke="var(--border-color, #94a3b8)" stroke-width="1.5" />
+          <text x="157" y="100" text-anchor="middle" font-size="11" font-weight="700" fill="var(--fg-primary, #1e293b)" font-family="var(--font-mono, monospace)">102:p…</text>
+          <text x="157" y="130" text-anchor="middle" font-size="9.5" fill="var(--fg-muted, #64748b)" font-family="var(--font-mono, monospace)">[1]</text>
+        </g>
+      
+        <g>
+          
+          <rect x="256" y="76" width="44" height="40" rx="8" fill="var(--bg-secondary, #f1f5f9)" stroke="var(--border-color, #94a3b8)" stroke-width="1.5" />
+          <text x="278" y="100" text-anchor="middle" font-size="11" font-weight="700" fill="var(--fg-primary, #1e293b)" font-family="var(--font-mono, monospace)">103:p…</text>
+          <text x="278" y="130" text-anchor="middle" font-size="9.5" fill="var(--fg-muted, #64748b)" font-family="var(--font-mono, monospace)">[2]</text>
+        </g>
+      
+        <g>
+          
+          <rect x="377" y="76" width="44" height="40" rx="8" fill="var(--bg-secondary, #f1f5f9)" stroke="var(--border-color, #94a3b8)" stroke-width="1.5" />
+          <text x="399" y="100" text-anchor="middle" font-size="11" font-weight="700" fill="var(--fg-primary, #1e293b)" font-family="var(--font-mono, monospace)">104:r…</text>
+          <text x="399" y="130" text-anchor="middle" font-size="9.5" fill="var(--fg-muted, #64748b)" font-family="var(--font-mono, monospace)">[3]</text>
+        </g>
+      
+        <g>
+          
+          <rect x="498" y="76" width="44" height="40" rx="8" fill="var(--bg-secondary, #f1f5f9)" stroke="var(--border-color, #94a3b8)" stroke-width="1.5" />
+          <text x="520" y="100" text-anchor="middle" font-size="11" font-weight="700" fill="var(--fg-primary, #1e293b)" font-family="var(--font-mono, monospace)">105:p…</text>
+          <text x="520" y="130" text-anchor="middle" font-size="9.5" fill="var(--fg-muted, #64748b)" font-family="var(--font-mono, monospace)">[4]</text>
+        </g>
+      
+        <g>
+          
+          <rect x="619" y="76" width="44" height="40" rx="8" fill="var(--bg-secondary, #f1f5f9)" stroke="var(--border-color, #94a3b8)" stroke-width="1.5" />
+          <text x="641" y="100" text-anchor="middle" font-size="11" font-weight="700" fill="var(--fg-primary, #1e293b)" font-family="var(--font-mono, monospace)">106:p…</text>
+          <text x="641" y="130" text-anchor="middle" font-size="9.5" fill="var(--fg-muted, #64748b)" font-family="var(--font-mono, monospace)">[5]</text>
+        </g>
+      
+        </svg>
+      </div>
+    
+      <div style="border:1px solid var(--border-color,#27272a);border-radius:8px;overflow:hidden;margin:6px 0;background:var(--bg-secondary,rgba(24,24,27,0.45));">
+        <div style="padding:5px 10px;background:var(--bg-tertiary,rgba(39,39,42,0.6));border-bottom:1px solid var(--border-color,#27272a);font-size:11.5px;font-weight:700;font-family:var(--font-mono,monospace);display:flex;justify-content:space-between;align-items:center;">
+          <span>📋 Logical Query Execution Pipeline (FROM → WHERE → SELECT → ORDER BY → LIMIT) — Initial Relation State</span>
+          <span style="font-size:10.5px;color:var(--fg-muted);font-weight:500;">6 row(s)</span>
+        </div>
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;">
+            <thead><tr><th style="padding:5px 8px;text-align:left;border-bottom:1px solid var(--border-color,#27272a);font-size:11px;color:var(--fg-muted);font-family:var(--font-mono,monospace);">order_id</th><th style="padding:5px 8px;text-align:left;border-bottom:1px solid var(--border-color,#27272a);font-size:11px;color:var(--fg-muted);font-family:var(--font-mono,monospace);">customer</th><th style="padding:5px 8px;text-align:left;border-bottom:1px solid var(--border-color,#27272a);font-size:11px;color:var(--fg-muted);font-family:var(--font-mono,monospace);">status</th><th style="padding:5px 8px;text-align:left;border-bottom:1px solid var(--border-color,#27272a);font-size:11px;color:var(--fg-muted);font-family:var(--font-mono,monospace);">total_cents</th><th style="padding:5px 8px;text-align:left;border-bottom:1px solid var(--border-color,#27272a);font-size:11px;color:var(--fg-muted);font-family:var(--font-mono,monospace);">created_at</th><th style="padding:5px 8px;text-align:left;border-bottom:1px solid var(--border-color,#27272a);font-size:11px;color:var(--fg-muted);font-family:var(--font-mono,monospace);">State</th></tr></thead>
+            <tbody><tr style="background:rgba(59,130,246,0.12);border-left:3px solid #3b82f6;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">101</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">Ada Lovelace</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">paid</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">18500</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">2026-03-01</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:10.5px;font-weight:700;font-family:var(--font-mono,monospace);color:#3b82f6;">CURSOR START</td></tr><tr style="background:transparent;border-left:3px solid transparent;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">102</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">Alan Turing</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">pending</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">9200</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">2026-03-02</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);"></td></tr><tr style="background:transparent;border-left:3px solid transparent;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">103</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">Grace Hopper</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">paid</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">34000</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">2026-03-02</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);"></td></tr><tr style="background:transparent;border-left:3px solid transparent;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">104</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">Edsger Dijkstra</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">refunded</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">21000</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">2026-03-03</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);"></td></tr><tr style="background:transparent;border-left:3px solid transparent;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">105</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">Barbara Liskov</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">paid</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">27500</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">2026-03-04</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);"></td></tr><tr style="background:transparent;border-left:3px solid transparent;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">106</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">Donald Knuth</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">paid</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">12900</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">2026-03-05</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);"></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    <div class="dsa-sim__array"><div class="dsa-sim__cell is-active"><span class="dsa-sim__cell-idx">[0]</span><span class="dsa-sim__cell-val">101:paid</span><span class="dsa-sim__cell-tag">Tuple #0</span></div><div class="dsa-sim__cell"><span class="dsa-sim__cell-idx">[1]</span><span class="dsa-sim__cell-val">102:pending</span></div><div class="dsa-sim__cell"><span class="dsa-sim__cell-idx">[2]</span><span class="dsa-sim__cell-val">103:paid</span></div><div class="dsa-sim__cell"><span class="dsa-sim__cell-idx">[3]</span><span class="dsa-sim__cell-val">104:refunded</span></div><div class="dsa-sim__cell"><span class="dsa-sim__cell-idx">[4]</span><span class="dsa-sim__cell-val">105:paid</span></div><div class="dsa-sim__cell"><span class="dsa-sim__cell-idx">[5]</span><span class="dsa-sim__cell-val">106:paid</span></div></div></div>
+            <div class="dsa-sim__metrics" data-role="metrics">
+              
+                <div class="dsa-sim__metric">
+                  <div class="dsa-sim__metric-label">Input Tuples</div>
+                  <div class="dsa-sim__metric-value">6</div>
+                </div>
+              
+                <div class="dsa-sim__metric">
+                  <div class="dsa-sim__metric-label">Columns</div>
+                  <div class="dsa-sim__metric-value">5</div>
+                </div>
+              
+                <div class="dsa-sim__metric">
+                  <div class="dsa-sim__metric-label">Preset Mode</div>
+                  <div class="dsa-sim__metric-value">orders</div>
+                </div>
+              
+                <div class="dsa-sim__metric">
+                  <div class="dsa-sim__metric-label">Pipeline Stage</div>
+                  <div class="dsa-sim__metric-value">1. Initial Scan</div>
+                </div>
+              
+            </div>
+            <div class="dsa-sim__log" data-role="log"><div>[Step 1] Initialized Logical Query Execution Pipeline (FROM → WHERE → SELECT → ORDER BY → LIMIT) (Paid Orders ≥ $120 Ordered by Total DESC LIMIT 3) with 6 base rows.</div></div>
+          </div>
+        </div>
+        <a class="landing-link" id="landing-demo-lesson" href="#topic/where-filtering-predicates">Open lesson →</a>
+      </section>
+      <section class="landing-section">
+        <h2 class="landing-section__title">In every lesson</h2>
+        <div class="landing-features">
+          <div class="landing-feature"><span class="landing-feature__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg></span><span class="landing-feature__title">Intuition first</span></div><div class="landing-feature"><span class="landing-feature__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m10 9 5 3-5 3z"/></svg></span><span class="landing-feature__title">Hand-picked videos</span></div><div class="landing-feature"><span class="landing-feature__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><path d="M10 6.5h4a2 2 0 0 1 2 2V14"/></svg></span><span class="landing-feature__title">Table-level visualizers</span></div><div class="landing-feature"><span class="landing-feature__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg></span><span class="landing-feature__title">Audio narration</span></div><div class="landing-feature"><span class="landing-feature__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span class="landing-feature__title">Check yourself</span></div><div class="landing-feature"><span class="landing-feature__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg></span><span class="landing-feature__title">WASM SQL in browser</span></div>
+        </div>
+      </section>
+      <section class="landing-section" id="landing-builds">
+        <h2 class="landing-section__title">18 from-scratch builds</h2>
+        <div class="landing-builds">
+          <a class="landing-build" href="/build/build-sql-query-interpreter/" data-action="navigate-build" data-build-id="build-sql-query-interpreter">Mini Relational Tuple Filter &amp; Projection Engine<span aria-hidden="true">→</span></a><a class="landing-build" href="/build/build-ecommerce-schema-ddl/" data-action="navigate-build" data-build-id="build-ecommerce-schema-ddl">E-Commerce Schema with Referential Integrity &amp; Upsert Pipeline<span aria-hidden="true">→</span></a><a class="landing-build" href="/build/build-multi-table-order-reconciler/" data-action="navigate-build" data-build-id="build-multi-table-order-reconciler">Multi-Table Order, Payment &amp; Shipment Reconciliation Engine<span aria-hidden="true">→</span></a><a class="landing-build" href="/build/build-executive-kpi-aggregation-suite/" data-action="navigate-build" data-build-id="build-executive-kpi-aggregation-suite">Multi-Dimensional Revenue, Cohort &amp; Funnel Aggregation Suite<span aria-hidden="true">→</span></a><a class="landing-build" href="/build/build-hierarchical-graph-query-engine/" data-action="navigate-build" data-build-id="build-hierarchical-graph-query-engine">Bill-of-Materials &amp; Social Graph Reachability Engine<span aria-hidden="true">→</span></a><a class="landing-build" href="/build/build-sessionization-retention-engine/" data-action="navigate-build" data-build-id="build-sessionization-retention-engine">Clickstream Sessionizer, Streak Tracker &amp; Rolling Window Analyzer<span aria-hidden="true">→</span></a><a class="landing-build" href="/build/build-normalized-booking-schema/" data-action="navigate-build" data-build-id="build-normalized-booking-schema">Normalize a Legacy Flat Spreadsheet into a 3NF/BCNF System<span aria-hidden="true">→</span></a><a class="landing-build" href="/build/build-scd-type2-warehouse-pipeline/" data-action="navigate-build" data-build-id="build-scd-type2-warehouse-pipeline">Star Schema with Automated SCD Type 2 Dimension Pipeline<span aria-hidden="true">→</span></a><a class="landing-build" href="/build/build-saas-cohort-funnel-workbench/" data-action="navigate-build" data-build-id="build-saas-cohort-funnel-workbench">Complete SaaS Analytics Engine<span aria-hidden="true">→</span></a><a class="landing-build" href="/build/build-btree-index-advisor/" data-action="navigate-build" data-build-id="build-btree-index-advisor">B+Tree Page Simulator &amp; Automated Workload Index Advisor<span aria-hidden="true">→</span></a><a class="landing-build" href="/build/build-visual-explain-plan-analyzer/" data-action="navigate-build" data-build-id="build-visual-explain-plan-analyzer">Interactive EXPLAIN Plan Bottleneck Detector &amp; Query Rewriter<span aria-hidden="true">→</span></a><a class="landing-build" href="/build/build-physical-join-execution-engine/" data-action="navigate-build" data-build-id="build-physical-join-execution-engine">Implement &amp; Benchmark Nested Loop, Hash Join &amp; Sort-Merge Join<span aria-hidden="true">→</span></a><a class="landing-build" href="/build/build-transaction-anomaly-simulator/" data-action="navigate-build" data-build-id="build-transaction-anomaly-simulator">Dual-Session Concurrency Anomaly &amp; Isolation Verifier<span aria-hidden="true">→</span></a><a class="landing-build" href="/build/build-mvcc-snapshot-storage-engine/" data-action="navigate-build" data-build-id="build-mvcc-snapshot-storage-engine">Multi-Version Tuple Store with Snapshot Isolation &amp; Vacuum GC<span aria-hidden="true">→</span></a><a class="landing-build" href="/build/build-slotted-page-wal-engine/" data-action="navigate-build" data-build-id="build-slotted-page-wal-engine">8KB Slotted Page + Write-Ahead Log Crash Recovery Simulator<span aria-hidden="true">→</span></a><a class="landing-build" href="/build/build-columnar-compression-query-engine/" data-action="navigate-build" data-build-id="build-columnar-compression-query-engine">Columnar RLE/Dictionary Encoder with Zone-Map Predicate Pushdown<span aria-hidden="true">→</span></a><a class="landing-build" href="/build/build-sharded-query-router/" data-action="navigate-build" data-build-id="build-sharded-query-router">Consistent-Hash Shard Router with Partition Pruning &amp; Scatter-Gather<span aria-hidden="true">→</span></a><a class="landing-build" href="/build/build-production-sql-tuning-clinic/" data-action="navigate-build" data-build-id="build-production-sql-tuning-clinic">End-to-End Slow Query Diagnostic &amp; Optimization Clinic<span aria-hidden="true">→</span></a>
+        </div>
+      </section><section class="landing-section" id="landing-curriculum"><h2 class="landing-section__title">Curriculum</h2><h3 class="landing-part">Relational Foundations &amp; Core Querying</h3><div class="landing-modules">
+          <a class="landing-module" href="/topic/why-databases-exist/" data-module="m01" data-units="why-databases-exist tables-rows-columns-types select-projection-aliases where-filtering-predicates boolean-logic-three-valued-null null-semantics-coalesce-nullif order-by-limit-offset-distinct case-expressions-type-casting case-stripe-ledger-precision build-sql-query-interpreter">
+            <span class="landing-module__num">1.1</span>
+            <span class="landing-module__title">The Relational Model, Tables &amp; SELECT Foundations</span>
+            <span class="landing-module__meta">10 topics</span>
+            <span class="landing-module__bar"><span style="width:0%"></span></span>
+          </a>
+          <a class="landing-module" href="/topic/create-table-ddl-anatomy/" data-module="m02" data-units="create-table-ddl-anatomy primary-keys-surrogate-vs-natural foreign-keys-referential-integrity check-unique-not-null-defaults insert-bulk-loading-returning upsert-on-conflict-merge update-delete-safe-mutations views-temp-tables-ctas case-github-zero-downtime-migrations build-ecommerce-schema-ddl">
+            <span class="landing-module__num">1.2</span>
+            <span class="landing-module__title">DDL, Schema Constraints &amp; DML Mutations</span>
+            <span class="landing-module__meta">10 topics</span>
+            <span class="landing-module__bar"><span style="width:0%"></span></span>
+          </a>
+          <a class="landing-module" href="/topic/relational-algebra-set-theory/" data-module="m03" data-units="relational-algebra-set-theory inner-join-equi-joins left-right-full-outer-joins join-where-vs-on-filter-trap self-joins-non-equi-joins cross-join-cartesian-products semi-joins-anti-joins set-operations-union-intersect-except case-missing-null-notin-outage build-multi-table-order-reconciler">
+            <span class="landing-module__num">1.3</span>
+            <span class="landing-module__title">Relational Algebra &amp; Multi-Table Joins</span>
+            <span class="landing-module__meta">10 topics</span>
+            <span class="landing-module__bar"><span style="width:0%"></span></span>
+          </a></div><h3 class="landing-part">Aggregations, Subqueries, CTEs &amp; Window Functions</h3><div class="landing-modules">
+          <a class="landing-module" href="/topic/aggregate-functions-internals/" data-module="m04" data-units="aggregate-functions-internals group-by-execution-mechanics having-vs-where-pipeline conditional-aggregation-filter string-json-array-aggregation grouping-sets-rollup-cube join-fanout-chasm-traps histograms-percentiles-medians case-analytics-double-counting-bug build-executive-kpi-aggregation-suite">
+            <span class="landing-module__num">2.1</span>
+            <span class="landing-module__title">Grouping, Aggregations &amp; Multi-Dimensional Rollups</span>
+            <span class="landing-module__meta">10 topics</span>
+            <span class="landing-module__bar"><span style="width:0%"></span></span>
+          </a>
+          <a class="landing-module" href="/topic/scalar-row-table-subqueries/" data-module="m05" data-units="scalar-row-table-subqueries correlated-subqueries-mechanics exists-not-exists-null-safety lateral-joins-cross-apply common-table-expressions-with cte-materialization-optimization-fence recursive-ctes-hierarchies graph-traversal-cycle-detection-sql case-recursive-org-permission-engine build-hierarchical-graph-query-engine">
+            <span class="landing-module__num">2.2</span>
+            <span class="landing-module__title">Subqueries, Correlated Queries, Lateral Joins &amp; CTEs</span>
+            <span class="landing-module__meta">10 topics</span>
+            <span class="landing-module__bar"><span style="width:0%"></span></span>
+          </a>
+          <a class="landing-module" href="/topic/window-functions-mental-model/" data-module="m06" data-units="window-functions-mental-model partition-by-order-by-mechanics ranking-functions-row-number-rank top-n-per-group-deduplication offset-functions-lag-lead-first-last window-frames-rows-range-groups running-totals-cumulative-shares gaps-and-islands-sessionization case-fintech-velocity-fraud-window build-sessionization-retention-engine">
+            <span class="landing-module__num">2.3</span>
+            <span class="landing-module__title">Window Functions &amp; Analytical SQL Mastery</span>
+            <span class="landing-module__meta">10 topics</span>
+            <span class="landing-module__bar"><span style="width:0%"></span></span>
+          </a></div><h3 class="landing-part">Data Modeling, Normalization &amp; Schema Architecture</h3><div class="landing-modules">
+          <a class="landing-module" href="/topic/entity-relationship-modeling/" data-module="m07" data-units="entity-relationship-modeling functional-dependencies-keys first-normal-form-atomicity second-third-normal-form boyce-codd-fourth-fifth-normal-form update-insertion-deletion-anomalies strategic-denormalization-tradeoffs schema-anti-patterns-eav-god-tables case-shopify-multi-tenant-schema build-normalized-booking-schema">
+            <span class="landing-module__num">3.1</span>
+            <span class="landing-module__title">Relational Data Modeling &amp; Normalization (1NF to BCNF/5NF)</span>
+            <span class="landing-module__meta">10 topics</span>
+            <span class="landing-module__bar"><span style="width:0%"></span></span>
+          </a>
+          <a class="landing-module" href="/topic/oltp-vs-olap-workload-physics/" data-module="m08" data-units="oltp-vs-olap-workload-physics star-schema-facts-dimensions snowflake-vs-star-vs-obt slowly-changing-dimensions-scd bridge-tables-junk-role-dimensions temporal-tables-bitemporal-sql json-semi-structured-hybrid-schemas idempotency-audit-logs-event-tables case-airbnb-minerva-metric-layer build-scd-type2-warehouse-pipeline">
+            <span class="landing-module__num">3.2</span>
+            <span class="landing-module__title">Dimensional Modeling &amp; Analytical Schema Design</span>
+            <span class="landing-module__meta">10 topics</span>
+            <span class="landing-module__bar"><span style="width:0%"></span></span>
+          </a>
+          <a class="landing-module" href="/topic/calendar-tables-date-spines/" data-module="m09" data-units="calendar-tables-date-spines cohort-retention-matrix-sql funnel-conversion-attribution-sql interval-overlap-allen-algebra pivoting-unpivoting-cross-tabs triggers-stored-procedures-udfs materialized-views-incremental-refresh sql-injection-parameterized-security case-double-booking-hotel-inventory build-saas-cohort-funnel-workbench">
+            <span class="landing-module__num">3.3</span>
+            <span class="landing-module__title">Advanced SQL Patterns, Temporal Queries &amp; Programmability</span>
+            <span class="landing-module__meta">10 topics</span>
+            <span class="landing-module__bar"><span style="width:0%"></span></span>
+          </a></div><h3 class="landing-part">Indexing, Query Planner &amp; Execution Engine</h3><div class="landing-modules">
+          <a class="landing-module" href="/topic/why-indexes-work-io-cost-model/" data-module="m10" data-units="why-indexes-work-io-cost-model btree-bplustree-internal-anatomy clustered-vs-secondary-indexes composite-indexes-leftmost-prefix covering-indexes-index-only-scans partial-filtered-expression-indexes hash-gin-gist-brin-bloom-indexes index-bloat-write-amplification-traps case-slack-composite-index-incident build-btree-index-advisor">
+            <span class="landing-module__num">4.1</span>
+            <span class="landing-module__title">B+Tree Indexes &amp; Access Path Mechanics</span>
+            <span class="landing-module__meta">10 topics</span>
+            <span class="landing-module__bar"><span style="width:0%"></span></span>
+          </a>
+          <a class="landing-module" href="/topic/life-of-a-sql-query-pipeline/" data-module="m11" data-units="life-of-a-sql-query-pipeline reading-explain-and-explain-analyze table-statistics-histograms-cardinality selectivity-estimation-correlated-columns scan-operators-seq-index-bitmap sargability-functions-on-columns or-conditions-in-lists-union-rewrites sorting-spill-to-disk-top-n-heapsort case-stale-statistics-plan-flip build-visual-explain-plan-analyzer">
+            <span class="landing-module__num">4.2</span>
+            <span class="landing-module__title">The Query Planner, Cost-Based Optimizer &amp; EXPLAIN</span>
+            <span class="landing-module__meta">10 topics</span>
+            <span class="landing-module__bar"><span style="width:0%"></span></span>
+          </a>
+          <a class="landing-module" href="/topic/nested-loop-join-indexed-nlj/" data-module="m12" data-units="nested-loop-join-indexed-nlj hash-join-build-probe-grace sort-merge-join-zipper-mechanics join-order-search-dynamic-programming predicate-pushdown-projection-pruning subquery-unnesting-semi-anti-physical execution-models-volcano-vectorized parallel-query-execution-workers case-hash-join-oom-work-mem-spill build-physical-join-execution-engine">
+            <span class="landing-module__num">4.3</span>
+            <span class="landing-module__title">Physical Join Algorithms &amp; Execution Pipelines</span>
+            <span class="landing-module__meta">10 topics</span>
+            <span class="landing-module__bar"><span style="width:0%"></span></span>
+          </a></div><h3 class="landing-part">Transactions, Concurrency Control, MVCC &amp; Storage Internals</h3><div class="landing-modules">
+          <a class="landing-module" href="/topic/acid-properties-under-the-hood/" data-module="m13" data-units="acid-properties-under-the-hood transaction-lifecycle-savepoints read-phenomena-dirty-nonrepeatable-phantom write-anomalies-lost-update-write-skew read-uncommitted-read-committed repeatable-read-snapshot-isolation serializable-2pl-vs-ssi optimistic-vs-pessimistic-concurrency case-fintech-double-spend-race-condition build-transaction-anomaly-simulator">
+            <span class="landing-module__num">5.1</span>
+            <span class="landing-module__title">ACID Transactions, Concurrency Anomalies &amp; Isolation Levels</span>
+            <span class="landing-module__meta">10 topics</span>
+            <span class="landing-module__bar"><span style="width:0%"></span></span>
+          </a>
+          <a class="landing-module" href="/topic/multi-version-concurrency-control-mvcc/" data-module="m14" data-units="multi-version-concurrency-control-mvcc tuple-headers-xmin-xmax-visibility transaction-snapshots-visibility-rules row-level-locks-for-update-skip-locked table-locks-intention-locks-ddl-hazards gap-locks-next-key-locks-innodb deadlocks-wait-for-graphs-detection dead-tuples-bloat-autovacuum-txid-wraparound case-sentry-transaction-id-wraparound build-mvcc-snapshot-storage-engine">
+            <span class="landing-module__num">5.2</span>
+            <span class="landing-module__title">Locking, MVCC Internals &amp; Vacuuming</span>
+            <span class="landing-module__meta">10 topics</span>
+            <span class="landing-module__bar"><span style="width:0%"></span></span>
+          </a>
+          <a class="landing-module" href="/topic/slotted-page-layout-8kb-anatomy/" data-module="m15" data-units="slotted-page-layout-8kb-anatomy heap-files-hot-updates-fillfactor buffer-pool-clock-sweep-lru-k write-ahead-logging-wal-lsn checkpoints-dirty-page-flushing aries-crash-recovery-analysis-redo-undo lsm-trees-memtable-sstable-compaction btree-vs-lsm-read-write-space-amplification case-uber-postgres-to-mysql-storage build-slotted-page-wal-engine">
+            <span class="landing-module__num">5.3</span>
+            <span class="landing-module__title">Storage Engine Internals: Pages, Buffer Pool, WAL &amp; LSM-Trees</span>
+            <span class="landing-module__meta">10 topics</span>
+            <span class="landing-module__bar"><span style="width:0%"></span></span>
+          </a></div><h3 class="landing-part">Analytical Engines (OLAP), Distributed SQL &amp; Production Operations</h3><div class="landing-modules">
+          <a class="landing-module" href="/topic/columnar-storage-layout-parquet/" data-module="m16" data-units="columnar-storage-layout-parquet columnar-compression-rle-dictionary-delta late-materialization-simd-vectorization zone-maps-min-max-pruning-bloom embedded-olap-duckdb-architecture realtime-olap-clickhouse-mergetree cloud-warehouses-snowflake-bigquery open-table-formats-iceberg-delta case-cloudflare-clickhouse-log-analytics build-columnar-compression-query-engine">
+            <span class="landing-module__num">6.1</span>
+            <span class="landing-module__title">Columnar Storage, Vectorized OLAP &amp; Modern Lakehouses</span>
+            <span class="landing-module__meta">10 topics</span>
+            <span class="landing-module__bar"><span style="width:0%"></span></span>
+          </a>
+          <a class="landing-module" href="/topic/single-leader-replication-sync-async/" data-module="m17" data-units="single-leader-replication-sync-async read-replicas-consistency-models failover-split-brain-fencing-tokens declarative-table-partitioning horizontal-sharding-routing-keys distributed-transactions-2pc-saga distributed-sql-spanner-cockroachdb connection-pooling-pgbouncer-proxies case-figma-postgres-horizontal-sharding build-sharded-query-router">
+            <span class="landing-module__num">6.2</span>
+            <span class="landing-module__title">Replication, Partitioning, Sharding &amp; Distributed NewSQL</span>
+            <span class="landing-module__meta">10 topics</span>
+            <span class="landing-module__bar"><span style="width:0%"></span></span>
+          </a>
+          <a class="landing-module" href="/topic/keyset-cursor-pagination-vs-offset/" data-module="m18" data-units="keyset-cursor-pagination-vs-offset solving-n-plus-one-orm-queries full-text-search-trigrams-inverted-index queue-processing-skip-locked-patterns bulk-ingestion-batching-unlogged-tables pg-stat-statements-slow-query-triage lock-contention-zero-downtime-ddl backup-pitr-wal-archiving-drills case-gitlab-database-incident-postmortem build-production-sql-tuning-clinic">
+            <span class="landing-module__num">6.3</span>
+            <span class="landing-module__title">Production Query Tuning, Observability &amp; Database Reliability</span>
+            <span class="landing-module__meta">10 topics</span>
+            <span class="landing-module__bar"><span style="width:0%"></span></span>
+          </a></div></section>
+      <section class="landing-closing">
+        <h2 class="landing-closing__title">Start with the first lesson.</h2>
+        <a class="btn btn--primary landing-btn" href="/topic/why-databases-exist/">Start learning →</a>
+      </section></div>      <!-- landing:end -->
+    </div>
+  </main>
+
+  <!-- Search Modal -->
+  <div class="search-modal" id="search-modal" role="dialog" aria-label="Search topics" aria-modal="true">
+    <div class="search-modal__backdrop" id="search-backdrop"></div>
+    <div class="search-modal__dialog">
+      <div class="search-modal__input-wrap">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input class="search-modal__input" id="search-input" type="text" placeholder="Search 180 SQL topics, clauses, and build labs…" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="search-modal__results" id="search-results"></div>
+      <div class="search-modal__footer">
+        <span><kbd>↑</kbd><kbd>↓</kbd> Navigate</span>
+        <span><kbd>↵</kbd> Open</span>
+        <span><kbd>Esc</kbd> Close</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Diagram Lightbox Modal -->
+  <div class="diagram-lightbox" id="diagram-lightbox" role="dialog" aria-label="Architecture diagram viewer" aria-modal="true">
+    <div class="diagram-lightbox__backdrop" id="diagram-lightbox-backdrop"></div>
+    <div class="diagram-lightbox__dialog">
+      <div class="diagram-lightbox__header">
+        <div class="diagram-lightbox__title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <path d="M3 9h18M9 21V9"/>
+          </svg>
+          <span>Relational &amp; Storage Diagram</span>
+        </div>
+        <div class="diagram-lightbox__actions">
+          <button class="diagram-lightbox__btn" id="diagram-zoom-out" title="Zoom Out" aria-label="Zoom out">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <button class="diagram-lightbox__btn diagram-lightbox__btn--text" id="diagram-zoom-reset" title="Reset Zoom" aria-label="Reset zoom">
+            <span id="diagram-zoom-level">100%</span>
+          </button>
+          <button class="diagram-lightbox__btn" id="diagram-zoom-in" title="Zoom In" aria-label="Zoom in">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <div class="diagram-lightbox__divider"></div>
+          <button class="diagram-lightbox__btn diagram-lightbox__close" id="diagram-lightbox-close" title="Close (Esc)" aria-label="Close dialog">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="diagram-lightbox__body" id="diagram-lightbox-body">
+        <div class="diagram-lightbox__stage" id="diagram-lightbox-stage"></div>
+      </div>
+      <div class="diagram-lightbox__footer">
+        <span>Click and drag to pan • Scroll to zoom • Press <kbd>Esc</kbd> to close</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Scripts -->
+  <script type="text/plain" data-defer src="data/curriculum.js?v=4f53b5646e"></script>
+  <script type="text/plain" data-defer src="data/datasets.js?v=b36e7e0d33"></script>
+  <script type="text/plain" data-defer src="data/roadmap.js?v=584992226a"></script>
+  <script type="text/plain" data-defer src="data/challenges.js?v=fb4083c38c"></script>
+  <script type="text/plain" data-defer src="data/srs-cards.js?v=fabc47dd9c"></script>
+  <script type="text/plain" data-defer src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
+  <script type="text/plain" data-defer src="data/implementations_code.js?v=fce884f8a8"></script>
+  <script type="text/plain" data-defer src="data/guided_labs.js?v=3bd996e9dc"></script>
+  <script type="text/plain" data-defer src="data/topic_guided_labs.js?v=9761466656"></script>
+  <script type="text/plain" data-defer src="data/projects.js?v=2280ac085f"></script>
+  <script type="text/plain" data-defer src="data/glossary.js?v=4f6c79a4e0"></script>
+
+  <!-- App Scripts -->
+  <script type="text/plain" data-defer src="js/lazy.js?v=7275ff46e4"></script>
+  <script type="text/plain" data-defer src="js/analytics.js?v=4bfe019329"></script>
+  <script type="text/plain" data-defer src="js/progress.js?v=20e4822556"></script>
+  <script type="text/plain" data-defer src="js/search.js?v=e2063e0ccd"></script>
+  <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
+  <script type="text/plain" data-defer src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>
+  <script type="text/plain" data-defer src="js/sql-engine.js?v=92e27d93f9"></script>
+  <script type="text/plain" data-defer src="js/table-visualizer.js?v=ad3ad8c767"></script>
+  <script type="text/plain" data-defer src="js/simulators.js?v=68b973e4c8"></script>
+  <script type="text/plain" data-defer src="js/simulators-relational.js?v=8e12b97831"></script>
+  <script type="text/plain" data-defer src="js/simulators-analytical.js?v=258089d8ac"></script>
+  <script type="text/plain" data-defer src="js/simulators-modeling.js?v=879389be96"></script>
+  <script type="text/plain" data-defer src="js/simulators-indexing.js?v=53c97b0c73"></script>
+  <script type="text/plain" data-defer src="js/simulators-transactions.js?v=677d3befc9"></script>
+  <script type="text/plain" data-defer src="js/simulators-olap-ops.js?v=c793d19e01"></script>
+  <script type="text/plain" data-defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script type="text/plain" data-defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <script type="text/plain" data-defer src="js/renderer.js?v=960b3ce310"></script>
+  <script type="text/plain" data-defer src="js/landing.js?v=65d1430533"></script>
+  
+  <script type="text/plain" data-defer src="js/quiz.js?v=5b300d9b3d"></script>
+  <script type="text/plain" data-defer src="js/roadmap.js?v=afdc0360a7"></script>
+  <script type="text/plain" data-defer src="js/challenges.js?v=a08b5b8a96"></script>
+  <script type="text/plain" data-defer src="js/dashboard.js?v=1e493b80a6"></script>
+  <script type="text/plain" data-defer src="js/sandbox.js?v=91b1b1bf55"></script>
+  <script type="text/plain" data-defer src="js/topic-codelab.js?v=096611d91c"></script>
+  
+  <script type="text/plain" data-defer src="js/app.js?v=90ae030c67"></script>
+
+  <!-- App bootstrap & deferred script loader -->
+  <script src="js/bootstrap.js?v=df2bb60aeb"></script>
+</body>
+</html>

@@ -1,0 +1,324 @@
+/* ═══════════════════════════════════════════════════════════════
+   Design Tokens — Ved Gupta design system (Geist, monochrome neutrals)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Self-hosted variable fonts (latin subset); other scripts fall back to the system stack. */
+@font-face {
+  font-family: "Geist"; font-style: normal; font-weight: 100 900; font-display: swap;
+  src: url("../fonts/geist-latin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Geist Mono"; font-style: normal; font-weight: 100 900; font-display: swap;
+  src: url("../fonts/geist-mono-latin.woff2") format("woff2");
+}
+
+:root {
+  /* ── Typography ──────────────────────────────────────────── */
+  --font-sans: "Geist", "Geist Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, "Roboto Mono", Menlo, Monaco, monospace;
+  --font-heading: var(--font-sans);
+
+  /* Font weights */
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 600; /* design system tops out at semibold */
+
+  /* Font sizes */
+  --text-xs: 0.75rem;    /* 12px */
+  --text-sm: 0.8125rem;  /* 13px */
+  --text-base: 0.875rem; /* 14px */
+  --text-md: 0.9375rem;  /* 15px */
+  --text-lg: 1.125rem;   /* 18px */
+  --text-xl: 1.25rem;    /* 20px */
+  --text-2xl: 1.5rem;    /* 24px */
+  --text-3xl: 1.875rem;  /* 30px */
+  --text-4xl: 2.25rem;   /* 36px */
+
+  /* Line heights */
+  --leading-tight: 1.2;
+  --leading-snug: 1.35;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.65;
+
+  /* Letter spacing */
+  --tracking-tighter: -0.05em; /* headings: matches vedgupta.in (-1.2px @ 24px) */
+  --tracking-tight: -0.025em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.025em;
+  --tracking-wider: 0.05em;
+
+  /* ── Spacing ─────────────────────────────────────────────── */
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+  --space-20: 5rem;     /* 80px */
+  --sp-1: var(--space-1);
+  --sp-2: var(--space-2);
+  --sp-3: var(--space-3);
+  --sp-4: var(--space-4);
+  --sp-5: var(--space-5);
+  --sp-6: var(--space-6);
+  --sp-8: var(--space-8);
+  --sp-10: var(--space-10);
+  --sp-12: var(--space-12);
+  --sp-16: var(--space-16);
+  --sp-20: var(--space-20);
+
+  /* ── Border Radius ───────────────────────────────────────── */
+  --r-sm: 4px;
+  --r-md: 6px;
+  --r-lg: 8px;
+  --r-xl: 12px;
+  --r-2xl: 16px;
+  --r-full: 999px;
+
+  /* ── Layout ──────────────────────────────────────────────── */
+  --topbar-h: 52px;
+  --sidebar-w: 280px;
+  --content-max: 760px;
+  --reading-max: 680px;
+
+  /* ── Transitions ─────────────────────────────────────────── */
+  --dur-fast: 120ms;
+  --dur-normal: 200ms;
+  --dur-slow: 350ms;
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ── Shadows ─────────────────────────────────────────────── */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.16);
+
+  /* ── Z-Index Scale ───────────────────────────────────────── */
+  --z-sidebar: 20;
+  --z-topbar: 30;
+  --z-dropdown: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+}
+
+/* ── Dark Theme (Default) ──────────────────────────────────── */
+/* Ved Gupta design system (vedgupta.in · sso.vedgupta.in · resume.vedgupta.in):
+   monochrome neutral palette, pure-black canvas, white primary. */
+[data-theme="dark"], :root {
+  --bg: #000000;
+  --bg-alt: #0a0a0a;
+  --surface: #0a0a0a;
+  --surface-hover: #171717;
+  --surface-active: #262626;
+  --sidebar-bg: #0a0a0a;
+  --topbar-bg: rgba(0, 0, 0, 0.88);
+  --topbar-glass: rgba(0, 0, 0, 0.8);
+  --panel-glass: rgba(10, 10, 10, 0.96);
+
+  /* Borders & Dividers */
+  --border: #262626;
+  --border-strong: #404040;
+  --border-focus: #525252;
+  --divider: #171717;
+
+  /* Typography Palette */
+  --fg: #ffffff;
+  --fg-prose: #e5e5e5;
+  --fg-muted: #a1a1a1;
+  --fg-faint: #8f8f8f; /* 5.5:1 on #171717 */
+  --fg-inv: #000000;
+
+  /* Primary (monochrome: white on black) */
+  --accent: #ffffff;
+  --accent-hover: #e5e5e5;
+  --accent-muted: rgba(255, 255, 255, 0.08);
+  --accent-border: rgba(255, 255, 255, 0.22);
+  --accent-fg: #000000;
+  --link: #54a2ff;
+  --selection: #47a3f3;
+
+  /* Status Colors (design-system chart palette) */
+  --success: #05df72;
+  --success-muted: rgba(5, 223, 114, 0.12);
+  --success-bg: rgba(5, 223, 114, 0.1);
+  --success-border: rgba(5, 223, 114, 0.32);
+  --warning: #ffd236;
+  --warning-muted: rgba(255, 210, 54, 0.12);
+  --warning-bg: rgba(255, 210, 54, 0.1);
+  --warning-border: rgba(255, 210, 54, 0.32);
+  --error: #fb2c36;
+  --error-muted: rgba(251, 44, 54, 0.12);
+  --error-bg: rgba(251, 44, 54, 0.1);
+  --error-border: rgba(251, 44, 54, 0.35);
+  --info: #54a2ff;
+  --info-muted: rgba(84, 162, 255, 0.12);
+  --info-bg: rgba(84, 162, 255, 0.1);
+  --info-border: rgba(84, 162, 255, 0.35);
+
+  /* Interactive Elements */
+  --chip-bg: #171717;
+  --chip-border: #262626;
+  --chip-fg: #a1a1a1;
+  --hover-bg: #171717;
+  --active-bg: #262626;
+  --selected-bg: rgba(255, 255, 255, 0.06);
+  --bg-card: #0a0a0a;
+  --bg-hover: #171717;
+  --bg-secondary: #0a0a0a;
+  --bg-elevated: #121212;
+  --bg-surface: #0a0a0a;
+  --border-color: #262626;
+  --fg-primary: #ffffff;
+  --border-subtle: #171717;
+
+  /* Code & Syntax */
+  --code-bg: #0a0a0a;
+  --code-border: #262626;
+  --code-fg: #f5f5f5;
+  --code-inline-bg: rgba(110, 118, 129, 0.4);
+  --code-inline-fg: #f47067;
+
+  /* Callouts */
+  --callout-bg: #0a0a0a;
+  --callout-border: #262626;
+  --callout-note: #54a2ff;
+  --callout-tip: #05df72;
+  --callout-warn: #ffd236;
+  --callout-danger: #fb2c36;
+
+  /* Progress */
+  --progress-track: #262626;
+  --progress-fill: #ffffff;
+
+  /* Flat, hairline elevation */
+  --shadow-sm: 0 0 0 1px rgba(255, 255, 255, 0.04);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  --shadow-card: none;
+  --shadow-card-hover: 0 0 0 1px rgba(255, 255, 255, 0.08);
+
+  color-scheme: dark;
+}
+
+/* ── Light Theme ───────────────────────────────────────────── */
+[data-theme="light"] {
+  --bg: #ffffff;
+  --bg-alt: #fafafa;
+  --surface: #ffffff;
+  --surface-hover: #f5f5f5;
+  --surface-active: #e5e5e5;
+  --sidebar-bg: #fafafa;
+  --topbar-bg: rgba(255, 255, 255, 0.9);
+  --topbar-glass: rgba(255, 255, 255, 0.85);
+  --panel-glass: rgba(255, 255, 255, 0.97);
+
+  --border: #e5e5e5;
+  --border-strong: #d4d4d4;
+  --border-focus: #a1a1a1;
+  --border-subtle: #f5f5f5;
+  --divider: #f5f5f5;
+
+  --fg: #0a0a0a;
+  --fg-prose: #262626;
+  --fg-muted: #525252;
+  --fg-faint: #666666; /* 5.4:1 on #f5f5f5 */
+  --fg-inv: #ffffff;
+
+  --accent: #000000;
+  --accent-hover: #262626;
+  --accent-muted: rgba(0, 0, 0, 0.05);
+  --accent-border: rgba(0, 0, 0, 0.2);
+  --accent-fg: #ffffff;
+  --link: #1447e6;
+  --selection: #47a3f3;
+
+  --success: #008138;
+  --success-muted: rgba(0, 129, 56, 0.1);
+  --success-bg: rgba(0, 129, 56, 0.08);
+  --success-border: rgba(0, 129, 56, 0.28);
+  --warning: #b75000;
+  --warning-muted: rgba(183, 80, 0, 0.1);
+  --warning-bg: rgba(183, 80, 0, 0.08);
+  --warning-border: rgba(183, 80, 0, 0.28);
+  --error: #e40014;
+  --error-muted: rgba(228, 0, 20, 0.08);
+  --error-bg: rgba(228, 0, 20, 0.07);
+  --error-border: rgba(228, 0, 20, 0.28);
+  --info: #1447e6;
+  --info-muted: rgba(20, 71, 230, 0.08);
+  --info-bg: rgba(20, 71, 230, 0.07);
+  --info-border: rgba(20, 71, 230, 0.28);
+
+  --chip-bg: #f5f5f5;
+  --chip-border: #e5e5e5;
+  --chip-fg: #404040;
+  --hover-bg: #f5f5f5;
+  --active-bg: #e5e5e5;
+  --selected-bg: rgba(0, 0, 0, 0.04);
+  --bg-card: #ffffff;
+  --bg-hover: #f5f5f5;
+  --bg-secondary: #fafafa;
+  --bg-elevated: #ffffff;
+  --bg-surface: #ffffff;
+  --border-color: #e5e5e5;
+  --fg-primary: #0a0a0a;
+
+  --code-bg: #fafafa;
+  --code-border: #e5e5e5;
+  --code-fg: #0a0a0a;
+  --code-inline-bg: rgba(175, 184, 193, 0.2);
+  --code-inline-fg: #c9463d;
+
+  --callout-bg: #fafafa;
+  --callout-border: #e5e5e5;
+  --callout-note: #1447e6;
+  --callout-tip: #008138;
+  --callout-warn: #b75000;
+  --callout-danger: #e40014;
+
+  --progress-track: #e5e5e5;
+  --progress-fill: #000000;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --shadow-card: none;
+  --shadow-card-hover: 0 0 0 1px rgba(0, 0, 0, 0.06);
+
+  color-scheme: light;
+}
+
+::selection {
+  background-color: var(--selection);
+  color: #fefefe;
+}
+
+/* ── Legacy aliases ───────────────────────────────────────────
+   Simulators and exercises were written against an older token set
+   (css/style.css, which index.html does not load). Map those names onto
+   the current tokens so they pick up borders, colours and both themes. */
+:root, [data-theme="dark"], [data-theme="light"] {
+  --border-color: var(--border);
+  --text: var(--fg);
+  --text-color: var(--fg);
+  --text-muted: var(--fg-muted);
+  --bg-body: var(--bg);
+  --bg-surface: var(--surface);
+  --bg-card-alt: var(--surface-hover);
+  --bg-input: var(--bg-alt);
+  --bg-primary: var(--bg);
+  --text-primary: var(--fg);
+  --c-accent: var(--info);
+  --c-bg-alt: var(--surface-active);
+  --c-border: var(--border);
+  --c-text-muted: var(--fg-muted);
+  --danger: var(--error);
+  /* data-viz highlight: the design system's chart blue, so white labels stay readable */
+  --accent-color: var(--info);
+}
