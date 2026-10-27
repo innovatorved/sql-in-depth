@@ -511,7 +511,8 @@ window.Renderer = (() => {
     const initialExpanded = !isLong;
 
     const runBtn = isRunnable
-      ? `<button type="button" class="code-block__copy code-block__run-btn" data-action="run-sql-inline" data-lang="${escapeHtml(cleanLang)}" title="Execute and visualize this SQL query step-by-step inline"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"/></svg><span>Run &amp; Visualize SQL</span></button>` +
+      ? `<button type="button" class="code-block__copy code-block__run-btn" data-action="run-sql-inline" data-lang="${escapeHtml(cleanLang)}" title="Execute this SQL query and view the interactive output table &amp; editor"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"/></svg><span>Run Query</span></button>` +
+        `<button type="button" class="code-block__copy" data-action="edit-sql-inline" data-lang="${escapeHtml(cleanLang)}" title="Edit and test variations of this SQL query inline"><span>✎ Edit &amp; Try</span></button>` +
         `<button type="button" class="code-block__copy" data-action="open-sql-studio" data-lang="${escapeHtml(cleanLang)}" title="Open this query in Full-Screen SQL Studio"><span>⤢ SQL Studio</span></button>`
       : '';
 

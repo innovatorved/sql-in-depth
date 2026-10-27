@@ -1460,21 +1460,41 @@
             toolbar.innerHTML =
                 '<div class="sql-exec-toolbar-left">' +
                     '<span class="sql-exec-ds-tag" title="Target dataset">🗄️ ' + escapeHtml(dsInfo.title) + '</span>' +
+                    '<span class="sql-exec-status-hint">Live WASM SQL · Edit query or step through clauses below</span>' +
                 '</div>' +
                 '<div class="sql-exec-toolbar-actions">' +
-                    '<button type="button" class="sql-exec-btn is-secondary" data-action="toggle-edit">✎ Edit SQL</button>' +
-                    '<button type="button" class="sql-exec-btn is-primary" data-action="run-visualize">▶ Run & Step Through Clauses</button>' +
+                    '<button type="button" class="sql-exec-btn is-primary" data-action="run-visualize">▶ Run Query</button>' +
+                    '<button type="button" class="sql-exec-btn is-secondary" data-action="toggle-edit">✎ Edit &amp; Try SQL</button>' +
+                    '<button type="button" class="sql-exec-btn is-studio" data-action="open-sql-studio" data-lang="sql">⤢ SQL Studio</button>' +
                 '</div>';
 
             var editorWrap = document.createElement('div');
             editorWrap.className = 'sql-inline-editor-wrap';
             editorWrap.hidden = true;
             editorWrap.innerHTML =
-                '<textarea class="sql-inline-textarea" rows="' + Math.min(14, Math.max(4, rawSql.split('\n').length + 1)) + '" spellcheck="false">' + escapeHtml(rawSql) + '</textarea>';
+                '<div class="sql-inline-editor-header">' +
+                    '<span class="sql-inline-editor-title">✎ Editable SQL Sandbox (<code>query.sql</code> · Dataset: ' + escapeHtml(dsInfo.title) + ')</span>' +
+                    '<span>Press <kbd>⌘↵</kbd> / <kbd>Ctrl+Enter</kbd> to Execute</span>' +
+                '</div>' +
+                '<textarea class="sql-inline-textarea" rows="' + Math.min(14, Math.max(5, rawSql.split('\n').length + 1)) + '" spellcheck="false">' + escapeHtml(rawSql) + '</textarea>' +
+                '<div class="sql-inline-editor-actions">' +
+                    '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
+                        '<button type="button" class="sql-exec-btn is-primary" data-action="exec-edited-sql">▶ Execute Edited Query (⌘↵)</button>' +
+                        '<button type="button" class="sql-exec-btn is-secondary" data-action="step-edited-sql">🔍 Step Clauses (Step 0 → Final)</button>' +
+                        '<button type="button" class="sql-exec-btn is-secondary" data-action="reset-edited-sql">↺ Reset to Original SQL</button>' +
+                    '</div>' +
+                    '<button type="button" class="sql-exec-btn is-studio" data-action="open-sql-studio" data-lang="sql">⤢ Open in Full-Screen SQL Studio</button>' +
+                '</div>';
 
             var outputWrap = document.createElement('div');
             outputWrap.className = 'sql-inline-output-wrap';
             outputWrap.hidden = false;
+            outputWrap.innerHTML =
+                '<div class="sql-output-section-banner">' +
+                    '<span>📊 Query Output &amp; Step-by-Step Table Visualizer</span>' +
+                    '<span class="sql-output-mode-label">Live Result Set</span>' +
+                '</div>' +
+                '<div class="sql-inline-output-stage"></div>';
 
             wrapper.appendChild(toolbar);
             wrapper.appendChild(editorWrap);
@@ -1483,33 +1503,100 @@
             var editBtn = toolbar.querySelector('[data-action="toggle-edit"]');
             var runBtn = toolbar.querySelector('[data-action="run-visualize"]');
             var textarea = editorWrap.querySelector('.sql-inline-textarea');
+            var execEditedBtn = editorWrap.querySelector('[data-action="exec-edited-sql"]');
+            var stepEditedBtn = editorWrap.querySelector('[data-action="step-edited-sql"]');
+            var resetEditedBtn = editorWrap.querySelector('[data-action="reset-edited-sql"]');
+            var outputStage = outputWrap.querySelector('.sql-inline-output-stage');
+
+            function setEditorVisible(visible, focusEditor) {
+                editorWrap.hidden = !visible;
+                editBtn.textContent = visible ? '✕ Hide SQL Editor' : '✎ Edit & Try SQL';
+                if (visible && focusEditor && textarea) {
+                    textarea.focus();
+                }
+            }
 
             editBtn.addEventListener('click', function () {
-                editorWrap.hidden = !editorWrap.hidden;
-                editBtn.textContent = editorWrap.hidden ? '✎ Edit SQL' : '✕ Hide Editor';
-                if (!editorWrap.hidden) textarea.focus();
+                setEditorVisible(editorWrap.hidden, true);
             });
 
             function runCurrentBlock(opts) {
-                var currentSql = editorWrap.hidden ? rawSql : textarea.value;
+                var currentSql = (textarea && textarea.value.trim()) ? textarea.value : rawSql;
+                var currentDs = inferDatasetFromSql(currentSql) || dsId;
                 outputWrap.hidden = false;
-                return mountClauseVisualizer(outputWrap, currentSql, dsId, opts);
+                return mountClauseVisualizer(outputStage, currentSql, currentDs, opts);
             }
 
             runBtn.addEventListener('click', function () {
-                runCurrentBlock();
+                setEditorVisible(true, false);
+                runCurrentBlock({ startAtFinal: true });
+                outputWrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             });
 
-            // Also wire any external header button in parent .code-block
+            if (execEditedBtn) {
+                execEditedBtn.addEventListener('click', function () {
+                    runCurrentBlock({ startAtFinal: true });
+                });
+            }
+
+            if (stepEditedBtn) {
+                stepEditedBtn.addEventListener('click', function () {
+                    runCurrentBlock({ startAtFinal: false, initialStepIndex: 0 });
+                });
+            }
+
+            if (resetEditedBtn) {
+                resetEditedBtn.addEventListener('click', function () {
+                    if (textarea) textarea.value = rawSql;
+                    runCurrentBlock({ startAtFinal: true });
+                });
+            }
+
+            if (textarea) {
+                textarea.addEventListener('keydown', function (ev) {
+                    if ((ev.metaKey || ev.ctrlKey) && ev.key === 'Enter') {
+                        ev.preventDefault();
+                        runCurrentBlock({ startAtFinal: true });
+                    }
+                });
+            }
+
+            // Store controller on parent .code-block and wrapper so external buttons work seamlessly
+            var blockController = {
+                runAndOpen: function (openEditor, focusEditor) {
+                    if (openEditor !== false) {
+                        setEditorVisible(true, Boolean(focusEditor));
+                    }
+                    runCurrentBlock({ startAtFinal: true });
+                    outputWrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                },
+                getCurrentSql: function () {
+                    return (textarea && textarea.value.trim()) ? textarea.value : rawSql;
+                },
+                getDatasetId: function () {
+                    var currentSql = (textarea && textarea.value.trim()) ? textarea.value : rawSql;
+                    return inferDatasetFromSql(currentSql) || dsId;
+                }
+            };
+            wrapper._sqlBlockController = blockController;
+
             var parentCodeBlock = wrapper.closest('.code-block');
             if (parentCodeBlock) {
-                var extBtns = parentCodeBlock.querySelectorAll('[data-action="run-sql-inline"], [data-action="run-snippet-codelab"]');
-                extBtns.forEach(function (extBtn) {
+                parentCodeBlock._sqlBlockController = blockController;
+                var extRunBtns = parentCodeBlock.querySelectorAll('[data-action="run-sql-inline"]');
+                extRunBtns.forEach(function (extBtn) {
                     extBtn.addEventListener('click', function (e) {
                         e.preventDefault();
                         e.stopPropagation();
-                        runCurrentBlock();
-                        outputWrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        blockController.runAndOpen(true, false);
+                    });
+                });
+                var extEditBtns = parentCodeBlock.querySelectorAll('[data-action="edit-sql-inline"]');
+                extEditBtns.forEach(function (extBtn) {
+                    extBtn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        blockController.runAndOpen(true, true);
                     });
                 });
             }
@@ -1518,12 +1605,12 @@
             if (typeof requestAnimationFrame === 'function') {
                 requestAnimationFrame(function () {
                     _autoRunQueue = _autoRunQueue.then(function () {
-                        return runCurrentBlock();
+                        return runCurrentBlock({ startAtFinal: true });
                     }).catch(function () {});
                 });
             } else {
                 _autoRunQueue = _autoRunQueue.then(function () {
-                    return runCurrentBlock();
+                    return runCurrentBlock({ startAtFinal: true });
                 }).catch(function () {});
             }
         });

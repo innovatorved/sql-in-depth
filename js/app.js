@@ -1812,17 +1812,26 @@ window.App = (() => {
         return;
       }
 
-      const runSqlInlineBtn = target.closest('[data-action="run-sql-inline"]');
+      const runSqlInlineBtn = target.closest('[data-action="run-sql-inline"], [data-action="edit-sql-inline"]');
       if (runSqlInlineBtn) {
         e.preventDefault();
-        const block = runSqlInlineBtn.closest('.code-block');
+        const isEditAction = runSqlInlineBtn.getAttribute('data-action') === 'edit-sql-inline';
+        const block = runSqlInlineBtn.closest('.code-block') || runSqlInlineBtn.closest('.sql-executable-block');
         if (block && window.TableVisualizer && typeof window.TableVisualizer.enhanceSqlCodeBlocks === 'function') {
           window.TableVisualizer.enhanceSqlCodeBlocks(block.parentElement || document);
+        }
+        const ctrl = (block && block._sqlBlockController) || (block?.querySelector('.sql-executable-block')?._sqlBlockController);
+        if (ctrl && typeof ctrl.runAndOpen === 'function') {
+          ctrl.runAndOpen(true, isEditAction);
+          return;
         }
         const codeEl = block?.querySelector('code');
         const code = codeEl ? codeEl.textContent : '';
         const titleEl = document.querySelector('.lesson__title, h1');
         const title = titleEl ? `${titleEl.textContent.trim()} — Live SQL Verification` : 'Lesson SQL Snippet';
+        const dsId = (window.TableVisualizer && typeof window.TableVisualizer.inferDatasetFromSql === 'function')
+          ? window.TableVisualizer.inferDatasetFromSql(code)
+          : 'ecommerce';
         const existingHost = block?.nextElementSibling?.classList?.contains('inline-sql-runner')
           ? block.nextElementSibling
           : null;
@@ -1835,7 +1844,8 @@ window.App = (() => {
           block.insertAdjacentElement('afterend', host);
           window.TableVisualizer.mountClauseVisualizer(host, {
             sql: code.trim(),
-            datasetId: 'ecommerce',
+            datasetId: dsId || 'ecommerce',
+            showEditor: true,
             showSchema: true,
             title: title
           });
@@ -1848,13 +1858,27 @@ window.App = (() => {
       const openSqlStudioBtn = target.closest('[data-action="open-sql-studio"], [data-action="run-snippet-codelab"]');
       if (openSqlStudioBtn) {
         e.preventDefault();
-        const block = openSqlStudioBtn.closest('.code-block');
+        const block = openSqlStudioBtn.closest('.code-block') || openSqlStudioBtn.closest('.sql-executable-block');
+        const ctrl = (block && block._sqlBlockController) || (block?.querySelector('.sql-executable-block')?._sqlBlockController);
+        const textareaEl = block?.querySelector('.sql-inline-textarea');
         const codeEl = block?.querySelector('code');
-        const code = codeEl ? codeEl.textContent : '';
+        const code = (ctrl && typeof ctrl.getCurrentSql === 'function')
+          ? ctrl.getCurrentSql()
+          : ((textareaEl && textareaEl.value.trim()) ? textareaEl.value : (codeEl ? codeEl.textContent : ''));
         const lang = openSqlStudioBtn.getAttribute('data-lang') || 'sql';
         const titleEl = document.querySelector('.lesson__title, h1');
         const title = titleEl ? `${titleEl.textContent.trim()} — SQL Studio` : 'Interactive SQL Studio';
         openSnippetInCodeLab(code, lang, title);
+        return;
+      }
+
+      const openBuildCodeLabBtn = target.closest('[data-action="open-code-lab"]');
+      if (openBuildCodeLabBtn) {
+        e.preventDefault();
+        const mode = openBuildCodeLabBtn.getAttribute('data-lab-mode') || 'guided';
+        const stepAttr = openBuildCodeLabBtn.getAttribute('data-step-index');
+        const stepIndex = stepAttr !== null ? parseInt(stepAttr, 10) : undefined;
+        openTopicCodeLab(currentSlug, mode, stepIndex);
         return;
       }
 
@@ -2274,11 +2298,15 @@ window.App = (() => {
     const steps = Array.isArray(opts.steps) && opts.steps.length > 0 ? opts.steps : (spec && Array.isArray(spec.steps) ? spec.steps : []);
     let activeStepIdx = typeof opts.activeStepIdx === 'number' ? opts.activeStepIdx : 0;
     let activeDatasetId = opts.datasetId || (spec && spec.datasetId) || 'ecommerce';
-    let activeEngine = (window.SQLEngine && typeof window.SQLEngine.getActiveEngineType === 'function')
-      ? window.SQLEngine.getActiveEngineType()
-      : 'sqlite';
+    let activeEngine = (window.SQLEngine && typeof window.SQLEngine.getEngineMode === 'function')
+      ? window.SQLEngine.getEngineMode()
+      : 'postgres';
 
     const initialSql = opts.sql || (steps[activeStepIdx] && steps[activeStepIdx].starterCode) || (spec && spec.referenceSql) || 'SELECT * FROM customers LIMIT 10;';
+    if (!opts.datasetId && window.TableVisualizer && typeof window.TableVisualizer.inferDatasetFromSql === 'function') {
+      const inferred = window.TableVisualizer.inferDatasetFromSql(initialSql);
+      if (inferred) activeDatasetId = inferred;
+    }
     const datasets = window.SQL_DATASETS || {};
     const datasetKeys = Object.keys(datasets).length > 0 ? Object.keys(datasets) : ['ecommerce', 'org_hr', 'saas_telemetry', 'fintech_ledger', 'social_graph'];
 
@@ -2431,8 +2459,8 @@ window.App = (() => {
     if (engSelect) {
       engSelect.addEventListener('change', async () => {
         activeEngine = engSelect.value;
-        if (window.SQLEngine && typeof window.SQLEngine.setEngineType === 'function') {
-          await window.SQLEngine.setEngineType(activeEngine);
+        if (window.SQLEngine && typeof window.SQLEngine.setEngineMode === 'function') {
+          await window.SQLEngine.setEngineMode(activeEngine);
         }
         const ta = visHost.querySelector('textarea');
         mountStudioQuery(ta ? ta.value : initialSql);
@@ -2441,8 +2469,8 @@ window.App = (() => {
 
     if (resetBtn) {
       resetBtn.addEventListener('click', async () => {
-        if (window.SQLEngine && typeof window.SQLEngine.loadDataset === 'function') {
-          await window.SQLEngine.loadDataset(activeDatasetId, true);
+        if (window.SQLEngine && typeof window.SQLEngine.resetDataset === 'function') {
+          await window.SQLEngine.resetDataset(activeDatasetId);
         }
         const ta = visHost.querySelector('textarea');
         mountStudioQuery(ta ? ta.value : initialSql);
@@ -2528,11 +2556,14 @@ window.App = (() => {
 
   function openSnippetInCodeLab(rawCode, lang, title) {
     const spec = getTopicLabSpec(currentSlug);
+    const inferredDs = (window.TableVisualizer && typeof window.TableVisualizer.inferDatasetFromSql === 'function' && rawCode)
+      ? window.TableVisualizer.inferDatasetFromSql(rawCode)
+      : null;
     return openSqlStudioModal({
       slug: currentSlug,
-      title: title || `SQL Snippet Runner — ${spec.title || currentSlug}`,
-      summary: 'Execute and step through this SQL snippet in the interactive SQL Studio.',
-      datasetId: spec.datasetId || 'ecommerce',
+      title: title || `SQL Studio — ${spec.title || currentSlug}`,
+      summary: 'Execute, edit, and step through this SQL query in the full-screen SQL Studio.',
+      datasetId: inferredDs || spec.datasetId || 'ecommerce',
       sql: rawCode || spec.referenceSql
     });
   }

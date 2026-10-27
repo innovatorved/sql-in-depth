@@ -65,6 +65,7 @@ window.Landing = (() => {
         <p class="landing-hero__subtitle">Read it, watch it, visualize every table step, run real SQL in WebAssembly.</p>
         <div class="landing-hero__actions">
           ${primary}
+          <a class="btn btn--outline landing-btn" href="/sandbox" data-nav="sandbox">⤢ Open SQL Studio</a>
           <button class="btn btn--outline landing-btn" type="button" data-landing-scroll="landing-curriculum">Browse curriculum</button>
           <button class="landing-search" type="button" data-landing-search>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
