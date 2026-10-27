@@ -810,7 +810,7 @@
         <h1 class="lesson-header__title">Multi-Dimensional Revenue, Cohort &amp; Funnel Aggregation Suite</h1>
         <p class="build-summary">A single-pass multi-dimensional OLAP aggregation engine implementing conditional FILTER (WHERE ...), GROUPING SETS / ROLLUP subtotals with bitmask GROUPING() flags, and exact/interpolated percentiles.</p>
         <div class="lesson-header__meta">
-          <span class="lesson-header__meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ~35 min</span>
+          <span class="lesson-header__meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ~25 min</span>
           <span class="lesson-header__meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Intermediate</span>
           <span class="lesson-header__meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Lessons: <a href="#" data-nav="topic" data-slug="build-executive-kpi-aggregation-suite">Hands-On Build: Multi-Dimensional Revenue, Cohort &amp; Funnel Aggregation Suite</a>, <a href="#" data-nav="topic" data-slug="aggregate-functions-internals">Aggregate Internals: COUNT(*) vs COUNT(col), COUNT(DISTINCT), SUM &amp; AVG</a>, <a href="#" data-nav="topic" data-slug="group-by-execution-mechanics">GROUP BY Execution Mechanics, HashAggregate vs GroupAggregate &amp; Functional Dependency</a>, <a href="#" data-nav="topic" data-slug="having-vs-where-pipeline">Pre-Filter (WHERE) vs Post-Aggregate Filter (HAVING) Pipeline</a>, <a href="#" data-nav="topic" data-slug="conditional-aggregation-filter">Pivoting &amp; Conditional Aggregation: SUM(CASE WHEN) &amp; FILTER (WHERE ...)</a>, <a href="#" data-nav="topic" data-slug="string-json-array-aggregation">List &amp; Document Rollups: GROUP_CONCAT, STRING_AGG &amp; JSON Aggregation</a></span>
         </div>
@@ -821,11 +821,11 @@
           <div class="build-lab-card__intro">
             <div class="build-lab-card__eyebrow">
               <span>Guided SQL &amp; Storage Engine Lab</span>
-              <span class="build-lab-card__progress" id="build-lab-progress-badge">0/4 Steps Completed</span>
+              <span class="build-lab-card__progress" id="build-lab-progress-badge">0/3 Steps Completed</span>
             </div>
             <h2 class="build-lab-card__title">Execute &amp; Verify SQL &amp; Storage Engine Invariants in the Browser SQL Studio</h2>
             <p class="build-lab-card__desc">
-              Complete 4 progressive relational steps with guided hints in <strong>PostgreSQL 18 WASM, SQLite 3 &amp; Step-by-Step Relational Table Visualizer</strong> against automated result-set and query-plan assertions — zero local setup required.
+              Complete 3 progressive relational steps with guided hints in <strong>PostgreSQL 18 WASM, SQLite 3 &amp; Step-by-Step Relational Table Visualizer</strong> against automated result-set and query-plan assertions — zero local setup required.
             </p>
             <div class="build-lab-progress-track" aria-hidden="true">
               <div class="build-lab-progress-track__fill" style="width:0%"></div>
@@ -846,60 +846,49 @@
         
           <div class="build-lab-steps-grid" id="build-lab-steps-grid">
             
-                <button type="button" class="build-lab-step-card " data-action="open-code-lab" data-lab-mode="guided" data-step-index="0">
+                <button type="button" class="build-lab-step-card " data-action="open-code-lab" data-lab-mode="guided" data-step-index="0" data-step="0">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">01</span>
-                    <span class="build-lab-step-card__target">index.js · OlapAggregationSuite.conditionalAggregate</span>
+                    <span class="build-lab-step-card__target">Phase 1 · Base Relation &amp; SARGable Predicate</span>
                   </div>
-                  <div class="build-lab-step-card__title">Single-Pass Conditional Aggregation (FILTER Clause)</div>
-                  <div class="build-lab-step-card__concept">Pivoting Funnel &amp; Revenue Metrics in One Table Scan</div>
+                  <div class="build-lab-step-card__title">Base Relation Scan &amp; SARGable Filter (org_hr)</div>
+                  <div class="build-lab-step-card__concept">Establish the base relation scan in <code>org_hr</code> for Hands-On Build: Multi-Dimensional Revenue, Cohort &amp; Funnel Aggregation Suite with a SARGable predicate and explicit Three-Valued Logic NULL handling.</div>
                   <div class="build-lab-step-card__footer">
-                    <span>1 test</span>
+                    <span>4 SQL assertions</span>
                     <span class="build-lab-step-card__open">Step 1 →</span>
                   </div>
                 </button>
               
-                <button type="button" class="build-lab-step-card " data-action="open-code-lab" data-lab-mode="guided" data-step-index="1">
+                <button type="button" class="build-lab-step-card " data-action="open-code-lab" data-lab-mode="guided" data-step-index="1" data-step="1">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">02</span>
-                    <span class="build-lab-step-card__target">index.js · OlapAggregationSuite.rollupRevenue</span>
+                    <span class="build-lab-step-card__target">Phase 2 · Relational Join, Aggregation &amp; 3VL Guard</span>
                   </div>
-                  <div class="build-lab-step-card__title">Hierarchical ROLLUP &amp; Bitmask GROUPING() Indicator</div>
-                  <div class="build-lab-step-card__concept">Generating Prefix Subtotals and Distinguishing Super-Aggregate NULLs</div>
+                  <div class="build-lab-step-card__title">Relational Join, Grouping &amp; NULL-Safe Aggregation</div>
+                  <div class="build-lab-step-card__concept">Combine normalized tables via explicit JOIN conditions and fold group buckets or window partitions without losing NULL boundary rows.</div>
                   <div class="build-lab-step-card__footer">
-                    <span>1 test</span>
+                    <span>4 SQL assertions</span>
                     <span class="build-lab-step-card__open">Step 2 →</span>
                   </div>
                 </button>
               
-                <button type="button" class="build-lab-step-card " data-action="open-code-lab" data-lab-mode="guided" data-step-index="2">
+                <button type="button" class="build-lab-step-card " data-action="open-code-lab" data-lab-mode="guided" data-step-index="2" data-step="2">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">03</span>
-                    <span class="build-lab-step-card__target">index.js · OlapAggregationSuite.percentileCont</span>
+                    <span class="build-lab-step-card__target">Phase 3 · Production Query &amp; Plan Verification</span>
                   </div>
-                  <div class="build-lab-step-card__title">Continuous Linear-Interpolated Percentile (PERCENTILE_CONT)</div>
-                  <div class="build-lab-step-card__concept">Order-Set Aggregate Interpolation Between Adjacent Ranks</div>
+                  <div class="build-lab-step-card__title">Production Query &amp; Execution Plan Verification (Hands-On Build: Multi-Dimensional Revenue, Cohort &amp; Funnel Aggregation Suite)</div>
+                  <div class="build-lab-step-card__concept">Verify final column projections, ordering, and physical B+Tree access paths via EXPLAIN QUERY PLAN and automated relational assertions.</div>
                   <div class="build-lab-step-card__footer">
-                    <span>1 test</span>
+                    <span>4 SQL assertions</span>
                     <span class="build-lab-step-card__open">Step 3 →</span>
-                  </div>
-                </button>
-              
-                <button type="button" class="build-lab-step-card " data-action="open-code-lab" data-lab-mode="guided" data-step-index="3">
-                  <div class="build-lab-step-card__header">
-                    <span class="build-lab-step-card__num">04</span>
-                    <span class="build-lab-step-card__target">index.js · OlapAggregationSuite.filterHaving</span>
-                  </div>
-                  <div class="build-lab-step-card__title">HAVING Post-Aggregation Group Filter</div>
-                  <div class="build-lab-step-card__concept">Filtering Aggregated Buckets After Group Collapse</div>
-                  <div class="build-lab-step-card__footer">
-                    <span>1 test</span>
-                    <span class="build-lab-step-card__open">Step 4 →</span>
                   </div>
                 </button>
               
           </div>
         
+
+        <div class="sql-guided-lab-host" id="sql-guided-lab-build-executive-kpi-aggregation-suite" data-sql-lab-slug="build-executive-kpi-aggregation-suite"></div>
       </section>
 
       <div id="build-walkthrough-pane"><article class="prose" id="build-file-build-executive-kpi-aggregation-suite-README_md"><h2>Architectural Overview</h2>
@@ -1019,9 +1008,9 @@
 
   <!-- Data Scripts -->
   <script type="text/plain" data-defer src="data/curriculum.js?v=4f53b5646e"></script>
-  <script type="text/plain" data-defer src="data/datasets.js?v=e7f505d819"></script>
+  <script type="text/plain" data-defer src="data/datasets.js?v=14de2d19c7"></script>
   <script type="text/plain" data-defer src="data/roadmap.js?v=584992226a"></script>
-  <script type="text/plain" data-defer src="data/challenges.js?v=fb4083c38c"></script>
+  <script type="text/plain" data-defer src="data/challenges.js?v=afec18fcf4"></script>
   <script type="text/plain" data-defer src="data/srs-cards.js?v=fabc47dd9c"></script>
   <script type="text/plain" data-defer src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
   <script type="text/plain" data-defer src="data/implementations_code.js?v=fce884f8a8"></script>
@@ -1038,7 +1027,7 @@
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
   <script type="text/plain" data-defer src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>
   <script type="text/plain" data-defer src="js/sql-engine.js?v=4d14b9bc51"></script>
-  <script type="text/plain" data-defer src="js/table-visualizer.js?v=e2ef072f71"></script>
+  <script type="text/plain" data-defer src="js/table-visualizer.js?v=67f65e306a"></script>
   <script type="text/plain" data-defer src="js/simulators.js?v=68b973e4c8"></script>
   <script type="text/plain" data-defer src="js/simulators-relational.js?v=8e12b97831"></script>
   <script type="text/plain" data-defer src="js/simulators-analytical.js?v=258089d8ac"></script>
@@ -1048,17 +1037,17 @@
   <script type="text/plain" data-defer src="js/simulators-olap-ops.js?v=c793d19e01"></script>
   <script type="text/plain" data-defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <script type="text/plain" data-defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
-  <script type="text/plain" data-defer src="js/renderer.js?v=8263212016"></script>
+  <script type="text/plain" data-defer src="js/renderer.js?v=8caa0312c7"></script>
   <script type="text/plain" data-defer src="js/landing.js?v=e3f781ab53"></script>
   
   <script type="text/plain" data-defer src="js/quiz.js?v=5b300d9b3d"></script>
   <script type="text/plain" data-defer src="js/roadmap.js?v=afdc0360a7"></script>
-  <script type="text/plain" data-defer src="js/challenges.js?v=3219f5a7f9"></script>
+  <script type="text/plain" data-defer src="js/challenges.js?v=1a9fcc6383"></script>
   <script type="text/plain" data-defer src="js/dashboard.js?v=1e493b80a6"></script>
-  <script type="text/plain" data-defer src="js/sandbox.js?v=3f3b1885df"></script>
+  <script type="text/plain" data-defer src="js/sandbox.js?v=77320ec21b"></script>
   <script type="text/plain" data-defer src="js/topic-codelab.js?v=096611d91c"></script>
   
-  <script type="text/plain" data-defer src="js/app.js?v=866990401a"></script>
+  <script type="text/plain" data-defer src="js/app.js?v=15365fe7c9"></script>
 
   <!-- App bootstrap & deferred script loader -->
   <script src="js/bootstrap.js?v=df2bb60aeb"></script>

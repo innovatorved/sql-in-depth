@@ -136,11 +136,30 @@
         return '<button class="eco-filter-pill ' + (diff === t.key ? 'active' : '') + '" data-challenge-tier="' + t.key + '">' + escapeHtml(t.label) + '</button>';
       }).join('');
 
+      var formatErrRate = function(val, fallback) {
+        if (val == null || val === '') return fallback || 'High';
+        if (typeof val === 'string') {
+          return val.indexOf('%') !== -1 ? val : (val + '%');
+        }
+        var num = Number(val);
+        if (Number.isNaN(num)) return String(val);
+        if (num > 0 && num <= 1) return (num * 100).toFixed(1).replace(/\.0$/, '') + '%';
+        return Math.round(num * 10) / 10 + '%';
+      };
+
+      var formatLatency = function(val, fallback) {
+        if (val == null || val === '') return fallback || 'Degraded';
+        if (typeof val === 'string') {
+          return /ms|s$/i.test(val.trim()) ? val : (val + 'ms');
+        }
+        return val + 'ms';
+      };
+
       var cardsHtml = filtered.map(function(c) {
         var solved = self.isChallengeSolved(c.id);
         var tierClass = 'tier--' + c.difficulty;
-        var errPct = c.metricsAndLogs && c.metricsAndLogs.errorRate != null ? Math.round(c.metricsAndLogs.errorRate * 100) + '%' : 'High';
-        var p99 = c.metricsAndLogs && c.metricsAndLogs.latencyP99 != null ? c.metricsAndLogs.latencyP99 + 'ms' : 'Degraded';
+        var errPct = formatErrRate(c.metricsAndLogs && c.metricsAndLogs.errorRate, 'High');
+        var p99 = formatLatency(c.metricsAndLogs && c.metricsAndLogs.latencyP99, 'Degraded');
 
         return (
           '<article class="eco-card challenge-card ' + (solved ? 'challenge-card--solved' : '') + '" data-challenge-card="' + escapeHtml(c.id) + '">' +
@@ -181,7 +200,7 @@
               '</div>' +
             '</div>' +
             '<div class="eco-controls-bar">' +
-              '<input type="search" class="eco-search-input" id="challenges-search-input" placeholder="Search incidents by symptom, Raft, Kafka, Redis, deadlock…" value="' + escapeHtml(this._searchQuery) + '" />' +
+              '<input type="search" class="eco-search-input" id="challenges-search-input" placeholder="Search incidents by symptom, NOT IN, B+Tree, MVCC, deadlock, vacuum…" value="' + escapeHtml(this._searchQuery) + '" />' +
               '<div class="eco-filter-group">' + filterHtml + '</div>' +
             '</div>' +
           '</header>' +
@@ -295,9 +314,11 @@
       }).join('');
 
       var timeseriesHtml = (m.timeseries || []).map(function(pt) {
-        var errPct = pt.errorRate != null ? Math.round(pt.errorRate * 100) + '%' : '-';
-        var p99Val = pt.latencyP99 != null ? pt.latencyP99 + 'ms' : '-';
-        var barH = Math.min(100, Math.max(12, Math.round((pt.errorRate || 0.2) * 100)));
+        var rawErr = pt.errorRate != null ? Number(pt.errorRate) : null;
+        var normErrPct = rawErr == null || Number.isNaN(rawErr) ? 0 : (rawErr > 0 && rawErr <= 1 ? rawErr * 100 : rawErr);
+        var errPct = rawErr != null ? Math.round(normErrPct * 10) / 10 + '%' : '-';
+        var p99Val = pt.latencyP99 != null ? (/ms|s$/i.test(String(pt.latencyP99)) ? String(pt.latencyP99) : pt.latencyP99 + 'ms') : '-';
+        var barH = Math.min(100, Math.max(12, Math.round(normErrPct || 12)));
         return (
           '<div class="ts-bar-col">' +
             '<div class="ts-bar-track"><div class="ts-bar-fill" style="height:' + barH + '%"></div></div>' +
@@ -363,8 +384,20 @@
       }
 
       // Dynamic metric display
-      var metricP99 = liveMetrics.latencyP99 != null ? liveMetrics.latencyP99 + ' ms' : (m.latencyP99 ? m.latencyP99 + ' ms' : 'N/A');
-      var metricErr = liveMetrics.errorRate != null ? (Number(liveMetrics.errorRate) <= 1 ? (Number(liveMetrics.errorRate) * 100).toFixed(1) + '%' : liveMetrics.errorRate + '%') : 'N/A';
+      var rawP99 = liveMetrics.latencyP99 != null ? liveMetrics.latencyP99 : m.latencyP99;
+      var metricP99 = rawP99 != null ? (/ms|s$/i.test(String(rawP99).trim()) ? String(rawP99) : rawP99 + ' ms') : 'N/A';
+      var rawErrVal = liveMetrics.errorRate != null ? liveMetrics.errorRate : m.errorRate;
+      var metricErr = 'N/A';
+      if (rawErrVal != null) {
+        if (typeof rawErrVal === 'string' && rawErrVal.indexOf('%') !== -1) {
+          metricErr = rawErrVal;
+        } else {
+          var numErr = Number(rawErrVal);
+          metricErr = !Number.isNaN(numErr)
+            ? (numErr > 0 && numErr <= 1 ? (numErr * 100).toFixed(1) + '%' : numErr + '%')
+            : String(rawErrVal);
+        }
+      }
 
       return (
         '<div class="view-canvas challenges-view incident-room" data-active-challenge="' + escapeHtml(ch.id) + '">' +
@@ -508,10 +541,10 @@
 
       var mountEl = this._container && this._container.querySelector('#challenge-inline-codelab-mount');
       if (mountEl && root.TableVisualizer && typeof root.TableVisualizer.mountClauseVisualizer === 'function') {
-        var sampleSql = (ch.codeFix && ch.codeFix.sqlQuery) || 'SELECT a.account_id, a.owner_name, a.posted_balance_cents, COUNT(j.entry_id) AS postings FROM accounts a LEFT JOIN journal_entries j ON j.account_id = a.account_id GROUP BY a.account_id, a.owner_name, a.posted_balance_cents ORDER BY a.account_id ASC;';
+        var sampleSql = (ch.codeFix && (ch.codeFix.solutionCode || ch.codeFix.buggyCode || ch.codeFix.sqlQuery)) || 'SELECT a.account_id, a.owner_name, a.posted_balance_cents, COUNT(j.entry_id) AS postings FROM accounts a LEFT JOIN journal_entries j ON j.account_id = a.account_id GROUP BY a.account_id, a.owner_name, a.posted_balance_cents ORDER BY a.account_id ASC;';
         root.TableVisualizer.mountClauseVisualizer(mountEl, sampleSql, {
-          datasetId: '__unified__',
-          referenceSql: sampleSql,
+          datasetId: (ch.codeFix && ch.codeFix.datasetId) || '__unified__',
+          referenceSql: (ch.codeFix && ch.codeFix.solutionCode) || sampleSql,
           startAtFinal: true,
           runTests: true
         });

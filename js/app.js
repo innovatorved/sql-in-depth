@@ -703,9 +703,6 @@ window.App = (() => {
           try { window.TableVisualizer.enhanceSqlCodeBlocks(reader); } catch (err) { console.warn('[TableVisualizer]', err); }
         }
         mountInlineTopicSqlLab(currentSlug, reader);
-        if (window.TopicCodeLab && typeof window.TopicCodeLab.init === 'function') {
-          window.TopicCodeLab.init(reader);
-        }
         if (window.setupAudioListeners) {
           window.setupAudioListeners(currentSlug);
         }
@@ -768,6 +765,7 @@ window.App = (() => {
           if (window.TableVisualizer && typeof window.TableVisualizer.enhanceSqlCodeBlocks === 'function') {
             window.TableVisualizer.enhanceSqlCodeBlocks(reader);
           }
+          mountInlineTopicSqlLab(currentSlug, reader);
 
           const impls = window.IMPLEMENTATIONS_DATA;
           const build = impls?.[currentSlug];
@@ -792,7 +790,8 @@ window.App = (() => {
                 if (Array.isArray(legacy)) completedIds = legacy;
               }
             } catch (_) {}
-            const steps = window.GUIDED_LABS_DATA?.[currentSlug]?.steps || [];
+            const guidedData = window.TopicGuidedLabs?.getLab?.(currentSlug) || window.TOPIC_GUIDED_LABS?.[currentSlug] || window.GUIDED_LABS_DATA?.[currentSlug];
+            const steps = guidedData?.steps || [];
             const badge = document.getElementById('build-lab-progress-badge');
             if (badge && steps.length) {
               badge.textContent = `${completedIds.length}/${steps.length} Steps Completed`;
@@ -833,24 +832,26 @@ window.App = (() => {
           };
 
           const openBuildLab = (opts = {}) => {
-            const guidedEntry = window.GUIDED_LABS_DATA?.[currentSlug] || window.TopicGuidedLabs?.getLab?.(currentSlug) || null;
+            const guidedEntry = window.TopicGuidedLabs?.getLab?.(currentSlug) || window.TOPIC_GUIDED_LABS?.[currentSlug] || window.GUIDED_LABS_DATA?.[currentSlug] || null;
             const buildEntry = build || window.IMPLEMENTATIONS_DATA?.[currentSlug] || null;
             const steps = guidedEntry?.steps || [];
             const stepIdx = typeof opts.stepIndex === 'number' && !Number.isNaN(opts.stepIndex) ? opts.stepIndex : 0;
             const activeStep = steps[stepIdx] || steps[0] || null;
             const sqlCode = (opts.mode === 'solution' || opts.mode === 'sandbox')
-              ? (activeStep?.solutionSnippet || guidedEntry?.solutionCode || guidedEntry?.referenceSql || 'SELECT * FROM customers LIMIT 10;')
-              : (activeStep?.starterSnippet || guidedEntry?.starterCode || guidedEntry?.referenceSql || 'SELECT * FROM customers LIMIT 10;');
+              ? (activeStep?.solutionCode || activeStep?.solutionSnippet || guidedEntry?.solutionCode || guidedEntry?.referenceSql || 'SELECT * FROM customers LIMIT 10;')
+              : (activeStep?.starterCode || activeStep?.starterSnippet || guidedEntry?.starterCode || guidedEntry?.referenceSql || 'SELECT * FROM customers LIMIT 10;');
 
             openSqlStudioModal({
+              slug: currentSlug,
               labId: currentSlug,
               title: buildEntry?.title || guidedEntry?.title || currentSlug,
               summary: buildEntry?.summary || guidedEntry?.summary || '',
               datasetId: guidedEntry?.datasetId || activeStep?.datasetId || 'ecommerce',
               sql: sqlCode,
-              starterSql: activeStep?.starterSnippet || guidedEntry?.starterCode || sqlCode,
-              referenceSql: activeStep?.solutionSnippet || guidedEntry?.referenceSql || guidedEntry?.solutionCode || sqlCode,
+              starterSql: activeStep?.starterCode || activeStep?.starterSnippet || guidedEntry?.starterCode || sqlCode,
+              referenceSql: activeStep?.solutionCode || activeStep?.solutionSnippet || guidedEntry?.referenceSql || guidedEntry?.solutionCode || sqlCode,
               steps: steps,
+              activeStepIdx: stepIdx,
               stepIndex: stepIdx,
               mode: opts.mode || 'guided',
               onStepComplete: (step) => {
@@ -860,12 +861,21 @@ window.App = (() => {
                 }
                 syncOverviewProgress();
               },
+              onLabComplete: () => {
+                const st = steps[stepIdx] || steps[0];
+                if (st && window.Progress?.markBuildStepComplete) {
+                  window.Progress.markBuildStepComplete(currentSlug, st.id || stepIdx);
+                }
+                syncOverviewProgress();
+              },
               onClose: closeBuildLab
             });
           };
 
           reader.querySelectorAll('[data-action="open-code-lab"]').forEach(btn => {
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', (e) => {
+              e.preventDefault();
+              e.stopPropagation();
               const mode = btn.getAttribute('data-lab-mode') || 'guided';
               const stepAttr = btn.getAttribute('data-step-index');
               const stepIndex = stepAttr !== null ? parseInt(stepAttr, 10) : undefined;
@@ -893,6 +903,9 @@ window.App = (() => {
         if (!window.IMPLEMENTATIONS_DATA || !window.IMPLEMENTATIONS_DATA[currentSlug]) {
           neededBuildScripts.push('data/implementations_code.js');
         }
+        if (!window.TopicGuidedLabs && !window.TOPIC_GUIDED_LABS) {
+          neededBuildScripts.push('data/topic_guided_labs.js');
+        }
         if (!window.GUIDED_LABS_DATA) {
           neededBuildScripts.push('data/guided_labs.js');
         }
@@ -910,24 +923,6 @@ window.App = (() => {
         }
         break;
     }
-
-    // Add click handlers for internal navigation links
-    reader.querySelectorAll('[data-nav]').forEach(el => {
-      el.addEventListener('click', (e) => {
-        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
-        e.preventDefault();
-        const nav = el.dataset.nav;
-        if (nav === 'home') navigateHome();
-        else if (nav === 'projects') navigateToProject(el.dataset.project);
-        else if (nav === 'topic') navigateTo(el.dataset.slug);
-        else if (nav === 'module') navigateToModule(el.dataset.module);
-        else if (nav === 'roadmap') navigateToRoadmap(el.dataset.tab);
-        else if (nav === 'challenges') navigateToChallenges(el.dataset.challenge);
-        else if (nav === 'dashboard') navigateToDashboard(el.dataset.tab);
-        else if (nav === 'sandbox') navigateToSandbox(el.dataset.blueprint);
-        else if (nav === 'glossary') navigateToGlossary();
-      });
-    });
   }
 
   // ── Module Content Loading ────────────────────────────────
@@ -960,11 +955,11 @@ window.App = (() => {
         (currentView === 'cheatsheet' && findModule(currentSlug)?.id === mod.id);
       if (needed) {
         const reader = document.getElementById('reader');
-        const isPrerenderedTopic = reader && reader.getAttribute('data-prerendered') === currentSlug;
-        if (!isPrerenderedTopic && reader) {
-          reader.removeAttribute('data-prerendered');
+        const isPrerenderedTopic = currentView === 'topic' && reader && reader.getAttribute('data-prerendered') === currentSlug;
+        if (!isPrerenderedTopic) {
+          if (reader) reader.removeAttribute('data-prerendered');
+          renderCurrentView();
         }
-        renderCurrentView();
       }
     }).catch(err => {
       loadedModules.delete(mod.id);
@@ -2292,17 +2287,17 @@ window.App = (() => {
       document.body.appendChild(overlay);
     }
 
-    const spec = opts.slug ? getTopicLabSpec(opts.slug) : null;
+    const spec = (opts.slug || opts.labId) ? getTopicLabSpec(opts.slug || opts.labId) : null;
     const title = opts.title || (spec ? spec.title : 'Interactive SQL & Table Studio (PostgreSQL 18 / SQLite WASM)');
     const summary = opts.summary || (spec ? spec.summary : 'Execute SQL against real relational datasets, inspect schemas, and step through clause-by-clause table transformations.');
     const steps = Array.isArray(opts.steps) && opts.steps.length > 0 ? opts.steps : (spec && Array.isArray(spec.steps) ? spec.steps : []);
-    let activeStepIdx = typeof opts.activeStepIdx === 'number' ? opts.activeStepIdx : 0;
+    let activeStepIdx = typeof opts.activeStepIdx === 'number' ? opts.activeStepIdx : (typeof opts.stepIndex === 'number' ? opts.stepIndex : 0);
     let activeDatasetId = opts.datasetId || (spec && spec.datasetId) || 'ecommerce';
     let activeEngine = (window.SQLEngine && typeof window.SQLEngine.getEngineMode === 'function')
       ? window.SQLEngine.getEngineMode()
       : 'postgres';
 
-    const initialSql = opts.sql || (steps[activeStepIdx] && steps[activeStepIdx].starterCode) || (spec && spec.referenceSql) || 'SELECT * FROM customers LIMIT 10;';
+    const initialSql = opts.sql || (steps[activeStepIdx] && (steps[activeStepIdx].starterCode || steps[activeStepIdx].starterSnippet)) || (spec && spec.referenceSql) || 'SELECT * FROM customers LIMIT 10;';
     if (!opts.datasetId && window.TableVisualizer && typeof window.TableVisualizer.inferDatasetFromSql === 'function') {
       const inferred = window.TableVisualizer.inferDatasetFromSql(initialSql);
       if (inferred) activeDatasetId = inferred;
@@ -2329,6 +2324,7 @@ window.App = (() => {
             <label style="font-size:0.78rem;color:var(--text-secondary,#94a3b8);display:flex;align-items:center;gap:6px;">
               Dataset:
               <select id="sql-studio-modal-dataset" style="background:var(--bg-primary,#0b0f19);color:var(--text-primary,#f8fafc);border:1px solid var(--border-subtle,rgba(148,163,184,0.28));border-radius:6px;padding:4px 8px;font-size:0.8rem;">
+                <option value="__unified__" ${activeDatasetId === '__unified__' ? 'selected' : ''}>All 5 Datasets (Unified Sandbox)</option>
                 ${datasetKeys.map(k => {
                   const ds = datasets[k] || { title: k };
                   return `<option value="${escapeHtml(k)}" ${k === activeDatasetId ? 'selected' : ''}>${escapeHtml(ds.title || ds.label || k)}</option>`;
@@ -2386,10 +2382,14 @@ window.App = (() => {
     overlay.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
 
+    const handleCloseModal = () => {
+      closeGlobalCodeLab();
+      if (typeof opts.onClose === 'function') opts.onClose();
+    };
     const closeBtn = overlay.querySelector('#global-codelab-close-btn');
-    if (closeBtn) closeBtn.addEventListener('click', closeGlobalCodeLab);
+    if (closeBtn) closeBtn.addEventListener('click', handleCloseModal);
     overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) closeGlobalCodeLab();
+      if (e.target === overlay) handleCloseModal();
     });
 
     const schemaListEl = overlay.querySelector('#sql-studio-modal-schema-list');
@@ -2400,21 +2400,33 @@ window.App = (() => {
 
     function refreshSchemaSidebar() {
       if (!schemaListEl) return;
-      const ds = (window.SQL_DATASETS && window.SQL_DATASETS[activeDatasetId]) || null;
-      if (ds && Array.isArray(ds.tables)) {
-        schemaListEl.innerHTML = ds.tables.map(t => `
-          <div style="margin-bottom:10px;padding:8px 10px;background:rgba(15,23,42,0.65);border:1px solid rgba(148,163,184,0.16);border-radius:8px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;" data-preview-table="${escapeHtml(t.name)}">
-              <strong style="color:#38bdf8;font-family:var(--font-mono,monospace);">${escapeHtml(t.name)}</strong>
-              <span style="font-size:0.72rem;color:#94a3b8;">${t.rowCount ? `${t.rowCount} rows` : 'SELECT *'}</span>
-            </div>
-            ${Array.isArray(t.columns) ? `
-              <div style="margin-top:6px;display:flex;flex-direction:column;gap:2px;font-size:0.75rem;color:#94a3b8;font-family:var(--font-mono,monospace);">
-                ${t.columns.map(c => `<div>• ${escapeHtml(typeof c === 'string' ? c : `${c.name} (${c.type || ''})`)}</div>`).join('')}
+      const allDatasets = window.SQL_DATASETS || {};
+      const dsList = activeDatasetId === '__unified__'
+        ? Object.keys(allDatasets).map(k => allDatasets[k]).filter(Boolean)
+        : [allDatasets[activeDatasetId]].filter(Boolean);
+      const tables = [];
+      dsList.forEach(ds => {
+        if (ds && Array.isArray(ds.tables)) {
+          ds.tables.forEach(t => tables.push(t));
+        }
+      });
+      if (tables.length > 0) {
+        schemaListEl.innerHTML = tables.map(t => {
+          const rowCnt = t.rowCount || (Array.isArray(t.rows) ? t.rows.length : 0);
+          return `
+            <div style="margin-bottom:10px;padding:8px 10px;background:rgba(15,23,42,0.65);border:1px solid rgba(148,163,184,0.16);border-radius:8px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;" data-preview-table="${escapeHtml(t.name)}">
+                <strong style="color:#38bdf8;font-family:var(--font-mono,monospace);">${escapeHtml(t.name)}</strong>
+                <span style="font-size:0.72rem;color:#94a3b8;">${rowCnt ? `${rowCnt} rows` : 'SELECT *'}</span>
               </div>
-            ` : ''}
-          </div>
-        `).join('');
+              ${Array.isArray(t.columns) ? `
+                <div style="margin-top:6px;display:flex;flex-direction:column;gap:2px;font-size:0.75rem;color:#94a3b8;font-family:var(--font-mono,monospace);">
+                  ${t.columns.map(c => `<div>• ${escapeHtml(typeof c === 'string' ? c : `${c.name} (${c.type || ''})`)}</div>`).join('')}
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }).join('');
         schemaListEl.querySelectorAll('[data-preview-table]').forEach(el => {
           el.addEventListener('click', () => {
             const tbl = el.getAttribute('data-preview-table');
@@ -2426,14 +2438,28 @@ window.App = (() => {
       }
     }
 
-    function mountStudioQuery(sqlText) {
+    function mountStudioQuery(sqlText, mountOpts = {}) {
       if (!visHost) return;
+      const step = steps[activeStepIdx] || null;
+      const refSql = mountOpts.referenceSql || (step && (step.solutionCode || step.solutionSnippet)) || opts.referenceSql || (spec && spec.referenceSql) || sqlText;
       const mountFn = () => {
         if (window.TableVisualizer && typeof window.TableVisualizer.mountClauseVisualizer === 'function') {
           window.TableVisualizer.mountClauseVisualizer(visHost, {
             datasetId: activeDatasetId,
             sql: sqlText,
-            title
+            referenceSql: refSql,
+            autoVerify: Boolean(mountOpts.autoVerify),
+            title,
+            onVerify: (vRes) => {
+              if (vRes && vRes.passed) {
+                if (typeof opts.onStepComplete === 'function' && step) {
+                  opts.onStepComplete(step);
+                }
+                if (typeof opts.onLabComplete === 'function') {
+                  opts.onLabComplete(vRes);
+                }
+              }
+            }
           });
         }
       };
@@ -2490,7 +2516,7 @@ window.App = (() => {
         const dEl = overlay.querySelector('#sql-studio-modal-step-desc');
         if (tEl) tEl.textContent = steps[idx].title || '';
         if (dEl) dEl.textContent = steps[idx].instructions || steps[idx].concept || '';
-        mountStudioQuery(steps[idx].starterCode || initialSql);
+        mountStudioQuery(steps[idx].starterCode || steps[idx].starterSnippet || initialSql);
       });
     });
 
@@ -2498,9 +2524,9 @@ window.App = (() => {
     if (solBtn) {
       solBtn.addEventListener('click', () => {
         const step = steps[activeStepIdx];
-        if (step && (step.solutionCode || step.starterCode)) {
-          mountStudioQuery(step.solutionCode || step.starterCode);
-        }
+        const solSql = (step && (step.solutionCode || step.solutionSnippet || step.starterCode)) || opts.referenceSql || initialSql;
+        mountStudioQuery(solSql, { referenceSql: solSql, autoVerify: true });
+        if (typeof opts.onStepComplete === 'function' && step) opts.onStepComplete(step);
         if (typeof opts.onLabComplete === 'function') opts.onLabComplete();
       });
     }
@@ -2519,6 +2545,7 @@ window.App = (() => {
       summary: cfg.summary || '',
       datasetId: cfg.datasetId || 'ecommerce',
       sql: sql || 'SELECT * FROM customers LIMIT 10;',
+      referenceSql: cfg.referenceSql || (cfg.files && cfg.files['solution.sql']) || sql,
       steps: cfg.steps || [],
       backLabel: cfg.backLabel || 'Back to Lesson',
       onLabComplete: cfg.onLabComplete
@@ -2543,14 +2570,17 @@ window.App = (() => {
       }
     }
     const spec = getTopicLabSpec(targetSlug);
+    const activeIdx = typeof stepIndex === 'number' && !Number.isNaN(stepIndex) ? stepIndex : 0;
+    const activeStep = (spec.steps && spec.steps[activeIdx]) || (spec.steps && spec.steps[0]) || null;
     return openSqlStudioModal({
       slug: targetSlug,
       title: spec.title,
       summary: spec.summary,
       datasetId: spec.datasetId || 'ecommerce',
-      sql: mode === 'solution' && spec.steps && spec.steps[0] ? spec.steps[0].solutionCode : spec.referenceSql,
+      sql: mode === 'solution' && activeStep ? (activeStep.solutionCode || spec.referenceSql) : (activeStep ? activeStep.starterCode : spec.referenceSql),
+      referenceSql: (activeStep && activeStep.solutionCode) || spec.referenceSql,
       steps: spec.steps || [],
-      activeStepIdx: typeof stepIndex === 'number' && !Number.isNaN(stepIndex) ? stepIndex : 0
+      activeStepIdx: activeIdx
     });
   }
 
@@ -2564,7 +2594,8 @@ window.App = (() => {
       title: title || `SQL Studio — ${spec.title || currentSlug}`,
       summary: 'Execute, edit, and step through this SQL query in the full-screen SQL Studio.',
       datasetId: inferredDs || spec.datasetId || 'ecommerce',
-      sql: rawCode || spec.referenceSql
+      sql: rawCode || spec.referenceSql,
+      referenceSql: rawCode || spec.referenceSql
     });
   }
 
@@ -2590,6 +2621,7 @@ window.App = (() => {
       summary: cf.summary || ch.summary,
       datasetId: cf.datasetId || 'ecommerce',
       sql: cf.buggyCode || cf.solutionCode || 'SELECT * FROM orders LIMIT 10;',
+      referenceSql: cf.solutionCode || cf.buggyCode || '',
       steps: [
         {
           id: `challenge-${ch.id}-fix`,

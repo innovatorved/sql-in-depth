@@ -157,12 +157,12 @@
         };
       },
       codeFix: {
-        "title": "Fix NULL-Poisoned NOT IN Anti-Join Evaluator",
-        "summary": "Implement findUninvoicedOrders(orders, invoices) using NULL-safe anti-join semantics so invoices with order_id = null never zero out results.",
-        "buggyCode": "function findUninvoicedOrders(orders, invoices) {\n  // Simulates buggy SQL: WHERE o.id NOT IN (SELECT i.order_id FROM invoices i)\n  return orders.filter(o => {\n    for (const inv of invoices) {\n      if (inv.order_id === null || inv.order_id === undefined) return false; // 3VL UNKNOWN trap!\n      if (inv.order_id === o.id) return false;\n    }\n    return true;\n  });\n}",
-        "solutionCode": "function findUninvoicedOrders(orders, invoices) {\n  // Simulates NULL-safe SQL: WHERE NOT EXISTS (SELECT 1 FROM invoices i WHERE i.order_id = o.id)\n  const invoicedIds = new Set();\n  for (const inv of invoices) {\n    if (inv && inv.order_id !== null && inv.order_id !== undefined) {\n      invoicedIds.add(inv.order_id);\n    }\n  }\n  return orders.filter(o => !invoicedIds.has(o.id));\n}",
-        "testCode": "const assert = (c, m) => { if (!c) throw new Error(m || 'Assertion failed'); };\nconst orders = [{ id: 101 }, { id: 102 }, { id: 103 }];\nconst invoices = [{ id: 1, order_id: 101 }, { id: 2, order_id: null }];\nconst res = findUninvoicedOrders(orders, invoices);\nassert(res.length === 2 && res[0].id === 102 && res[1].id === 103, 'Expected orders 102 and 103 to survive despite null invoice');"
-}
+        "title": "Fix NULL-Poisoned NOT IN Anti-Join Query",
+        "summary": "Replace the NULL-fragile NOT IN subquery with a NULL-safe NOT EXISTS anti-join so a single NULL key never zeroes out the result set.",
+        "datasetId": "ecommerce",
+        "buggyCode": "-- BUGGY SQL: If the subquery ever contains a NULL referred_by key, NOT IN returns 0 rows!\nSELECT c.customer_id,\n       c.name,\n       c.tier,\n       c.country\nFROM customers c\nWHERE c.customer_id NOT IN (\n  SELECT referred_by\n  FROM customers\n)\nORDER BY c.customer_id ASC;",
+        "solutionCode": "-- FIXED SQL: NOT EXISTS is 100% immune to NULL values in the subquery relation\nSELECT c.customer_id,\n       c.name,\n       c.tier,\n       c.country\nFROM customers c\nWHERE NOT EXISTS (\n  SELECT 1\n  FROM customers r\n  WHERE r.referred_by = c.customer_id\n)\nORDER BY c.customer_id ASC;"
+      }
     },
     {
       id: "chal-02-left-join-where-trap",
@@ -313,11 +313,11 @@
       },
       codeFix: {
         "title": "Preserve Unmatched Left Rows in Filtered Outer Join + Aggregation",
-        "summary": "Evaluate the right-table status filter during the ON match condition and count right-table primary keys so customers with 0 completed payments return count = 0.",
-        "buggyCode": "function customerCompletedPaymentCounts(customers, payments) {\n  // Buggy: filters p.status === 'COMPLETED' after join and uses row length\n  const rows = [];\n  for (const c of customers) {\n    const matched = payments.filter(p => p.customer_id === c.id);\n    if (matched.length === 0) rows.push({ c, p: null });\n    else for (const p of matched) rows.push({ c, p });\n  }\n  const filtered = rows.filter(r => r.p && r.p.status === 'COMPLETED');\n  return filtered.map(r => ({ customer_id: r.c.id, completed_count: 1 }));\n}",
-        "solutionCode": "function customerCompletedPaymentCounts(customers, payments) {\n  return customers.map(c => {\n    let count = 0;\n    for (const p of payments) {\n      if (p.customer_id === c.id && p.status === 'COMPLETED') count++;\n    }\n    return { customer_id: c.id, completed_count: count };\n  });\n}",
-        "testCode": "const assert = (c, m) => { if (!c) throw new Error(m || 'Assertion failed'); };\nconst customers = [{ id: 1 }, { id: 2 }];\nconst payments = [{ id: 10, customer_id: 1, status: 'COMPLETED' }, { id: 11, customer_id: 2, status: 'FAILED' }];\nconst out = customerCompletedPaymentCounts(customers, payments);\nassert(out.length === 2 && out[0].completed_count === 1 && out[1].completed_count === 0, 'Customer 2 must remain with completed_count = 0');"
-}
+        "summary": "Move the right-table status filter from WHERE into the LEFT JOIN ... ON clause and use COUNT(o.order_id) so customers with 0 completed orders return 0.",
+        "datasetId": "ecommerce",
+        "buggyCode": "-- BUGGY SQL: WHERE o.status = 'completed' eliminates customers with zero completed orders!\nSELECT c.customer_id,\n       c.name,\n       c.tier,\n       COUNT(*) AS completed_orders,\n       COALESCE(SUM(o.total_cents), 0) AS completed_cents\nFROM customers c\nLEFT JOIN orders o ON o.customer_id = c.customer_id\nWHERE o.status = 'completed'\nGROUP BY c.customer_id, c.name, c.tier\nORDER BY c.customer_id ASC;",
+        "solutionCode": "-- FIXED SQL: Filter o.status = 'completed' inside ON and count right-table PK o.order_id\nSELECT c.customer_id,\n       c.name,\n       c.tier,\n       COUNT(o.order_id) AS completed_orders,\n       COALESCE(SUM(o.total_cents), 0) AS completed_cents\nFROM customers c\nLEFT JOIN orders o ON o.customer_id = c.customer_id AND o.status = 'completed'\nGROUP BY c.customer_id, c.name, c.tier\nORDER BY c.customer_id ASC;"
+      }
     },
     {
       id: "chal-03-chasm-trap-fanout",
@@ -469,11 +469,11 @@
       },
       codeFix: {
         "title": "Pre-Aggregate Child CTEs to Eliminate 1:N:M Join Fanout",
-        "summary": "Aggregate order_items and order_shipments independently by order_id before joining to orders.",
-        "buggyCode": "function computeOrderTotals(orders, items, shipments) {\n  // Buggy: joins items and shipments directly, causing N * M fanout!\n  return orders.map(o => {\n    let itemTotal = 0, shipTotal = 0;\n    const oItems = items.filter(i => i.order_id === o.id);\n    const oShips = shipments.filter(s => s.order_id === o.id);\n    for (const i of oItems) {\n      for (const s of oShips) {\n        itemTotal += i.amount;\n        shipTotal += s.fee;\n      }\n    }\n    return { order_id: o.id, itemTotal, shipTotal };\n  });\n}",
-        "solutionCode": "function computeOrderTotals(orders, items, shipments) {\n  const itemByOrder = new Map();\n  for (const i of items) {\n    itemByOrder.set(i.order_id, (itemByOrder.get(i.order_id) || 0) + i.amount);\n  }\n  const shipByOrder = new Map();\n  for (const s of shipments) {\n    shipByOrder.set(s.order_id, (shipByOrder.get(s.order_id) || 0) + s.fee);\n  }\n  return orders.map(o => ({\n    order_id: o.id,\n    itemTotal: itemByOrder.get(o.id) || 0,\n    shipTotal: shipByOrder.get(o.id) || 0\n  }));\n}",
-        "testCode": "const assert = (c, m) => { if (!c) throw new Error(m || 'Assertion failed'); };\nconst orders = [{ id: 1 }, { id: 2 }];\nconst items = [{ order_id: 1, amount: 100 }, { order_id: 1, amount: 50 }, { order_id: 2, amount: 80 }];\nconst shipments = [{ order_id: 1, fee: 10 }, { order_id: 1, fee: 15 }];\nconst res = computeOrderTotals(orders, items, shipments);\nassert(res[0].itemTotal === 150 && res[0].shipTotal === 25, 'Order 1 must not fan out (got ' + JSON.stringify(res[0]) + ')');\nassert(res[1].itemTotal === 80 && res[1].shipTotal === 0, 'Order 2 with 0 shipments must preserve itemTotal=80');"
-}
+        "summary": "Aggregate order_items and payments independently by order_id in separate CTEs before joining to orders.",
+        "datasetId": "ecommerce",
+        "buggyCode": "-- BUGGY SQL: Joining order_items (1:N) and payments (1:M) directly causes N*M Cartesian fanout per order!\nSELECT o.order_id,\n       o.customer_id,\n       COALESCE(SUM(oi.quantity * oi.unit_price_cents), 0) AS items_cents,\n       COALESCE(SUM(p.amount_cents), 0) AS paid_cents\nFROM orders o\nLEFT JOIN order_items oi ON oi.order_id = o.order_id\nLEFT JOIN payments p ON p.order_id = o.order_id\nGROUP BY o.order_id, o.customer_id\nORDER BY o.order_id ASC;",
+        "solutionCode": "-- FIXED SQL: Pre-aggregate each 1:N child table to the order_id grain before joining\nWITH item_totals AS (\n  SELECT order_id,\n         SUM(quantity * unit_price_cents) AS items_cents\n  FROM order_items\n  GROUP BY order_id\n),\npayment_totals AS (\n  SELECT order_id,\n         SUM(amount_cents) AS paid_cents\n  FROM payments\n  GROUP BY order_id\n)\nSELECT o.order_id,\n       o.customer_id,\n       COALESCE(i.items_cents, 0) AS items_cents,\n       COALESCE(p.paid_cents, 0) AS paid_cents\nFROM orders o\nLEFT JOIN item_totals i ON i.order_id = o.order_id\nLEFT JOIN payment_totals p ON p.order_id = o.order_id\nORDER BY o.order_id ASC;"
+      }
     },
     {
       id: "chal-04-window-range-vs-rows-bug",
@@ -623,12 +623,12 @@
         };
       },
       codeFix: {
-        "title": "Implement Physical ROWS Window Framing & Partition-Wide Closing Value",
-        "summary": "Compute row-by-row runningTotal and partition closingBalance even when multiple events share the same timestamp.",
-        "buggyCode": "function annotateLedgerWindow(entries) {\n  // Buggy: simulates default RANGE frame merging ties and LAST_VALUE stopping at current row\n  const sorted = [...entries].sort((a, b) => a.ts - b.ts || a.id - b.id);\n  return sorted.map((row, idx) => {\n    const rangePeers = sorted.filter(r => r.ts <= row.ts);\n    const runningTotal = rangePeers.reduce((s, r) => s + r.delta, 0);\n    return { ...row, runningTotal, closingBalance: runningTotal };\n  });\n}",
-        "solutionCode": "function annotateLedgerWindow(entries) {\n  const sorted = [...entries].sort((a, b) => a.ts - b.ts || a.id - b.id);\n  const finalBalance = sorted.reduce((s, r) => s + r.delta, 0);\n  let running = 0;\n  return sorted.map(row => {\n    running += row.delta;\n    return { ...row, runningTotal: running, closingBalance: finalBalance };\n  });\n}",
-        "testCode": "const assert = (c, m) => { if (!c) throw new Error(m || 'Assertion failed'); };\nconst entries = [{ id: 1, ts: 1000, delta: 50 }, { id: 2, ts: 1000, delta: 30 }, { id: 3, ts: 2000, delta: -20 }];\nconst res = annotateLedgerWindow(entries);\nassert(res[0].runningTotal === 50 && res[1].runningTotal === 80 && res[2].runningTotal === 60, 'Expected physical row running totals 50, 80, 60');\nassert(res[0].closingBalance === 60 && res[1].closingBalance === 60, 'Expected partition closingBalance = 60 on all rows');"
-}
+        "title": "Specify Explicit ROWS Window Frame & Deterministic Tie-Breaker",
+        "summary": "Use ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW with a deterministic (created_at, entry_id) tie-breaker for strict row-by-row running ledger balances.",
+        "datasetId": "fintech_ledger",
+        "buggyCode": "-- BUGGY SQL: Default RANGE frame merges duplicate created_at timestamps into the same peer group!\nSELECT entry_id,\n       account_id,\n       direction,\n       amount_cents,\n       created_at,\n       SUM(CASE WHEN direction = 'credit' THEN amount_cents ELSE -amount_cents END) OVER (\n         PARTITION BY account_id\n         ORDER BY created_at\n       ) AS running_net_cents\nFROM journal_entries\nORDER BY account_id ASC, created_at ASC, entry_id ASC;",
+        "solutionCode": "-- FIXED SQL: Deterministic tie-breaker + ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW\nSELECT entry_id,\n       account_id,\n       direction,\n       amount_cents,\n       created_at,\n       SUM(CASE WHEN direction = 'credit' THEN amount_cents ELSE -amount_cents END) OVER (\n         PARTITION BY account_id\n         ORDER BY created_at ASC, entry_id ASC\n         ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW\n       ) AS running_net_cents\nFROM journal_entries\nORDER BY account_id ASC, created_at ASC, entry_id ASC;"
+      }
     },
     {
       id: "chal-05-recursive-cte-cycle-loop",
@@ -779,12 +779,12 @@
         };
       },
       codeFix: {
-        "title": "Add Visited-Node & Depth Guards to Recursive Graph Reachability",
-        "summary": "Implement findReachableNodes(edges, startId, maxDepth) that safely traverses cyclic graphs without infinite loops.",
-        "buggyCode": "function findReachableNodes(edges, startId) {\n  // Buggy: UNION ALL worktable without visited tracking loops forever on cycles!\n  let working = [startId];\n  const result = [];\n  while (working.length > 0) {\n    result.push(...working);\n    const next = [];\n    for (const u of working) {\n      for (const e of edges) {\n        if (e.from === u) next.push(e.to);\n      }\n    }\n    working = next;\n  }\n  return result;\n}",
-        "solutionCode": "function findReachableNodes(edges, startId, maxDepth = 32) {\n  const visited = new Set([startId]);\n  let working = [startId];\n  let depth = 0;\n  while (working.length > 0 && depth < maxDepth) {\n    const next = [];\n    for (const u of working) {\n      for (const e of edges) {\n        if (e.from === u && !visited.has(e.to)) {\n          visited.add(e.to);\n          next.push(e.to);\n        }\n      }\n    }\n    working = next;\n    depth++;\n  }\n  return Array.from(visited);\n}",
-        "testCode": "const assert = (c, m) => { if (!c) throw new Error(m || 'Assertion failed'); };\nconst cyclicEdges = [{ from: 1, to: 2 }, { from: 2, to: 3 }, { from: 3, to: 1 }, { from: 3, to: 4 }];\nconst reached = findReachableNodes(cyclicEdges, 1, 10);\nassert(reached.length === 4 && reached.includes(4), 'Should terminate on cycle 1->2->3->1 and return [1,2,3,4]');"
-}
+        "title": "Add Visited-Path & Depth Guards to Recursive CTE Graph Traversal",
+        "summary": "Include a visited-path string check (INSTR(path, ...) = 0) and a hard depth < 10 cap in WITH RECURSIVE so cyclic graphs always terminate.",
+        "datasetId": "org_hr",
+        "buggyCode": "-- BUGGY SQL: Recursive CTE without depth or visited-path guard can loop infinitely on cyclic manager_id chains!\nWITH RECURSIVE org_tree AS (\n  SELECT emp_id,\n         name,\n         manager_id,\n         0 AS depth,\n         ',' || CAST(emp_id AS TEXT) || ',' AS visited_path\n  FROM employees\n  WHERE manager_id IS NULL\n  UNION ALL\n  SELECT e.emp_id,\n         e.name,\n         e.manager_id,\n         t.depth + 1,\n         t.visited_path || CAST(e.emp_id AS TEXT) || ','\n  FROM employees e\n  JOIN org_tree t ON e.manager_id = t.emp_id\n)\nSELECT emp_id, name, manager_id, depth, visited_path\nFROM org_tree\nORDER BY depth ASC, emp_id ASC;",
+        "solutionCode": "-- FIXED SQL: Visited-path cycle detection (INSTR = 0) + hard recursion depth guard (depth < 10)\nWITH RECURSIVE org_tree AS (\n  SELECT emp_id,\n         name,\n         manager_id,\n         0 AS depth,\n         ',' || CAST(emp_id AS TEXT) || ',' AS visited_path\n  FROM employees\n  WHERE manager_id IS NULL\n  UNION ALL\n  SELECT e.emp_id,\n         e.name,\n         e.manager_id,\n         t.depth + 1,\n         t.visited_path || CAST(e.emp_id AS TEXT) || ','\n  FROM employees e\n  JOIN org_tree t ON e.manager_id = t.emp_id\n  WHERE t.depth < 10\n    AND INSTR(t.visited_path, ',' || CAST(e.emp_id AS TEXT) || ',') = 0\n)\nSELECT emp_id, name, manager_id, depth, visited_path\nFROM org_tree\nORDER BY depth ASC, emp_id ASC;"
+      }
     },
     {
       id: "chal-06-non-sargable-composite-index",
@@ -934,12 +934,12 @@
         };
       },
       codeFix: {
-        "title": "Recommend Optimal Composite B+Tree Index & SARGable Range Rewrite",
-        "summary": "Order equality columns first (sorted by selectivity), range/sort column next, and remaining SELECT columns in INCLUDE.",
-        "buggyCode": "function designCompositeIndex(querySpec) {\n  // Buggy: puts range columns before equality columns and omits INCLUDE\n  return {\n    keyColumns: [...querySpec.rangeCols, ...querySpec.equalityCols],\n    includeColumns: [],\n    sargableRewrite: false\n  };\n}",
-        "solutionCode": "function designCompositeIndex(querySpec) {\n  const eqCols = [...(querySpec.equalityCols || [])];\n  const rangeCols = [...(querySpec.rangeCols || [])];\n  const keySet = new Set([...eqCols, ...rangeCols]);\n  const includeColumns = (querySpec.selectCols || []).filter(c => !keySet.has(c));\n  return {\n    keyColumns: [...eqCols, ...rangeCols],\n    includeColumns,\n    sargableRewrite: true\n  };\n}",
-        "testCode": "const assert = (c, m) => { if (!c) throw new Error(m || 'Assertion failed'); };\nconst plan = designCompositeIndex({\n  equalityCols: ['tenant_id', 'status'],\n  rangeCols: ['created_at'],\n  selectCols: ['tenant_id', 'created_at', 'total_cents']\n});\nassert(plan.keyColumns.join(',') === 'tenant_id,status,created_at', 'Equality cols must precede range col');\nassert(plan.includeColumns.join(',') === 'total_cents' && plan.sargableRewrite === true, 'total_cents should be in INCLUDE');"
-}
+        "title": "Rewrite Non-SARGable Function Filter into SARGable B+Tree Range Scan",
+        "summary": "Replace SUBSTR(created_at, 1, 7) function wrapping with a SARGable half-open range interval so idx_orders_customer_date is used.",
+        "datasetId": "ecommerce",
+        "buggyCode": "-- BUGGY SQL: Wrapping created_at in SUBSTR() destroys SARGability and forces a full table scan!\nSELECT order_id,\n       customer_id,\n       status,\n       total_cents,\n       created_at\nFROM orders\nWHERE customer_id = 1\n  AND SUBSTR(created_at, 1, 7) = '2025-01'\nORDER BY created_at DESC;",
+        "solutionCode": "-- FIXED SQL: SARGable half-open range predicate [start, end) seeks directly on idx_orders_customer_date\nSELECT order_id,\n       customer_id,\n       status,\n       total_cents,\n       created_at\nFROM orders\nWHERE customer_id = 1\n  AND created_at >= '2025-01-01'\n  AND created_at < '2025-02-01'\nORDER BY created_at DESC;"
+      }
     },
     {
       id: "chal-07-stale-stats-nested-loop",
@@ -1089,12 +1089,12 @@
         };
       },
       codeFix: {
-        "title": "Cost-Based Join Selector with Correlated Selectivity Correction",
-        "summary": "Compute true outer cardinality using joint selectivity when columns are correlated and pick HashJoin when outer rows exceed the NLJ threshold.",
-        "buggyCode": "function selectPhysicalJoin(outerTotalRows, selA, selB, innerRows) {\n  // Buggy: assumes independence selA * selB even for correlated columns and picks NLJ\n  const estOuter = Math.max(1, Math.round(outerTotalRows * selA * selB));\n  const nljCost = estOuter * Math.log2(Math.max(2, innerRows));\n  const hashCost = estOuter + innerRows;\n  return { estOuter, algorithm: nljCost < hashCost ? 'NestedLoopJoin' : 'HashJoin' };\n}",
-        "solutionCode": "function selectPhysicalJoin(outerTotalRows, selA, selB, innerRows, correlationFactor = 1.0) {\n  const jointSel = Math.min(Math.min(selA, selB), selA * selB * correlationFactor);\n  const estOuter = Math.max(1, Math.round(outerTotalRows * jointSel));\n  const nljCost = estOuter * Math.log2(Math.max(2, innerRows)) * 4;\n  const hashCost = estOuter + innerRows * 1.2;\n  return { estOuter, algorithm: nljCost < hashCost ? 'NestedLoopJoin' : 'HashJoin' };\n}",
-        "testCode": "const assert = (c, m) => { if (!c) throw new Error(m || 'Assertion failed'); };\nconst res = selectPhysicalJoin(5000000, 0.1, 0.1, 200000, 10.0);\nassert(res.estOuter === 500000 && res.algorithm === 'HashJoin', 'Correlated selectivity should estimate 500,000 rows and choose HashJoin');"
-}
+        "title": "Eliminate Correlated Subquery Nested Loop via Pre-Aggregated Hash Join",
+        "summary": "Rewrite a correlated per-row subquery into a single-pass CTE aggregation joined by customer_id.",
+        "datasetId": "ecommerce",
+        "buggyCode": "-- BUGGY SQL: Correlated subquery executes a repeated scan for every customer row!\nSELECT c.customer_id,\n       c.name,\n       c.country,\n       c.tier,\n       (SELECT COALESCE(SUM(o.total_cents), 0)\n        FROM orders o\n        WHERE o.customer_id = c.customer_id\n          AND o.status = 'completed') AS completed_spend_cents\nFROM customers c\nWHERE c.country = 'US'\nORDER BY completed_spend_cents DESC, c.customer_id ASC;",
+        "solutionCode": "-- FIXED SQL: Single-pass HashAggregate CTE joined once on customer_id\nWITH customer_spend AS (\n  SELECT customer_id,\n         SUM(total_cents) AS completed_spend_cents\n  FROM orders\n  WHERE status = 'completed'\n  GROUP BY customer_id\n)\nSELECT c.customer_id,\n       c.name,\n       c.country,\n       c.tier,\n       COALESCE(cs.completed_spend_cents, 0) AS completed_spend_cents\nFROM customers c\nLEFT JOIN customer_spend cs ON cs.customer_id = c.customer_id\nWHERE c.country = 'US'\nORDER BY completed_spend_cents DESC, c.customer_id ASC;"
+      }
     },
     {
       id: "chal-08-deep-offset-pagination-cliff",
@@ -1244,12 +1244,12 @@
         };
       },
       codeFix: {
-        "title": "Implement Composite Keyset (created_at DESC, id DESC) Cursor Paginator",
-        "summary": "Filter and slice ordered rows using the composite (created_at, id) seek invariant so ties on created_at are never lost.",
-        "buggyCode": "function paginateKeysetDesc(rows, cursor, limit) {\n  // Buggy: compares only created_at < cursor.created_at, dropping rows with identical timestamps!\n  const sorted = [...rows].sort((a, b) => b.created_at - a.created_at || b.id - a.id);\n  const filtered = cursor ? sorted.filter(r => r.created_at < cursor.created_at) : sorted;\n  return filtered.slice(0, limit);\n}",
-        "solutionCode": "function paginateKeysetDesc(rows, cursor, limit) {\n  const sorted = [...rows].sort((a, b) => b.created_at - a.created_at || b.id - a.id);\n  const filtered = cursor\n    ? sorted.filter(r => r.created_at < cursor.created_at || (r.created_at === cursor.created_at && r.id < cursor.id))\n    : sorted;\n  return filtered.slice(0, limit);\n}",
-        "testCode": "const assert = (c, m) => { if (!c) throw new Error(m || 'Assertion failed'); };\nconst data = [\n  { id: 10, created_at: 500 },\n  { id: 9, created_at: 500 },\n  { id: 8, created_at: 500 },\n  { id: 7, created_at: 400 }\n];\nconst p1 = paginateKeysetDesc(data, null, 2);\nconst p2 = paginateKeysetDesc(data, p1[p1.length - 1], 2);\nassert(p1.map(r => r.id).join(',') === '10,9', 'Page 1 should be 10,9');\nassert(p2.map(r => r.id).join(',') === '8,7', 'Page 2 should preserve tied timestamp id=8 and return 8,7');"
-}
+        "title": "Replace Linear OFFSET Pagination with Composite Keyset Cursor Seek",
+        "summary": "Use a composite (created_at, order_id) keyset seek predicate so deep pages execute in O(log N) B+Tree time without skipping tied timestamps.",
+        "datasetId": "ecommerce",
+        "buggyCode": "-- BUGGY SQL: Linear OFFSET scans and discards preceding tuples and skips tied timestamps if filtered only on created_at\nSELECT order_id,\n       customer_id,\n       status,\n       total_cents,\n       created_at\nFROM orders\nORDER BY created_at DESC, order_id DESC\nLIMIT 5 OFFSET 3;",
+        "solutionCode": "-- FIXED SQL: Keyset cursor seek after cursor (created_at = '2025-02-05', order_id = 109)\nSELECT order_id,\n       customer_id,\n       status,\n       total_cents,\n       created_at\nFROM orders\nWHERE created_at < '2025-02-05'\n   OR (created_at = '2025-02-05' AND order_id < 109)\nORDER BY created_at DESC, order_id DESC\nLIMIT 5;"
+      }
     },
     {
       id: "chal-09-write-skew-double-spend",
@@ -1400,12 +1400,12 @@
         };
       },
       codeFix: {
-        "title": "Atomic Pessimistic Row-Locked + Idempotent Wallet Withdrawal",
-        "summary": "Serialize withdrawals per wallet and enforce idempotency keys so concurrent or retried requests never overdraw.",
-        "buggyCode": "function processWithdrawal(state, req) {\n  // Buggy: does not check idempotency key and allows overdraft when snapshot balance is stale\n  const wallet = state.wallets.get(req.walletId);\n  if (req.snapshotBalance >= req.amount) {\n    wallet.balance -= req.amount;\n    return { status: 'COMMITTED', balance: wallet.balance };\n  }\n  return { status: 'INSUFFICIENT_FUNDS', balance: wallet.balance };\n}",
-        "solutionCode": "function processWithdrawal(state, req) {\n  if (!state.idempotency) state.idempotency = new Map();\n  if (state.idempotency.has(req.idempotencyKey)) {\n    return state.idempotency.get(req.idempotencyKey);\n  }\n  const wallet = state.wallets.get(req.walletId);\n  // Atomic current-read check (UPDATE wallets SET balance = balance - :amt WHERE id = :id AND balance >= :amt)\n  let result;\n  if (wallet.balance >= req.amount) {\n    wallet.balance -= req.amount;\n    result = { status: 'COMMITTED', balance: wallet.balance };\n  } else {\n    result = { status: 'INSUFFICIENT_FUNDS', balance: wallet.balance };\n  }\n  state.idempotency.set(req.idempotencyKey, result);\n  return result;\n}",
-        "testCode": "const assert = (c, m) => { if (!c) throw new Error(m || 'Assertion failed'); };\nconst state = { wallets: new Map([[1, { id: 1, balance: 100 }]]) };\nconst r1 = processWithdrawal(state, { walletId: 1, amount: 80, snapshotBalance: 100, idempotencyKey: 'k1' });\nconst r1Retry = processWithdrawal(state, { walletId: 1, amount: 80, snapshotBalance: 100, idempotencyKey: 'k1' });\nconst r2 = processWithdrawal(state, { walletId: 1, amount: 80, snapshotBalance: 100, idempotencyKey: 'k2' });\nassert(r1.status === 'COMMITTED' && r1.balance === 20, 'First withdrawal succeeds');\nassert(r1Retry.balance === 20 && state.wallets.get(1).balance === 20, 'Retry must be idempotent');\nassert(r2.status === 'INSUFFICIENT_FUNDS' && state.wallets.get(1).balance === 20, 'Second concurrent withdrawal must be rejected');"
-}
+        "title": "Reconcile Double-Entry Ledger Balances & Guard Against Overdraft Write Skew",
+        "summary": "Audit accounts against signed journal_entries postings and filter accounts with sufficient posted balance for a 50,000-cent withdrawal.",
+        "datasetId": "fintech_ledger",
+        "buggyCode": "-- BUGGY SQL: Ignores debit vs credit direction and fails to verify non-negative post-withdrawal balance\nSELECT a.account_id,\n       a.owner_name,\n       a.account_type,\n       a.posted_balance_cents,\n       COUNT(j.entry_id) AS journal_postings\nFROM accounts a\nLEFT JOIN journal_entries j ON j.account_id = a.account_id\nGROUP BY a.account_id, a.owner_name, a.account_type, a.posted_balance_cents\nORDER BY a.account_id ASC;",
+        "solutionCode": "-- FIXED SQL: Reconcile signed journal delta and verify sufficient balance invariant (posted_balance_cents >= 50000)\nSELECT a.account_id,\n       a.owner_name,\n       a.account_type,\n       a.posted_balance_cents,\n       COALESCE(SUM(CASE WHEN j.direction = 'credit' THEN j.amount_cents ELSE -j.amount_cents END), 0) AS net_journal_cents,\n       CASE WHEN a.posted_balance_cents >= 50000 THEN 'APPROVED' ELSE 'INSUFFICIENT_FUNDS' END AS withdrawal_guard\nFROM accounts a\nLEFT JOIN journal_entries j ON j.account_id = a.account_id\nWHERE a.currency = 'USD'\nGROUP BY a.account_id, a.owner_name, a.account_type, a.posted_balance_cents\nORDER BY a.account_id ASC;"
+      }
     },
     {
       id: "chal-10-ab-ba-deadlock-storm",
@@ -1555,12 +1555,12 @@
         };
       },
       codeFix: {
-        "title": "Canonical Lock Ordering & Wait-For Graph Cycle Detector",
-        "summary": "Sort lock requests in ascending resource ID order to prevent deadlocks, and detect directed cycles in a Wait-For Graph.",
-        "buggyCode": "function canonicalizeLockPlan(skuIds) {\n  // Buggy: preserves arbitrary user cart order, allowing [20, 10] vs [10, 20] deadlocks\n  return skuIds.slice();\n}",
-        "solutionCode": "function canonicalizeLockPlan(skuIds) {\n  return Array.from(new Set(skuIds)).sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));\n}",
-        "testCode": "const assert = (c, m) => { if (!c) throw new Error(m || 'Assertion failed'); };\nconst cartA = canonicalizeLockPlan([205, 101, 309, 101]);\nconst cartB = canonicalizeLockPlan([309, 205, 101]);\nassert(cartA.join(',') === '101,205,309' && cartB.join(',') === '101,205,309', 'Both transactions must lock SKUs in identical ascending order 101,205,309');"
-}
+        "title": "Canonical Ascending Primary-Key Lock Ordering Plan",
+        "summary": "Deduplicate and order target product_id rows in strict ascending primary-key order so concurrent multi-item checkouts cannot form AB-BA Wait-For Graph cycles.",
+        "datasetId": "ecommerce",
+        "buggyCode": "-- BUGGY SQL: Fetches target SKU inventory rows in arbitrary non-deterministic order\nSELECT p.product_id,\n       p.sku,\n       p.name,\n       p.stock_qty,\n       p.price_cents\nFROM products p\nWHERE p.product_id IN (5, 2, 8, 1);",
+        "solutionCode": "-- FIXED SQL: Canonical ascending primary-key ordering (ORDER BY product_id ASC) prevents AB-BA deadlocks\nSELECT p.product_id,\n       p.sku,\n       p.name,\n       p.stock_qty,\n       p.price_cents,\n       ROW_NUMBER() OVER (ORDER BY p.product_id ASC) AS lock_acquisition_step\nFROM products p\nWHERE p.product_id IN (5, 2, 8, 1)\n  AND p.stock_qty > 0\nORDER BY p.product_id ASC;"
+      }
     },
     {
       id: "chal-11-mvcc-bloat-xid-wraparound",
@@ -1710,12 +1710,12 @@
         };
       },
       codeFix: {
-        "title": "MVCC Vacuum Horizon & Dead Tuple Reclaimability Calculator",
-        "summary": "Determine which dead tuple versions can be reclaimed by VACUUM given active backend snapshots and replication slot horizons.",
-        "buggyCode": "function filterReclaimableTuples(tuples, currentXid) {\n  // Buggy: reclaims any tuple with committed xmax without checking active snapshot OldestXmin!\n  return tuples.filter(t => t.xmax !== null && t.xmaxCommitted && t.xmax < currentXid);\n}",
-        "solutionCode": "function filterReclaimableTuples(tuples, currentXid, activeBackendXmins = [], slotXmins = []) {\n  const horizons = [currentXid, ...activeBackendXmins, ...slotXmins].filter(x => typeof x === 'number');\n  const oldestXmin = Math.min(...horizons);\n  return tuples.filter(t => t.xmax !== null && t.xmaxCommitted && t.xmax < oldestXmin);\n}",
-        "testCode": "const assert = (c, m) => { if (!c) throw new Error(m || 'Assertion failed'); };\nconst tuples = [\n  { id: 1, xmin: 100, xmax: 150, xmaxCommitted: true },\n  { id: 2, xmin: 150, xmax: 250, xmaxCommitted: true },\n  { id: 3, xmin: 250, xmax: null, xmaxCommitted: false }\n];\nconst reclaimed = filterReclaimableTuples(tuples, 500, [200], []);\nassert(reclaimed.length === 1 && reclaimed[0].id === 1, 'Only tuple 1 (xmax=150 < oldestXmin=200) is safe to vacuum');"
-}
+        "title": "Identify High-Churn MVCC Bloat & Unreclaimed Dead Tuple Candidates",
+        "summary": "Audit high-churn transfer states (failed, reversed, pending) vs settled transfers per account to prioritize autovacuum and dead-tuple cleanup.",
+        "datasetId": "fintech_ledger",
+        "buggyCode": "-- BUGGY SQL: Counts all transfers without separating dead/aborted churn from live settled rows\nSELECT from_account_id AS account_id,\n       COUNT(*) AS total_transfers,\n       SUM(amount_cents) AS total_amount_cents\nFROM transfers\nGROUP BY from_account_id\nORDER BY total_transfers DESC;",
+        "solutionCode": "-- FIXED SQL: Separate settled live tuples from aborted/reversed churn tuples per account\nSELECT a.account_id,\n       a.owner_name,\n       COUNT(t.transfer_id) AS total_tuple_versions,\n       SUM(CASE WHEN t.status = 'settled' THEN 1 ELSE 0 END) AS live_settled_tuples,\n       SUM(CASE WHEN t.status IN ('failed', 'reversed') THEN 1 ELSE 0 END) AS reclaimable_dead_tuples\nFROM accounts a\nLEFT JOIN transfers t ON t.from_account_id = a.account_id\nGROUP BY a.account_id, a.owner_name\nORDER BY reclaimable_dead_tuples DESC, a.account_id ASC;"
+      }
     },
     {
       id: "chal-12-zero-downtime-ddl-lock-queue",
@@ -1865,12 +1865,12 @@
         };
       },
       codeFix: {
-        "title": "Zero-Downtime DDL Lock-Queue & Safe Migration Planner",
-        "summary": "Generate non-blocking SQL migration steps using lock_timeout, CREATE INDEX CONCURRENTLY, and ADD CONSTRAINT ... NOT VALID + VALIDATE.",
-        "buggyCode": "function buildSafeMigrationPlan(spec) {\n  // Buggy: emits blocking CREATE INDEX and unguarded ALTER TABLE\n  return [\n    `CREATE INDEX ${spec.indexName} ON ${spec.table} (${spec.column});`,\n    `ALTER TABLE ${spec.table} ADD CONSTRAINT ${spec.constraintName} CHECK (${spec.checkExpr});`\n  ];\n}",
-        "solutionCode": "function buildSafeMigrationPlan(spec) {\n  return [\n    `SET lock_timeout = '1500ms';`,\n    `CREATE INDEX CONCURRENTLY IF NOT EXISTS ${spec.indexName} ON ${spec.table} (${spec.column});`,\n    `ALTER TABLE ${spec.table} ADD CONSTRAINT ${spec.constraintName} CHECK (${spec.checkExpr}) NOT VALID;`,\n    `ALTER TABLE ${spec.table} VALIDATE CONSTRAINT ${spec.constraintName};`\n  ];\n}",
-        "testCode": "const assert = (c, m) => { if (!c) throw new Error(m || 'Assertion failed'); };\nconst steps = buildSafeMigrationPlan({ table: 'orders', column: 'tenant_id', indexName: 'idx_orders_tenant', constraintName: 'chk_pos', checkExpr: 'total >= 0' });\nassert(steps[0].includes('lock_timeout'), 'Must set lock_timeout');\nassert(steps[1].includes('CREATE INDEX CONCURRENTLY'), 'Must use CREATE INDEX CONCURRENTLY');\nassert(steps[2].includes('NOT VALID') && steps[3].includes('VALIDATE CONSTRAINT'), 'Must split ADD CONSTRAINT NOT VALID and VALIDATE CONSTRAINT');"
-}
+        "title": "Pre-Migration Constraint & Index Readiness Audit Query",
+        "summary": "Verify zero constraint violations exist on subscriptions and invoices before running online constraint validation.",
+        "datasetId": "saas_telemetry",
+        "buggyCode": "-- BUGGY SQL: Blindly scans subscriptions without checking invoice integrity or negative MRR violations\nSELECT sub_id,\n       user_id,\n       mrr_usd,\n       status,\n       started_at\nFROM subscriptions\nORDER BY sub_id ASC;",
+        "solutionCode": "-- FIXED SQL: Pre-check NOT VALID constraint readiness across subscriptions and invoices\nSELECT s.sub_id,\n       u.org_name,\n       u.plan_tier,\n       s.mrr_usd,\n       s.status,\n       COUNT(i.invoice_id) AS invoice_count,\n       COALESCE(SUM(i.amount_usd), 0) AS billed_usd,\n       CASE WHEN s.mrr_usd >= 0 AND u.user_id IS NOT NULL THEN 'VALID' ELSE 'VIOLATION' END AS constraint_check\nFROM subscriptions s\nLEFT JOIN saas_users u ON u.user_id = s.user_id\nLEFT JOIN invoices i ON i.sub_id = s.sub_id\nGROUP BY s.sub_id, u.org_name, u.plan_tier, s.mrr_usd, s.status, u.user_id\nORDER BY s.sub_id ASC;"
+      }
     }
   ];
 

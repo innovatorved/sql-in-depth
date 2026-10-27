@@ -251,7 +251,7 @@
             '  SELECT e.emp_id, e.name, e.title, e.manager_id, o.level + 1',
             '  FROM employees e JOIN org_tree o ON e.manager_id = o.emp_id',
             ')',
-            'SELECT emp_id, printf(\'%.*c\', level * 2, \' \') || name AS hierarchy, title, level',
+            'SELECT emp_id, SUBSTR(\'          \', 1, level * 2) || name AS hierarchy, title, level',
             'FROM org_tree;'
           ].join('\n')
         },

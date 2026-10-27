@@ -1312,11 +1312,14 @@
 
             var activeIdx = steps.length > 0 ? steps.length - 1 : 0;
             // Default to final data step (before Step 8 Explain Plan) so the user immediately sees the output table
-            if (steps.length > 1 && steps[activeIdx].isExplainStep) {
+            if (steps.length > 1 && steps[activeIdx].isExplainStep && !options.focusExplain) {
                 activeIdx = steps.length - 2;
             }
             if (options.startAtFinal === false) {
                 activeIdx = 0;
+            }
+            if (options.focusExplain && steps.length > 0) {
+                activeIdx = steps.length - 1;
             }
             if (typeof options.initialStepIndex === 'number' && options.initialStepIndex >= 0 && options.initialStepIndex < steps.length) {
                 activeIdx = options.initialStepIndex;
@@ -1408,6 +1411,13 @@
             }
 
             render();
+            if (options.focusExplain) {
+                var expBox = container.querySelector('.sql-explain-box');
+                if (expBox) {
+                    expBox.classList.add('is-focused');
+                    expBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }
         })();
 
         promise.stop = function () {};

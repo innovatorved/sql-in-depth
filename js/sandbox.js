@@ -921,7 +921,7 @@
             '<div class="sql-schema-table-item" style="margin-bottom:6px;border:1px solid var(--border);border-radius:6px;background:var(--bg);overflow:hidden;">' +
               '<button type="button" data-sql-preview-table="' + escapeHtml(t.name) + '" data-sql-preview-ds="' + escapeHtml(dsKey) + '" style="width:100%;display:flex;justify-content:space-between;align-items:center;padding:6px 8px;background:var(--surface);border:none;color:var(--fg);font-family:var(--font-mono);font-size:0.78rem;font-weight:600;cursor:pointer;text-align:left;" title="Click to preview SELECT * FROM ' + escapeHtml(t.name) + ' LIMIT 15;">' +
                 '<span>▤ ' + escapeHtml(t.name) + '</span>' +
-                '<span style="font-size:0.68rem;color:var(--fg-muted);font-weight:400;">' + (t.rowCount || 0) + ' rows</span>' +
+                '<span style="font-size:0.68rem;color:var(--fg-muted);font-weight:400;">' + (t.rowCount || (Array.isArray(t.rows) ? t.rows.length : 0)) + ' rows</span>' +
               '</button>' +
               '<div style="padding:4px 4px 6px;border-top:1px solid var(--border);">' + colsHtml + '</div>' +
             '</div>'
@@ -956,6 +956,7 @@
         datasetId: this._sqlStudioDatasetId || '__unified__',
         referenceSql: sql,
         startAtFinal: opts.startAtFinal !== false,
+        focusExplain: Boolean(opts.focusExplain),
         runTests: Boolean(opts.runTests)
       });
     },
@@ -1810,10 +1811,10 @@
           } else if (sqlAct === 'step-clauses') {
             self._mountSqlStudioVisualizer({ startAtFinal: false });
           } else if (sqlAct === 'explain') {
-            self._mountSqlStudioVisualizer({ startAtFinal: true, runTests: false });
+            self._mountSqlStudioVisualizer({ startAtFinal: true, focusExplain: true, runTests: false });
           } else if (sqlAct === 'reset-db') {
-            if (root.SqlEngine && typeof root.SqlEngine.resetDatabase === 'function') {
-              root.SqlEngine.resetDatabase(self._sqlStudioDatasetId || '__unified__').then(function() {
+            if (root.SQLEngine && typeof root.SQLEngine.resetDataset === 'function') {
+              root.SQLEngine.resetDataset(self._sqlStudioDatasetId || '__unified__').then(function() {
                 self._mountSqlStudioVisualizer({ startAtFinal: true });
               });
             } else {
@@ -2103,7 +2104,13 @@
       container.addEventListener('change', function(e) {
         if (e.target.id === 'wb-sql-engine-select') {
           self._sqlStudioEngine = e.target.value || 'postgres';
-          self._mountSqlStudioVisualizer({ startAtFinal: true });
+          if (root.SQLEngine && typeof root.SQLEngine.setEngineMode === 'function') {
+            root.SQLEngine.setEngineMode(self._sqlStudioEngine).then(function() {
+              self._mountSqlStudioVisualizer({ startAtFinal: true });
+            });
+          } else {
+            self._mountSqlStudioVisualizer({ startAtFinal: true });
+          }
           return;
         }
         if (e.target.id === 'wb-sql-dataset-select') {
@@ -2118,6 +2125,11 @@
           var foundTpl = tpls.find(function(t) { return t.id === tplId; });
           if (foundTpl) {
             self._sqlStudioQuery = foundTpl.sql;
+            if (self._sqlStudioDatasetId && self._sqlStudioDatasetId !== '__unified__' && foundTpl.datasetId && self._sqlStudioDatasetId !== foundTpl.datasetId) {
+              self._sqlStudioDatasetId = '__unified__';
+              var dsSel = container.querySelector('#wb-sql-dataset-select');
+              if (dsSel) dsSel.value = '__unified__';
+            }
             var ed = container.querySelector('#wb-sql-studio-editor');
             if (ed) ed.value = foundTpl.sql;
             self._mountSqlStudioVisualizer({ startAtFinal: true });

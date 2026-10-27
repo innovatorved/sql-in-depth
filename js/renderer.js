@@ -1050,7 +1050,7 @@ window.Renderer = (() => {
     if (!impls || !impls[buildId]) return '<p>Build not found.</p>';
 
     const build = impls[buildId];
-    const guided = window.GUIDED_LABS_DATA?.[buildId] || null;
+    const guided = (window.TopicGuidedLabs && typeof window.TopicGuidedLabs.getLab === 'function' && window.TopicGuidedLabs.getLab(buildId)) || window.TOPIC_GUIDED_LABS?.[buildId] || window.GUIDED_LABS_DATA?.[buildId] || null;
     const steps = Array.isArray(guided?.steps) ? guided.steps : [];
     const files = orderedBuildFiles(build.files);
     const lessons = [build.primarySlug, ...(build.relatedSlugs || [])].filter(Boolean)
@@ -1126,16 +1126,18 @@ window.Renderer = (() => {
             ${steps.map((s, idx) => {
               const isDone = completedIds.includes(s.id);
               const cleanTitle = (s.title || '').replace(/^Step\s*\d+:\s*/i, '');
+              const targetLabel = s.phase || (s.targetFile ? `${s.targetFile}${s.targetSymbol ? ' · ' + s.targetSymbol.split('/')[0].trim() : ''}` : 'query.sql');
+              const assertionCount = Array.isArray(s.testNames) && s.testNames.length ? s.testNames.length : 4;
               return `
-                <button type="button" class="build-lab-step-card ${isDone ? 'is-done' : ''}" data-action="open-code-lab" data-lab-mode="guided" data-step-index="${idx}">
+                <button type="button" class="build-lab-step-card ${isDone ? 'is-done' : ''}" data-action="open-code-lab" data-lab-mode="guided" data-step-index="${idx}" data-step="${idx}">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">${isDone ? icons.check : `0${idx + 1}`}</span>
-                    <span class="build-lab-step-card__target">${escapeHtml(s.targetFile || '')}${s.targetSymbol ? ` · ${escapeHtml(s.targetSymbol.split('/')[0].trim())}` : ''}</span>
+                    <span class="build-lab-step-card__target">${escapeHtml(targetLabel)}</span>
                   </div>
                   <div class="build-lab-step-card__title">${escapeHtml(cleanTitle)}</div>
-                  <div class="build-lab-step-card__concept">${escapeHtml(s.concept || '')}</div>
+                  <div class="build-lab-step-card__concept">${formatInlineCode(s.concept || s.instructions || '')}</div>
                   <div class="build-lab-step-card__footer">
-                    <span>${(s.testNames || []).length} test${(s.testNames || []).length === 1 ? '' : 's'}</span>
+                    <span>${assertionCount} SQL assertion${assertionCount === 1 ? '' : 's'}</span>
                     <span class="build-lab-step-card__open">Step ${idx + 1} →</span>
                   </div>
                 </button>
@@ -1143,6 +1145,8 @@ window.Renderer = (() => {
             }).join('')}
           </div>
         ` : ''}
+
+        <div class="sql-guided-lab-host" id="sql-guided-lab-${escapeHtml(buildId)}" data-sql-lab-slug="${escapeHtml(buildId)}"></div>
       </section>
 
       <div id="build-walkthrough-pane">`;
