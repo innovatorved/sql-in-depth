@@ -36,13 +36,7 @@ window.App = (() => {
 
   function ensureDefaultCollapsedModules() {
     if (collapsedModulesInitialized) return;
-    const allIds = getAllModuleIds();
-    if (allIds.length === 0) return;
     collapsedModulesInitialized = true;
-    const activeModId = (currentSlug && getModuleIdForSlug(currentSlug)) || allIds[0];
-    for (const id of allIds) {
-      if (id !== activeModId) collapsedModules.add(id);
-    }
   }
 
   function syncCollapseModulesBtn() {
@@ -1875,6 +1869,17 @@ window.App = (() => {
         return;
       }
 
+      const stepCardEl = target.closest('.build-lab-step-card[data-step]');
+      if (stepCardEl && !target.closest('details, summary, button, a')) {
+        const hero = stepCardEl.closest('.topic-codelab-hero');
+        const host = hero ? hero.querySelector('.sql-guided-lab-host') : null;
+        const idx = parseInt(stepCardEl.getAttribute('data-step'), 10);
+        if (host && host._sqlLabController && !Number.isNaN(idx)) {
+          host._sqlLabController.loadStep(idx, { scroll: true });
+          return;
+        }
+      }
+
       const toggleLabStepsBtn = target.closest('[data-action="toggle-lab-steps"]');
       if (toggleLabStepsBtn) {
         e.preventDefault();
@@ -2032,16 +2037,19 @@ window.App = (() => {
   function getTopicLabSpec(slug) {
     const unitInfo = getUnitInfo(slug);
     const topicLabs = window.TOPIC_GUIDED_LABS || {};
-    const spec = topicLabs[slug];
+    let spec = topicLabs[slug];
+    if (!spec && window.TopicGuidedLabs && typeof window.TopicGuidedLabs.getLab === 'function') {
+      spec = window.TopicGuidedLabs.getLab(slug, '', unitInfo ? unitInfo.unit.title : slug);
+    }
     if (spec) return spec;
 
     const unitTitle = unitInfo ? unitInfo.unit.title : slug;
     const modId = unitInfo ? unitInfo.module.id : 'm01';
     const dsMap = {
-      m01: 'ecommerce', m02: 'ecommerce', m03: 'ecommerce', m04: 'hr_analytics',
-      m05: 'ecommerce', m06: 'hr_analytics', m07: 'saas_events', m08: 'ecommerce',
+      m01: 'ecommerce', m02: 'ecommerce', m03: 'ecommerce', m04: 'org_hr',
+      m05: 'ecommerce', m06: 'org_hr', m07: 'saas_telemetry', m08: 'ecommerce',
       m09: 'fintech_ledger', m10: 'ecommerce', m11: 'fintech_ledger', m12: 'fintech_ledger',
-      m13: 'ecommerce', m14: 'saas_events', m15: 'fintech_ledger', m16: 'saas_events',
+      m13: 'ecommerce', m14: 'saas_telemetry', m15: 'fintech_ledger', m16: 'saas_telemetry',
       m17: 'social_graph', m18: 'fintech_ledger'
     };
     const datasetId = dsMap[modId] || 'ecommerce';
@@ -2095,10 +2103,10 @@ window.App = (() => {
     const steps = Array.isArray(spec.steps) && spec.steps.length > 0 ? spec.steps : [];
     let activeStepIdx = 0;
 
-    const card = host.closest('.topic-codelab-card') || root;
-    const stepPills = card.querySelectorAll('.topic-codelab-step-pill[data-step]');
+    const card = host.closest('.topic-codelab-hero') || host.closest('.topic-codelab-card') || root;
+    const stepCards = card.querySelectorAll('.build-lab-step-card[data-step], .topic-codelab-step-pill[data-step]');
 
-    function renderActiveStep(stepIdx) {
+    function renderActiveStep(stepIdx, opts = {}) {
       activeStepIdx = Math.max(0, Math.min(stepIdx, Math.max(0, steps.length - 1)));
       const step = steps[activeStepIdx] || {
         title: spec.title || 'Guided SQL Lab',
@@ -2109,11 +2117,21 @@ window.App = (() => {
         hint: 'Use the Step-by-Step Clause Visualizer to trace each relational stage.'
       };
 
-      stepPills.forEach((pill, i) => {
+      stepCards.forEach((pill, i) => {
         pill.classList.toggle('active', i === activeStepIdx);
+        pill.classList.toggle('is-active', i === activeStepIdx);
+        const btn = pill.querySelector('button[data-action="open-topic-codelab"]');
+        if (btn) {
+          btn.textContent = i === activeStepIdx ? `✓ Step ${i + 1} Active in Workbench` : `Load Step ${i + 1} SQL →`;
+        }
       });
 
       const datasetId = spec.datasetId || 'ecommerce';
+      const initialSql = opts.useSolution
+        ? (step.solutionCode || step.starterCode || spec.referenceSql || 'SELECT * FROM customers LIMIT 10;')
+        : (step.starterCode || spec.referenceSql || 'SELECT * FROM customers LIMIT 10;');
+      const refSql = step.solutionCode || spec.referenceSql || initialSql;
+
       host.innerHTML = `
         <div class="sql-guided-step-bar" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:12px 16px;background:var(--bg-elevated,rgba(15,23,42,0.65));border:1px solid var(--border-subtle,rgba(148,163,184,0.18));border-radius:10px 10px 0 0;margin-top:8px;">
           <div style="flex:1;min-width:240px;">
@@ -2121,15 +2139,16 @@ window.App = (() => {
               Active Step ${activeStepIdx + 1} of ${steps.length || 1} · Dataset: <code>${escapeHtml(datasetId)}</code>
             </div>
             <div style="font-size:0.95rem;font-weight:600;color:var(--text-primary,#f8fafc);">${escapeHtml(step.title || '')}</div>
-            <div style="font-size:0.83rem;color:var(--text-secondary,#94a3b8);margin-top:2px;">${escapeHtml(step.instructions || step.concept || '')}</div>
+            <div style="font-size:0.83rem;color:var(--text-secondary,#94a3b8);margin-top:2px;">${escapeHtml((step.instructions || step.concept || '').replace(/\*\*([^*]+)\*\*/g, '$1'))}</div>
           </div>
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
             ${steps.length > 1 ? `
               <button type="button" class="btn btn-secondary btn-sm" data-sql-lab-nav="prev" ${activeStepIdx === 0 ? 'disabled' : ''}>← Prev Step</button>
               <button type="button" class="btn btn-secondary btn-sm" data-sql-lab-nav="next" ${activeStepIdx >= steps.length - 1 ? 'disabled' : ''}>Next Step →</button>
             ` : ''}
+            <button type="button" class="btn btn-secondary btn-sm" data-sql-lab-action="verify" style="border-color:rgba(16,185,129,0.45);color:#34d399;">✓ Check SQL Assertions</button>
             <button type="button" class="btn btn-secondary btn-sm" data-sql-lab-action="hint">💡 Hint</button>
-            <button type="button" class="btn btn-secondary btn-sm" data-sql-lab-action="solution">✓ Load Solution SQL</button>
+            <button type="button" class="btn btn-secondary btn-sm" data-sql-lab-action="solution">★ Load Solution SQL</button>
             <button type="button" class="btn btn-primary btn-sm" data-sql-lab-action="fullscreen">⤢ Full-Screen Studio</button>
           </div>
         </div>
@@ -2146,7 +2165,9 @@ window.App = (() => {
         if (window.TableVisualizer && typeof window.TableVisualizer.mountClauseVisualizer === 'function') {
           window.TableVisualizer.mountClauseVisualizer(mountSlot, {
             datasetId,
-            sql: step.starterCode || spec.referenceSql || 'SELECT * FROM customers LIMIT 10;',
+            sql: initialSql,
+            referenceSql: refSql,
+            autoVerify: Boolean(opts.autoVerify),
             title: step.title || spec.title || 'Guided SQL Lab'
           });
         }
@@ -2165,6 +2186,14 @@ window.App = (() => {
         });
       });
 
+      const verifyBtn = host.querySelector('[data-sql-lab-action="verify"]');
+      if (verifyBtn) {
+        verifyBtn.addEventListener('click', () => {
+          const innerVerify = mountSlot.querySelector('[data-inline-viz-action="verify"]');
+          if (innerVerify) innerVerify.click();
+        });
+      }
+
       const hintBtn = host.querySelector('[data-sql-lab-action="hint"]');
       if (hintBtn && hintEl) {
         hintBtn.addEventListener('click', () => {
@@ -2175,13 +2204,7 @@ window.App = (() => {
       const solBtn = host.querySelector('[data-sql-lab-action="solution"]');
       if (solBtn) {
         solBtn.addEventListener('click', () => {
-          if (window.TableVisualizer && typeof window.TableVisualizer.mountClauseVisualizer === 'function') {
-            window.TableVisualizer.mountClauseVisualizer(mountSlot, {
-              datasetId,
-              sql: step.solutionCode || step.starterCode || spec.referenceSql,
-              title: `${step.title || 'Step'} (Solution SQL)`
-            });
-          }
+          renderActiveStep(activeStepIdx, { useSolution: true, autoVerify: true });
         });
       }
 
@@ -2189,7 +2212,7 @@ window.App = (() => {
       if (fullBtn) {
         fullBtn.addEventListener('click', () => {
           const ta = mountSlot.querySelector('textarea');
-          const currentSql = ta ? ta.value : (step.starterCode || spec.referenceSql);
+          const currentSql = ta ? ta.value : initialSql;
           openSqlStudioModal({
             slug,
             title: spec.title || `SQL Studio — ${slug}`,
@@ -2201,12 +2224,23 @@ window.App = (() => {
           });
         });
       }
+
+      if (opts.scroll) {
+        host.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
     }
 
-    stepPills.forEach((pill, idx) => {
-      pill.style.cursor = 'pointer';
-      pill.addEventListener('click', () => renderActiveStep(idx));
-    });
+    host._sqlLabController = {
+      loadStep(idx, opts) {
+        renderActiveStep(idx, opts || {});
+      },
+      runVerify(opts) {
+        renderActiveStep(activeStepIdx, Object.assign({ autoVerify: true }, opts || {}));
+      },
+      loadSolution(opts) {
+        renderActiveStep(activeStepIdx, Object.assign({ useSolution: true, autoVerify: true }, opts || {}));
+      }
+    };
 
     renderActiveStep(0);
   }
@@ -2246,7 +2280,7 @@ window.App = (() => {
 
     const initialSql = opts.sql || (steps[activeStepIdx] && steps[activeStepIdx].starterCode) || (spec && spec.referenceSql) || 'SELECT * FROM customers LIMIT 10;';
     const datasets = window.SQL_DATASETS || {};
-    const datasetKeys = Object.keys(datasets).length > 0 ? Object.keys(datasets) : ['ecommerce', 'hr_analytics', 'saas_events', 'fintech_ledger', 'social_graph'];
+    const datasetKeys = Object.keys(datasets).length > 0 ? Object.keys(datasets) : ['ecommerce', 'org_hr', 'saas_telemetry', 'fintech_ledger', 'social_graph'];
 
     overlay.innerHTML = `
       <div class="global-codelab-shell sql-studio-modal-shell" style="display:flex;flex-direction:column;width:96vw;max-width:1560px;height:92vh;margin:4vh auto;background:var(--bg-primary,#0b0f19);border:1px solid var(--border-subtle,rgba(148,163,184,0.22));border-radius:14px;overflow:hidden;box-shadow:0 25px 70px rgba(0,0,0,0.65);">
@@ -2268,8 +2302,8 @@ window.App = (() => {
               Dataset:
               <select id="sql-studio-modal-dataset" style="background:var(--bg-primary,#0b0f19);color:var(--text-primary,#f8fafc);border:1px solid var(--border-subtle,rgba(148,163,184,0.28));border-radius:6px;padding:4px 8px;font-size:0.8rem;">
                 ${datasetKeys.map(k => {
-                  const ds = datasets[k] || { label: k };
-                  return `<option value="${escapeHtml(k)}" ${k === activeDatasetId ? 'selected' : ''}>${escapeHtml(ds.label || k)}</option>`;
+                  const ds = datasets[k] || { title: k };
+                  return `<option value="${escapeHtml(k)}" ${k === activeDatasetId ? 'selected' : ''}>${escapeHtml(ds.title || ds.label || k)}</option>`;
                 }).join('')}
               </select>
             </label>
@@ -2344,7 +2378,7 @@ window.App = (() => {
           <div style="margin-bottom:10px;padding:8px 10px;background:rgba(15,23,42,0.65);border:1px solid rgba(148,163,184,0.16);border-radius:8px;">
             <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;" data-preview-table="${escapeHtml(t.name)}">
               <strong style="color:#38bdf8;font-family:var(--font-mono,monospace);">${escapeHtml(t.name)}</strong>
-              <span style="font-size:0.72rem;color:#94a3b8;">SELECT *</span>
+              <span style="font-size:0.72rem;color:#94a3b8;">${t.rowCount ? `${t.rowCount} rows` : 'SELECT *'}</span>
             </div>
             ${Array.isArray(t.columns) ? `
               <div style="margin-top:6px;display:flex;flex-direction:column;gap:2px;font-size:0.75rem;color:#94a3b8;font-family:var(--font-mono,monospace);">
@@ -2465,6 +2499,21 @@ window.App = (() => {
 
   function openTopicCodeLab(slug, mode, stepIndex) {
     const targetSlug = slug || currentSlug;
+    const inlineHost = document.querySelector(`.sql-guided-lab-host[data-sql-lab-slug="${targetSlug}"]`) || document.querySelector('.sql-guided-lab-host');
+    if (mode !== 'modal' && inlineHost && inlineHost._sqlLabController) {
+      if (typeof stepIndex === 'number' && !Number.isNaN(stepIndex)) {
+        inlineHost._sqlLabController.loadStep(stepIndex, { scroll: true });
+        return Promise.resolve(inlineHost);
+      }
+      if (mode === 'solution') {
+        inlineHost._sqlLabController.loadSolution({ scroll: true });
+        return Promise.resolve(inlineHost);
+      }
+      if (mode === 'verify' || mode === 'guided') {
+        inlineHost._sqlLabController.runVerify({ scroll: true });
+        return Promise.resolve(inlineHost);
+      }
+    }
     const spec = getTopicLabSpec(targetSlug);
     return openSqlStudioModal({
       slug: targetSlug,
@@ -2495,7 +2544,7 @@ window.App = (() => {
       title: `${p.title} — SQL Capstone Studio`,
       summary: p.tagline || p.description || 'Interactive SQL schema & query verification studio.',
       datasetId: 'fintech_ledger',
-      sql: `-- ${p.title}\nSELECT *\nFROM accounts\nORDER BY balance_cents DESC\nLIMIT 10;`
+      sql: `-- ${p.title}\nSELECT *\nFROM accounts\nORDER BY posted_balance_cents DESC\nLIMIT 10;`
     });
   }
 

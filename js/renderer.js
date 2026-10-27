@@ -506,7 +506,7 @@ window.Renderer = (() => {
     const unescaped = unescapeHtml(rawCode).trim();
     const lineCount = unescaped ? unescaped.split('\n').length : 0;
     const isSqlLang = ['sql', 'sqlite', 'postgres', 'postgresql', 'mysql', 'duckdb'].includes(cleanLang);
-    const isLong = lineCount > 6 && !isSqlLang;
+    const isLong = false;
     const collapsedClass = isLong ? ' code-block--collapsed' : '';
     const initialExpanded = !isLong;
 
@@ -544,7 +544,9 @@ window.Renderer = (() => {
 
   function formatInlineCode(str) {
     if (!str) return '';
-    return escapeHtml(String(str)).replace(/`([^`]+)`/g, '<code>$1</code>');
+    return escapeHtml(String(str))
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
   }
 
   function decorateProseHeadings(proseHtml) {
@@ -568,7 +570,7 @@ window.Renderer = (() => {
     const safeSlug = escapeHtml(slug);
     const hasSections = Array.isArray(headings) && headings.length > 0;
     return `
-      <nav class="topic-quick-jump is-collapsed" aria-label="On this page">
+      <nav class="topic-quick-jump" aria-label="On this page">
         <div class="topic-quick-jump__bar">
           <div class="topic-quick-jump__pills">
             <span class="topic-quick-jump__label">Jump to:</span>
@@ -592,9 +594,9 @@ window.Renderer = (() => {
             ` : ''}
           </div>
           ${hasSections ? `
-            <button type="button" class="topic-quick-jump__toggle" data-action="toggle-quick-jump" aria-expanded="false" title="Show or hide article sections">
+            <button type="button" class="topic-quick-jump__toggle" data-action="toggle-quick-jump" aria-expanded="true" title="Show or hide article sections">
               <span class="topic-quick-jump__toggle-text">Sections (${headings.length})</span>
-              <span class="topic-quick-jump__toggle-chevron">▼</span>
+              <span class="topic-quick-jump__toggle-chevron">▲</span>
             </button>
           ` : ''}
         </div>
@@ -653,13 +655,16 @@ window.Renderer = (() => {
             </div>
           </div>
           <div class="build-lab-card__cta-col">
-            <button type="button" class="btn btn--primary build-lab-card__launch-btn" data-action="open-topic-codelab" data-slug="${escapeHtml(slug)}" data-mode="guided">
+            <button type="button" class="btn btn--primary build-lab-card__launch-btn" data-action="open-topic-codelab" data-slug="${escapeHtml(slug)}" data-mode="verify">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
               <span>Run SQL Lab &amp; Verify</span>
             </button>
             <button type="button" class="btn btn--outline build-lab-card__launch-btn" data-action="open-topic-codelab" data-slug="${escapeHtml(slug)}" data-mode="solution">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
               <span>View Reference Solution</span>
+            </button>
+            <button type="button" class="btn btn--outline build-lab-card__launch-btn" data-action="open-topic-codelab" data-slug="${escapeHtml(slug)}" data-mode="modal">
+              <span>⤢ Full-Screen Studio</span>
             </button>
           </div>
         </div>
@@ -671,7 +676,7 @@ window.Renderer = (() => {
               const phaseLabel = s.phase || defaultPhases[idx] || `Step ${idx + 1} · SQL Implementation`;
               const stepTitle = (s.title || `Step ${idx + 1}`).replace(/^Step\s*\d+:\s*/i, '');
               return `
-              <div class="build-lab-step-card" data-step="${idx}" data-step-index="${idx}">
+              <div class="build-lab-step-card ${idx === 0 ? 'is-active' : ''}" data-step="${idx}" data-step-index="${idx}">
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">0${idx + 1}</span>

@@ -90,11 +90,11 @@
       '       c.country,',
       '       COUNT(DISTINCT c.customer_id) AS customers,',
       '       COUNT(o.order_id) AS total_orders,',
-      '       ROUND(COALESCE(SUM(o.total_amount), 0), 2) AS gross_revenue',
+      '       ROUND(COALESCE(SUM(o.total_cents), 0) / 100.0, 2) AS gross_revenue_usd',
       'FROM customers c',
-      'LEFT JOIN orders o ON o.customer_id = c.customer_id AND o.status IN (\'paid\', \'shipped\', \'delivered\')',
+      'LEFT JOIN orders o ON o.customer_id = c.customer_id AND o.status = \'completed\'',
       'GROUP BY c.tier, c.country',
-      'ORDER BY gross_revenue DESC;'
+      'ORDER BY gross_revenue_usd DESC;'
     ].join('\n'),
     _sqlStudioVizHandle: null,
 
@@ -748,12 +748,12 @@
         '       c.name,',
         '       c.tier,',
         '       COUNT(o.order_id) AS order_count,',
-        '       ROUND(COALESCE(SUM(o.total_amount), 0), 2) AS total_spend,',
-        '       RANK() OVER (PARTITION BY c.tier ORDER BY COALESCE(SUM(o.total_amount), 0) DESC) AS tier_rank',
+        '       ROUND(COALESCE(SUM(o.total_cents), 0) / 100.0, 2) AS total_spend_usd,',
+        '       RANK() OVER (PARTITION BY c.tier ORDER BY COALESCE(SUM(o.total_cents), 0) DESC) AS tier_rank',
         'FROM customers c',
         'LEFT JOIN orders o ON o.customer_id = c.customer_id',
         'GROUP BY c.customer_id, c.name, c.tier',
-        'ORDER BY total_spend DESC',
+        'ORDER BY total_spend_usd DESC',
         'LIMIT 15;'
       ].join('\n');
       this._activeWorkbenchMode = 'sql-studio';
@@ -772,29 +772,29 @@
             '       c.country,',
             '       COUNT(DISTINCT c.customer_id) AS customers,',
             '       COUNT(o.order_id) AS total_orders,',
-            '       ROUND(COALESCE(SUM(o.total_amount), 0), 2) AS gross_revenue',
+            '       ROUND(COALESCE(SUM(o.total_cents), 0) / 100.0, 2) AS gross_revenue_usd',
             'FROM customers c',
-            'LEFT JOIN orders o ON o.customer_id = c.customer_id AND o.status IN (\'paid\', \'shipped\', \'delivered\')',
+            'LEFT JOIN orders o ON o.customer_id = c.customer_id AND o.status = \'completed\'',
             'GROUP BY c.tier, c.country',
-            'ORDER BY gross_revenue DESC;'
+            'ORDER BY gross_revenue_usd DESC;'
           ].join('\n')
         },
         {
           id: 'window-fn',
-          label: '2. Window Functions: RANK, LAG & Moving Average (salary_history)',
+          label: '2. Window Functions: RANK, LAG & Moving Average (employees + departments)',
           datasetId: 'org_hr',
           sql: [
             '-- Window Functions: Department Salary Ranking & Compensation Progression',
             'SELECT e.emp_id,',
-            '       e.full_name,',
-            '       d.dept_name,',
+            '       e.name AS employee_name,',
+            '       d.name AS dept_name,',
             '       e.title,',
             '       e.salary_usd,',
             '       RANK() OVER (PARTITION BY e.dept_id ORDER BY e.salary_usd DESC) AS dept_salary_rank,',
             '       ROUND(e.salary_usd - AVG(e.salary_usd) OVER (PARTITION BY e.dept_id), 0) AS diff_from_dept_avg',
             'FROM employees e',
             'JOIN departments d ON d.dept_id = e.dept_id',
-            'ORDER BY d.dept_name ASC, dept_salary_rank ASC;'
+            'ORDER BY d.name ASC, dept_salary_rank ASC;'
           ].join('\n')
         },
         {
@@ -802,17 +802,17 @@
           label: '3. Recursive CTE: Organizational Reporting Hierarchy (employees)',
           datasetId: 'org_hr',
           sql: [
-            '-- Recursive CTE: Traverse Management Reporting Tree from CEO Downward',
+            '-- Recursive CTE: Traverse Management Reporting Tree from Chief Architect Downward',
             'WITH RECURSIVE org_tree AS (',
-            '  SELECT emp_id, full_name, title, manager_id, 0 AS depth, full_name AS path',
+            '  SELECT emp_id, name, title, manager_id, 0 AS depth, name AS path',
             '  FROM employees',
             '  WHERE manager_id IS NULL',
             '  UNION ALL',
-            '  SELECT e.emp_id, e.full_name, e.title, e.manager_id, t.depth + 1, t.path || \' -> \' || e.full_name',
+            '  SELECT e.emp_id, e.name, e.title, e.manager_id, t.depth + 1, t.path || \' -> \' || e.name',
             '  FROM employees e',
             '  JOIN org_tree t ON e.manager_id = t.emp_id',
             ')',
-            'SELECT emp_id, depth, full_name, title, path',
+            'SELECT emp_id, depth, name, title, path',
             'FROM org_tree',
             'ORDER BY depth ASC, emp_id ASC;'
           ].join('\n')
@@ -826,12 +826,12 @@
             'SELECT a.account_id,',
             '       a.owner_name,',
             '       a.account_type,',
-            '       ROUND(a.balance_cents / 100.0, 2) AS book_balance_usd,',
+            '       ROUND(a.posted_balance_cents / 100.0, 2) AS book_balance_usd,',
             '       COUNT(j.entry_id) AS journal_postings,',
-            '       ROUND(COALESCE(SUM(CASE WHEN j.direction = \'CR\' THEN j.amount_cents ELSE -j.amount_cents END), 0) / 100.0, 2) AS net_journal_delta_usd',
+            '       ROUND(COALESCE(SUM(CASE WHEN j.direction = \'credit\' THEN j.amount_cents ELSE -j.amount_cents END), 0) / 100.0, 2) AS net_journal_delta_usd',
             'FROM accounts a',
             'LEFT JOIN journal_entries j ON j.account_id = a.account_id',
-            'GROUP BY a.account_id, a.owner_name, a.account_type, a.balance_cents',
+            'GROUP BY a.account_id, a.owner_name, a.account_type, a.posted_balance_cents',
             'ORDER BY a.account_id ASC;'
           ].join('\n')
         },
@@ -840,18 +840,18 @@
           label: '5. SaaS Funnel & Telemetry Engagement Cohort (saas_users + user_events)',
           datasetId: 'saas_telemetry',
           sql: [
-            '-- SaaS Telemetry Cohort: Event Volume, P95 Latency & Plan MRR Breakdown',
+            '-- SaaS Telemetry Cohort: Event Volume, Average Latency & Plan MRR Breakdown',
             'SELECT u.user_id,',
-            '       u.company_name,',
-            '       s.plan_name,',
-            '       s.mrr_usd,',
+            '       u.org_name,',
+            '       u.plan_tier,',
+            '       COALESCE(s.mrr_usd, 0) AS mrr_usd,',
             '       COUNT(e.event_id) AS total_events,',
             '       ROUND(AVG(e.latency_ms), 1) AS avg_latency_ms,',
             '       MAX(e.latency_ms) AS max_latency_ms',
             'FROM saas_users u',
             'LEFT JOIN subscriptions s ON s.user_id = u.user_id AND s.status = \'active\'',
             'LEFT JOIN user_events e ON e.user_id = u.user_id',
-            'GROUP BY u.user_id, u.company_name, s.plan_name, s.mrr_usd',
+            'GROUP BY u.user_id, u.org_name, u.plan_tier, s.mrr_usd',
             'ORDER BY total_events DESC;'
           ].join('\n')
         },
@@ -865,12 +865,12 @@
             '       o.customer_id,',
             '       c.name AS customer_name,',
             '       o.status,',
-            '       o.total_amount,',
+            '       ROUND(o.total_cents / 100.0, 2) AS total_usd,',
             '       o.created_at',
             'FROM orders o',
             'JOIN customers c ON c.customer_id = o.customer_id',
             'WHERE o.customer_id IN (1, 2, 4)',
-            '  AND o.created_at >= \'2025-02-01\'',
+            '  AND o.created_at >= \'2025-01-01\'',
             'ORDER BY o.created_at DESC;'
           ].join('\n')
         }
@@ -889,12 +889,23 @@
         var tables = ds.tables || [];
         var tablesHtml = tables.map(function(t) {
           var cols = t.columns || [];
-          var colsHtml = cols.map(function(colStr) {
-            var parts = colStr.trim().split(/\s+/);
-            var colName = parts[0] || '';
-            var colType = parts[1] || 'TEXT';
-            var isPk = /PRIMARY\s+KEY/i.test(colStr) || /_id$|^id$/i.test(colName);
-            var isFk = /REFERENCES/i.test(colStr) || (!isPk && /_id$/i.test(colName));
+          var colsHtml = cols.map(function(colItem) {
+            var colName = '';
+            var colType = 'TEXT';
+            var isPk = false;
+            var isFk = false;
+            if (typeof colItem === 'string') {
+              var parts = colItem.trim().split(/\s+/);
+              colName = parts[0] || '';
+              colType = parts[1] || 'TEXT';
+              isPk = /PRIMARY\s+KEY/i.test(colItem) || (t.pk && t.pk.split(/\s*,\s*/).indexOf(colName) !== -1);
+              isFk = /REFERENCES/i.test(colItem) || (!isPk && /_id$/i.test(colName));
+            } else if (colItem && typeof colItem === 'object') {
+              colName = colItem.name || '';
+              colType = colItem.type || 'TEXT';
+              isPk = Boolean(colItem.pk);
+              isFk = Boolean(colItem.fk);
+            }
             return (
               '<div style="display:flex;justify-content:space-between;align-items:center;padding:2px 6px;font-size:0.73rem;font-family:var(--font-mono);color:var(--fg-muted);">' +
                 '<span>' + escapeHtml(colName) +

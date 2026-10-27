@@ -508,7 +508,7 @@
 
       var mountEl = this._container && this._container.querySelector('#challenge-inline-codelab-mount');
       if (mountEl && root.TableVisualizer && typeof root.TableVisualizer.mountClauseVisualizer === 'function') {
-        var sampleSql = (ch.codeFix && ch.codeFix.sqlQuery) || 'SELECT a.account_id, a.owner_name, a.balance_cents, COUNT(j.entry_id) AS postings FROM accounts a LEFT JOIN journal_entries j ON j.account_id = a.account_id GROUP BY a.account_id, a.owner_name, a.balance_cents ORDER BY a.account_id ASC;';
+        var sampleSql = (ch.codeFix && ch.codeFix.sqlQuery) || 'SELECT a.account_id, a.owner_name, a.posted_balance_cents, COUNT(j.entry_id) AS postings FROM accounts a LEFT JOIN journal_entries j ON j.account_id = a.account_id GROUP BY a.account_id, a.owner_name, a.posted_balance_cents ORDER BY a.account_id ASC;';
         root.TableVisualizer.mountClauseVisualizer(mountEl, sampleSql, {
           datasetId: '__unified__',
           referenceSql: sampleSql,

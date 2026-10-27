@@ -221,10 +221,7 @@ function renderStaticSidebar(curriculum, currentSlug) {
     html += `<div style="padding:${part.number > 1 ? '8px' : '4px'} 16px 4px;font-size:11px;font-weight:600;color:var(--fg-faint);text-transform:uppercase;letter-spacing:0.05em;">${escapeHtml(part.title)}</div>`;
 
     for (const mod of part.modules) {
-      const hasActiveUnit = mod.units.some(u => u.slug === currentSlug);
-      const isFirstMod = part.number === 1 && mod === part.modules[0] && !currentSlug;
-      const isExpanded = hasActiveUnit || isFirstMod;
-      html += `<div class="module-group${isExpanded ? ' expanded' : ' collapsed'}" data-module="${escapeAttr(mod.id)}">
+      html += `<div class="module-group" data-module="${escapeAttr(mod.id)}">
         <div class="module-group__header">
           <span class="module-group__chevron">${context.window.Renderer.icons.chevronDown}</span>
           <span class="module-group__number">${escapeHtml(mod.number)}</span>

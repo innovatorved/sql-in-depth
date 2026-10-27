@@ -1180,30 +1180,94 @@
 
         if (options.showEditor) {
             var editorOpts = Object.assign({}, options, { showEditor: false });
+            var refSql = options.referenceSql || options.solutionSql || sql;
             container.innerHTML =
                 '<div class="sql-studio-inline-workbench" style="display:flex;flex-direction:column;gap:10px;padding:12px;background:var(--bg-secondary,#0f172a);">' +
                     '<div class="sql-lab-editor-box" style="display:flex;flex-direction:column;gap:8px;">' +
-                        '<textarea class="sql-live-editor sql-inline-textarea" rows="6" spellcheck="false" style="width:100%;font-family:var(--font-mono,monospace);font-size:0.85rem;padding:10px 12px;border-radius:8px;background:var(--bg-primary,#0b0f19);color:var(--text-primary,#f8fafc);border:1px solid var(--border-subtle,rgba(148,163,184,0.28));">' + escapeHtml(sql) + '</textarea>' +
+                        '<div style="display:flex;align-items:center;justify-content:space-between;font-size:0.76rem;color:var(--text-secondary,#94a3b8);padding:0 2px;">' +
+                            '<span style="font-family:var(--font-mono,monospace);color:#38bdf8;font-weight:700;">query.sql · Live SQL Workbench</span>' +
+                            '<span>Shortcut: Cmd/Ctrl + Enter to Run</span>' +
+                        '</div>' +
+                        '<textarea class="sql-live-editor sql-inline-textarea" rows="7" spellcheck="false" style="width:100%;font-family:var(--font-mono,monospace);font-size:0.85rem;padding:10px 12px;border-radius:8px;background:var(--bg-primary,#0b0f19);color:var(--text-primary,#f8fafc);border:1px solid var(--border-subtle,rgba(148,163,184,0.28));">' + escapeHtml(sql) + '</textarea>' +
                         '<div class="sql-lab-actions" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
                             '<button type="button" class="sql-exec-btn is-primary" data-inline-viz-action="run">▶ Run &amp; Visualize SQL</button>' +
-                            '<button type="button" class="sql-exec-btn is-secondary" data-inline-viz-action="step">🔍 Step-by-Step Clauses (Step 0 → 8)</button>' +
-                            '<span style="font-size:0.75rem;color:var(--text-secondary,#94a3b8);margin-left:auto;">Press Cmd/Ctrl + Enter to run</span>' +
+                            '<button type="button" class="sql-exec-btn is-secondary" data-inline-viz-action="step">🔍 Step Clauses (Step 0 → 8)</button>' +
+                            '<button type="button" class="sql-exec-btn is-verify" data-inline-viz-action="verify" style="background:rgba(16,185,129,0.16);color:#34d399;border:1px solid rgba(16,185,129,0.4);">✓ Check SQL Assertions</button>' +
+                            '<button type="button" class="sql-exec-btn is-secondary" data-inline-viz-action="explain">📊 EXPLAIN QUERY PLAN</button>' +
                         '</div>' +
                     '</div>' +
+                    '<div class="sql-inline-verify-banner" style="display:none;padding:12px 14px;border-radius:8px;font-size:0.83rem;"></div>' +
                     '<div class="sql-inline-viz-stage"></div>' +
                 '</div>';
             var ed = container.querySelector('.sql-live-editor');
             var stage = container.querySelector('.sql-inline-viz-stage');
+            var verifyBanner = container.querySelector('.sql-inline-verify-banner');
             var runBtn = container.querySelector('[data-inline-viz-action="run"]');
             var stepBtn = container.querySelector('[data-inline-viz-action="step"]');
+            var verifyBtn = container.querySelector('[data-inline-viz-action="verify"]');
+            var explainBtn = container.querySelector('[data-inline-viz-action="explain"]');
+
+            async function runVerification() {
+                if (!verifyBanner) return;
+                var currentSql = ed ? ed.value : sql;
+                verifyBanner.style.display = 'block';
+                verifyBanner.style.background = 'rgba(56,189,248,0.1)';
+                verifyBanner.style.border = '1px solid rgba(56,189,248,0.35)';
+                verifyBanner.style.color = '#e2e8f0';
+                verifyBanner.innerHTML = '⏳ Running automated relational assertions against reference schema &amp; tuples...';
+                await mountClauseVisualizer(stage, currentSql, datasetId, Object.assign({}, editorOpts, { startAtFinal: true }));
+                var vRes = await verifyQueryAgainstReference(currentSql, refSql, { datasetId: datasetId });
+                var checksHtml = (vRes.checks || []).map(function (c) {
+                    return '<div style="display:flex;align-items:center;gap:8px;padding:3px 0;">' +
+                        '<span style="font-weight:700;color:' + (c.passed ? '#34d399' : '#f87171') + ';">' + (c.passed ? '✓' : '✗') + '</span>' +
+                        '<strong style="color:#f8fafc;">' + escapeHtml(c.name) + ':</strong>' +
+                        '<span style="color:#cbd5e1;">' + escapeHtml(c.detail || '') + '</span>' +
+                    '</div>';
+                }).join('');
+                verifyBanner.style.background = vRes.passed ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.12)';
+                verifyBanner.style.border = vRes.passed ? '1px solid rgba(16,185,129,0.45)' : '1px solid rgba(239,68,68,0.45)';
+                verifyBanner.innerHTML =
+                    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">' +
+                        '<strong style="font-size:0.9rem;color:' + (vRes.passed ? '#34d399' : '#f87171') + ';">' +
+                            (vRes.passed ? '✓ All Relational SQL Assertions Passed (' + vRes.passedCount + '/' + vRes.totalCount + ')' : '⚠ SQL Verification Checks (' + (vRes.passedCount || 0) + '/' + (vRes.totalCount || 4) + ' Passed)') +
+                        '</strong>' +
+                        '<span style="font-size:0.75rem;color:#94a3b8;">Dataset: ' + escapeHtml(datasetId || 'ecommerce') + '</span>' +
+                    '</div>' +
+                    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:4px 14px;">' + checksHtml + '</div>';
+                if (typeof options.onVerify === 'function') {
+                    options.onVerify(vRes);
+                }
+            }
+
             if (runBtn) {
                 runBtn.addEventListener('click', function () {
+                    if (verifyBanner) verifyBanner.style.display = 'none';
                     mountClauseVisualizer(stage, ed ? ed.value : sql, datasetId, Object.assign({}, editorOpts, { startAtFinal: true }));
                 });
             }
             if (stepBtn) {
                 stepBtn.addEventListener('click', function () {
+                    if (verifyBanner) verifyBanner.style.display = 'none';
                     mountClauseVisualizer(stage, ed ? ed.value : sql, datasetId, Object.assign({}, editorOpts, { startAtFinal: false, initialStepIndex: 0 }));
+                });
+            }
+            if (verifyBtn) {
+                verifyBtn.addEventListener('click', function () {
+                    runVerification();
+                });
+            }
+            if (explainBtn) {
+                explainBtn.addEventListener('click', async function () {
+                    if (verifyBanner) verifyBanner.style.display = 'none';
+                    await mountClauseVisualizer(stage, ed ? ed.value : sql, datasetId, Object.assign({}, editorOpts, { startAtFinal: true }));
+                    var stepBtns = stage.querySelectorAll('.sql-pipeline-step');
+                    if (stepBtns.length > 0) {
+                        stepBtns[stepBtns.length - 1].click();
+                    }
+                    var expBox = stage.querySelector('.sql-explain-box');
+                    if (expBox) {
+                        expBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
                 });
             }
             if (ed) {
@@ -1214,7 +1278,11 @@
                     }
                 });
             }
-            return mountClauseVisualizer(stage, sql, datasetId, editorOpts);
+            var initProm = mountClauseVisualizer(stage, sql, datasetId, editorOpts);
+            if (options.autoVerify) {
+                initProm.then(function () { runVerification(); });
+            }
+            return initProm;
         }
 
         var promise = (async function () {
@@ -1475,32 +1543,41 @@
      */
     function mountGuidedSqlLab(container, labConfig) {
         if (!container || !labConfig) return;
-        var datasetId = labConfig.datasetId || inferDatasetFromSql(labConfig.solutionSql || '');
+        var rootSol = labConfig.solutionSql || labConfig.referenceSql || labConfig.solutionCode || '';
+        var datasetId = labConfig.datasetId || inferDatasetFromSql(rootSol || '');
         var dsInfo = getDatasets()[datasetId] || { title: datasetId };
 
         var steps = Array.isArray(labConfig.steps) && labConfig.steps.length > 0
-            ? labConfig.steps
+            ? labConfig.steps.map(function (s, idx) {
+                return Object.assign({}, s, {
+                    title: s.title || ('Step ' + (idx + 1)),
+                    instruction: s.instruction || s.instructions || s.concept || '',
+                    hint: s.hint || '',
+                    starterSql: s.starterSql || s.starterCode || rootSol || '',
+                    solutionSql: s.solutionSql || s.solutionCode || rootSol || ''
+                });
+            })
             : [
                 {
                     title: 'Step 1: Inspect & Filter Base Rows',
                     instruction: labConfig.step1Instruction || 'Write the foundational SELECT / FROM / WHERE query against the dataset.',
                     hint: labConfig.step1Hint || 'Check the schema badges in Step 0 (SOURCE TABLES) to pick the right columns.',
                     starterSql: labConfig.starterSql || 'SELECT * FROM ' + (Object.keys(KNOWN_TABLES)[0] || 'customers') + ' LIMIT 10;',
-                    solutionSql: labConfig.step1SolutionSql || labConfig.solutionSql || ''
+                    solutionSql: labConfig.step1SolutionSql || rootSol || ''
                 },
                 {
                     title: 'Step 2: Join / Group / Window',
                     instruction: labConfig.step2Instruction || 'Extend the query with the required JOIN, GROUP BY, or WINDOW clause.',
                     hint: labConfig.step2Hint || 'Use the Step-by-Step Clauses bar below to inspect how groups or window frames form.',
                     starterSql: labConfig.step2StarterSql || labConfig.starterSql || '',
-                    solutionSql: labConfig.step2SolutionSql || labConfig.solutionSql || ''
+                    solutionSql: labConfig.step2SolutionSql || rootSol || ''
                 },
                 {
                     title: 'Step 3: Final Projection & Ordering',
                     instruction: labConfig.step3Instruction || labConfig.instruction || 'Complete the final query and verify that your output matches the reference solution.',
                     hint: labConfig.step3Hint || labConfig.hint || 'Click "Verify SQL Output" to compare your result set against the reference query.',
                     starterSql: labConfig.step3StarterSql || labConfig.starterSql || '',
-                    solutionSql: labConfig.solutionSql || ''
+                    solutionSql: rootSol || ''
                 }
             ];
 

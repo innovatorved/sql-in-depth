@@ -72,14 +72,14 @@
         }
       ],
       tables: [
-        { name: 'customers', pk: 'customer_id', fks: [] },
-        { name: 'categories', pk: 'category_id', fks: ['parent_category_id -> categories.category_id'] },
-        { name: 'products', pk: 'product_id', fks: ['category_id -> categories.category_id'] },
-        { name: 'orders', pk: 'order_id', fks: ['customer_id -> customers.customer_id'] },
-        { name: 'order_items', pk: 'order_item_id', fks: ['order_id -> orders.order_id', 'product_id -> products.product_id'] },
-        { name: 'payments', pk: 'payment_id', fks: ['order_id -> orders.order_id'] },
-        { name: 'shipments', pk: 'shipment_id', fks: ['order_id -> orders.order_id'] },
-        { name: 'product_reviews', pk: 'review_id', fks: ['product_id -> products.product_id', 'customer_id -> customers.customer_id'] }
+        { name: 'customers', pk: 'customer_id', rowCount: 8, fks: [], columns: [{"name":"customer_id","type":"INTEGER","pk":true},{"name":"email","type":"TEXT"},{"name":"name","type":"TEXT"},{"name":"tier","type":"TEXT"},{"name":"country","type":"TEXT"},{"name":"referred_by","type":"INTEGER"},{"name":"created_at","type":"TEXT"}] },
+        { name: 'categories', pk: 'category_id', rowCount: 4, fks: ['parent_category_id -> categories.category_id'], columns: [{"name":"category_id","type":"INTEGER","pk":true},{"name":"name","type":"TEXT"},{"name":"parent_category_id","type":"INTEGER","fk":"categories.category_id"}] },
+        { name: 'products', pk: 'product_id', rowCount: 8, fks: ['category_id -> categories.category_id'], columns: [{"name":"product_id","type":"INTEGER","pk":true},{"name":"sku","type":"TEXT"},{"name":"name","type":"TEXT"},{"name":"category_id","type":"INTEGER","fk":"categories.category_id"},{"name":"price_cents","type":"INTEGER"},{"name":"stock_qty","type":"INTEGER"},{"name":"is_active","type":"INTEGER"}] },
+        { name: 'orders', pk: 'order_id', rowCount: 10, fks: ['customer_id -> customers.customer_id'], columns: [{"name":"order_id","type":"INTEGER","pk":true},{"name":"customer_id","type":"INTEGER","fk":"customers.customer_id"},{"name":"status","type":"TEXT"},{"name":"total_cents","type":"INTEGER"},{"name":"discount_code","type":"TEXT"},{"name":"created_at","type":"TEXT"}] },
+        { name: 'order_items', pk: 'order_item_id', rowCount: 12, fks: ['order_id -> orders.order_id', 'product_id -> products.product_id'], columns: [{"name":"order_item_id","type":"INTEGER","pk":true},{"name":"order_id","type":"INTEGER","fk":"orders.order_id"},{"name":"product_id","type":"INTEGER","fk":"products.product_id"},{"name":"quantity","type":"INTEGER"},{"name":"unit_price_cents","type":"INTEGER"}] },
+        { name: 'payments', pk: 'payment_id', rowCount: 8, fks: ['order_id -> orders.order_id'], columns: [{"name":"payment_id","type":"INTEGER","pk":true},{"name":"order_id","type":"INTEGER","fk":"orders.order_id"},{"name":"method","type":"TEXT"},{"name":"amount_cents","type":"INTEGER"},{"name":"status","type":"TEXT"},{"name":"processed_at","type":"TEXT"}] },
+        { name: 'shipments', pk: 'shipment_id', rowCount: 5, fks: ['order_id -> orders.order_id'], columns: [{"name":"shipment_id","type":"INTEGER","pk":true},{"name":"order_id","type":"INTEGER","fk":"orders.order_id"},{"name":"carrier","type":"TEXT"},{"name":"tracking_no","type":"TEXT"},{"name":"shipped_at","type":"TEXT"},{"name":"delivered_at","type":"TEXT"}] },
+        { name: 'product_reviews', pk: 'review_id', rowCount: 5, fks: ['product_id -> products.product_id', 'customer_id -> customers.customer_id'], columns: [{"name":"review_id","type":"INTEGER","pk":true},{"name":"product_id","type":"INTEGER","fk":"products.product_id"},{"name":"customer_id","type":"INTEGER","fk":"customers.customer_id"},{"name":"rating","type":"INTEGER"},{"name":"comment","type":"TEXT"},{"name":"created_at","type":"TEXT"}] }
       ],
       ddl: [
         'PRAGMA foreign_keys = ON;',
@@ -283,11 +283,11 @@
         }
       ],
       tables: [
-        { name: 'departments', pk: 'dept_id', fks: [] },
-        { name: 'employees', pk: 'emp_id', fks: ['dept_id -> departments.dept_id', 'manager_id -> employees.emp_id'] },
-        { name: 'salary_history', pk: 'history_id', fks: ['emp_id -> employees.emp_id'] },
-        { name: 'projects', pk: 'project_id', fks: ['lead_emp_id -> employees.emp_id'] },
-        { name: 'employee_projects', pk: 'emp_id, project_id', fks: ['emp_id -> employees.emp_id', 'project_id -> projects.project_id'] }
+        { name: 'departments', pk: 'dept_id', rowCount: 4, fks: [], columns: [{"name":"dept_id","type":"INTEGER","pk":true},{"name":"name","type":"TEXT"},{"name":"cost_center","type":"TEXT"},{"name":"annual_budget_usd","type":"INTEGER"}] },
+        { name: 'employees', pk: 'emp_id', rowCount: 9, fks: ['dept_id -> departments.dept_id', 'manager_id -> employees.emp_id'], columns: [{"name":"emp_id","type":"INTEGER","pk":true},{"name":"name","type":"TEXT"},{"name":"title","type":"TEXT"},{"name":"dept_id","type":"INTEGER","fk":"departments.dept_id"},{"name":"manager_id","type":"INTEGER","fk":"employees.emp_id"},{"name":"salary_usd","type":"INTEGER"},{"name":"hired_at","type":"TEXT"}] },
+        { name: 'salary_history', pk: 'history_id', rowCount: 4, fks: ['emp_id -> employees.emp_id'], columns: [{"name":"history_id","type":"INTEGER","pk":true},{"name":"emp_id","type":"INTEGER","fk":"employees.emp_id"},{"name":"old_salary_usd","type":"INTEGER"},{"name":"new_salary_usd","type":"INTEGER"},{"name":"effective_date","type":"TEXT"}] },
+        { name: 'projects', pk: 'project_id', rowCount: 3, fks: ['lead_emp_id -> employees.emp_id'], columns: [{"name":"project_id","type":"INTEGER","pk":true},{"name":"code","type":"TEXT"},{"name":"title","type":"TEXT"},{"name":"lead_emp_id","type":"INTEGER","fk":"employees.emp_id"},{"name":"budget_usd","type":"INTEGER"}] },
+        { name: 'employee_projects', pk: 'emp_id, project_id', rowCount: 7, fks: ['emp_id -> employees.emp_id', 'project_id -> projects.project_id'], columns: [{"name":"emp_id","type":"INTEGER","pk":true,"fk":"employees.emp_id"},{"name":"project_id","type":"INTEGER","pk":true,"fk":"projects.project_id"},{"name":"allocation_pct","type":"INTEGER"}] }
       ],
       ddl: [
         'PRAGMA foreign_keys = ON;',
@@ -398,11 +398,11 @@
         }
       ],
       tables: [
-        { name: 'accounts', pk: 'account_id', fks: [] },
-        { name: 'transfers', pk: 'transfer_id', fks: ['from_account_id -> accounts.account_id', 'to_account_id -> accounts.account_id'] },
-        { name: 'journal_entries', pk: 'entry_id', fks: ['transfer_id -> transfers.transfer_id', 'account_id -> accounts.account_id'] },
-        { name: 'cards', pk: 'card_id', fks: ['account_id -> accounts.account_id'] },
-        { name: 'merchant_txns', pk: 'txn_id', fks: ['card_id -> cards.card_id'] }
+        { name: 'accounts', pk: 'account_id', rowCount: 4, fks: [], columns: [{"name":"account_id","type":"INTEGER","pk":true},{"name":"owner_name","type":"TEXT"},{"name":"account_type","type":"TEXT"},{"name":"currency","type":"TEXT"},{"name":"posted_balance_cents","type":"INTEGER"},{"name":"version","type":"INTEGER"}] },
+        { name: 'transfers', pk: 'transfer_id', rowCount: 5, fks: ['from_account_id -> accounts.account_id', 'to_account_id -> accounts.account_id'], columns: [{"name":"transfer_id","type":"INTEGER","pk":true},{"name":"idempotency_key","type":"TEXT"},{"name":"from_account_id","type":"INTEGER","fk":"accounts.account_id"},{"name":"to_account_id","type":"INTEGER","fk":"accounts.account_id"},{"name":"amount_cents","type":"INTEGER"},{"name":"status","type":"TEXT"},{"name":"created_at","type":"TEXT"}] },
+        { name: 'journal_entries', pk: 'entry_id', rowCount: 11, fks: ['transfer_id -> transfers.transfer_id', 'account_id -> accounts.account_id'], columns: [{"name":"entry_id","type":"INTEGER","pk":true},{"name":"transfer_id","type":"INTEGER","fk":"transfers.transfer_id"},{"name":"account_id","type":"INTEGER","fk":"accounts.account_id"},{"name":"direction","type":"TEXT"},{"name":"amount_cents","type":"INTEGER"},{"name":"created_at","type":"TEXT"}] },
+        { name: 'cards', pk: 'card_id', rowCount: 2, fks: ['account_id -> accounts.account_id'], columns: [{"name":"card_id","type":"INTEGER","pk":true},{"name":"account_id","type":"INTEGER","fk":"accounts.account_id"},{"name":"last4","type":"TEXT"},{"name":"daily_limit_cents","type":"INTEGER"},{"name":"status","type":"TEXT"}] },
+        { name: 'merchant_txns', pk: 'txn_id', rowCount: 6, fks: ['card_id -> cards.card_id'], columns: [{"name":"txn_id","type":"INTEGER","pk":true},{"name":"card_id","type":"INTEGER","fk":"cards.card_id"},{"name":"merchant","type":"TEXT"},{"name":"mcc","type":"TEXT"},{"name":"amount_cents","type":"INTEGER"},{"name":"country","type":"TEXT"},{"name":"txn_ts","type":"TEXT"}] }
       ],
       ddl: [
         'PRAGMA foreign_keys = ON;',
@@ -518,10 +518,10 @@
         }
       ],
       tables: [
-        { name: 'saas_users', pk: 'user_id', fks: [] },
-        { name: 'subscriptions', pk: 'sub_id', fks: ['user_id -> saas_users.user_id'] },
-        { name: 'user_events', pk: 'event_id', fks: ['user_id -> saas_users.user_id'] },
-        { name: 'invoices', pk: 'invoice_id', fks: ['sub_id -> subscriptions.sub_id'] }
+        { name: 'saas_users', pk: 'user_id', rowCount: 5, fks: [], columns: [{"name":"user_id","type":"INTEGER","pk":true},{"name":"org_name","type":"TEXT"},{"name":"cohort_month","type":"TEXT"},{"name":"plan_tier","type":"TEXT"},{"name":"signup_country","type":"TEXT"}] },
+        { name: 'subscriptions', pk: 'sub_id', rowCount: 5, fks: ['user_id -> saas_users.user_id'], columns: [{"name":"sub_id","type":"INTEGER","pk":true},{"name":"user_id","type":"INTEGER","fk":"saas_users.user_id"},{"name":"mrr_usd","type":"INTEGER"},{"name":"status","type":"TEXT"},{"name":"started_at","type":"TEXT"},{"name":"ended_at","type":"TEXT"}] },
+        { name: 'user_events', pk: 'event_id', rowCount: 13, fks: ['user_id -> saas_users.user_id'], columns: [{"name":"event_id","type":"INTEGER","pk":true},{"name":"user_id","type":"INTEGER","fk":"saas_users.user_id"},{"name":"event_type","type":"TEXT"},{"name":"latency_ms","type":"INTEGER"},{"name":"event_ts","type":"TEXT"}] },
+        { name: 'invoices', pk: 'invoice_id', rowCount: 7, fks: ['sub_id -> subscriptions.sub_id'], columns: [{"name":"invoice_id","type":"INTEGER","pk":true},{"name":"sub_id","type":"INTEGER","fk":"subscriptions.sub_id"},{"name":"billing_month","type":"TEXT"},{"name":"amount_usd","type":"INTEGER"},{"name":"paid","type":"INTEGER"}] }
       ],
       ddl: [
         'PRAGMA foreign_keys = ON;',
@@ -621,10 +621,10 @@
         }
       ],
       tables: [
-        { name: 'profiles', pk: 'user_id', fks: [] },
-        { name: 'follows', pk: 'follower_id, followee_id', fks: ['follower_id -> profiles.user_id', 'followee_id -> profiles.user_id'] },
-        { name: 'posts', pk: 'post_id', fks: ['author_id -> profiles.user_id'] },
-        { name: 'post_likes', pk: 'post_id, user_id', fks: ['post_id -> posts.post_id', 'user_id -> profiles.user_id'] }
+        { name: 'profiles', pk: 'user_id', rowCount: 5, fks: [], columns: [{"name":"user_id","type":"INTEGER","pk":true},{"name":"handle","type":"TEXT"},{"name":"reputation","type":"INTEGER"}] },
+        { name: 'follows', pk: 'follower_id, followee_id', rowCount: 8, fks: ['follower_id -> profiles.user_id', 'followee_id -> profiles.user_id'], columns: [{"name":"follower_id","type":"INTEGER","pk":true,"fk":"profiles.user_id"},{"name":"followee_id","type":"INTEGER","pk":true,"fk":"profiles.user_id"},{"name":"followed_at","type":"TEXT"}] },
+        { name: 'posts', pk: 'post_id', rowCount: 4, fks: ['author_id -> profiles.user_id'], columns: [{"name":"post_id","type":"INTEGER","pk":true},{"name":"author_id","type":"INTEGER","fk":"profiles.user_id"},{"name":"topic_tag","type":"TEXT"},{"name":"body","type":"TEXT"},{"name":"published_at","type":"TEXT"}] },
+        { name: 'post_likes', pk: 'post_id, user_id', rowCount: 10, fks: ['post_id -> posts.post_id', 'user_id -> profiles.user_id'], columns: [{"name":"post_id","type":"INTEGER","pk":true,"fk":"posts.post_id"},{"name":"user_id","type":"INTEGER","pk":true,"fk":"profiles.user_id"},{"name":"liked_at","type":"TEXT"}] }
       ],
       ddl: [
         'PRAGMA foreign_keys = ON;',
