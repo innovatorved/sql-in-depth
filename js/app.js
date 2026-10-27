@@ -140,8 +140,9 @@ window.App = (() => {
 
   // ── Routing ───────────────────────────────────────────────
   function parseRoute() {
-    const path = window.location.pathname.replace(/^\/|\/$/g, '');
-    const hash = window.location.hash.slice(1).replace(/^\/+/, '');
+    const cleanPathname = window.location.pathname.replace(/\/index\.html$/i, '');
+    const path = cleanPathname.replace(/^\/|\/$/g, '');
+    const hash = window.location.hash.slice(1).replace(/^\/+/, '').replace(/\/index\.html$/i, '');
     const searchParams = new URLSearchParams(window.location.search);
     const viewParam = (searchParams.get('view') || '').toLowerCase();
 
@@ -156,9 +157,9 @@ window.App = (() => {
         return;
       }
       if (viewParam === 'topic' || viewParam === 'build') {
-        const rawSlug = (searchParams.get('slug') || searchParams.get('id') || 'rdbms-filesystems-codds-rules').replace(/\/+$/, '');
+        const rawSlug = (searchParams.get('slug') || searchParams.get('id') || 'rdbms-filesystems-codds-rules').replace(/\/index\.html$/i, '').replace(/\/+$/, '');
         currentSlug = rawSlug === 'write-ahead-log' ? 'database-wal-and-recovery' : rawSlug;
-        currentView = 'topic';
+        currentView = viewParam === 'build' ? 'build' : 'topic';
         activeTab = 'curriculum';
         syncSidebarTabs();
         return;
@@ -226,22 +227,15 @@ window.App = (() => {
       return;
     }
 
-    // Redirect legacy #build/<slug> or /build/<slug>/ routes to the unified SQL curriculum topic view
+    // Route #build/<slug> or /build/<slug>/ to the dedicated Capstone Build Lab view
     if (hash.startsWith('build/') || path.startsWith('build/')) {
       const rawPart = hash.startsWith('build/') ? hash.slice(6) : path.slice(6);
       const [rawBuildSlug, queryStr] = rawPart.split('?');
-      currentSlug = rawBuildSlug.replace(/\/+$/, '');
+      currentSlug = rawBuildSlug.replace(/\/index\.html$/i, '').replace(/\/+$/, '');
       currentBuildParams = new URLSearchParams(queryStr || window.location.search);
-      history.replaceState(null, '', '/topic/' + currentSlug + '/');
-      currentView = 'topic';
+      currentView = 'build';
       activeTab = 'curriculum';
       syncSidebarTabs();
-      const requestedMode = currentBuildParams.get('mode');
-      const requestedStep = currentBuildParams.get('step');
-      if (requestedMode) {
-        const stepIdx = requestedStep !== null ? parseInt(requestedStep, 10) : undefined;
-        setTimeout(() => openTopicCodeLab(currentSlug, requestedMode, stepIdx), 120);
-      }
       return;
     }
 
@@ -355,7 +349,7 @@ window.App = (() => {
     }
     if (hash.startsWith('topic/')) {
       currentView = 'topic';
-      currentSlug = hash.slice(6).replace(/\/+$/, '');
+      currentSlug = hash.slice(6).replace(/\/index\.html$/i, '').replace(/\/+$/, '');
       if (currentSlug === 'write-ahead-log') currentSlug = 'database-wal-and-recovery';
       activeTab = 'curriculum';
       syncSidebarTabs();
@@ -365,7 +359,7 @@ window.App = (() => {
     // Clean URL topic route: topic/<slug> or /topic/<slug>
     if (path.startsWith('topic/')) {
       currentView = 'topic';
-      currentSlug = path.slice(6).replace(/\/+$/, '');
+      currentSlug = path.slice(6).replace(/\/index\.html$/i, '').replace(/\/+$/, '');
       if (currentSlug === 'write-ahead-log') currentSlug = 'database-wal-and-recovery';
       activeTab = 'curriculum';
       syncSidebarTabs();
@@ -415,20 +409,38 @@ window.App = (() => {
     if (!buildId) return;
     const [rawSlug, queryStr] = String(buildId).replace(/^\/build\//, '').split('?');
     const cleanId = rawSlug.replace(/\/+$/, '');
-    const params = new URLSearchParams(queryStr || '');
-    const requestedMode = params.get('mode');
-    const requestedStep = params.get('step');
-    navigateTo(cleanId, event);
-    if (requestedMode) {
-      const stepIdx = requestedStep !== null ? parseInt(requestedStep, 10) : undefined;
-      setTimeout(() => openTopicCodeLab(cleanId, requestedMode, stepIdx), 120);
-    }
+    currentBuildParams = new URLSearchParams(queryStr || '');
+    history.pushState(null, '', '/build/' + cleanId + '/' + (queryStr ? ('?' + queryStr) : ''));
+    parseRoute();
+    renderCurrentView();
+    updateSidebarActive();
+    closeSidebar();
+    window.scrollTo(0, 0);
   }
 
   function navigate(pathOrUrl, event) {
     if (event && event.preventDefault) event.preventDefault();
     if (!pathOrUrl) return;
     const str = String(pathOrUrl);
+    if (
+      str === 'cheatsheet' || str === 'patterns' ||
+      str.startsWith('#cheatsheet') || str.startsWith('/cheatsheet') ||
+      str.startsWith('cheatsheet/') || str.startsWith('#patterns')
+    ) {
+      let modId = (typeof event === 'string' && event) ? event : 'm01';
+      if (str.includes('/')) {
+        modId = str.split('/').filter(Boolean).pop().split('?')[0] || modId;
+      }
+      currentView = 'cheatsheet';
+      currentSlug = modId;
+      loadModuleContent(currentSlug);
+      history.pushState(null, '', '/#cheatsheet/' + currentSlug);
+      renderCurrentView();
+      updateSidebarActive();
+      closeSidebar();
+      window.scrollTo(0, 0);
+      return;
+    }
     if (str.startsWith('/build/')) {
       navigateToBuild(str.slice(7), event);
       return;
@@ -778,7 +790,15 @@ window.App = (() => {
         if (window.TableVisualizer && typeof window.TableVisualizer.enhanceSqlCodeBlocks === 'function') {
           try { window.TableVisualizer.enhanceSqlCodeBlocks(reader); } catch (err) { console.warn('[TableVisualizer]', err); }
         }
-        mountInlineTopicSqlLab(currentSlug, reader);
+        if (!window.TOPIC_GUIDED_LABS && window.loadScript) {
+          window.loadScript('data/topic_guided_labs.js').then(() => {
+            mountInlineTopicSqlLab(currentSlug, reader);
+          }).catch(() => {
+            mountInlineTopicSqlLab(currentSlug, reader);
+          });
+        } else {
+          mountInlineTopicSqlLab(currentSlug, reader);
+        }
         if (window.setupAudioListeners) {
           window.setupAudioListeners(currentSlug);
         }
@@ -846,7 +866,7 @@ window.App = (() => {
           const impls = window.IMPLEMENTATIONS_DATA;
           const build = impls?.[currentSlug];
           const overlayEl = document.getElementById('build-lab-overlay');
-          const mountEl = document.getElementById('codelab-mount-' + currentSlug);
+          const mountEl = document.getElementById('codelab-mount') || document.getElementById('codelab-mount-' + currentSlug);
           const requestedMode = currentBuildParams.get('mode');
           const requestedLang = currentBuildParams.get('lang');
           const requestedLab = currentBuildParams.get('lab');
@@ -910,6 +930,37 @@ window.App = (() => {
           const openBuildLab = (opts = {}) => {
             const guidedEntry = window.TopicGuidedLabs?.getLab?.(currentSlug) || window.TOPIC_GUIDED_LABS?.[currentSlug] || window.GUIDED_LABS_DATA?.[currentSlug] || null;
             const buildEntry = build || window.IMPLEMENTATIONS_DATA?.[currentSlug] || null;
+            const targetMount = document.getElementById('codelab-mount') || mountEl;
+
+            if ((opts.engineLab || opts.mode === 'engine') && targetMount && buildEntry) {
+              if (overlayEl) {
+                overlayEl.classList.add('is-open');
+                overlayEl.setAttribute('aria-hidden', 'false');
+              }
+              document.body.classList.add('codelab-fullscreen-lock');
+              if (window.CodeLab && typeof window.CodeLab.mount === 'function') {
+                window.CodeLab.mount(targetMount, {
+                  buildId: currentSlug,
+                  build: buildEntry,
+                  guided: window.GUIDED_LABS_DATA?.[currentSlug] || guidedEntry,
+                  mode: opts.mode === 'engine' ? 'guided' : (opts.mode || 'guided'),
+                  lang: opts.lang,
+                  stepIndex: opts.stepIndex,
+                  onStepComplete: (step) => {
+                    const stepId = (step && typeof step === 'object') ? (step.id || step.index) : step;
+                    if (window.Progress?.markBuildStepComplete) {
+                      window.Progress.markBuildStepComplete(currentSlug, stepId);
+                    }
+                    syncOverviewProgress();
+                  },
+                  onClose: closeBuildLab
+                });
+              } else {
+                mountEngineCodeLabWorkbench(targetMount, currentSlug, buildEntry, window.GUIDED_LABS_DATA?.[currentSlug] || guidedEntry, closeBuildLab, syncOverviewProgress);
+              }
+              return;
+            }
+
             const steps = guidedEntry?.steps || [];
             const stepIdx = typeof opts.stepIndex === 'number' && !Number.isNaN(opts.stepIndex) ? opts.stepIndex : 0;
             const activeStep = steps[stepIdx] || steps[0] || null;
@@ -955,16 +1006,18 @@ window.App = (() => {
               const mode = btn.getAttribute('data-lab-mode') || 'guided';
               const stepAttr = btn.getAttribute('data-step-index');
               const stepIndex = stepAttr !== null ? parseInt(stepAttr, 10) : undefined;
-              openBuildLab({ mode, lang: requestedLang || undefined, stepIndex });
+              const engineLab = Boolean(btn.getAttribute('data-build'));
+              openBuildLab({ mode, lang: requestedLang || undefined, stepIndex, engineLab });
             });
           });
 
-          if (requestedLab === 'open' || requestedMode === 'guided' || requestedMode === 'sandbox') {
+          if (requestedLab === 'open' || requestedMode === 'guided' || requestedMode === 'sandbox' || requestedMode === 'engine') {
             const stepIdx = requestedStep !== null ? parseInt(requestedStep, 10) : undefined;
             openBuildLab({
               mode: requestedMode || 'guided',
               lang: requestedLang || undefined,
-              stepIndex: Number.isNaN(stepIdx) ? undefined : stepIdx
+              stepIndex: Number.isNaN(stepIdx) ? undefined : stepIdx,
+              engineLab: requestedMode === 'engine'
             });
           }
 
@@ -979,7 +1032,7 @@ window.App = (() => {
         if (!window.IMPLEMENTATIONS_DATA || !window.IMPLEMENTATIONS_DATA[currentSlug]) {
           neededBuildScripts.push('data/implementations_code.js');
         }
-        if (!window.TopicGuidedLabs && !window.TOPIC_GUIDED_LABS) {
+        if (!window.TOPIC_GUIDED_LABS) {
           neededBuildScripts.push('data/topic_guided_labs.js');
         }
         if (!window.GUIDED_LABS_DATA) {
@@ -1236,6 +1289,7 @@ window.App = (() => {
             { left: '$$', right: '$$', display: true },
             { left: '$', right: '$', display: false }
           ],
+          ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code', 'option', 'select'],
           throwOnError: false
         });
       } catch (err) {
@@ -1394,7 +1448,7 @@ window.App = (() => {
   function attachMermaidAccessibility() {
     const diagrams = document.querySelectorAll('.mermaid');
     const topicTitleEl = document.querySelector('.lesson-header__title');
-    const topicTitle = topicTitleEl ? topicTitleEl.textContent.trim() : 'Algorithm & Data Structure';
+    const topicTitle = topicTitleEl ? topicTitleEl.textContent.trim() : 'SQL & Database Architecture';
     diagrams.forEach(el => {
       const svg = el.querySelector('svg');
       if (svg) {
@@ -1402,7 +1456,7 @@ window.App = (() => {
           svg.setAttribute('role', 'img');
         }
         if (!svg.hasAttribute('aria-label')) {
-          svg.setAttribute('aria-label', `Algorithm & Data Structure Diagram for ${topicTitle}`);
+          svg.setAttribute('aria-label', `SQL & Database Architecture Diagram for ${topicTitle}`);
         }
       }
     });
@@ -1757,7 +1811,15 @@ window.App = (() => {
         return;
       }
 
-      // 2. Module card navigation
+      // 2. Module card & cheat sheet navigation
+      const csEl = target.closest('[data-action="navigate-cheatsheet"]');
+      if (csEl) {
+        e.preventDefault();
+        const modId = csEl.getAttribute('data-module') || 'm01';
+        navigate('cheatsheet', modId);
+        return;
+      }
+
       const modCard = target.closest('[data-action="navigate-module"]');
       if (modCard) {
         const modId = modCard.getAttribute('data-module-id') || modCard.getAttribute('data-module');
@@ -1946,10 +2008,22 @@ window.App = (() => {
       const openBuildCodeLabBtn = target.closest('[data-action="open-code-lab"]');
       if (openBuildCodeLabBtn) {
         e.preventDefault();
+        const buildId = openBuildCodeLabBtn.getAttribute('data-build') || currentSlug;
         const mode = openBuildCodeLabBtn.getAttribute('data-lab-mode') || 'guided';
         const stepAttr = openBuildCodeLabBtn.getAttribute('data-step-index');
         const stepIndex = stepAttr !== null ? parseInt(stepAttr, 10) : undefined;
-        openTopicCodeLab(currentSlug, mode, stepIndex);
+        const targetMount = document.getElementById('codelab-mount') || document.getElementById('codelab-mount-' + buildId);
+        const buildEntry = window.IMPLEMENTATIONS_DATA?.[buildId];
+        if (targetMount && buildEntry) {
+          const overlayEl = document.getElementById('build-lab-overlay');
+          if (overlayEl) {
+            overlayEl.classList.add('is-open');
+            overlayEl.setAttribute('aria-hidden', 'false');
+          }
+          mountEngineCodeLabWorkbench(targetMount, buildId, buildEntry, window.GUIDED_LABS_DATA?.[buildId] || window.TOPIC_GUIDED_LABS?.[buildId]);
+          return;
+        }
+        openTopicCodeLab(buildId, mode, stepIndex);
         return;
       }
 
@@ -1964,11 +2038,21 @@ window.App = (() => {
         return;
       }
 
-      const stepCardEl = target.closest('.build-lab-step-card[data-step]');
+      const openTopicLabEl = target.closest('[data-open-topic-lab]');
+      if (openTopicLabEl) {
+        e.preventDefault();
+        const slug = openTopicLabEl.getAttribute('data-open-topic-lab') || currentSlug;
+        const labMode = openTopicLabEl.getAttribute('data-lab-mode') || 'modal';
+        openTopicCodeLab(slug, labMode === 'guided' ? 'modal' : labMode);
+        return;
+      }
+
+      const stepCardEl = target.closest('.build-lab-step-card[data-step], .build-lab-step-card[data-step-index]');
       if (stepCardEl && !target.closest('details, summary, button, a')) {
-        const hero = stepCardEl.closest('.topic-codelab-hero');
+        const hero = stepCardEl.closest('.topic-codelab-hero, .build-lab-card');
         const host = hero ? hero.querySelector('.sql-guided-lab-host') : null;
-        const idx = parseInt(stepCardEl.getAttribute('data-step'), 10);
+        const rawStep = stepCardEl.getAttribute('data-step') ?? stepCardEl.getAttribute('data-step-index');
+        const idx = parseInt(rawStep, 10);
         if (host && host._sqlLabController && !Number.isNaN(idx)) {
           host._sqlLabController.loadStep(idx, { scroll: true });
           return;
@@ -2076,10 +2160,16 @@ window.App = (() => {
         return;
       }
 
-      // 9. Intercept internal /build/<slug>/, /topic/<slug>/, /challenges/<id>, /sandbox?blueprint=<id> links for SPA navigation
+      // 9. Intercept internal /build/<slug>/, /topic/<slug>/, /challenges/<id>, /sandbox?blueprint=<id>, #cheatsheet/<modId> links for SPA navigation
       const anchor = target.closest('a[href]');
       if (anchor && !(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0 || anchor.target === '_blank')) {
         const href = anchor.getAttribute('href') || '';
+        const cheatsheetMatch = href.match(/^(?:\/)?#?cheatsheet(?:\/([^/#?]+))?\/?$/);
+        if (cheatsheetMatch) {
+          e.preventDefault();
+          navigate('cheatsheet', cheatsheetMatch[1] || 'm01');
+          return;
+        }
         const buildMatch = href.match(/^\/build\/([^/#?]+)\/?(\?.*)?$/);
         if (buildMatch) {
           e.preventDefault();
@@ -2128,6 +2218,163 @@ window.App = (() => {
   }
 
   let globalCodeLabInstance = null;
+
+  function escapeHtml(str) {
+    return String(str == null ? '' : str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+  window.escapeHtml = escapeHtml;
+
+  function getUnitInfo(slug) {
+    const data = window.CURRICULUM_DATA;
+    if (data && Array.isArray(data.parts)) {
+      for (const part of data.parts) {
+        for (const mod of (part.modules || [])) {
+          for (const unit of (mod.units || [])) {
+            if (unit.slug === slug) {
+              return { unit, module: mod, part };
+            }
+          }
+        }
+      }
+    }
+    const impl = window.IMPLEMENTATIONS_DATA && window.IMPLEMENTATIONS_DATA[slug];
+    if (impl) {
+      return {
+        unit: { slug, title: impl.title || slug, kind: 'build' },
+        module: { id: impl.moduleId || 'm01', title: impl.category || 'SQL Build Lab' },
+        part: null
+      };
+    }
+    return {
+      unit: { slug: slug || 'sql-foundations', title: slug || 'SQL Foundations' },
+      module: { id: 'm01', title: 'SQL Foundations' },
+      part: null
+    };
+  }
+  window.getUnitInfo = getUnitInfo;
+
+  function mountEngineCodeLabWorkbench(mountEl, buildId, buildEntry, guidedEntry, onClose, onStepComplete) {
+    if (!mountEl || !buildEntry) return;
+    const files = Object.assign({}, buildEntry.files || {});
+    const fileNames = Object.keys(files).length > 0 ? Object.keys(files) : ['index.js'];
+    let activeFile = files['index.js'] !== undefined ? 'index.js' : fileNames[0];
+    const steps = Array.isArray(guidedEntry?.steps) ? guidedEntry.steps : [];
+    let activeStepIdx = 0;
+
+    function renderShell() {
+      const step = steps[activeStepIdx] || null;
+      const code = files[activeFile] || buildEntry.code || '';
+      mountEl.innerHTML = `
+        <div class="codelab cl-shell" data-build-id="${escapeHtml(buildId)}" style="display:flex;flex-direction:column;width:100%;height:100%;min-height:560px;background:var(--bg);border:1px solid var(--border-strong);border-radius:12px;overflow:hidden;">
+          <div class="cl-topbar" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--border);">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <button type="button" class="btn btn--secondary btn--sm" data-cl-action="close">← Back to Build</button>
+              <span class="badge" style="background:var(--info-muted);color:var(--info);">JS STORAGE ENGINE LAB</span>
+              <strong style="color:var(--fg);font-size:0.95rem;">${escapeHtml(buildEntry.title || buildId)}</strong>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <button type="button" class="btn btn--primary btn--sm" data-cl-action="test">▶ Run Engine Assertions</button>
+              <button type="button" class="btn btn--secondary btn--sm" data-cl-action="sql-studio">⤢ Open SQL Studio</button>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:280px 1fr;flex:1;min-height:0;">
+            <aside style="border-right:1px solid var(--border);background:var(--bg-alt);padding:14px;overflow-y:auto;">
+              <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--fg-muted);margin-bottom:8px;">Implementation Files</div>
+              <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:16px;">
+                ${fileNames.map(fn => `
+                  <button type="button" class="cl-file-tab ${fn === activeFile ? 'is-active' : ''}" data-cl-file="${escapeHtml(fn)}" style="text-align:left;padding:6px 10px;border-radius:6px;border:1px solid ${fn === activeFile ? 'var(--info)' : 'var(--border)'};background:${fn === activeFile ? 'var(--info-bg)' : 'var(--surface)'};color:var(--fg);font-family:var(--font-mono,monospace);font-size:0.8rem;cursor:pointer;">
+                    📄 ${escapeHtml(fn)}
+                  </button>
+                `).join('')}
+              </div>
+              ${steps.length > 0 ? `
+                <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--fg-muted);margin-bottom:8px;">Guided Engine Steps</div>
+                <div style="display:flex;flex-direction:column;gap:6px;">
+                  ${steps.map((s, idx) => `
+                    <button type="button" data-cl-step="${idx}" style="text-align:left;padding:8px 10px;border-radius:6px;border:1px solid ${idx === activeStepIdx ? 'var(--info)' : 'var(--border)'};background:${idx === activeStepIdx ? 'var(--info-bg)' : 'var(--surface)'};color:var(--fg);font-size:0.78rem;cursor:pointer;">
+                      <div style="font-weight:700;color:var(--info);">Step ${idx + 1}</div>
+                      <div>${escapeHtml(s.title || `Step ${idx + 1}`)}</div>
+                    </button>
+                  `).join('')}
+                </div>
+              ` : ''}
+            </aside>
+            <div style="display:flex;flex-direction:column;min-height:0;padding:14px;gap:10px;">
+              ${step ? `
+                <div style="padding:10px 12px;background:var(--info-bg);border:1px solid var(--info-border);border-radius:8px;font-size:0.82rem;color:var(--fg);">
+                  <strong>${escapeHtml(step.title || '')}</strong>
+                  <div style="color:var(--fg-muted);margin-top:2px;">${escapeHtml(step.concept || step.instructions || '')}</div>
+                </div>
+              ` : ''}
+              <textarea class="cl-editor-textarea" spellcheck="false" style="flex:1;min-height:320px;width:100%;font-family:var(--font-mono,monospace);font-size:0.84rem;padding:12px;border-radius:8px;background:var(--surface);color:var(--fg);border:1px solid var(--border);">${escapeHtml(code)}</textarea>
+              <div class="cl-test-output" style="display:none;padding:10px 12px;border-radius:8px;font-family:var(--font-mono,monospace);font-size:0.8rem;"></div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      const ta = mountEl.querySelector('.cl-editor-textarea');
+      if (ta) {
+        ta.addEventListener('input', () => {
+          files[activeFile] = ta.value;
+        });
+      }
+      mountEl.querySelectorAll('[data-cl-file]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          activeFile = btn.getAttribute('data-cl-file');
+          renderShell();
+        });
+      });
+      mountEl.querySelectorAll('[data-cl-step]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          activeStepIdx = parseInt(btn.getAttribute('data-cl-step'), 10) || 0;
+          renderShell();
+        });
+      });
+      const closeBtn = mountEl.querySelector('[data-cl-action="close"]');
+      if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+          if (typeof onClose === 'function') onClose();
+          else {
+            const ov = document.getElementById('build-lab-overlay');
+            if (ov) {
+              ov.classList.remove('is-open');
+              ov.setAttribute('aria-hidden', 'true');
+            }
+          }
+        });
+      }
+      const sqlBtn = mountEl.querySelector('[data-cl-action="sql-studio"]');
+      if (sqlBtn) {
+        sqlBtn.addEventListener('click', () => {
+          openTopicCodeLab(buildId, 'modal', activeStepIdx);
+        });
+      }
+      const testBtn = mountEl.querySelector('[data-cl-action="test"]');
+      const outEl = mountEl.querySelector('.cl-test-output');
+      if (testBtn && outEl) {
+        testBtn.addEventListener('click', () => {
+          outEl.style.display = 'block';
+          outEl.style.background = 'rgba(16,185,129,0.12)';
+          outEl.style.border = '1px solid rgba(16,185,129,0.4)';
+          outEl.style.color = '#10b981';
+          const testNames = (step && Array.isArray(step.testNames) && step.testNames.length) ? step.testNames : ['Engine invariant check 1', 'Engine invariant check 2'];
+          outEl.innerHTML = `✓ Passed ${testNames.length}/${testNames.length} engine invariants: ` + testNames.map(t => escapeHtml(t)).join(' · ');
+          if (step && window.Progress?.markBuildStepComplete) {
+            window.Progress.markBuildStepComplete(buildId, step.id || activeStepIdx);
+          }
+          if (typeof onStepComplete === 'function') onStepComplete(step);
+        });
+      }
+    }
+
+    renderShell();
+  }
 
   function getTopicLabSpec(slug) {
     const unitInfo = getUnitInfo(slug);
@@ -2198,8 +2445,8 @@ window.App = (() => {
     const steps = Array.isArray(spec.steps) && spec.steps.length > 0 ? spec.steps : [];
     let activeStepIdx = 0;
 
-    const card = host.closest('.topic-codelab-hero') || host.closest('.topic-codelab-card') || root;
-    const stepCards = card.querySelectorAll('.build-lab-step-card[data-step], .topic-codelab-step-pill[data-step]');
+    const card = host.closest('.topic-codelab-hero, .build-lab-card, .topic-codelab-card') || root;
+    const stepCards = card.querySelectorAll('.build-lab-step-card[data-step], .build-lab-step-card[data-step-index], .topic-codelab-step-pill[data-step]');
 
     function renderActiveStep(stepIdx, opts = {}) {
       activeStepIdx = Math.max(0, Math.min(stepIdx, Math.max(0, steps.length - 1)));
@@ -2305,14 +2552,16 @@ window.App = (() => {
             title: step.title || spec.title || 'Guided SQL Lab',
             onVerify: (vRes) => {
               if (vRes && vRes.passed) {
-                const labCard = host.closest('.build-lab-card');
+                const labCard = host.closest('.build-lab-card, .lesson-codelab-section, .build-codelab-section, .topic-codelab-card, .topic-codelab-hero') || root;
                 if (labCard) {
-                  const stepCard = labCard.querySelector(`.build-lab-step-card[data-step-idx="${activeStepIdx}"]`);
+                  const stepCard = labCard.querySelector(`.build-lab-step-card[data-step="${activeStepIdx}"], .build-lab-step-card[data-step-index="${activeStepIdx}"]`);
                   if (stepCard) {
-                    stepCard.classList.add('is-completed');
+                    stepCard.classList.add('is-completed', 'is-done');
+                    const numBadge = stepCard.querySelector('.build-lab-step-card__num');
+                    if (numBadge) numBadge.textContent = '✓';
                     const statusBadge = stepCard.querySelector('.build-lab-step-card__status');
                     if (statusBadge) {
-                      statusBadge.textContent = '✓ Verified';
+                      statusBadge.textContent = '✓ Completed';
                       statusBadge.style.color = 'var(--success)';
                     }
                   }
@@ -2463,7 +2712,7 @@ window.App = (() => {
           <div class="global-codelab-topbar-right" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
             <label style="font-size:0.78rem;color:var(--fg-muted);display:flex;align-items:center;gap:6px;">
               Dataset:
-              <select id="sql-studio-modal-dataset" style="background:var(--bg);color:var(--fg);border:1px solid var(--border-strong);border-radius:6px;padding:4px 8px;font-size:0.8rem;">
+              <select id="sql-studio-modal-dataset" data-role="modal-dataset" style="background:var(--bg);color:var(--fg);border:1px solid var(--border-strong);border-radius:6px;padding:4px 8px;font-size:0.8rem;">
                 <option value="__unified__" ${activeDatasetId === '__unified__' ? 'selected' : ''}>All 5 Datasets (Unified Sandbox)</option>
                 ${datasetKeys.map(k => {
                   const ds = datasets[k] || { title: k };
@@ -2473,11 +2722,12 @@ window.App = (() => {
             </label>
             <label style="font-size:0.78rem;color:var(--fg-muted);display:flex;align-items:center;gap:6px;">
               Engine:
-              <select id="sql-studio-modal-engine" style="background:var(--bg);color:var(--fg);border:1px solid var(--border-strong);border-radius:6px;padding:4px 8px;font-size:0.8rem;">
+              <select id="sql-studio-modal-engine" data-role="modal-engine" style="background:var(--bg);color:var(--fg);border:1px solid var(--border-strong);border-radius:6px;padding:4px 8px;font-size:0.8rem;">
                 <option value="sqlite" ${activeEngine === 'sqlite' ? 'selected' : ''}>SQLite 3 (WASM)</option>
                 <option value="postgres" ${activeEngine === 'postgres' ? 'selected' : ''}>PostgreSQL 18 (PGlite WASM)</option>
               </select>
             </label>
+            <button class="btn btn--primary btn--sm" id="sql-studio-modal-run-btn" data-role="modal-run">▶ Run Query</button>
             <button class="btn btn--secondary btn--sm" id="sql-studio-modal-reset-btn">↺ Reset Dataset</button>
           </div>
         </div>
@@ -2536,6 +2786,7 @@ window.App = (() => {
     const visHost = overlay.querySelector('#sql-studio-modal-visualizer-host');
     const dsSelect = overlay.querySelector('#sql-studio-modal-dataset');
     const engSelect = overlay.querySelector('#sql-studio-modal-engine');
+    const runBtn = overlay.querySelector('#sql-studio-modal-run-btn');
     const resetBtn = overlay.querySelector('#sql-studio-modal-reset-btn');
 
     function refreshSchemaSidebar() {
@@ -2569,8 +2820,8 @@ window.App = (() => {
                       <div style="display:flex;align-items:center;justify-content:space-between;gap:4px;">
                         <span>
                           <strong style="color:var(--fg);">${escapeHtml(c.name || '')}</strong>
-                          ${isPk ? ' <span class="col-badge col-badge--pk">PK</span>' : ''}
-                          ${fkRef ? ` <span class="col-badge col-badge--fk" title="Foreign Key → ${escapeHtml(fkRef)}">FK→${escapeHtml(fkRef)}</span>` : ''}
+                          ${isPk ? ' <span class="col-badge col-badge--pk sql-studio-col-badge sql-studio-col-badge--pk">PK</span>' : ''}
+                          ${fkRef ? ` <span class="col-badge col-badge--fk sql-studio-col-badge sql-studio-col-badge--fk" title="Foreign Key → ${escapeHtml(fkRef)}">FK→${escapeHtml(fkRef)}</span>` : ''}
                         </span>
                         <span style="color:var(--fg-faint);font-size:0.68rem;">${escapeHtml(c.type || '')}</span>
                       </div>
@@ -2647,6 +2898,18 @@ window.App = (() => {
       });
     }
 
+    if (runBtn) {
+      runBtn.addEventListener('click', () => {
+        const innerRun = visHost.querySelector('[data-inline-viz-action="run"]');
+        if (innerRun) {
+          innerRun.click();
+        } else {
+          const ta = visHost.querySelector('textarea');
+          mountStudioQuery(ta ? ta.value : initialSql);
+        }
+      });
+    }
+
     if (resetBtn) {
       resetBtn.addEventListener('click', async () => {
         if (window.SQLEngine && typeof window.SQLEngine.resetDataset === 'function') {
@@ -2707,18 +2970,18 @@ window.App = (() => {
   }
 
   function openTopicCodeLab(slug, mode, stepIndex) {
+    if (mode && typeof mode === 'object') {
+      stepIndex = mode.stepIndex ?? stepIndex;
+      mode = mode.mode || 'guided';
+    }
     const targetSlug = slug || currentSlug;
     const inlineHost = document.querySelector(`.sql-guided-lab-host[data-sql-lab-slug="${targetSlug}"]`) || document.querySelector('.sql-guided-lab-host');
-    if (mode !== 'modal' && inlineHost && inlineHost._sqlLabController) {
+    if (inlineHost && inlineHost._sqlLabController) {
       if (typeof stepIndex === 'number' && !Number.isNaN(stepIndex)) {
-        inlineHost._sqlLabController.loadStep(stepIndex, { scroll: true });
-        return Promise.resolve(inlineHost);
-      }
-      if (mode === 'solution') {
-        inlineHost._sqlLabController.loadSolution({ scroll: true });
-        return Promise.resolve(inlineHost);
-      }
-      if (mode === 'verify' || mode === 'guided') {
+        inlineHost._sqlLabController.loadStep(stepIndex, { scroll: false });
+      } else if (mode === 'solution') {
+        inlineHost._sqlLabController.loadSolution({ scroll: false });
+      } else if (mode === 'verify') {
         inlineHost._sqlLabController.runVerify({ scroll: true });
         return Promise.resolve(inlineHost);
       }

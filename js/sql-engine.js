@@ -89,13 +89,24 @@
     var normalized = (mode === 'sqlite' || mode === 'postgres') ? mode : 'postgres';
     var changed = _engineMode !== normalized;
     _engineMode = normalized;
-    if (normalized === 'postgres' && !_pgDb) {
-      initPglite().catch(function () {});
-    }
+    try {
+      if (typeof localStorage !== 'undefined' && localStorage) {
+        localStorage.setItem('sql-in-depth-engine-mode', _engineMode);
+      }
+    } catch (e) {}
     if (changed) {
       notifyEngineListeners();
     }
-    return _engineMode;
+    if (_engineMode === 'postgres') {
+      return initPglite().catch(function () {
+        return initSqlite();
+      }).then(function () {
+        return _engineMode;
+      });
+    }
+    return initSqlite().then(function () {
+      return _engineMode;
+    });
   }
 
   /**
@@ -238,7 +249,8 @@
         // Install compatibility helper overloads so both PostgreSQL and SQLite idioms work seamlessly
         var compatSql = [
           'CREATE OR REPLACE FUNCTION pg_catalog.round(double precision, integer) RETURNS numeric AS $$ SELECT pg_catalog.round($1::numeric, $2); $$ LANGUAGE SQL IMMUTABLE;',
-          'CREATE OR REPLACE FUNCTION datetime(text) RETURNS timestamp AS $$ SELECT CURRENT_TIMESTAMP::timestamp; $$ LANGUAGE SQL STABLE;'
+          'CREATE OR REPLACE FUNCTION datetime(text) RETURNS timestamp AS $$ SELECT CURRENT_TIMESTAMP::timestamp; $$ LANGUAGE SQL STABLE;',
+          'CREATE OR REPLACE FUNCTION instr(text, text) RETURNS integer AS $$ SELECT pg_catalog.strpos($1, $2); $$ LANGUAGE SQL IMMUTABLE;'
         ].join('\n');
         return instance.exec(compatSql).catch(function () {}).then(function () {
           return seedPostgresDataset(instance, '__unified__', false);
@@ -258,7 +270,12 @@
 
   function init() {
     if (_engineMode === 'postgres') {
-      initPglite().catch(function () {});
+      return Promise.all([
+        initSqlite(),
+        initPglite().catch(function () {})
+      ]).then(function (res) {
+        return res[0];
+      });
     }
     return initSqlite();
   }
@@ -282,6 +299,13 @@
     var usePg = typeof forPostgres === 'boolean' ? forPostgres : (_engineMode === 'postgres' && Boolean(_pgDb));
     var normalized = sql;
     var notes = [];
+
+    // Normalize orders.status = 'paid' alias to 'completed' when querying ecommerce orders table
+    if (/\borders\b/i.test(normalized) && !/\binvoices\b/i.test(normalized) && /\b(?:o\.|orders\.)?status\s*=\s*'paid'/i.test(normalized)) {
+      normalized = normalized.replace(/\b(o\.|orders\.)?status\s*=\s*'paid'/gi, function (_, prefix) {
+        return (prefix || '') + "status = 'completed'";
+      });
+    }
 
     if (usePg) {
       // Translate SQLite printf('%.*c', expr, ' ') indentation idiom to PostgreSQL REPEAT(' ', (expr)::int)
@@ -825,103 +849,109 @@
     var includeExplain = options.explain !== false;
     var forceEngine = options.engine || _engineMode;
 
-    // Use PostgreSQL 18 if active or if explicitly requested in Node
-    if (forceEngine === 'postgres' && (_pgDb || !isBrowserEnv)) {
+    function runSqliteFallback() {
+      var dbGetter = datasetId === '__unified__'
+        ? getUnifiedDatabase(Boolean(options.reset))
+        : createDatabaseForDataset(datasetId, Boolean(options.reset));
+
+      return dbGetter.then(function (db) {
+        var dmlInfo = !options.skipDmlDiff ? detectDmlTarget(sql) : null;
+        var beforeCols = [];
+        var beforeRows = [];
+        if (dmlInfo) {
+          try {
+            var bRes = db.exec('SELECT * FROM "' + dmlInfo.tableName + '" LIMIT 50;');
+            if (bRes && bRes[0]) {
+              beforeCols = bRes[0].columns || [];
+              beforeRows = (bRes[0].values || []).map(function (r) { return r.slice(); });
+            }
+          } catch (e) {}
+        }
+
+        var norm = normalizeDialect(sql, false);
+        var t0 = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+        var resultSets = [];
+        var explainNodes = [];
+        var error = null;
+
+        try {
+          var rawResults = db.exec(norm.sql);
+          resultSets = (rawResults || []).map(function (r) {
+            var cols = r.columns || [];
+            var vals = r.values || [];
+            return {
+              columns: cols,
+              columnTypes: inferSqliteColumnTypes(cols, vals),
+              values: vals,
+              rowCount: vals.length
+            };
+          });
+        } catch (err) {
+          error = err && err.message ? err.message : String(err);
+        }
+
+        var t1 = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+        var elapsedMs = Math.max(0.05, Number((t1 - t0).toFixed(2)));
+
+        var dmlDiff = null;
+        if (!error && dmlInfo) {
+          try {
+            var aRes = db.exec('SELECT * FROM "' + dmlInfo.tableName + '" LIMIT 50;');
+            var afterCols = (aRes && aRes[0] && aRes[0].columns) ? aRes[0].columns : beforeCols;
+            var afterRows = (aRes && aRes[0] && aRes[0].values) ? aRes[0].values : [];
+            var retCols = resultSets[0] ? resultSets[0].columns : [];
+            var retRows = resultSets[0] ? resultSets[0].values : [];
+            dmlDiff = computeDmlDiff(dmlInfo, afterCols, beforeRows, afterRows, retCols, retRows);
+            if (resultSets.length === 0) {
+              resultSets.push({
+                columns: dmlDiff.columns,
+                columnTypes: inferSqliteColumnTypes(dmlDiff.columns, dmlDiff.afterRows),
+                values: dmlDiff.afterRows,
+                rowCount: dmlDiff.afterRows.length
+              });
+            }
+          } catch (e) {}
+        }
+
+        if (!error && includeExplain) {
+          explainNodes = explainQueryPlanSync(db, norm.sql);
+        }
+
+        var primarySet = resultSets[resultSets.length - 1] || resultSets[0] || null;
+
+        return {
+          ok: !error,
+          error: error,
+          engine: 'sqlite',
+          engineLabel: 'SQLite 3 (sql.js WASM)',
+          sql: sql,
+          normalizedSql: norm.sql,
+          dialectNotes: norm.notes,
+          elapsedMs: elapsedMs,
+          durationMs: elapsedMs,
+          resultSets: resultSets,
+          columns: primarySet ? primarySet.columns : [],
+          columnTypes: primarySet ? primarySet.columnTypes : [],
+          rows: primarySet ? primarySet.values : [],
+          rowCount: primarySet ? primarySet.rowCount : 0,
+          dmlDiff: dmlDiff,
+          explain: explainNodes,
+          plan: explainNodes
+        };
+      });
+    }
+
+    // Always use PostgreSQL 18 when requested, awaiting PGlite initialization in both Browser and Node
+    if (forceEngine === 'postgres') {
       return initPglite().then(function (pgDb) {
         return executePostgres(pgDb, sql, options);
+      }).catch(function () {
+        return runSqliteFallback();
       });
     }
 
     // Fallback or explicit SQLite 3 execution
-    var dbGetter = datasetId === '__unified__'
-      ? getUnifiedDatabase(Boolean(options.reset))
-      : createDatabaseForDataset(datasetId, Boolean(options.reset));
-
-    return dbGetter.then(function (db) {
-      var dmlInfo = !options.skipDmlDiff ? detectDmlTarget(sql) : null;
-      var beforeCols = [];
-      var beforeRows = [];
-      if (dmlInfo) {
-        try {
-          var bRes = db.exec('SELECT * FROM "' + dmlInfo.tableName + '" LIMIT 50;');
-          if (bRes && bRes[0]) {
-            beforeCols = bRes[0].columns || [];
-            beforeRows = (bRes[0].values || []).map(function (r) { return r.slice(); });
-          }
-        } catch (e) {}
-      }
-
-      var norm = normalizeDialect(sql, false);
-      var t0 = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
-      var resultSets = [];
-      var explainNodes = [];
-      var error = null;
-
-      try {
-        var rawResults = db.exec(norm.sql);
-        resultSets = (rawResults || []).map(function (r) {
-          var cols = r.columns || [];
-          var vals = r.values || [];
-          return {
-            columns: cols,
-            columnTypes: inferSqliteColumnTypes(cols, vals),
-            values: vals,
-            rowCount: vals.length
-          };
-        });
-      } catch (err) {
-        error = err && err.message ? err.message : String(err);
-      }
-
-      var t1 = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
-      var elapsedMs = Math.max(0.05, Number((t1 - t0).toFixed(2)));
-
-      var dmlDiff = null;
-      if (!error && dmlInfo) {
-        try {
-          var aRes = db.exec('SELECT * FROM "' + dmlInfo.tableName + '" LIMIT 50;');
-          var afterCols = (aRes && aRes[0] && aRes[0].columns) ? aRes[0].columns : beforeCols;
-          var afterRows = (aRes && aRes[0] && aRes[0].values) ? aRes[0].values : [];
-          var retCols = resultSets[0] ? resultSets[0].columns : [];
-          var retRows = resultSets[0] ? resultSets[0].values : [];
-          dmlDiff = computeDmlDiff(dmlInfo, afterCols, beforeRows, afterRows, retCols, retRows);
-          if (resultSets.length === 0) {
-            resultSets.push({
-              columns: dmlDiff.columns,
-              columnTypes: inferSqliteColumnTypes(dmlDiff.columns, dmlDiff.afterRows),
-              values: dmlDiff.afterRows,
-              rowCount: dmlDiff.afterRows.length
-            });
-          }
-        } catch (e) {}
-      }
-
-      if (!error && includeExplain) {
-        explainNodes = explainQueryPlanSync(db, norm.sql);
-      }
-
-      var primarySet = resultSets[resultSets.length - 1] || resultSets[0] || null;
-
-      return {
-        ok: !error,
-        error: error,
-        engine: 'sqlite',
-        engineLabel: 'SQLite 3 (sql.js WASM)',
-        sql: sql,
-        normalizedSql: norm.sql,
-        dialectNotes: norm.notes,
-        elapsedMs: elapsedMs,
-        durationMs: elapsedMs,
-        resultSets: resultSets,
-        columns: primarySet ? primarySet.columns : [],
-        columnTypes: primarySet ? primarySet.columnTypes : [],
-        rows: primarySet ? primarySet.values : [],
-        rowCount: primarySet ? primarySet.rowCount : 0,
-        dmlDiff: dmlDiff,
-        explain: explainNodes,
-        plan: explainNodes
-      };
-    });
+    return runSqliteFallback();
   }
 
   function explainQueryPlanSync(db, sql) {
@@ -967,6 +997,16 @@
     return createDatabaseForDataset(dsId, false).then(function (db) {
       var tablesRes = db.exec("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name;");
       var tableNames = (tablesRes[0] && tablesRes[0].values) ? tablesRes[0].values.map(function (r) { return r[0]; }) : [];
+
+      if (dsId && dsId !== '__unified__' && root.SQL_DATASETS && root.SQL_DATASETS[dsId] && Array.isArray(root.SQL_DATASETS[dsId].tables)) {
+        var allowedSet = {};
+        root.SQL_DATASETS[dsId].tables.forEach(function (t) {
+          if (t && t.name) allowedSet[String(t.name).toLowerCase()] = true;
+        });
+        tableNames = tableNames.filter(function (name) {
+          return Boolean(allowedSet[String(name).toLowerCase()]);
+        });
+      }
 
       return tableNames.map(function (tableName) {
         var colRes = db.exec('PRAGMA table_info("' + tableName + '");');

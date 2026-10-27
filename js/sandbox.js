@@ -1,5 +1,5 @@
 /**
- * System Design in Depth — Interactive Excalidraw-Style Architecture Whiteboard & Capacity Studio
+ * SQL & Database Architecture in Depth — Interactive Excalidraw-Style Architecture Whiteboard & SQL Capacity Studio
  * Handles /sandbox view:
  * - Multi-Board Tabs (+ New Board, Switch, Rename, Duplicate, Close, localStorage persistence)
  * - Excalidraw-Style Floating Tool Dock: Select (V), Pan (H), Connect (C), Zone Frame (F), Sticky Note (T), Freehand Sketch (P), Undo/Redo, Delete
@@ -20,39 +20,39 @@
   };
 
   var NODE_TYPE_TO_CODELAB = {
-    'pgbouncer-conn-pool': 'build-query-execution-simulator',
-    'sql-parser-rewriter': 'build-sargable-predicate-rewriter',
-    'buffer-pool-clock-sweep': 'build-clock-sweep-buffer-pool',
-    'materialized-view-cache': 'build-Star-Schema-Rollup-Engine',
-    'cbo-join-planner': 'build-cost-based-join-planner',
-    'window-hash-agg-engine': 'build-streaming-window-aggregator',
-    'vectorized-simd-olap': 'build-vectorized-columnar-scanner',
-    'mvcc-ssi-lock-manager': 'build-mvcc-snapshot-manager',
-    'bplustree-covering-index': 'build-bplus-tree-page-layout',
-    'gin-gist-brin-index': 'build-inverted-gin-trigram-index',
-    'wal-aries-storage': 'build-aries-wal-recovery-engine',
-    'outbox-cdc-streamer': 'build-transactional-outbox-poller',
-    gateway: 'build-query-execution-simulator',
-    APIGateway: 'build-query-execution-simulator',
-    lb: 'build-cost-based-join-planner',
-    L4LB: 'build-cost-based-join-planner',
-    L7LB: 'build-cost-based-join-planner',
-    cache: 'build-clock-sweep-buffer-pool',
-    RedisCache: 'build-clock-sweep-buffer-pool',
-    cdn: 'build-sargable-predicate-rewriter',
-    CDN: 'build-sargable-predicate-rewriter',
-    db: 'build-bplus-tree-page-layout',
-    SQLShard: 'build-bplus-tree-page-layout',
-    NoSQLKV: 'build-inverted-gin-trigram-index',
-    search: 'build-inverted-gin-trigram-index',
-    queue: 'build-transactional-outbox-poller',
-    KafkaQueue: 'build-transactional-outbox-poller',
-    worker: 'build-mvcc-snapshot-manager',
-    WorkerPool: 'build-mvcc-snapshot-manager',
-    storage: 'build-aries-wal-recovery-engine',
-    ObjectStorage: 'build-aries-wal-recovery-engine',
-    service: 'build-streaming-window-aggregator',
-    Microservice: 'build-streaming-window-aggregator'
+    'pgbouncer-conn-pool': 'build-sharded-query-router',
+    'sql-parser-rewriter': 'build-sql-query-interpreter',
+    'buffer-pool-clock-sweep': 'build-slotted-page-wal-engine',
+    'materialized-view-cache': 'build-executive-kpi-aggregation-suite',
+    'cbo-join-planner': 'build-visual-explain-plan-analyzer',
+    'window-hash-agg-engine': 'build-sessionization-retention-engine',
+    'vectorized-simd-olap': 'build-columnar-compression-query-engine',
+    'mvcc-ssi-lock-manager': 'build-mvcc-snapshot-storage-engine',
+    'bplustree-covering-index': 'build-btree-index-advisor',
+    'gin-gist-brin-index': 'build-production-sql-tuning-clinic',
+    'wal-aries-storage': 'build-slotted-page-wal-engine',
+    'outbox-cdc-streamer': 'build-scd-type2-warehouse-pipeline',
+    gateway: 'build-sharded-query-router',
+    APIGateway: 'build-sharded-query-router',
+    lb: 'build-sharded-query-router',
+    L4LB: 'build-sharded-query-router',
+    L7LB: 'build-sharded-query-router',
+    cache: 'build-executive-kpi-aggregation-suite',
+    RedisCache: 'build-executive-kpi-aggregation-suite',
+    cdn: 'build-sql-query-interpreter',
+    CDN: 'build-sql-query-interpreter',
+    db: 'build-btree-index-advisor',
+    SQLShard: 'build-sharded-query-router',
+    NoSQLKV: 'build-production-sql-tuning-clinic',
+    search: 'build-production-sql-tuning-clinic',
+    queue: 'build-production-sql-tuning-clinic',
+    KafkaQueue: 'build-scd-type2-warehouse-pipeline',
+    worker: 'build-mvcc-snapshot-storage-engine',
+    WorkerPool: 'build-mvcc-snapshot-storage-engine',
+    storage: 'build-slotted-page-wal-engine',
+    ObjectStorage: 'build-columnar-compression-query-engine',
+    service: 'build-physical-join-execution-engine',
+    Microservice: 'build-physical-join-execution-engine'
   };
 
   function escapeHtml(str) {
@@ -912,8 +912,8 @@
             return (
               '<div style="display:flex;justify-content:space-between;align-items:center;gap:4px;padding:2px 6px;font-size:0.73rem;font-family:var(--font-mono);color:var(--fg-muted);">' +
                 '<span><strong style="color:var(--fg);">' + escapeHtml(colName) + '</strong>' +
-                  (isPk ? ' <span class="col-badge col-badge--pk" style="font-size:0.62rem;padding:0 4px;">PK</span>' : '') +
-                  (fkTarget ? ' <span class="col-badge col-badge--fk" style="font-size:0.62rem;padding:0 4px;" title="Foreign Key → ' + escapeHtml(fkTarget) + '">FK→' + escapeHtml(fkTarget) + '</span>' : '') +
+                  (isPk ? ' <span class="col-badge col-badge--pk wb-col-badge wb-col-badge--pk" style="font-size:0.62rem;padding:0 4px;">PK</span>' : '') +
+                  (fkTarget ? ' <span class="col-badge col-badge--fk wb-col-badge wb-col-badge--fk" style="font-size:0.62rem;padding:0 4px;" title="Foreign Key → ' + escapeHtml(fkTarget) + '">FK→' + escapeHtml(fkTarget) + '</span>' : '') +
                 '</span>' +
                 '<span style="color:var(--fg-faint);font-size:0.68rem;">' + escapeHtml(colType) + '</span>' +
               '</div>'
@@ -1137,7 +1137,7 @@
                   '<div class="view-badge-row">' +
                     '<span class="eco-pill eco-pill--accent">Interactive SQL &amp; Table Studio</span>' +
                     '<span class="eco-pill">PostgreSQL 18 (PGlite WASM) &amp; SQLite 3.46 WASM</span>' +
-                    '<span class="eco-pill">5 Relational Datasets · 27 Tables</span>' +
+                    '<span class="eco-pill">5 Relational Datasets · 26 Tables</span>' +
                     '<span class="eco-pill">Step-by-Step Clause Visualizer</span>' +
                   '</div>' +
                   '<h1 class="view-title">SQL Workbench &amp; Relational Execution Studio</h1>' +
@@ -1187,7 +1187,7 @@
                     '<h3 class="inspector-subtitle">Schema &amp; Table Explorer</h3>' +
                     '<span class="sandbox-palette__hint">Click any table to preview rows</span>' +
                   '</div>' +
-                  schemaExplorerHtml +
+                  '<div id="wb-sql-schema-sidebar">' + schemaExplorerHtml + '</div>' +
                 '</aside>' +
                 '<section class="sandbox-canvas-wrapper" style="display:flex;flex-direction:column;gap:14px;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;">' +
                   '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">' +
@@ -1599,6 +1599,10 @@
 
       // 1. No Single Points of Failure (SPOF)
       var spofTypes = [
+        'pgbouncer-conn-pool', 'sql-parser-rewriter', 'buffer-pool-clock-sweep',
+        'materialized-view-cache', 'cbo-join-planner', 'window-hash-agg-engine',
+        'vectorized-simd-olap', 'mvcc-ssi-lock-manager', 'bplustree-covering-index',
+        'gin-gist-brin-index', 'wal-aries-storage', 'outbox-cdc-streamer',
         'monotonic-window-engine', 'divide-conquer-sorter', 'graph-shortest-path-router',
         'dp-state-optimizer', 'balanced-order-tree', 'range-segment-fenwick',
         'string-automaton-index', 'priority-event-scheduler',
@@ -1614,7 +1618,8 @@
       // 2. Read Path Caching / Offload
       var readQps = Number(cap.readQps) || 0;
       var hasCacheOrCdn = nodes.some(function(n) {
-        return n.type === 'hash-index-robin-hood' || n.type === 'lru-lfu-eviction-tier' || n.type === 'bit-parallel-filter' ||
+        return n.type === 'buffer-pool-clock-sweep' || n.type === 'materialized-view-cache' || n.type === 'bplustree-covering-index' || n.type === 'gin-gist-brin-index' ||
+          n.type === 'hash-index-robin-hood' || n.type === 'lru-lfu-eviction-tier' || n.type === 'bit-parallel-filter' ||
           n.type === 'RedisCache' || n.type === 'CDN' || n.type === 'cache' || n.type === 'cdn';
       });
       var cachePassed = readQps < 5000 || hasCacheOrCdn || nodes.length >= 3;
@@ -1623,7 +1628,8 @@
       var writeQps = Number(cap.writeQps) || 0;
       var writeUtilization = (writeQps / 40000) * 100;
       var hasQueueOrWorker = nodes.some(function(n) {
-        return n.type === 'priority-event-scheduler' || n.type === 'monotonic-window-engine' ||
+        return n.type === 'wal-aries-storage' || n.type === 'outbox-cdc-streamer' || n.type === 'pgbouncer-conn-pool' || n.type === 'mvcc-ssi-lock-manager' ||
+          n.type === 'priority-event-scheduler' || n.type === 'monotonic-window-engine' ||
           n.type === 'KafkaQueue' || n.type === 'WorkerPool' || n.type === 'queue' || n.type === 'worker';
       });
       var asyncPassed = hasQueueOrWorker || writeUtilization < 80;
@@ -1792,6 +1798,14 @@
         var previewTblBtn = e.target.closest('[data-sql-preview-table]');
         if (previewTblBtn) {
           var tblName = previewTblBtn.getAttribute('data-sql-preview-table');
+          var previewDs = previewTblBtn.getAttribute('data-sql-preview-ds');
+          if (previewDs && self._sqlStudioDatasetId !== '__unified__' && self._sqlStudioDatasetId !== previewDs) {
+            self._sqlStudioDatasetId = previewDs;
+            var dsSel = container.querySelector('#wb-sql-dataset-select');
+            if (dsSel) dsSel.value = previewDs;
+            var sidebarEl = container.querySelector('#wb-sql-schema-sidebar');
+            if (sidebarEl) sidebarEl.innerHTML = self._renderSqlStudioSchemaExplorer();
+          }
           if (tblName) {
             self._sqlStudioQuery = 'SELECT * FROM ' + tblName + ' LIMIT 15;';
             var edEl = container.querySelector('#wb-sql-studio-editor');
@@ -2108,7 +2122,7 @@
         if (e.target.id === 'wb-sql-engine-select') {
           self._sqlStudioEngine = e.target.value || 'postgres';
           if (root.SQLEngine && typeof root.SQLEngine.setEngineMode === 'function') {
-            root.SQLEngine.setEngineMode(self._sqlStudioEngine).then(function() {
+            Promise.resolve(root.SQLEngine.setEngineMode(self._sqlStudioEngine)).then(function() {
               self._mountSqlStudioVisualizer({ startAtFinal: true });
             });
           } else {

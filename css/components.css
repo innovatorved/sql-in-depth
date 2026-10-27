@@ -5813,9 +5813,90 @@ body.view-ecosystem .main__content {
   color: #c7d2fe;
 }
 
+/* ── PK/FK Schema Explorer Badges (F11) ────────────────────── */
+.wb-col-badge,
+.sql-studio-col-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 9.5px;
+  font-weight: 700;
+  font-family: var(--font-mono, monospace);
+  line-height: 1.3;
+  letter-spacing: 0.02em;
+}
 
+.wb-col-badge--pk,
+.sql-studio-col-badge--pk {
+  background: rgba(16, 185, 129, 0.16);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.38);
+}
 
+.wb-col-badge--fk,
+.sql-studio-col-badge--fk {
+  background: rgba(99, 102, 241, 0.16);
+  color: #818cf8;
+  border: 1px solid rgba(99, 102, 241, 0.38);
+}
 
+/* ── Light-Theme Overrides for SQL Components (F13) ────────── */
+[data-theme="light"] .wb-col-badge--pk,
+[data-theme="light"] .sql-studio-col-badge--pk {
+  background: #ecfdf5;
+  color: #047857;
+  border-color: #6ee7b7;
+}
 
+[data-theme="light"] .wb-col-badge--fk,
+[data-theme="light"] .sql-studio-col-badge--fk {
+  background: #eef2ff;
+  color: #4338ca;
+  border-color: #a5b4fc;
+}
 
+[data-theme="light"] .sql-inline-workbench,
+[data-theme="light"] .sql-guided-lab,
+[data-theme="light"] .sql-tviz {
+  background: var(--surface, #ffffff);
+  color: var(--fg, #0f172a);
+  border-color: var(--border, #cbd5e1);
+}
 
+[data-theme="light"] .sql-inline-workbench__editor,
+[data-theme="light"] .sql-guided-lab textarea,
+[data-theme="light"] .sql-guided-lab .sql-inline-textarea {
+  background: #ffffff;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+
+[data-theme="light"] .sql-explain-tree {
+  background: var(--bg-alt, #f8fafc);
+  color: var(--fg, #0f172a);
+}
+
+[data-theme="light"] .sql-lab-verify-banner.is-pass {
+  background: #ecfdf5;
+  border-color: #6ee7b7;
+  color: #065f46;
+}
+
+[data-theme="light"] .sql-lab-verify-banner.is-fail {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #991b1b;
+}
+
+[data-theme="light"] .sql-lab-verify-banner.is-checking {
+  background: #eef2ff;
+  border-color: #a5b4fc;
+  color: #3730a3;
+}
+
+[data-theme="light"] .sql-exec-btn.is-verify {
+  background: #ecfdf5;
+  border-color: #34d399;
+  color: #047857;
+}

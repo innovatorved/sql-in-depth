@@ -528,7 +528,6 @@ for (const { unit, mod } of units) {
     (_, closingMain) => `<div class="main__content" id="reader" data-prerendered="${slug}">\n${lessonHtml}\n    </div>${closingMain}`
   );
 
-  page = stripScriptTag(page, 'data/implementations_code.js');
   page = stripScriptTag(page, 'data/guided_labs.js');
 
   const topicDir = path.join(root, 'topic', slug);

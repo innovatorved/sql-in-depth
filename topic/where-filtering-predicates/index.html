@@ -33,10 +33,10 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
   <link rel="stylesheet" href="css/variables.css?v=b68ab27ba0">
   <link rel="stylesheet" href="css/layout.css?v=a384f455dc">
-  <link rel="stylesheet" href="css/components.css?v=924f7bd273">
+  <link rel="stylesheet" href="css/components.css?v=8fed5d69e3">
   <link rel="stylesheet" href="css/content.css?v=178f3a2481">
   <link rel="stylesheet" href="css/landing.css?v=14b77b8c3d">
-  <link rel="stylesheet" href="css/simulators.css?v=160cf62986">
+  <link rel="stylesheet" href="css/simulators.css?v=be366fe40d">
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=59c953e95f"></script>
@@ -820,7 +820,10 @@
           <button class="completion-toggle" data-action="toggle-complete" data-slug="where-filtering-predicates">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/></svg> Mark Complete
           </button>
-          <a href="#cheatsheet/m01" class="btn btn--sm btn--outline" title="View printable cheat sheet for this module">
+          <button type="button" class="btn btn--secondary btn--sm" data-action="open-topic-codelab" data-slug="where-filtering-predicates" data-mode="modal" title="Launch Interactive SQL Studio">
+            ▶ Run SQL Studio
+          </button>
+          <a href="#cheatsheet/m01" class="btn btn--secondary btn--sm" data-action="navigate-cheatsheet" data-module="m01" title="View printable cheat sheet for this module">
             📄 Cheat Sheet
           </a>
         </div>
@@ -876,7 +879,7 @@
           <div class="audio-player__progress" id="audio-bar-where-filtering-predicates" style="width: 0%;"></div>
         </div>
         <button class="audio-player__speed-btn" data-action="cycle-audio-speed" data-slug="where-filtering-predicates" id="audio-speed-where-filtering-predicates" title="Playback speed">1x</button>
-        <audio id="audio-where-filtering-predicates" src="audio/where-filtering-predicates.mp3" preload="metadata"></audio>
+        <audio id="audio-where-filtering-predicates" data-src="audio/where-filtering-predicates.mp3" preload="none"></audio>
       </div>
       <nav class="topic-quick-jump" aria-label="On this page">
         <div class="topic-quick-jump__bar">
@@ -1085,7 +1088,7 @@ erDiagram
               <label style="font-size:12px;color:var(--fg-muted);display:inline-flex;align-items:center;gap:6px;">
                 Preset
                 <select class="simulator-card__input sim-select" data-role="preset" style="padding:4px 8px;font-size:12px;">
-                  <option value="0">Paid Orders ≥ <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>120</mn><mi>O</mi><mi>r</mi><mi>d</mi><mi>e</mi><mi>r</mi><mi>e</mi><mi>d</mi><mi>b</mi><mi>y</mi><mi>T</mi><mi>o</mi><mi>t</mi><mi>a</mi><mi>l</mi><mi>D</mi><mi>E</mi><mi>S</mi><mi>C</mi><mi>L</mi><mi>I</mi><mi>M</mi><mi>I</mi><mi>T</mi><mn>3</mn><mo>&lt;</mo><mi mathvariant="normal">/</mi><mi>o</mi><mi>p</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi><mo>&gt;</mo><mo>&lt;</mo><mi>o</mi><mi>p</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi><mi>v</mi><mi>a</mi><mi>l</mi><mi>u</mi><mi>e</mi><mo>=</mo><mi mathvariant="normal">&quot;</mi><mn>1</mn><mi mathvariant="normal">&quot;</mi><mo>&gt;</mo><mi>H</mi><mi>i</mi><mi>g</mi><mi>h</mi><mo>−</mo><mi>V</mi><mi>a</mi><mi>l</mi><mi>u</mi><mi>e</mi><mi>O</mi><mi>r</mi><mi>d</mi><mi>e</mi><mi>r</mi><mi>s</mi><mo>≥</mo></mrow><annotation encoding="application/x-tex">120 Ordered by Total DESC LIMIT 3&lt;/option&gt;&lt;option value=&quot;1&quot;&gt;High-Value Orders ≥</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord">120</span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mord mathnormal">d</span><span class="mord mathnormal" style="margin-right:0.0278em;">er</span><span class="mord mathnormal">e</span><span class="mord mathnormal">d</span><span class="mord mathnormal">b</span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mord mathnormal">o</span><span class="mord mathnormal">t</span><span class="mord mathnormal">a</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mord mathnormal">L</span><span class="mord mathnormal" style="margin-right:0.0785em;">I</span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mord mathnormal" style="margin-right:0.0785em;">I</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mord">3</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">/</span><span class="mord mathnormal">o</span><span class="mord mathnormal">pt</span><span class="mord mathnormal">i</span><span class="mord mathnormal">o</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">o</span><span class="mord mathnormal">pt</span><span class="mord mathnormal">i</span><span class="mord mathnormal">o</span><span class="mord mathnormal">n</span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="mord mathnormal">a</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">u</span><span class="mord mathnormal">e</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7335em;vertical-align:-0.0391em;"></span><span class="mord">&quot;1&quot;</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mord mathnormal">i</span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="mord mathnormal">h</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8304em;vertical-align:-0.136em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="mord mathnormal">a</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">u</span><span class="mord mathnormal">e</span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mord mathnormal">d</span><span class="mord mathnormal" style="margin-right:0.0278em;">er</span><span class="mord mathnormal">s</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≥</span></span></span></span>250 with Alias Projection</option>
+                  <option value="0">Paid Orders ≥ $120 Ordered by Total DESC LIMIT 3</option><option value="1">High-Value Orders ≥ $250 with Alias Projection</option>
                 </select>
               </label>
               <button type="button" class="btn btn--secondary btn--sm" data-role="prev" title="Step Back">◀ Prev</button>
@@ -1315,7 +1318,7 @@ erDiagram
     <tr>
       <td><strong>MySQL 8.4 (InnoDB)</strong></td>
       <td>Clustered Primary Key B+Tree + Undo Log Rollback Segments</td>
-      <td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mi>B</mi></msub><mi>N</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(\log_B N)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2342em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0502em;">B</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mclose">)</span></span></span></span> PK / <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mo>×</mo><mi>O</mi><mo stretchy="false">(</mo><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mi>B</mi></msub><mi>N</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">2 \times O(\log_B N)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2342em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0502em;">B</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mclose">)</span></span></span></span> Secondary</td>
+      <td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mi>B</mi></msub><mi>N</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(\log_B N)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2342em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0502em;">B</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mclose">)</span></span></span></span> PK / $2 \times O(\log_B N)$ Secondary</td>
       <td>Secondary indexes store the Primary Key value; wide PKs amplify secondary index footprint.</td>
     </tr>
     <tr>
@@ -1694,6 +1697,18 @@ ORDER BY created_at DESC;</code></pre>
             <div class="takeaways__item">WHERE Clause, Comparison Operators, BETWEEN, IN, LIKE & SARGability (where-filtering-predicates): Row-level tuple filtering with comparison operators, range bounds, pattern matching, and an introduction to Search Argument Able (SARGable) predicates.</div><div class="takeaways__item">Always separate logical SQL semantics (FROM -> WHERE -> GROUP BY -> HAVING -> WINDOW -> SELECT -> ORDER BY -> LIMIT) from the physical execution plan chosen by the cost-based optimizer.</div><div class="takeaways__item">Audit every predicate and join condition for Three-Valued Logic (NULL -> UNKNOWN) edge cases and verify SARGability so B+Tree indexes can perform O(log_B N) range seeks.</div><div class="takeaways__item">Use EXPLAIN QUERY PLAN / EXPLAIN (ANALYZE, BUFFERS) to inspect physical scan operators, join algorithms, and temporary sort/hash spills before shipping queries to production.</div>
           </div>
         </div>
+      <div class="lesson-builds">
+        <h3 class="lesson-builds__title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Multi-File Capstone SQL & Storage Engine Lab — Guided Implementation</h3>
+        
+          <a class="lesson-builds__item" href="/build/build-sql-query-interpreter/" data-action="navigate-build" data-build-id="build-sql-query-interpreter">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+              <span class="lesson-builds__name">Mini Relational Tuple Filter &amp; Projection Engine</span>
+              
+            </div>
+            <span class="lesson-builds__summary">A relational tuple-at-a-time volcano iterator engine implementing Kleene three-valued logic (TRUE/FALSE/UNKNOWN), WHERE filtering, SELECT projection with expressions, ORDER BY NULLS LAST, and LIMIT/OFFSET slicing.</span>
+            <span class="lesson-builds__cta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg> Open Guided SQL &amp; Engine Lab (PostgreSQL 18 WASM, SQLite 3 &amp; Step-by-Step Relational Table Visualizer) →</span>
+          </a>
+      </div>
       <div class="lesson-builds lesson-challenges">
         <h3 class="lesson-builds__title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> Debug This in Production — Incident Simulator &amp; SQL Hotfix</h3>
         
@@ -1796,11 +1811,12 @@ ORDER BY created_at DESC;</code></pre>
 
   <!-- Data Scripts -->
   <script type="text/plain" data-defer src="data/curriculum.js?v=4f53b5646e"></script>
-  <script type="text/plain" data-defer src="data/datasets.js?v=14de2d19c7"></script>
+  <script type="text/plain" data-defer src="data/datasets.js?v=259e5934af"></script>
   <script type="text/plain" data-defer src="data/roadmap.js?v=584992226a"></script>
   <script type="text/plain" data-defer src="data/challenges.js?v=afec18fcf4"></script>
   <script type="text/plain" data-defer src="data/srs-cards.js?v=fabc47dd9c"></script>
   <script type="text/plain" data-defer src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
+  <script type="text/plain" data-defer src="data/implementations_code.js?v=fce884f8a8"></script>
   <script type="text/plain" data-defer src="data/topic_guided_labs.js?v=341584ee01"></script>
   <script type="text/plain" data-defer src="data/projects.js?v=2280ac085f"></script>
   <script type="text/plain" data-defer src="data/glossary.js?v=4f6c79a4e0"></script>
@@ -1812,8 +1828,8 @@ ORDER BY created_at DESC;</code></pre>
   <script type="text/plain" data-defer src="js/search.js?v=e2063e0ccd"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
   <script type="text/plain" data-defer src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>
-  <script type="text/plain" data-defer src="js/sql-engine.js?v=4d14b9bc51"></script>
-  <script type="text/plain" data-defer src="js/table-visualizer.js?v=67f65e306a"></script>
+  <script type="text/plain" data-defer src="js/sql-engine.js?v=a668c919ba"></script>
+  <script type="text/plain" data-defer src="js/table-visualizer.js?v=7aedb57aba"></script>
   <script type="text/plain" data-defer src="js/simulators.js?v=68b973e4c8"></script>
   <script type="text/plain" data-defer src="js/simulators-relational.js?v=8e12b97831"></script>
   <script type="text/plain" data-defer src="js/simulators-analytical.js?v=258089d8ac"></script>
@@ -1823,17 +1839,17 @@ ORDER BY created_at DESC;</code></pre>
   <script type="text/plain" data-defer src="js/simulators-olap-ops.js?v=c793d19e01"></script>
   <script type="text/plain" data-defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <script type="text/plain" data-defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
-  <script type="text/plain" data-defer src="js/renderer.js?v=64c27ef0a7"></script>
+  <script type="text/plain" data-defer src="js/renderer.js?v=4a1d611d31"></script>
   <script type="text/plain" data-defer src="js/landing.js?v=e3f781ab53"></script>
   
   <script type="text/plain" data-defer src="js/quiz.js?v=5b300d9b3d"></script>
-  <script type="text/plain" data-defer src="js/roadmap.js?v=afdc0360a7"></script>
-  <script type="text/plain" data-defer src="js/challenges.js?v=1a9fcc6383"></script>
-  <script type="text/plain" data-defer src="js/dashboard.js?v=1e493b80a6"></script>
-  <script type="text/plain" data-defer src="js/sandbox.js?v=de24de6ada"></script>
+  <script type="text/plain" data-defer src="js/roadmap.js?v=cebfb7e32c"></script>
+  <script type="text/plain" data-defer src="js/challenges.js?v=fcc5b1b6c5"></script>
+  <script type="text/plain" data-defer src="js/dashboard.js?v=d411d5a9bb"></script>
+  <script type="text/plain" data-defer src="js/sandbox.js?v=1f94508aa4"></script>
   <script type="text/plain" data-defer src="js/topic-codelab.js?v=096611d91c"></script>
   
-  <script type="text/plain" data-defer src="js/app.js?v=f461f53b51"></script>
+  <script type="text/plain" data-defer src="js/app.js?v=44b4d826a6"></script>
 
   <!-- App bootstrap & deferred script loader -->
   <script src="js/bootstrap.js?v=df2bb60aeb"></script>

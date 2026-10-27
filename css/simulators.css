@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   DSA In Depth — Simulators, Complexity Badges & Callouts CSS
+   SQL & Database Architecture in Depth — Simulators, Complexity Badges & Callouts CSS
    ═══════════════════════════════════════════════════════════════ */
 
 /* Complexity Badges */
@@ -1898,7 +1898,136 @@
   color: #2563eb;
 }
 
+/* Light theme overrides for Interactive Simulators, Callout Boxes & SQL Visualizers (F13) */
+[data-theme="light"] .complexity-matrix {
+  background: var(--surface, #ffffff);
+  border-color: var(--border, #e2e8f0);
+}
 
+[data-theme="light"] .complexity-matrix th {
+  background: var(--bg-alt, #f8fafc);
+  color: var(--fg-muted, #475569);
+  border-bottom-color: var(--border, #e2e8f0);
+}
 
+[data-theme="light"] .complexity-matrix td {
+  border-bottom-color: var(--border, #e2e8f0);
+  color: var(--fg, #0f172a);
+}
 
+[data-theme="light"] .invariant-box {
+  background: linear-gradient(90deg, rgba(99, 102, 241, 0.1) 0%, rgba(248, 250, 252, 0.95) 100%);
+  border-color: var(--border, #cbd5e1);
+  border-left-color: #4f46e5;
+  color: var(--fg, #0f172a);
+}
+
+[data-theme="light"] .invariant-box h4 {
+  color: #4338ca;
+}
+
+[data-theme="light"] .hardware-box {
+  background: linear-gradient(90deg, rgba(16, 185, 129, 0.1) 0%, rgba(248, 250, 252, 0.95) 100%);
+  border-color: var(--border, #cbd5e1);
+  border-left-color: #059669;
+  color: var(--fg, #0f172a);
+}
+
+[data-theme="light"] .hardware-box h4 {
+  color: #047857;
+}
+
+[data-theme="light"] .dsa-sim {
+  background: var(--surface, #ffffff);
+  border-color: var(--border, #cbd5e1);
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
+}
+
+[data-theme="light"] .dsa-sim__title,
+[data-theme="light"] .dsa-sim__metric-value {
+  color: var(--fg, #0f172a);
+}
+
+[data-theme="light"] .dsa-sim__subtitle,
+[data-theme="light"] .dsa-sim__metric-label,
+[data-theme="light"] .dsa-sim__cell-idx {
+  color: var(--fg-muted, #475569);
+}
+
+[data-theme="light"] .dsa-sim__controls,
+[data-theme="light"] .dsa-sim__metric {
+  background: var(--bg-alt, #f8fafc);
+  border-color: var(--border, #cbd5e1);
+}
+
+[data-theme="light"] .dsa-sim__stage {
+  background: var(--bg, #f8fafc);
+  border-color: var(--border, #cbd5e1);
+  color: var(--fg, #0f172a);
+}
+
+[data-theme="light"] .dsa-sim__cell {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+[data-theme="light"] .dsa-sim__cell.is-active {
+  background: #eef2ff;
+  border-color: #4f46e5;
+  color: #312e81;
+}
+
+[data-theme="light"] .dsa-sim__cell.is-match,
+[data-theme="light"] .dsa-sim__cell.is-hit {
+  background: #ecfdf5;
+  border-color: #10b981;
+  color: #065f46;
+}
+
+[data-theme="light"] .dsa-sim__cell.is-warn,
+[data-theme="light"] .dsa-sim__cell.is-miss {
+  background: #fef2f2;
+  border-color: #ef4444;
+  color: #991b1b;
+}
+
+[data-theme="light"] .dsa-sim__cell.is-pivot {
+  background: #fffbeb;
+  border-color: #f59e0b;
+  color: #92400e;
+}
+
+[data-theme="light"] .dsa-sim__log {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+
+[data-theme="light"] .dsa-sim__custom-bar {
+  background: #eef2ff;
+  border-color: #c7d2fe;
+}
+
+[data-theme="light"] .dsa-sim__custom-label {
+  color: #3730a3;
+}
+
+[data-theme="light"] .dsa-sim__custom-input {
+  background: #ffffff;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+[data-theme="light"] .dsa-sim__visual-canvas {
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  border-color: #cbd5e1;
+}
+
+[data-theme="light"] .sql-inline-workbench__editor,
+[data-theme="light"] .sql-tviz {
+  background: #ffffff;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
 

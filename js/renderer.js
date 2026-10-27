@@ -466,9 +466,9 @@ window.Renderer = (() => {
 
     const k = (typeof window !== 'undefined' && window.katex) || (typeof globalThis !== 'undefined' && globalThis.katex);
 
-    // Stash pre, code, svg, script, textarea blocks to protect them from math delimiters
+    // Stash pre, code, svg, script, textarea, select blocks to protect them from math delimiters
     const stash = [];
-    let safe = html.replace(/<(pre|code|svg|script|textarea)\b[\s\S]*?<\/\1>/gi, (m) => {
+    let safe = html.replace(/<(pre|code|svg|script|textarea|select)\b[\s\S]*?<\/\1>/gi, (m) => {
       stash.push(m);
       return '\x00PROTECTED_' + (stash.length - 1) + '\x00';
     });
@@ -484,8 +484,9 @@ window.Renderer = (() => {
       return '<div class="katex-display-math" data-math="' + escapeHtml(clean) + '">$$' + escapeHtml(clean) + '$$</div>';
     });
 
-    // 2. Inline math $...$
-    safe = safe.replace(/\$([^\$\n\r]+?)\$/g, (_, math) => {
+    // 2. Inline math $...$ (exclude HTML tags and currency amounts like $120 ... $300)
+    safe = safe.replace(/\$([^\$\n\r<>]+?)\$/g, (full, math) => {
+      if (/^\d+(?:[.,]\d+)?(?:\s|$)/.test(math.trim())) return full;
       const clean = math.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').trim();
       if (k && typeof k.renderToString === 'function') {
         try {
@@ -796,7 +797,10 @@ window.Renderer = (() => {
           <button class="completion-toggle${isCompleted ? ' completed' : ''}" data-action="toggle-complete" data-slug="${slug}">
             ${isCompleted ? icons.check + ' Completed' : icons.circle + ' Mark Complete'}
           </button>
-          <a href="#cheatsheet/${mod.id}" class="btn btn--sm btn--outline" title="View printable cheat sheet for this module">
+          <button type="button" class="btn btn--secondary btn--sm" data-action="open-topic-codelab" data-slug="${slug}" data-mode="modal" title="Launch Interactive SQL Studio">
+            ▶ Run SQL Studio
+          </button>
+          <a href="#cheatsheet/${mod.id}" class="btn btn--secondary btn--sm" data-action="navigate-cheatsheet" data-module="${mod.id}" title="View printable cheat sheet for this module">
             📄 Cheat Sheet
           </a>
         </div>
@@ -834,7 +838,7 @@ window.Renderer = (() => {
           <div class="audio-player__progress" id="audio-bar-${slug}" style="width: 0%;"></div>
         </div>
         <button class="audio-player__speed-btn" data-action="cycle-audio-speed" data-slug="${slug}" id="audio-speed-${slug}" title="Playback speed">1x</button>
-        <audio id="audio-${slug}" src="audio/${slug}.mp3" preload="metadata"></audio>
+        <audio id="audio-${slug}" data-src="audio/${slug}.mp3" preload="none"></audio>
       </div>`;
 
     // Content
@@ -903,7 +907,7 @@ window.Renderer = (() => {
     // Interactive Visual Simulator (only if not already mounted inline via .simulator-mount)
     if (simHtml) html += simHtml;
 
-    // Interactive Guided C++20 CodeLab Workbench Card (Unified Guided Algorithm Coding Practice)
+    // Interactive Guided SQL & Relational Execution Lab Card
     html += renderTopicCodeLabCard(slug, unit, mod, moduleContent);
 
     // Key takeaways
@@ -917,7 +921,8 @@ window.Renderer = (() => {
         </div>`;
     }
 
-    // Incident challenges and architecture blueprints for this lesson
+    // Capstone builds, incident challenges, and architecture blueprints for this lesson
+    html += renderLessonBuilds(slug);
     html += renderLessonChallenges(slug);
     html += renderLessonBlueprints(slug);
 
@@ -1111,13 +1116,17 @@ window.Renderer = (() => {
             </div>
           </div>
           <div class="build-lab-card__cta-col">
-            <button type="button" class="btn btn--primary build-lab-card__launch-btn" data-action="open-code-lab" data-lab-mode="guided">
+            <button type="button" class="btn btn--primary build-lab-card__launch-btn" data-action="open-topic-codelab" data-slug="${escapeHtml(buildId)}" data-mode="modal">
               ${icons.terminal}
               <span>Launch SQL Studio Lab</span>
             </button>
-            <button type="button" class="btn btn--outline build-lab-card__launch-btn" data-action="open-code-lab" data-lab-mode="sandbox">
+            <button type="button" class="btn btn--outline build-lab-card__launch-btn" data-action="open-topic-codelab" data-slug="${escapeHtml(buildId)}" data-mode="solution">
               ${icons.code}
               <span>Open Reference SQL</span>
+            </button>
+            <button type="button" class="btn btn--outline build-lab-card__launch-btn" data-action="open-code-lab" data-build="${escapeHtml(buildId)}" data-lab-mode="guided">
+              ${icons.code}
+              <span>⚙ Open Engine Code Lab</span>
             </button>
           </div>
         </div>
@@ -1130,7 +1139,7 @@ window.Renderer = (() => {
               const targetLabel = s.phase || (s.targetFile ? `${s.targetFile}${s.targetSymbol ? ' · ' + s.targetSymbol.split('/')[0].trim() : ''}` : 'query.sql');
               const assertionCount = Array.isArray(s.testNames) && s.testNames.length ? s.testNames.length : 4;
               return `
-                <button type="button" class="build-lab-step-card ${isDone ? 'is-done' : ''}" data-action="open-code-lab" data-lab-mode="guided" data-step-index="${idx}" data-step="${idx}">
+                <div class="build-lab-step-card ${isDone ? 'is-done' : ''}" data-action="open-topic-codelab" data-slug="${escapeHtml(buildId)}" data-mode="guided" data-step="${idx}" data-step-index="${idx}">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">${isDone ? icons.check : `0${idx + 1}`}</span>
                     <span class="build-lab-step-card__target">${escapeHtml(targetLabel)}</span>
@@ -1139,9 +1148,9 @@ window.Renderer = (() => {
                   <div class="build-lab-step-card__concept">${formatInlineCode(s.concept || s.instructions || '')}</div>
                   <div class="build-lab-step-card__footer">
                     <span>${assertionCount} SQL assertion${assertionCount === 1 ? '' : 's'}</span>
-                    <span class="build-lab-step-card__open">Step ${idx + 1} →</span>
+                    <button type="button" class="btn btn--xs btn--ghost build-lab-step-card__open" data-action="open-topic-codelab" data-slug="${escapeHtml(buildId)}" data-mode="modal" data-step="${idx}" data-step-index="${idx}">Step ${idx + 1} →</button>
                   </div>
-                </button>
+                </div>
               `;
             }).join('')}
           </div>
@@ -1166,7 +1175,7 @@ window.Renderer = (() => {
       </div>
 
       <div class="build-lab-overlay" id="build-lab-overlay" aria-hidden="true">
-        <div id="codelab-mount-${escapeHtml(buildId)}" class="build-lab-overlay__mount" data-build-id="${escapeHtml(buildId)}"></div>
+        <div id="codelab-mount" class="build-lab-overlay__mount codelab-container" data-build-id="${escapeHtml(buildId)}"></div>
       </div>`;
     return html;
   }
@@ -1301,8 +1310,9 @@ window.Renderer = (() => {
         mathSpans.push({ isBlock: true, math });
         return '\x00MATHSPAN_' + idx + '\x00';
       })
-      // Inline math ($...$) - protect from markdown asterisks / underscores
-      .replace(/\$([^\$\n\r]+?)\$/g, (_, math) => {
+      // Inline math ($...$) - protect from markdown asterisks / underscores (skip HTML tags and currency)
+      .replace(/\$([^\$\n\r<>]+?)\$/g, (full, math) => {
+        if (/^\d+(?:[.,]\d+)?(?:\s|$)/.test(math.trim())) return full;
         const idx = mathSpans.length;
         mathSpans.push({ isBlock: false, math });
         return '\x00MATHSPAN_' + idx + '\x00';
@@ -1624,6 +1634,9 @@ window.Renderer = (() => {
         }
       });
       window.setupAudioListeners(slug);
+      if (!audio.getAttribute('src') && audio.dataset && audio.dataset.src) {
+        audio.src = audio.dataset.src;
+      }
       audio.play().then(() => {
         if (playIcon) playIcon.style.display = 'none';
         if (pauseIcon) pauseIcon.style.display = 'block';
@@ -1917,7 +1930,7 @@ window.Renderer = (() => {
         <span style="font-size:11px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:0.05em;color:var(--fg-muted);margin-right:4px;">Modules &amp; Patterns:</span>
         ${allModules.map(m => {
           const isAct = m.id === targetMod.id;
-          return `<a href="#cheatsheet/${escapeHtml(m.id)}" class="cheatsheet-module-pill ${isAct ? 'is-active' : ''}" title="Module ${escapeHtml(m.number)}: ${escapeHtml(m.title)}">M${escapeHtml(m.number)} · ${escapeHtml(m.title.split(',')[0].split('&')[0].trim())}</a>`;
+          return `<a href="#cheatsheet/${escapeHtml(m.id)}" class="cheatsheet-module-pill ${isAct ? 'is-active' : ''}" data-action="navigate-cheatsheet" data-module="${escapeHtml(m.id)}" title="Module ${escapeHtml(m.number)}: ${escapeHtml(m.title)}">M${escapeHtml(m.number)} · ${escapeHtml(m.title.split(',')[0].split('&')[0].trim())}</a>`;
         }).join('')}
       </div>
     ` : '';

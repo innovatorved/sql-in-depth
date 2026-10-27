@@ -33,10 +33,10 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
   <link rel="stylesheet" href="css/variables.css?v=b68ab27ba0">
   <link rel="stylesheet" href="css/layout.css?v=a384f455dc">
-  <link rel="stylesheet" href="css/components.css?v=924f7bd273">
+  <link rel="stylesheet" href="css/components.css?v=8fed5d69e3">
   <link rel="stylesheet" href="css/content.css?v=178f3a2481">
   <link rel="stylesheet" href="css/landing.css?v=14b77b8c3d">
-  <link rel="stylesheet" href="css/simulators.css?v=160cf62986">
+  <link rel="stylesheet" href="css/simulators.css?v=be366fe40d">
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=59c953e95f"></script>
@@ -820,7 +820,10 @@
           <button class="completion-toggle" data-action="toggle-complete" data-slug="semi-joins-anti-joins">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/></svg> Mark Complete
           </button>
-          <a href="#cheatsheet/m03" class="btn btn--sm btn--outline" title="View printable cheat sheet for this module">
+          <button type="button" class="btn btn--secondary btn--sm" data-action="open-topic-codelab" data-slug="semi-joins-anti-joins" data-mode="modal" title="Launch Interactive SQL Studio">
+            ▶ Run SQL Studio
+          </button>
+          <a href="#cheatsheet/m03" class="btn btn--secondary btn--sm" data-action="navigate-cheatsheet" data-module="m03" title="View printable cheat sheet for this module">
             📄 Cheat Sheet
           </a>
         </div>
@@ -876,7 +879,7 @@
           <div class="audio-player__progress" id="audio-bar-semi-joins-anti-joins" style="width: 0%;"></div>
         </div>
         <button class="audio-player__speed-btn" data-action="cycle-audio-speed" data-slug="semi-joins-anti-joins" id="audio-speed-semi-joins-anti-joins" title="Playback speed">1x</button>
-        <audio id="audio-semi-joins-anti-joins" src="audio/semi-joins-anti-joins.mp3" preload="metadata"></audio>
+        <audio id="audio-semi-joins-anti-joins" data-src="audio/semi-joins-anti-joins.mp3" preload="none"></audio>
       </div>
       <nav class="topic-quick-jump" aria-label="On this page">
         <div class="topic-quick-jump__bar">
@@ -1288,7 +1291,7 @@ erDiagram
     <tr>
       <td><strong>MySQL 8.4 (InnoDB)</strong></td>
       <td>Clustered Primary Key B+Tree + Undo Log Rollback Segments</td>
-      <td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mi>B</mi></msub><mi>N</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(\log_B N)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2342em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0502em;">B</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mclose">)</span></span></span></span> PK / <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mo>×</mo><mi>O</mi><mo stretchy="false">(</mo><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mi>B</mi></msub><mi>N</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">2 \times O(\log_B N)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2342em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0502em;">B</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mclose">)</span></span></span></span> Secondary</td>
+      <td><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mi>B</mi></msub><mi>N</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(\log_B N)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2342em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0502em;">B</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mclose">)</span></span></span></span> PK / $2 \times O(\log_B N)$ Secondary</td>
       <td>Secondary indexes store the Primary Key value; wide PKs amplify secondary index footprint.</td>
     </tr>
     <tr>
@@ -1757,11 +1760,12 @@ ORDER BY p.price_cents DESC;</code></pre>
 
   <!-- Data Scripts -->
   <script type="text/plain" data-defer src="data/curriculum.js?v=4f53b5646e"></script>
-  <script type="text/plain" data-defer src="data/datasets.js?v=14de2d19c7"></script>
+  <script type="text/plain" data-defer src="data/datasets.js?v=259e5934af"></script>
   <script type="text/plain" data-defer src="data/roadmap.js?v=584992226a"></script>
   <script type="text/plain" data-defer src="data/challenges.js?v=afec18fcf4"></script>
   <script type="text/plain" data-defer src="data/srs-cards.js?v=fabc47dd9c"></script>
   <script type="text/plain" data-defer src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
+  <script type="text/plain" data-defer src="data/implementations_code.js?v=fce884f8a8"></script>
   <script type="text/plain" data-defer src="data/topic_guided_labs.js?v=341584ee01"></script>
   <script type="text/plain" data-defer src="data/projects.js?v=2280ac085f"></script>
   <script type="text/plain" data-defer src="data/glossary.js?v=4f6c79a4e0"></script>
@@ -1773,8 +1777,8 @@ ORDER BY p.price_cents DESC;</code></pre>
   <script type="text/plain" data-defer src="js/search.js?v=e2063e0ccd"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
   <script type="text/plain" data-defer src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>
-  <script type="text/plain" data-defer src="js/sql-engine.js?v=4d14b9bc51"></script>
-  <script type="text/plain" data-defer src="js/table-visualizer.js?v=67f65e306a"></script>
+  <script type="text/plain" data-defer src="js/sql-engine.js?v=a668c919ba"></script>
+  <script type="text/plain" data-defer src="js/table-visualizer.js?v=7aedb57aba"></script>
   <script type="text/plain" data-defer src="js/simulators.js?v=68b973e4c8"></script>
   <script type="text/plain" data-defer src="js/simulators-relational.js?v=8e12b97831"></script>
   <script type="text/plain" data-defer src="js/simulators-analytical.js?v=258089d8ac"></script>
@@ -1784,17 +1788,17 @@ ORDER BY p.price_cents DESC;</code></pre>
   <script type="text/plain" data-defer src="js/simulators-olap-ops.js?v=c793d19e01"></script>
   <script type="text/plain" data-defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <script type="text/plain" data-defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
-  <script type="text/plain" data-defer src="js/renderer.js?v=64c27ef0a7"></script>
+  <script type="text/plain" data-defer src="js/renderer.js?v=4a1d611d31"></script>
   <script type="text/plain" data-defer src="js/landing.js?v=e3f781ab53"></script>
   
   <script type="text/plain" data-defer src="js/quiz.js?v=5b300d9b3d"></script>
-  <script type="text/plain" data-defer src="js/roadmap.js?v=afdc0360a7"></script>
-  <script type="text/plain" data-defer src="js/challenges.js?v=1a9fcc6383"></script>
-  <script type="text/plain" data-defer src="js/dashboard.js?v=1e493b80a6"></script>
-  <script type="text/plain" data-defer src="js/sandbox.js?v=de24de6ada"></script>
+  <script type="text/plain" data-defer src="js/roadmap.js?v=cebfb7e32c"></script>
+  <script type="text/plain" data-defer src="js/challenges.js?v=fcc5b1b6c5"></script>
+  <script type="text/plain" data-defer src="js/dashboard.js?v=d411d5a9bb"></script>
+  <script type="text/plain" data-defer src="js/sandbox.js?v=1f94508aa4"></script>
   <script type="text/plain" data-defer src="js/topic-codelab.js?v=096611d91c"></script>
   
-  <script type="text/plain" data-defer src="js/app.js?v=f461f53b51"></script>
+  <script type="text/plain" data-defer src="js/app.js?v=44b4d826a6"></script>
 
   <!-- App bootstrap & deferred script loader -->
   <script src="js/bootstrap.js?v=df2bb60aeb"></script>

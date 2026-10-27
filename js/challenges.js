@@ -1,6 +1,6 @@
 /**
- * System Design in Depth — Incident Troubleshooting Challenges Controller
- * Handles /challenges view: Break/Fix incident rooms across 4 difficulty tiers.
+ * SQL & Database Architecture in Depth — Incident Troubleshooting Challenges Controller
+ * Handles /challenges view: Break/Fix SQL & database engine incident rooms across 4 difficulty tiers.
  */
 (function(root) {
   'use strict';

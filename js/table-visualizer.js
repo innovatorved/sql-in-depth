@@ -87,6 +87,34 @@
     }
 
     /**
+     * Return table names for a given datasetId, or all 26 table names across all datasets
+     * when datasetId === '__unified__' or not a specific single dataset.
+     */
+    function getDatasetTableNames(datasetId) {
+        var datasets = getDatasets();
+        if (!datasetId || datasetId === '__unified__' || !datasets[datasetId]) {
+            var allNames = [];
+            var seen = {};
+            Object.keys(datasets).forEach(function (dsKey) {
+                var ds = datasets[dsKey];
+                if (ds && Array.isArray(ds.tables)) {
+                    ds.tables.forEach(function (t) {
+                        if (t && t.name && !seen[t.name]) {
+                            seen[t.name] = true;
+                            allNames.push(t.name);
+                        }
+                    });
+                }
+            });
+            if (allNames.length > 0) return allNames;
+            return Object.keys(SCHEMA_META);
+        }
+        var targetDs = datasets[datasetId];
+        if (!targetDs || !Array.isArray(targetDs.tables)) return [];
+        return targetDs.tables.map(function (t) { return t.name; });
+    }
+
+    /**
      * Detect dataset ID from SQL text or fallback to page context / ecommerce
      */
     function inferDatasetFromSql(sql, explicitDataset) {
@@ -185,10 +213,48 @@
     }
 
     /**
+     * Strip trailing AS <alias> (or bare identifier alias) from a single SELECT projection item
+     */
+    function stripSelectAlias(selectItem) {
+        var s = String(selectItem || '').trim();
+        if (!s) return s;
+        // Strip explicit AS alias at the end (top-level)
+        var depth = 0;
+        var inSingle = false;
+        var inDouble = false;
+        var lastAsPos = -1;
+        var upper = s.toUpperCase();
+        for (var i = 0; i < s.length; i++) {
+            var ch = s[i];
+            if (ch === "'" && !inDouble && s[i - 1] !== '\\') {
+                inSingle = !inSingle;
+                continue;
+            }
+            if (ch === '"' && !inSingle && s[i - 1] !== '\\') {
+                inDouble = !inDouble;
+                continue;
+            }
+            if (inSingle || inDouble) continue;
+            if (ch === '(') depth++;
+            else if (ch === ')') depth = Math.max(0, depth - 1);
+            else if (depth === 0) {
+                if (upper.slice(i, i + 2) === 'AS' && (i === 0 || /[\s)]/.test(s[i - 1])) && /[\s"']/.test(s[i + 2] || '')) {
+                    lastAsPos = i;
+                }
+            }
+        }
+        if (lastAsPos > 0) {
+            return s.slice(0, lastAsPos).trim();
+        }
+        return s;
+    }
+
+    /**
      * Strip ROLLUP(...), CUBE(...), GROUPING SETS(...) wrappers from a GROUP BY expression
+     * and resolve any positional integer ordinals (e.g. GROUP BY 1, 2) against SELECT projections
      * so we can safely project the underlying columns in Step 4 (`SELECT <cols>, COUNT(*) ...`).
      */
-    function stripGroupingWrappers(groupExpr) {
+    function stripGroupingWrappers(groupExpr, selectClause) {
         if (!groupExpr) return '';
         var s = String(groupExpr).trim();
         // Repeatedly unwrap GROUPING SETS (...), ROLLUP (...), CUBE (...)
@@ -200,7 +266,17 @@
         }
         // Remove nested parens from grouping sets like ((a, b), (a), ())
         s = s.replace(/[()]/g, ' ');
-        var parts = s.split(',').map(function (p) { return p.trim(); }).filter(Boolean);
+        var selectItems = selectClause ? splitTopLevelCommas(selectClause) : [];
+        var parts = s.split(',').map(function (p) { return p.trim(); }).filter(Boolean).map(function (p) {
+            if (/^\d+$/.test(p)) {
+                var ord = parseInt(p, 10);
+                if (ord >= 1 && ord <= selectItems.length) {
+                    var resolved = stripSelectAlias(selectItems[ord - 1]);
+                    if (resolved && resolved !== '*') return resolved;
+                }
+            }
+            return p;
+        });
         // Deduplicate columns
         var unique = [];
         var seen = {};
@@ -686,22 +762,31 @@
         // ─── STEP 3: WHERE (3VL FILTER) ───
         if (parsed.from && parsed.where) {
             var whereMatchedSql = withPrefix + 'SELECT * FROM ' + parsed.from + ' WHERE ' + parsed.where + ' LIMIT 15';
-            var whereRemovedSql = withPrefix + 'SELECT * FROM ' + parsed.from + ' WHERE NOT (' + parsed.where + ') OR (' + parsed.where + ') IS NULL LIMIT 6';
+            var whereRemovedSql = withPrefix + 'SELECT *, CASE WHEN NOT (' + parsed.where + ') THEN \'✗ FALSE (Pruned)\' ELSE \'∅ UNKNOWN / NULL (Pruned)\' END AS "__verdict__" FROM ' + parsed.from + ' WHERE NOT (' + parsed.where + ') OR (' + parsed.where + ') IS NULL LIMIT 6';
             var matchedRes = await getEngine().execute(whereMatchedSql, dsId);
             var removedRes = await getEngine().execute(whereRemovedSql, dsId);
+            if (removedRes.error) {
+                var fallbackRemovedSql = withPrefix + 'SELECT * FROM ' + parsed.from + ' WHERE NOT (' + parsed.where + ') OR (' + parsed.where + ') IS NULL LIMIT 6';
+                removedRes = await getEngine().execute(fallbackRemovedSql, dsId);
+            }
 
             if (!matchedRes.error && matchedRes.columns.length > 0) {
                 var combinedRows = [];
                 var rowStates = [];
+                var colCount = matchedRes.columns.length;
                 var keptRows = matchedRes.rows.slice(0, 10);
                 keptRows.forEach(function (r) {
                     combinedRows.push(r.concat(['✓ TRUE (Kept)']));
                     rowStates.push('matched');
                 });
                 if (!removedRes.error && removedRes.rows.length > 0) {
+                    var hasSqlVerdict = removedRes.columns && removedRes.columns[removedRes.columns.length - 1] === '__verdict__';
                     removedRes.rows.slice(0, 5).forEach(function (r) {
-                        var hasNull = r.some(function (c) { return c === null; });
-                        combinedRows.push(r.concat([hasNull ? '∅ UNKNOWN / NULL (Pruned)' : '✗ FALSE (Pruned)']));
+                        var dataCells = hasSqlVerdict ? r.slice(0, colCount) : r;
+                        var verdict = hasSqlVerdict
+                            ? r[r.length - 1]
+                            : (dataCells.some(function (c) { return c === null; }) ? '∅ UNKNOWN / NULL (Pruned)' : '✗ FALSE (Pruned)');
+                        combinedRows.push(dataCells.concat([verdict]));
                         rowStates.push('filtered');
                     });
                 }
@@ -722,7 +807,7 @@
         // ─── STEP 4: GROUP BY & 4b. HAVING ───
         if (parsed.from && parsed.groupBy) {
             var wherePart = parsed.where ? (' WHERE ' + parsed.where) : '';
-            var safeProjectionCols = stripGroupingWrappers(parsed.groupBy);
+            var safeProjectionCols = stripGroupingWrappers(parsed.groupBy, parsed.select);
             var selectColsForGroup = safeProjectionCols ? (safeProjectionCols + ', COUNT(*) AS _group_row_count') : 'COUNT(*) AS _group_row_count';
             var groupSql = withPrefix + 'SELECT ' + selectColsForGroup + ' FROM ' + parsed.from + wherePart + ' GROUP BY ' + parsed.groupBy + ' LIMIT 15';
             var groupRes = await getEngine().execute(groupSql, dsId);
@@ -855,33 +940,10 @@
             }
         }
 
-        // ─── STEP 7: ORDER BY + LIMIT (with sliced-off rows shown as filtered) ───
+        // ─── STEP 7: ORDER BY + LIMIT ───
         if ((parsed.orderBy || parsed.limit) && !finalRes.error) {
             var orderLimitRows = finalRes.rows.slice(0, 20);
             var orderLimitStates = orderLimitRows.map(function () { return 'matched'; });
-
-            // If LIMIT is present, fetch up to 20 rows WITHOUT LIMIT so we can show sliced-off rows at the bottom!
-            if (parsed.limit) {
-                var unlimitedSql = withPrefix + 'SELECT ' + (parsed.selectDistinct ? 'DISTINCT ' : '') + parsed.select +
-                    (parsed.from ? (' FROM ' + parsed.from) : '') +
-                    (parsed.where ? (' WHERE ' + parsed.where) : '') +
-                    (parsed.groupBy ? (' GROUP BY ' + parsed.groupBy) : '') +
-                    (parsed.having ? (' HAVING ' + parsed.having) : '') +
-                    (parsed.window ? (' WINDOW ' + parsed.window) : '') +
-                    (parsed.setOp ? (' ' + parsed.setOp) : '') +
-                    (parsed.orderBy ? (' ORDER BY ' + parsed.orderBy) : '') +
-                    ' LIMIT 20';
-                var unlimRes = await getEngine().execute(unlimitedSql, dsId);
-                if (!unlimRes.error && unlimRes.rows.length > finalRes.rows.length) {
-                    var keptCount = finalRes.rows.length;
-                    orderLimitRows = [];
-                    orderLimitStates = [];
-                    unlimRes.rows.slice(0, Math.min(keptCount + 5, 20)).forEach(function (r, idx) {
-                        orderLimitRows.push(r);
-                        orderLimitStates.push(idx < keptCount ? 'matched' : 'filtered');
-                    });
-                }
-            }
 
             var labelParts = [];
             var codeParts = [];
@@ -898,7 +960,7 @@
                 badge: finalRes.rows.length + ' final rows',
                 description: (parsed.orderBy ? 'Sorts output rows by `' + parsed.orderBy + '`' : '') +
                     (parsed.orderBy && parsed.limit ? ' and then ' : '') +
-                    (parsed.limit ? 'slices the top `' + parsed.limit + '` rows (rows beyond `LIMIT` are pruned at the bottom).' : '.'),
+                    (parsed.limit ? 'slices the top `' + parsed.limit + '` rows.' : '.'),
                 code: codeParts.join('\n'),
                 columns: finalRes.columns,
                 rows: orderLimitRows,
@@ -923,6 +985,12 @@
                 planNodes: finalRes.plan
             });
         }
+
+        steps.forEach(function (st) {
+            if (!st.sourceTables) {
+                st.sourceTables = st.tableName ? [st.tableName] : sourceTables;
+            }
+        });
 
         return {
             datasetId: dsId,
@@ -1017,13 +1085,45 @@
             return '<div class="sql-viz-empty">Statement executed successfully (0 columns returned).</div>';
         }
 
+        var activeTables = [];
+        if (Array.isArray(step.sourceTables) && step.sourceTables.length > 0) {
+            activeTables = step.sourceTables;
+        } else if (step.tableName) {
+            activeTables = [step.tableName];
+        } else if (step.code) {
+            activeTables = extractSourceTables(step.code);
+        }
+        if (!activeTables || activeTables.length === 0) {
+            activeTables = getDatasetTableNames(datasetId);
+        }
+
         var pkSet = {};
+        var pkOwner = {};
         var fkMap = {};
-        Object.keys(SCHEMA_META).forEach(function (tbl) {
-            if (!datasetId || KNOWN_TABLES[tbl] === datasetId) {
-                SCHEMA_META[tbl].pk.forEach(function (col) { pkSet[col] = true; });
-                Object.keys(SCHEMA_META[tbl].fk).forEach(function (col) { fkMap[col] = SCHEMA_META[tbl].fk[col]; });
-            }
+        activeTables.forEach(function (tblName) {
+            var tbl = String(tblName || '').toLowerCase();
+            var meta = SCHEMA_META[tbl];
+            if (!meta) return;
+            (meta.pk || []).forEach(function (col) {
+                var lc = col.toLowerCase();
+                pkSet[lc] = true;
+                if (!pkOwner[lc]) pkOwner[lc] = tbl;
+            });
+        });
+        activeTables.forEach(function (tblName) {
+            var tbl = String(tblName || '').toLowerCase();
+            var meta = SCHEMA_META[tbl];
+            if (!meta || !meta.fk) return;
+            Object.keys(meta.fk).forEach(function (col) {
+                var lc = col.toLowerCase();
+                var target = meta.fk[col];
+                // Do not let a child table's FK (e.g. orders.customer_id -> customers.customer_id)
+                // badge the parent PK column (customers.customer_id) as an FK to itself.
+                if (pkSet[lc] && pkOwner[lc] && String(target).toLowerCase() === pkOwner[lc] + '.' + lc) {
+                    return;
+                }
+                fkMap[lc] = target;
+            });
         });
 
         var highlightSet = {};
@@ -1182,17 +1282,17 @@
             var editorOpts = Object.assign({}, options, { showEditor: false });
             var refSql = options.referenceSql || options.solutionSql || sql;
             container.innerHTML =
-                '<div class="sql-studio-inline-workbench" style="display:flex;flex-direction:column;gap:10px;padding:12px;background:var(--bg-secondary,#0f172a);">' +
+                '<div class="sql-studio-inline-workbench" style="display:flex;flex-direction:column;gap:10px;padding:12px;background:var(--bg-elevated);">' +
                     '<div class="sql-lab-editor-box" style="display:flex;flex-direction:column;gap:8px;">' +
-                        '<div style="display:flex;align-items:center;justify-content:space-between;font-size:0.76rem;color:var(--text-secondary,#94a3b8);padding:0 2px;">' +
-                            '<span style="font-family:var(--font-mono,monospace);color:#38bdf8;font-weight:700;">query.sql · Live SQL Workbench</span>' +
+                        '<div style="display:flex;align-items:center;justify-content:space-between;font-size:0.76rem;color:var(--fg-muted);padding:0 2px;">' +
+                            '<span style="font-family:var(--font-mono,monospace);color:var(--accent,#38bdf8);font-weight:700;">query.sql · Live SQL Workbench</span>' +
                             '<span>Shortcut: Cmd/Ctrl + Enter to Run</span>' +
                         '</div>' +
-                        '<textarea class="sql-live-editor sql-inline-textarea" rows="7" spellcheck="false" style="width:100%;font-family:var(--font-mono,monospace);font-size:0.85rem;padding:10px 12px;border-radius:8px;background:var(--bg-primary,#0b0f19);color:var(--text-primary,#f8fafc);border:1px solid var(--border-subtle,rgba(148,163,184,0.28));">' + escapeHtml(sql) + '</textarea>' +
+                        '<textarea class="sql-live-editor sql-inline-textarea" rows="7" spellcheck="false" style="width:100%;font-family:var(--font-mono,monospace);font-size:0.85rem;padding:10px 12px;border-radius:8px;background:var(--bg-surface);color:var(--fg);border:1px solid var(--border-subtle,rgba(148,163,184,0.28));">' + escapeHtml(sql) + '</textarea>' +
                         '<div class="sql-lab-actions" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
                             '<button type="button" class="sql-exec-btn is-primary" data-inline-viz-action="run">▶ Run &amp; Visualize SQL</button>' +
                             '<button type="button" class="sql-exec-btn is-secondary" data-inline-viz-action="step">🔍 Step Clauses (Step 0 → 8)</button>' +
-                            '<button type="button" class="sql-exec-btn is-verify" data-inline-viz-action="verify" style="background:rgba(16,185,129,0.16);color:#34d399;border:1px solid rgba(16,185,129,0.4);">✓ Check SQL Assertions</button>' +
+                            '<button type="button" class="sql-exec-btn is-verify" data-inline-viz-action="verify" style="background:rgba(16,185,129,0.16);color:#10b981;border:1px solid rgba(16,185,129,0.4);">✓ Check SQL Assertions</button>' +
                             '<button type="button" class="sql-exec-btn is-secondary" data-inline-viz-action="explain">📊 EXPLAIN QUERY PLAN</button>' +
                         '</div>' +
                     '</div>' +
@@ -1213,25 +1313,25 @@
                 verifyBanner.style.display = 'block';
                 verifyBanner.style.background = 'rgba(56,189,248,0.1)';
                 verifyBanner.style.border = '1px solid rgba(56,189,248,0.35)';
-                verifyBanner.style.color = '#e2e8f0';
+                verifyBanner.style.color = 'var(--fg)';
                 verifyBanner.innerHTML = '⏳ Running automated relational assertions against reference schema &amp; tuples...';
                 await mountClauseVisualizer(stage, currentSql, datasetId, Object.assign({}, editorOpts, { startAtFinal: true }));
                 var vRes = await verifyQueryAgainstReference(currentSql, refSql, { datasetId: datasetId });
                 var checksHtml = (vRes.checks || []).map(function (c) {
                     return '<div style="display:flex;align-items:center;gap:8px;padding:3px 0;">' +
-                        '<span style="font-weight:700;color:' + (c.passed ? '#34d399' : '#f87171') + ';">' + (c.passed ? '✓' : '✗') + '</span>' +
-                        '<strong style="color:#f8fafc;">' + escapeHtml(c.name) + ':</strong>' +
-                        '<span style="color:#cbd5e1;">' + escapeHtml(c.detail || '') + '</span>' +
+                        '<span style="font-weight:700;color:' + (c.passed ? '#10b981' : '#ef4444') + ';">' + (c.passed ? '✓' : '✗') + '</span>' +
+                        '<strong style="color:var(--fg);">' + escapeHtml(c.name) + ':</strong>' +
+                        '<span style="color:var(--fg-muted);">' + escapeHtml(c.detail || '') + '</span>' +
                     '</div>';
                 }).join('');
                 verifyBanner.style.background = vRes.passed ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.12)';
                 verifyBanner.style.border = vRes.passed ? '1px solid rgba(16,185,129,0.45)' : '1px solid rgba(239,68,68,0.45)';
                 verifyBanner.innerHTML =
                     '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">' +
-                        '<strong style="font-size:0.9rem;color:' + (vRes.passed ? '#34d399' : '#f87171') + ';">' +
+                        '<strong style="font-size:0.9rem;color:' + (vRes.passed ? '#10b981' : '#ef4444') + ';">' +
                             (vRes.passed ? '✓ All Relational SQL Assertions Passed (' + vRes.passedCount + '/' + vRes.totalCount + ')' : '⚠ SQL Verification Checks (' + (vRes.passedCount || 0) + '/' + (vRes.totalCount || 4) + ' Passed)') +
                         '</strong>' +
-                        '<span style="font-size:0.75rem;color:#94a3b8;">Dataset: ' + escapeHtml(datasetId || 'ecommerce') + '</span>' +
+                        '<span style="font-size:0.75rem;color:var(--fg-muted);">Dataset: ' + escapeHtml(datasetId || 'ecommerce') + '</span>' +
                     '</div>' +
                     '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:4px 14px;">' + checksHtml + '</div>';
                 if (typeof options.onVerify === 'function') {
@@ -1296,7 +1396,7 @@
 
             if (finalRes.error) {
                 container.innerHTML =
-                    '<div class="sql-viz-panel is-error">' +
+                    '<div class="sql-viz-panel sql-tviz is-error">' +
                         '<div class="sql-viz-header">' +
                             '<span class="sql-viz-badge is-error">✗ SQL Execution Error</span>' +
                             '<div class="sql-viz-meta-right">' +
@@ -1336,7 +1436,7 @@
                     rowStates: []
                 };
 
-                var html = '<div class="sql-viz-panel">';
+                var html = '<div class="sql-viz-panel sql-tviz">';
                 // Header bar with Engine Toggle + Reset DB button
                 html += '<div class="sql-viz-header">' +
                     '<div class="sql-viz-title-wrap">' +
@@ -1884,6 +1984,8 @@
     }
 
     root.TableVisualizer = {
+        getDatasetTableNames: getDatasetTableNames,
+        stripGroupingWrappers: stripGroupingWrappers,
         inferDatasetFromSql: inferDatasetFromSql,
         extractSourceTables: extractSourceTables,
         extractJoinColumns: extractJoinColumns,

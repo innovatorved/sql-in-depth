@@ -33,10 +33,10 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
   <link rel="stylesheet" href="css/variables.css?v=b68ab27ba0">
   <link rel="stylesheet" href="css/layout.css?v=a384f455dc">
-  <link rel="stylesheet" href="css/components.css?v=924f7bd273">
+  <link rel="stylesheet" href="css/components.css?v=8fed5d69e3">
   <link rel="stylesheet" href="css/content.css?v=178f3a2481">
   <link rel="stylesheet" href="css/landing.css?v=14b77b8c3d">
-  <link rel="stylesheet" href="css/simulators.css?v=160cf62986">
+  <link rel="stylesheet" href="css/simulators.css?v=be366fe40d">
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=59c953e95f"></script>
@@ -832,13 +832,17 @@
             </div>
           </div>
           <div class="build-lab-card__cta-col">
-            <button type="button" class="btn btn--primary build-lab-card__launch-btn" data-action="open-code-lab" data-lab-mode="guided">
+            <button type="button" class="btn btn--primary build-lab-card__launch-btn" data-action="open-topic-codelab" data-slug="build-executive-kpi-aggregation-suite" data-mode="modal">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
               <span>Launch SQL Studio Lab</span>
             </button>
-            <button type="button" class="btn btn--outline build-lab-card__launch-btn" data-action="open-code-lab" data-lab-mode="sandbox">
+            <button type="button" class="btn btn--outline build-lab-card__launch-btn" data-action="open-topic-codelab" data-slug="build-executive-kpi-aggregation-suite" data-mode="solution">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
               <span>Open Reference SQL</span>
+            </button>
+            <button type="button" class="btn btn--outline build-lab-card__launch-btn" data-action="open-code-lab" data-build="build-executive-kpi-aggregation-suite" data-lab-mode="guided">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              <span>⚙ Open Engine Code Lab</span>
             </button>
           </div>
         </div>
@@ -846,7 +850,7 @@
         
           <div class="build-lab-steps-grid" id="build-lab-steps-grid">
             
-                <button type="button" class="build-lab-step-card " data-action="open-code-lab" data-lab-mode="guided" data-step-index="0" data-step="0">
+                <div class="build-lab-step-card " data-action="open-topic-codelab" data-slug="build-executive-kpi-aggregation-suite" data-mode="guided" data-step="0" data-step-index="0">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">01</span>
                     <span class="build-lab-step-card__target">Phase 1 · Base Relation &amp; SARGable Predicate</span>
@@ -855,11 +859,11 @@
                   <div class="build-lab-step-card__concept">Establish the base relation scan in <code>org_hr</code> for Hands-On Build: Multi-Dimensional Revenue, Cohort &amp; Funnel Aggregation Suite with a SARGable predicate and explicit Three-Valued Logic NULL handling.</div>
                   <div class="build-lab-step-card__footer">
                     <span>4 SQL assertions</span>
-                    <span class="build-lab-step-card__open">Step 1 →</span>
+                    <button type="button" class="btn btn--xs btn--ghost build-lab-step-card__open" data-action="open-topic-codelab" data-slug="build-executive-kpi-aggregation-suite" data-mode="modal" data-step="0" data-step-index="0">Step 1 →</button>
                   </div>
-                </button>
+                </div>
               
-                <button type="button" class="build-lab-step-card " data-action="open-code-lab" data-lab-mode="guided" data-step-index="1" data-step="1">
+                <div class="build-lab-step-card " data-action="open-topic-codelab" data-slug="build-executive-kpi-aggregation-suite" data-mode="guided" data-step="1" data-step-index="1">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">02</span>
                     <span class="build-lab-step-card__target">Phase 2 · Relational Join, Aggregation &amp; 3VL Guard</span>
@@ -868,11 +872,11 @@
                   <div class="build-lab-step-card__concept">Combine normalized tables via explicit JOIN conditions and fold group buckets or window partitions without losing NULL boundary rows.</div>
                   <div class="build-lab-step-card__footer">
                     <span>4 SQL assertions</span>
-                    <span class="build-lab-step-card__open">Step 2 →</span>
+                    <button type="button" class="btn btn--xs btn--ghost build-lab-step-card__open" data-action="open-topic-codelab" data-slug="build-executive-kpi-aggregation-suite" data-mode="modal" data-step="1" data-step-index="1">Step 2 →</button>
                   </div>
-                </button>
+                </div>
               
-                <button type="button" class="build-lab-step-card " data-action="open-code-lab" data-lab-mode="guided" data-step-index="2" data-step="2">
+                <div class="build-lab-step-card " data-action="open-topic-codelab" data-slug="build-executive-kpi-aggregation-suite" data-mode="guided" data-step="2" data-step-index="2">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">03</span>
                     <span class="build-lab-step-card__target">Phase 3 · Production Query &amp; Plan Verification</span>
@@ -881,9 +885,9 @@
                   <div class="build-lab-step-card__concept">Verify final column projections, ordering, and physical B+Tree access paths via EXPLAIN QUERY PLAN and automated relational assertions.</div>
                   <div class="build-lab-step-card__footer">
                     <span>4 SQL assertions</span>
-                    <span class="build-lab-step-card__open">Step 3 →</span>
+                    <button type="button" class="btn btn--xs btn--ghost build-lab-step-card__open" data-action="open-topic-codelab" data-slug="build-executive-kpi-aggregation-suite" data-mode="modal" data-step="2" data-step-index="2">Step 3 →</button>
                   </div>
-                </button>
+                </div>
               
           </div>
         
@@ -947,7 +951,7 @@
       </div>
 
       <div class="build-lab-overlay" id="build-lab-overlay" aria-hidden="true">
-        <div id="codelab-mount-build-executive-kpi-aggregation-suite" class="build-lab-overlay__mount" data-build-id="build-executive-kpi-aggregation-suite"></div>
+        <div id="codelab-mount" class="build-lab-overlay__mount codelab-container" data-build-id="build-executive-kpi-aggregation-suite"></div>
       </div>
     </div>
   </main>
@@ -1008,7 +1012,7 @@
 
   <!-- Data Scripts -->
   <script type="text/plain" data-defer src="data/curriculum.js?v=4f53b5646e"></script>
-  <script type="text/plain" data-defer src="data/datasets.js?v=14de2d19c7"></script>
+  <script type="text/plain" data-defer src="data/datasets.js?v=259e5934af"></script>
   <script type="text/plain" data-defer src="data/roadmap.js?v=584992226a"></script>
   <script type="text/plain" data-defer src="data/challenges.js?v=afec18fcf4"></script>
   <script type="text/plain" data-defer src="data/srs-cards.js?v=fabc47dd9c"></script>
@@ -1026,8 +1030,8 @@
   <script type="text/plain" data-defer src="js/search.js?v=e2063e0ccd"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
   <script type="text/plain" data-defer src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>
-  <script type="text/plain" data-defer src="js/sql-engine.js?v=4d14b9bc51"></script>
-  <script type="text/plain" data-defer src="js/table-visualizer.js?v=67f65e306a"></script>
+  <script type="text/plain" data-defer src="js/sql-engine.js?v=a668c919ba"></script>
+  <script type="text/plain" data-defer src="js/table-visualizer.js?v=7aedb57aba"></script>
   <script type="text/plain" data-defer src="js/simulators.js?v=68b973e4c8"></script>
   <script type="text/plain" data-defer src="js/simulators-relational.js?v=8e12b97831"></script>
   <script type="text/plain" data-defer src="js/simulators-analytical.js?v=258089d8ac"></script>
@@ -1037,17 +1041,17 @@
   <script type="text/plain" data-defer src="js/simulators-olap-ops.js?v=c793d19e01"></script>
   <script type="text/plain" data-defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <script type="text/plain" data-defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
-  <script type="text/plain" data-defer src="js/renderer.js?v=64c27ef0a7"></script>
+  <script type="text/plain" data-defer src="js/renderer.js?v=4a1d611d31"></script>
   <script type="text/plain" data-defer src="js/landing.js?v=e3f781ab53"></script>
   
   <script type="text/plain" data-defer src="js/quiz.js?v=5b300d9b3d"></script>
-  <script type="text/plain" data-defer src="js/roadmap.js?v=afdc0360a7"></script>
-  <script type="text/plain" data-defer src="js/challenges.js?v=1a9fcc6383"></script>
-  <script type="text/plain" data-defer src="js/dashboard.js?v=1e493b80a6"></script>
-  <script type="text/plain" data-defer src="js/sandbox.js?v=de24de6ada"></script>
+  <script type="text/plain" data-defer src="js/roadmap.js?v=cebfb7e32c"></script>
+  <script type="text/plain" data-defer src="js/challenges.js?v=fcc5b1b6c5"></script>
+  <script type="text/plain" data-defer src="js/dashboard.js?v=d411d5a9bb"></script>
+  <script type="text/plain" data-defer src="js/sandbox.js?v=1f94508aa4"></script>
   <script type="text/plain" data-defer src="js/topic-codelab.js?v=096611d91c"></script>
   
-  <script type="text/plain" data-defer src="js/app.js?v=f461f53b51"></script>
+  <script type="text/plain" data-defer src="js/app.js?v=44b4d826a6"></script>
 
   <!-- App bootstrap & deferred script loader -->
   <script src="js/bootstrap.js?v=df2bb60aeb"></script>

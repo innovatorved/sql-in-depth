@@ -340,7 +340,7 @@
 
           '<div class="srs-flashcard ' + (this._cardFlipped ? 'is-flipped' : '') + '" id="srs-active-card" data-card-id="' + escapeHtml(card.id) + '">' +
             '<div class="srs-flashcard__meta">' +
-              '<span class="eco-pill">' + escapeHtml(card.category || 'Algorithms & Data Structures') + '</span>' +
+              '<span class="eco-pill">' + escapeHtml(card.category || 'SQL & Database Architecture') + '</span>' +
               '<span class="eco-pill">' + escapeHtml(card.unitTitle || card.topicSlug || '') + '</span>' +
               '<span class="eco-pill">' + escapeHtml((card.type || 'concept').toUpperCase()) + '</span>' +
             '</div>' +
@@ -456,51 +456,46 @@
 
     _renderToolkitTab: function() {
       var cap = this._capState || {
-        inputN: 100000,
-        queriesQ: 100000,
+        inputN: 10000000,
+        queriesQ: 5000,
         timeLimitSec: 1.0,
-        opsPerSec: 100000000,
-        elemBytes: 8,
+        opsPerSec: 25000,
+        elemBytes: 128,
         nodeOverheadBytes: 24,
-        cacheLineBytes: 64,
-        memoryLimitMb: 256
+        cacheLineBytes: 8192,
+        memoryLimitMb: 4096
       };
 
-      var n = Math.max(1, cap.inputN || 100000);
-      var q = Math.max(1, cap.queriesQ || 100000);
-      var budgetOps = Math.round((cap.timeLimitSec || 1.0) * (cap.opsPerSec || 100000000));
-      var log2N = Math.max(1, Math.ceil(Math.log2(n)));
-      var nLogN = Math.round(n * log2N);
+      var n = Math.max(1, cap.inputN || 10000000);
+      var q = Math.max(1, cap.queriesQ || 5000);
+      var budgetOps = Math.round((cap.timeLimitSec || 1.0) * (cap.opsPerSec || 25000));
+      var btreeFanout = 250;
+      var btreeHeight = Math.max(1, Math.ceil(Math.log(n) / Math.log(btreeFanout)));
+      var nLogN = Math.round(n * Math.max(1, Math.ceil(Math.log2(n))));
 
-      var maxClass = 'O(N log N) / O(N)';
-      var recommendedPatterns = 'Sorting, Segment/Fenwick Tree, Heap, Two Pointers, Monotonic Stack';
-      if (n <= 11) {
-        maxClass = 'O(N!) / O(2^N)';
-        recommendedPatterns = 'Permutations, Backtracking, Exact Branch-and-Bound';
-      } else if (n <= 22) {
-        maxClass = 'O(2^N · N)';
-        recommendedPatterns = 'Bitmask DP, Meet-in-the-Middle (2^(N/2)), SOS DP';
-      } else if (n <= 450) {
-        maxClass = 'O(N^3)';
-        recommendedPatterns = 'Floyd-Warshall, Interval DP, Gaussian Elimination, Edmonds-Karp';
-      } else if (n <= 5000) {
-        maxClass = 'O(N^2)';
-        recommendedPatterns = '2D DP, Quadratic Graph Scan, All-Pairs Distance';
-      } else if (n <= 300000) {
-        maxClass = 'O(N log N) or O(N √N)';
-        recommendedPatterns = 'Merge/IntroSort, Dijkstra, Lazy Segment Tree, Mo\'s Algorithm';
-      } else if (n <= 5000000) {
-        maxClass = 'O(N) Linear';
-        recommendedPatterns = 'Sliding Window, KMP/Z-Algorithm, Monotonic Deque, Linear Sieve';
+      var maxClass = 'Composite B+Tree Index + Hash/Merge Join';
+      var recommendedPatterns = 'Covering Index-Only Scan, Hash Join in work_mem, Keyset Seek Pagination';
+      if (n <= 10000) {
+        maxClass = 'In-Memory Buffer Pool Scan / Indexed NLJ';
+        recommendedPatterns = 'Seq Scan or B+Tree Point Lookup, Nested Loop Join, Materialized CTE';
+      } else if (n <= 500000) {
+        maxClass = 'B+Tree Index Seek + In-Memory Hash Join';
+        recommendedPatterns = 'SARGable Composite Index (equality -> sort -> range), Hash Join, Partial Index';
+      } else if (n <= 10000000) {
+        maxClass = 'Covering Index-Only Scan + Keyset Pagination';
+        recommendedPatterns = 'CREATE INDEX ... INCLUDE (...), Keyset Seek (ts, id) < ($1, $2), Sort-Merge Join';
+      } else if (n <= 100000000) {
+        maxClass = 'Declarative Range Partitioning + BRIN / GIN';
+        recommendedPatterns = 'Monthly Partition Pruning, BRIN Zone Maps, Parallel Hash Aggregate, SKIP LOCKED';
       } else {
-        maxClass = 'O(log N) / O(1)';
-        recommendedPatterns = 'Binary Search on Answer, Matrix Exponentiation, Closed-Form Math';
+        maxClass = 'Columnar OLAP / Sharded Distributed SQL';
+        recommendedPatterns = 'Parquet/DuckDB Vectorized Scan, Dictionary/RLE Encoding, Consistent-Hash Sharding';
       }
 
-      var flatVectorMb = ((n * cap.elemBytes) / (1024 * 1024)).toFixed(2);
-      var pointerNodeMb = ((n * (cap.elemBytes + cap.nodeOverheadBytes)) / (1024 * 1024)).toFixed(2);
-      var segTreeMb = ((4 * n * cap.elemBytes) / (1024 * 1024)).toFixed(2);
-      var cacheLinesScanned = Math.ceil((n * cap.elemBytes) / Math.max(16, cap.cacheLineBytes));
+      var heapTableMb = ((n * cap.elemBytes) / (1024 * 1024)).toFixed(2);
+      var btreeIndexMb = ((n * (16 + cap.nodeOverheadBytes)) / (1024 * 1024)).toFixed(2);
+      var bufferPoolRecommendedMb = ((n * (cap.elemBytes + 16 + cap.nodeOverheadBytes) * 0.25) / (1024 * 1024)).toFixed(2);
+      var pagesScanned = Math.ceil((n * cap.elemBytes) / Math.max(4096, cap.cacheLineBytes));
 
       var latencyItems = [
         { op: 'Buffer Pool L1/DRAM Cache Hit', ns: 100, real: '100 ns', human: '1 min 40 sec', category: 'Buffer Pool', note: 'Shared buffers / OS page cache hit (8KB page already pinned)' },
@@ -571,43 +566,43 @@
           '<section class="eco-card" style="margin-bottom:24px;">' +
             '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:16px;">' +
               '<div>' +
-                '<h2 class="eco-card__title">Interactive DSA Constraints → Complexity &amp; Memory Footprint Calculator</h2>' +
-                '<p class="eco-card__desc">Enter problem input size N, query count Q, time limit, and element byte size to determine maximum feasible Big-O complexity and cache/DRAM footprint.</p>' +
+                '<h2 class="eco-card__title">Interactive SQL Workload → Query Execution, Index &amp; Buffer Pool Sizing Calculator</h2>' +
+                '<p class="eco-card__desc">Enter table cardinality N, target QPS, SLA latency budget, tuple width, and page size (8KB) to size B+Tree indexes, shared_buffers, and physical join/scan strategies.</p>' +
               '</div>' +
-              '<button class="eco-btn eco-btn--primary" data-action="open-capacity-codelab">Benchmark Complexity in CodeLab</button>' +
+              '<button class="eco-btn eco-btn--primary" data-action="open-capacity-codelab">Simulate Cost Model in CodeLab</button>' +
             '</div>' +
 
             '<div class="eco-grid eco-grid--4" style="gap:12px;margin-bottom:20px;">' +
-              '<label class="cap-input-group"><span class="kpi-label">Input Size (N)</span><input type="number" class="knob-select" data-cap-field="inputN" value="' + cap.inputN + '" min="1" step="1000"></label>' +
-              '<label class="cap-input-group"><span class="kpi-label">Queries (Q)</span><input type="number" class="knob-select" data-cap-field="queriesQ" value="' + cap.queriesQ + '" min="1" step="1000"></label>' +
-              '<label class="cap-input-group"><span class="kpi-label">Time Limit (sec)</span><input type="number" class="knob-select" data-cap-field="timeLimitSec" value="' + cap.timeLimitSec + '" min="0.1" max="10" step="0.5"></label>' +
-              '<label class="cap-input-group"><span class="kpi-label">CPU Ops / Sec Budget</span><input type="number" class="knob-select" data-cap-field="opsPerSec" value="' + cap.opsPerSec + '" min="1000000" step="10000000"></label>' +
-              '<label class="cap-input-group"><span class="kpi-label">Element Size (Bytes)</span><input type="number" class="knob-select" data-cap-field="elemBytes" value="' + cap.elemBytes + '" min="1" max="128" step="4"></label>' +
-              '<label class="cap-input-group"><span class="kpi-label">Pointer Node Overhead (B)</span><input type="number" class="knob-select" data-cap-field="nodeOverheadBytes" value="' + cap.nodeOverheadBytes + '" min="0" max="64" step="8"></label>' +
-              '<label class="cap-input-group"><span class="kpi-label">CPU Cache Line (Bytes)</span><input type="number" class="knob-select" data-cap-field="cacheLineBytes" value="' + cap.cacheLineBytes + '" min="32" max="128" step="32"></label>' +
-              '<label class="cap-input-group"><span class="kpi-label">Memory Limit (MB)</span><input type="number" class="knob-select" data-cap-field="memoryLimitMb" value="' + cap.memoryLimitMb + '" min="16" max="2048" step="64"></label>' +
+              '<label class="cap-input-group"><span class="kpi-label">Table Cardinality (N Rows)</span><input type="number" class="knob-select" data-cap-field="inputN" value="' + cap.inputN + '" min="1" step="10000"></label>' +
+              '<label class="cap-input-group"><span class="kpi-label">Peak Queries / Sec (QPS)</span><input type="number" class="knob-select" data-cap-field="queriesQ" value="' + cap.queriesQ + '" min="1" step="500"></label>' +
+              '<label class="cap-input-group"><span class="kpi-label">Query SLA Budget (sec)</span><input type="number" class="knob-select" data-cap-field="timeLimitSec" value="' + cap.timeLimitSec + '" min="0.05" max="10" step="0.05"></label>' +
+              '<label class="cap-input-group"><span class="kpi-label">NVMe IOPS Budget / Node</span><input type="number" class="knob-select" data-cap-field="opsPerSec" value="' + cap.opsPerSec + '" min="1000" step="5000"></label>' +
+              '<label class="cap-input-group"><span class="kpi-label">Avg Tuple Width (Bytes)</span><input type="number" class="knob-select" data-cap-field="elemBytes" value="' + cap.elemBytes + '" min="16" max="2048" step="16"></label>' +
+              '<label class="cap-input-group"><span class="kpi-label">MVCC Tuple Header (Bytes)</span><input type="number" class="knob-select" data-cap-field="nodeOverheadBytes" value="' + cap.nodeOverheadBytes + '" min="0" max="64" step="4"></label>' +
+              '<label class="cap-input-group"><span class="kpi-label">Page Size (Bytes)</span><input type="number" class="knob-select" data-cap-field="cacheLineBytes" value="' + cap.cacheLineBytes + '" min="4096" max="65536" step="4096"></label>' +
+              '<label class="cap-input-group"><span class="kpi-label">shared_buffers RAM (MB)</span><input type="number" class="knob-select" data-cap-field="memoryLimitMb" value="' + cap.memoryLimitMb + '" min="128" max="65536" step="256"></label>' +
             '</div>' +
 
             '<div class="eco-grid eco-grid--4" id="dash-cap-results">' +
               '<div class="eco-card dash-kpi-card">' +
-                '<span class="kpi-label">Max Feasible Time Complexity</span>' +
+                '<span class="kpi-label">Recommended Access Path</span>' +
                 '<strong class="kpi-val" id="cap-peak-qps">' + escapeHtml(maxClass) + '</strong>' +
-                '<span class="kpi-sub">Budget: ~' + budgetOps.toLocaleString() + ' ops (' + cap.timeLimitSec + 's)</span>' +
+                '<span class="kpi-sub">I/O Budget: ~' + budgetOps.toLocaleString() + ' page ops (' + cap.timeLimitSec + 's)</span>' +
               '</div>' +
               '<div class="eco-card dash-kpi-card">' +
-                '<span class="kpi-label">N log₂ N Operations</span>' +
-                '<strong class="kpi-val" id="cap-concurrency">' + nLogN.toLocaleString() + ' ops</strong>' +
-                '<span class="kpi-sub">log₂(N) = ' + log2N + ' levels · Q log₂ N = ' + (q * log2N).toLocaleString() + '</span>' +
+                '<span class="kpi-label">B+Tree Depth &amp; Sort Cost</span>' +
+                '<strong class="kpi-val" id="cap-concurrency">Height ' + btreeHeight + ' (' + (q * btreeHeight).toLocaleString() + ' page seeks/s)</strong>' +
+                '<span class="kpi-sub">Fanout ~' + btreeFanout + ' · External Sort N log₂ N = ' + nLogN.toLocaleString() + '</span>' +
               '</div>' +
               '<div class="eco-card dash-kpi-card">' +
-                '<span class="kpi-label">Contiguous vs Pointer Memory</span>' +
-                '<strong class="kpi-val" id="cap-bandwidth">' + flatVectorMb + ' MB Flat Array</strong>' +
-                '<span class="kpi-sub">Pointer Nodes: ' + pointerNodeMb + ' MB · 4N SegTree: ' + segTreeMb + ' MB</span>' +
+                '<span class="kpi-label">Heap Table vs B+Tree Footprint</span>' +
+                '<strong class="kpi-val" id="cap-bandwidth">' + heapTableMb + ' MB Heap Table</strong>' +
+                '<span class="kpi-sub">B+Tree Index: ' + btreeIndexMb + ' MB · 25% Hot Working Set: ' + bufferPoolRecommendedMb + ' MB</span>' +
               '</div>' +
               '<div class="eco-card dash-kpi-card">' +
-                '<span class="kpi-label">Recommended Algorithmic Patterns</span>' +
+                '<span class="kpi-label">Recommended SQL &amp; Indexing Patterns</span>' +
                 '<strong class="kpi-val" id="cap-storage" style="font-size:0.92rem;">' + escapeHtml(recommendedPatterns) + '</strong>' +
-                '<span class="kpi-sub">Sequential Scan: ' + cacheLinesScanned.toLocaleString() + ' cache lines (' + cap.cacheLineBytes + 'B)</span>' +
+                '<span class="kpi-sub">Full Seq Scan: ' + pagesScanned.toLocaleString() + ' pages (' + Math.round(cap.cacheLineBytes / 1024) + 'KB blocks)</span>' +
               '</div>' +
             '</div>' +
           '</section>' +
@@ -615,8 +610,8 @@
           '<section class="eco-card" style="margin-bottom:24px;">' +
             '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:14px;">' +
               '<div>' +
-                '<h2 class="eco-card__title">Hardware Latency &amp; Algorithmic Operation Timings</h2>' +
-                '<p class="eco-card__desc">Why cache locality and flat arrays beat pointer chasing in practice (if 1 ns = 1 second, 1,000 pointer-chasing tree hops take 1.15 days).</p>' +
+                '<h2 class="eco-card__title">Database Storage, Buffer Pool &amp; Replication Latency Hierarchy</h2>' +
+                '<p class="eco-card__desc">Why buffer pool hit ratios, covering indexes, and sequential page scans outperform uncached random heap fetches (if 1 ns = 1 second, 100k random SSD fetches take 238 years).</p>' +
               '</div>' +
               '<div style="display:flex;gap:8px;">' +
                 '<button class="eco-btn eco-btn--sm ' + (!isHumanScale ? 'eco-btn--primary' : '') + '" data-latency-scale="real">Actual Hardware (ns / ms)</button>' +
@@ -626,11 +621,11 @@
             '<div class="eco-table-wrap">' +
               '<table class="eco-table">' +
                 '<thead><tr>' +
-                  '<th>Operation</th>' +
-                  '<th>Layer</th>' +
+                  '<th>Database Operation</th>' +
+                  '<th>Engine Layer</th>' +
                   '<th>' + (isHumanScale ? 'Humanized (1ns=1s)' : 'Typical Latency') + '</th>' +
                   '<th>Log10 Scale</th>' +
-                  '<th>Algorithmic Implication</th>' +
+                  '<th>Query Planner &amp; Storage Implication</th>' +
                 '</tr></thead>' +
                 '<tbody>' + latencyRowsHtml + '</tbody>' +
               '</table>' +
@@ -640,8 +635,8 @@
           '<section class="eco-card">' +
             '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:14px;">' +
               '<div>' +
-                '<h2 class="eco-card__title">Algorithm &amp; Data Structure Trade-Off Matrix</h2>' +
-                '<p class="eco-card__desc">Side-by-side comparison of hashing schemes, balanced trees, range query structures, graph shortest-path kernels, string automata, and DP optimizations.</p>' +
+                '<h2 class="eco-card__title">Relational &amp; Analytical Database Engine Trade-Off Matrix</h2>' +
+                '<p class="eco-card__desc">Side-by-side comparison of B+Tree/GIN/BRIN indexes, physical join operators, MVCC/SSI isolation levels, B+Tree vs LSM storage engines, and columnar OLAP formats.</p>' +
               '</div>' +
               '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
                 ['all', 'indexing', 'joins', 'isolation', 'storage', 'olap'].map(function(cat) {
@@ -654,11 +649,11 @@
             '<div class="eco-table-wrap">' +
               '<table class="eco-table">' +
                 '<thead><tr>' +
-                  '<th>Data Structure / Algorithm</th>' +
-                  '<th>Update / Build Cost</th>' +
-                  '<th>Query Cost</th>' +
-                  '<th>Sweet Spot</th>' +
-                  '<th>Degenerate Case / Watch Out</th>' +
+                  '<th>Database Mechanism / Operator</th>' +
+                  '<th>Write / Build Cost</th>' +
+                  '<th>Read / Probe Cost</th>' +
+                  '<th>Production Sweet Spot</th>' +
+                  '<th>Failure Mode / Watch Out</th>' +
                   '<th>Deep Dive &amp; Lab</th>' +
                 '</tr></thead>' +
                 '<tbody>' + matrixHtml + '</tbody>' +
@@ -672,40 +667,41 @@
     _openCapacityCodeLab: function() {
       var cap = this._capState;
       var code = [
-        '// DSA Constraints -> Complexity & Memory Footprint Simulator',
-        '// Edit the parameters below and click Run to evaluate asymptotic feasibility!',
+        '// SQL Workload -> Query Cost, B+Tree Index & Buffer Pool Sizing Simulator',
+        '// Edit the workload parameters below and click Run to evaluate Seq Scan vs Index Scan costs!',
         '',
         'const config = ' + JSON.stringify(cap, null, 2) + ';',
         '',
         'const N = config.inputN;',
-        'const Q = config.queriesQ;',
-        'const budgetOps = config.timeLimitSec * config.opsPerSec;',
-        'const log2N = Math.ceil(Math.log2(Math.max(2, N)));',
-        'const nLogN = N * log2N;',
-        'const flatMb = (N * config.elemBytes) / (1024 * 1024);',
-        'const nodeMb = (N * (config.elemBytes + config.nodeOverheadBytes)) / (1024 * 1024);',
-        'const segTreeMb = (4 * N * config.elemBytes) / (1024 * 1024);',
+        'const QPS = config.queriesQ;',
+        'const pageBytes = Math.max(4096, config.cacheLineBytes || 8192);',
+        'const tupleBytes = config.elemBytes + config.nodeOverheadBytes;',
+        'const heapPages = Math.ceil((N * tupleBytes) / pageBytes);',
+        'const btreeHeight = Math.max(1, Math.ceil(Math.log(N) / Math.log(250)));',
+        'const heapMb = (heapPages * pageBytes) / (1024 * 1024);',
+        'const indexMb = (N * (16 + config.nodeOverheadBytes)) / (1024 * 1024);',
+        'const seqScanCost = heapPages * 1.0 + N * 0.01;',
+        'const indexPointSeekCost = btreeHeight * 4.0 + 1.0;',
         '',
-        'console.log("=== DSA COMPLEXITY & MEMORY FOOTPRINT REPORT ===");',
-        'console.log(`Input Size (N)     : ${N.toLocaleString()} | Queries (Q): ${Q.toLocaleString()}`);',
-        'console.log(`Operation Budget   : ${budgetOps.toLocaleString()} ops in ${config.timeLimitSec}s`);',
-        'console.log(`O(N log2 N) Cost   : ${nLogN.toLocaleString()} ops (${((nLogN / budgetOps) * 100).toFixed(1)}% of budget)`);',
-        'console.log(`O(N^2) Cost        : ${(N * N).toLocaleString()} ops (${N * N <= budgetOps ? "FEASIBLE" : "TLE - Exceeds Budget"})`);',
-        'console.log(`Flat Vector Memory : ${flatMb.toFixed(2)} MB (${Math.ceil((N * config.elemBytes) / config.cacheLineBytes).toLocaleString()} cache lines)`);',
-        'console.log(`Pointer Node Memory: ${nodeMb.toFixed(2)} MB (std::set / pointer tree overhead)`);',
-        'console.log(`4N Segment Tree    : ${segTreeMb.toFixed(2)} MB (Limit: ${config.memoryLimitMb} MB)`);'
+        'console.log("=== SQL WORKLOAD, BUFFER POOL & COST ESTIMATOR REPORT ===");',
+        'console.log(`Table Cardinality (N) : ${N.toLocaleString()} rows | Peak Workload: ${QPS.toLocaleString()} QPS`);',
+        'console.log(`Physical Heap Pages   : ${heapPages.toLocaleString()} pages (${(pageBytes / 1024)}KB) -> ${heapMb.toFixed(2)} MB`);',
+        'console.log(`B+Tree Index Footprint: ${indexMb.toFixed(2)} MB (Tree Height: ${btreeHeight} levels)`);',
+        'console.log(`Seq Scan Planner Cost : ${seqScanCost.toFixed(1)} cost units`);',
+        'console.log(`B+Tree Point Seek Cost: ${indexPointSeekCost.toFixed(1)} cost units (${(seqScanCost / indexPointSeekCost).toFixed(0)}x faster)`);',
+        'console.log(`Buffer Pool Fit       : ${(heapMb + indexMb <= config.memoryLimitMb) ? "100% Resident in shared_buffers" : "Exceeds shared_buffers - Partitioning / Covering Index Recommended"}`);'
       ].join('\n');
 
       if (root.App && typeof root.App.openGlobalCodeLab === 'function') {
         root.App.openGlobalCodeLab({
-          labId: 'complexity-estimator',
-          title: 'DSA Complexity & Memory Footprint Simulator',
-          summary: 'Interactive Constraints-to-Big-O & Cache Footprint Model',
+          labId: 'sql-capacity-estimator',
+          title: 'SQL Query Cost, B+Tree & Buffer Pool Sizing Simulator',
+          summary: 'Interactive Relational Cost-Based Optimizer & Buffer Pool Sizing Model',
           mode: 'sandbox',
-          entry: 'complexity-model.js',
+          entry: 'sql-cost-model.js',
           files: {
-            'complexity-model.js': code,
-            'README.md': '# DSA Complexity & Memory Footprint Simulator\n\nClick **Run** to evaluate time-complexity feasibility ($O(N \\log N)$ vs $O(N^2)$) and memory footprint across flat vectors, pointer nodes, and $4N$ segment trees.\n'
+            'sql-cost-model.js': code,
+            'README.md': '# SQL Query Cost, B+Tree & Buffer Pool Sizing Simulator\n\nClick **Run** to evaluate sequential scan vs B+Tree index seek planner costs, 8KB slotted page counts, and `shared_buffers` working-set residency.\n'
           }
         });
       }
