@@ -357,7 +357,7 @@ window.Renderer = (() => {
 
   function highlightSyntax(code, lang) {
     if (!code) return '';
-    const cleanLang = (lang || 'cpp').toLowerCase();
+    const cleanLang = (lang || 'sql').toLowerCase();
 
     const CPP_KEYWORDS = new Set([
       'auto', 'bool', 'break', 'case', 'catch', 'class', 'const', 'constexpr', 'continue',
@@ -399,7 +399,7 @@ window.Renderer = (() => {
     const isPy = ['py', 'python'].includes(cleanLang);
     const isSh = ['sh', 'bash', 'shell', 'zsh'].includes(cleanLang);
     const SQL_KEYWORDS = new Set([
-      "SELECT","FROM","WHERE","JOIN","INNER","LEFT","RIGHT","FULL","OUTER","CROSS","ON","USING","GROUP","BY","HAVING","ORDER","ASC","DESC","NULLS","FIRST","LAST","LIMIT","OFFSET","FETCH","NEXT","ROWS","ONLY","WITH","RECURSIVE","AS","UNION","ALL","INTERSECT","EXCEPT","DISTINCT","CASE","WHEN","THEN","ELSE","END","COALESCE","NULLIF","CAST","OVER","PARTITION","RANGE","GROUPS","UNBOUNDED","PRECEDING","FOLLOWING","CURRENT","ROW","FILTER","WITHIN","EXISTS","IN","NOT","AND","OR","IS","NULL","TRUE","FALSE","BETWEEN","LIKE","ILIKE","SIMILAR","TO","CREATE","TABLE","TEMP","TEMPORARY","VIEW","MATERIALIZED","INDEX","UNIQUE","CONCURRENTLY","DROP","ALTER","ADD","COLUMN","CONSTRAINT","PRIMARY","KEY","FOREIGN","REFERENCES","CHECK","DEFAULT","GENERATED","ALWAYS","IDENTITY","INSERT","INTO","VALUES","UPDATE","SET","DELETE","RETURNING","ON","CONFLICT","DO","NOTHING","MERGE","MATCHED","BEGIN","COMMIT","ROLLBACK","SAVEPOINT","TRANSACTION","ISOLATION","LEVEL","READ","COMMITTED","REPEATABLE","SERIALIZABLE","FOR","SHARE","SKIP","LOCKED","NOWAIT","EXPLAIN","ANALYZE","VACUUM","CLUSTER","REINDEX","PRAGMA","LATERAL"," JSONB","JSON","INT","INTEGER","BIGINT","NUMERIC","DECIMAL","TEXT","VARCHAR","BOOLEAN","TIMESTAMPTZ","TIMESTAMP","DATE","INTERVAL","UUID","COUNT","SUM","AVG","MIN","MAX","ROW_NUMBER","RANK","DENSE_RANK","NTILE","LAG","LEAD","FIRST_VALUE","LAST_VALUE","NTH_VALUE"
+      "SELECT","FROM","WHERE","JOIN","INNER","LEFT","RIGHT","FULL","OUTER","CROSS","ON","USING","GROUP","BY","HAVING","ORDER","ASC","DESC","NULLS","FIRST","LAST","LIMIT","OFFSET","FETCH","NEXT","ROWS","ONLY","WITH","RECURSIVE","AS","UNION","ALL","INTERSECT","EXCEPT","DISTINCT","CASE","WHEN","THEN","ELSE","END","COALESCE","NULLIF","CAST","OVER","PARTITION","RANGE","GROUPS","UNBOUNDED","PRECEDING","FOLLOWING","CURRENT","ROW","FILTER","WITHIN","EXISTS","IN","NOT","AND","OR","IS","NULL","TRUE","FALSE","BETWEEN","LIKE","ILIKE","SIMILAR","TO","CREATE","TABLE","TEMP","TEMPORARY","VIEW","MATERIALIZED","INDEX","UNIQUE","CONCURRENTLY","DROP","ALTER","ADD","COLUMN","CONSTRAINT","PRIMARY","KEY","FOREIGN","REFERENCES","CHECK","DEFAULT","GENERATED","ALWAYS","IDENTITY","INSERT","INTO","VALUES","UPDATE","SET","DELETE","RETURNING","CONFLICT","DO","NOTHING","MERGE","MATCHED","BEGIN","COMMIT","ROLLBACK","SAVEPOINT","TRANSACTION","ISOLATION","LEVEL","READ","COMMITTED","REPEATABLE","SERIALIZABLE","FOR","SHARE","SKIP","LOCKED","NOWAIT","EXPLAIN","ANALYZE","VACUUM","CLUSTER","REINDEX","PRAGMA","LATERAL","JSONB","JSON","INT","INTEGER","BIGINT","NUMERIC","DECIMAL","TEXT","VARCHAR","BOOLEAN","TIMESTAMPTZ","TIMESTAMP","DATE","INTERVAL","UUID","COUNT","SUM","AVG","MIN","MAX","ROW_NUMBER","RANK","DENSE_RANK","NTILE","LAG","LEAD","FIRST_VALUE","LAST_VALUE","NTH_VALUE","WINDOW","ROUND","STRING_AGG","ARRAY_AGG","JSONB_BUILD_OBJECT","GENERATE_SERIES","BUFFERS","COSTS","ROLLUP","CUBE","GROUPING","SETS","PERCENT_RANK","CUME_DIST","GROUP_CONCAT","TOTAL","PRINTF","STRFTIME","DATETIME","JULIANDAY","SUBSTR","INSTR","LENGTH","LOWER","UPPER","REPLACE","TRIM","ABS","RANDOM"
     ]);
     const isSql = ["sql", "postgres", "postgresql", "sqlite", "mysql", "duckdb"].includes(cleanLang);
     const isJs = ['js', 'javascript', 'ts', 'typescript', 'node'].includes(cleanLang);
@@ -500,9 +500,9 @@ window.Renderer = (() => {
   }
 
   function renderTopicCodeBlock(rawCode, lang) {
-    const cleanLang = (lang || 'cpp').toLowerCase();
-    const isRunnable = ['sql', 'postgres', 'postgresql', 'sqlite', 'js', 'javascript', 'ts', 'typescript', 'cpp', 'c++', 'cc', 'cxx', 'c', 'hpp', 'py', 'python', 'node', 'sh', 'bash'].includes(cleanLang);
-    const displayLang = (cleanLang === 'sql' || cleanLang === 'sqlite') ? 'SQL · WASM' : (cleanLang === 'cpp' || cleanLang === 'c++' || cleanLang === 'cc') ? 'C++20' : cleanLang.toUpperCase();
+    const cleanLang = (lang || 'sql').toLowerCase();
+    const isRunnable = ['sql', 'postgres', 'postgresql', 'sqlite', 'js', 'javascript', 'ts', 'typescript', 'py', 'python', 'node', 'sh', 'bash'].includes(cleanLang);
+    const displayLang = (cleanLang === 'sql' || cleanLang === 'sqlite' || cleanLang === 'postgres' || cleanLang === 'postgresql') ? 'SQL · WASM' : cleanLang.toUpperCase();
     const unescaped = unescapeHtml(rawCode).trim();
     const lineCount = unescaped ? unescaped.split('\n').length : 0;
     const isSqlLang = ['sql', 'sqlite', 'postgres', 'postgresql', 'mysql', 'duckdb'].includes(cleanLang);
@@ -511,7 +511,8 @@ window.Renderer = (() => {
     const initialExpanded = !isLong;
 
     const runBtn = isRunnable
-      ? `<button type="button" class="code-block__copy code-block__run-btn" data-action="run-snippet-codelab" data-lang="${escapeHtml(cleanLang)}" title="Execute this snippet in the in-browser CodeLab IDE"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"/></svg><span>Run in CodeLab</span></button>`
+      ? `<button type="button" class="code-block__copy code-block__run-btn" data-action="run-sql-inline" data-lang="${escapeHtml(cleanLang)}" title="Execute and visualize this SQL query step-by-step inline"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"/></svg><span>Run &amp; Visualize SQL</span></button>` +
+        `<button type="button" class="code-block__copy" data-action="open-sql-studio" data-lang="${escapeHtml(cleanLang)}" title="Open this query in Full-Screen SQL Studio"><span>⤢ SQL Studio</span></button>`
       : '';
 
     const copyBtn = `<button type="button" class="code-block__copy" data-action="copy-code" title="Copy code to clipboard">Copy</button>`;
@@ -612,28 +613,28 @@ window.Renderer = (() => {
   }
 
   function renderTopicCodeLabCard(slug, unit, mod, moduleContent) {
-    let fallbackCpp = '';
+    let fallbackSql = '';
     if (moduleContent?.content) {
-      const m = moduleContent.content.match(/<pre><code\s+class=["']language-cpp["']>([\s\S]*?)<\/code><\/pre>/);
-      if (m) fallbackCpp = m[1];
+      const m = moduleContent.content.match(/<pre><code\s+class=["']language-sql["']>([\s\S]*?)<\/code><\/pre>/);
+      if (m) fallbackSql = m[1];
     }
     const lab = (window.TopicGuidedLabs && typeof window.TopicGuidedLabs.getLab === 'function')
-      ? window.TopicGuidedLabs.getLab(slug, fallbackCpp, unit?.title)
+      ? window.TopicGuidedLabs.getLab(slug, fallbackSql, unit?.title)
       : null;
     if (!lab) return '';
 
     const steps = Array.isArray(lab.steps) ? lab.steps : [];
-    const labTitle = lab.title || `${unit?.title || 'Interactive'} — Guided SQL & Engine Coding Practice`;
-    const labSummary = lab.summary || 'Hands-on algorithm implementation with step-by-step progressive hints and automated C++20 verification.';
+    const labTitle = lab.title || `${unit?.title || 'Interactive'} — Guided SQL & Relational Execution Lab`;
+    const labSummary = lab.summary || 'Interactive 3-Step Guided SQL Lab & Step-by-Step Table Visualizer (PostgreSQL 18 WASM & SQLite 3 WASM).';
     const totalSteps = steps.length || 3;
-    const comp = lab.complexity || { time: 'O(N log N)', space: 'O(N)', pattern: mod?.title || 'Algorithmic Invariants' };
+    const comp = lab.complexity || { time: 'O(N log N)', space: 'O(N)', pattern: mod?.title || 'Relational Algebra & Query Planning' };
 
     return `
-      <section class="build-lab-card topic-codelab-hero" id="guided-coding-practice-${escapeHtml(slug)}" aria-label="Guided Algorithm Coding Practice">
+      <section class="build-lab-card topic-codelab-hero" id="guided-coding-practice-${escapeHtml(slug)}" aria-label="Guided SQL & Relational Execution Lab">
         <div class="build-lab-card__top">
           <div class="build-lab-card__intro">
             <div class="build-lab-card__eyebrow">
-              <span>Guided SQL & Database Engine Practice · Browser WASM Workbench</span>
+              <span>Interactive 3-Step Guided SQL Lab &amp; Step-by-Step Table Visualizer (PostgreSQL 18 WASM &amp; SQLite 3 WASM)</span>
               <span class="build-lab-card__progress">${totalSteps} Guided Steps + Progressive Hints</span>
               ${steps.length ? `
                 <button type="button" class="build-lab-card__collapse-btn" data-action="toggle-lab-steps" aria-expanded="true" title="Collapse or expand guided coding steps">
@@ -647,7 +648,8 @@ window.Renderer = (() => {
             <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;">
               <span class="badge">⏱ Target Time: <code>${escapeHtml(comp.time || 'O(N log N)')}</code></span>
               <span class="badge">💾 Auxiliary Space: <code>${escapeHtml(comp.space || 'O(N)')}</code></span>
-              <span class="badge">🧭 Pattern: ${escapeHtml(comp.pattern || mod?.title || 'Core Invariants')}</span>
+              <span class="badge">🧭 Pattern: ${escapeHtml(comp.pattern || mod?.title || 'Relational Invariants')}</span>
+              ${lab.datasetId ? `<span class="badge">🗄️ Dataset: <code>${escapeHtml(lab.datasetId)}</code></span>` : ''}
             </div>
           </div>
           <div class="build-lab-card__cta-col">
@@ -665,11 +667,11 @@ window.Renderer = (() => {
         ${steps.length ? `
           <div class="build-lab-steps-grid">
             ${steps.map((s, idx) => {
-              const defaultPhases = ['Phase 1 · State & Boundaries', 'Phase 2 · Core Transition', 'Phase 3 · Verification & Bounds'];
-              const phaseLabel = s.phase || defaultPhases[idx] || `Phase ${idx + 1} · Implementation`;
+              const defaultPhases = ['Step 1 · Schema & Base Projection', 'Step 2 · Relational Transformation', 'Step 3 · Verification & Query Plan'];
+              const phaseLabel = s.phase || defaultPhases[idx] || `Step ${idx + 1} · SQL Implementation`;
               const stepTitle = (s.title || `Step ${idx + 1}`).replace(/^Step\s*\d+:\s*/i, '');
               return `
-              <div class="build-lab-step-card">
+              <div class="build-lab-step-card" data-step="${idx}" data-step-index="${idx}">
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">0${idx + 1}</span>
@@ -677,18 +679,18 @@ window.Renderer = (() => {
                   </div>
                   <div class="build-lab-step-card__title">${escapeHtml(stepTitle)}</div>
                   ${s.concept ? `<div class="build-lab-step-card__invariant">${formatInlineCode(s.concept)}</div>` : ''}
-                  <div class="build-lab-step-card__concept">${formatInlineCode(s.instructions || 'Implement and verify core invariants in `src/main.cpp`.')}</div>
+                  <div class="build-lab-step-card__concept">${formatInlineCode(s.instructions || 'Write and verify the SQL query in `query.sql`.')}</div>
                   ${s.hint ? `
                     <details class="quiz-hint-details">
-                      <summary>💡 Progressive Hint (Step ${idx + 1})</summary>
+                      <summary>💡 Progressive SQL Hint (Step ${idx + 1})</summary>
                       <pre><code>${escapeHtml(s.hint)}</code></pre>
                     </details>
                   ` : ''}
                 </div>
                 <div class="build-lab-step-card__footer">
-                  <span>Step ${idx + 1} of ${steps.length} · <code>src/main.cpp</code></span>
-                  <button type="button" class="btn btn--sm btn--outline" data-action="open-topic-codelab" data-slug="${escapeHtml(slug)}" data-mode="guided" data-step-index="${idx}">
-                    Code Step ${idx + 1} →
+                  <span>Step ${idx + 1} of ${steps.length} · <code>query.sql</code></span>
+                  <button type="button" class="btn btn--sm btn--outline" data-action="open-topic-codelab" data-slug="${escapeHtml(slug)}" data-mode="guided" data-step="${idx}" data-step-index="${idx}">
+                    Load Step ${idx + 1} SQL →
                   </button>
                 </div>
               </div>
@@ -696,6 +698,8 @@ window.Renderer = (() => {
             }).join('')}
           </div>
         ` : ''}
+
+        <div class="sql-guided-lab-host" id="sql-guided-lab-${escapeHtml(slug)}" data-sql-lab-slug="${escapeHtml(slug)}"></div>
       </section>
     `;
   }
@@ -978,7 +982,7 @@ window.Renderer = (() => {
               ${badgeHtml}
             </div>
             ${b.summary ? `<span class="lesson-builds__summary">${escapeHtml(b.summary)}</span>` : ''}
-            <span class="lesson-builds__cta">${icons.terminal} Open Guided SQL & Engine Lab (SQL, TypeScript, C++20 &amp; JS) →</span>
+            <span class="lesson-builds__cta">${icons.terminal} Open Guided SQL &amp; Engine Lab (PostgreSQL 18 WASM, SQLite 3 &amp; Step-by-Step Relational Table Visualizer) →</span>
           </a>`;
         }).join('')}
       </div>`;
@@ -995,7 +999,7 @@ window.Renderer = (() => {
     if (!challenges.length) return '';
     return `
       <div class="lesson-builds lesson-challenges">
-        <h3 class="lesson-builds__title">${icons.target} Debug This in Production — Incident Simulator &amp; Code Hotfix</h3>
+        <h3 class="lesson-builds__title">${icons.target} Debug This in Production — Incident Simulator &amp; SQL Hotfix</h3>
         ${challenges.map(c => `
           <a class="lesson-builds__item" href="/challenges/${c.id}/" data-nav="challenges" data-challenge="${c.id}">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
@@ -1003,7 +1007,7 @@ window.Renderer = (() => {
               <span class="badge">${escapeHtml(c.severity || 'SEV-1')} · ${escapeHtml(c.difficulty || 'Senior')}</span>
             </div>
             ${c.subtitle ? `<span class="lesson-builds__summary">${escapeHtml(c.subtitle)}</span>` : ''}
-            <span class="lesson-builds__cta">${icons.terminal} Launch Production Incident &amp; CodeLab Hotfix →</span>
+            <span class="lesson-builds__cta">${icons.terminal} Launch Production Incident &amp; SQL Studio Hotfix →</span>
           </a>`).join('')}
       </div>`;
   }
@@ -1084,16 +1088,16 @@ window.Renderer = (() => {
         </div>
       </div>
 
-      <section class="build-lab-card" aria-label="Guided Algorithm Lab Overview">
+      <section class="build-lab-card" aria-label="Guided SQL & Storage Engine Lab Overview">
         <div class="build-lab-card__top">
           <div class="build-lab-card__intro">
             <div class="build-lab-card__eyebrow">
-              <span>Guided Algorithm Coding Lab</span>
+              <span>Guided SQL &amp; Storage Engine Lab</span>
               <span class="build-lab-card__progress" id="build-lab-progress-badge">${completedIds.length}/${totalSteps} Steps Completed</span>
             </div>
-            <h2 class="build-lab-card__title">Code &amp; Verify SQL &amp; Storage Engine Invariants in the Browser Workbench</h2>
+            <h2 class="build-lab-card__title">Execute &amp; Verify SQL &amp; Storage Engine Invariants in the Browser SQL Studio</h2>
             <p class="build-lab-card__desc">
-              Complete ${totalSteps} progressive algorithmic steps with guided hints in <strong>C++20 (WebAssembly)</strong>, <strong>TypeScript</strong>, or <strong>JavaScript</strong> against automated unit test assertions — zero local setup required.
+              Complete ${totalSteps} progressive relational steps with guided hints in <strong>PostgreSQL 18 WASM, SQLite 3 &amp; Step-by-Step Relational Table Visualizer</strong> against automated result-set and query-plan assertions — zero local setup required.
             </p>
             <div class="build-lab-progress-track" aria-hidden="true">
               <div class="build-lab-progress-track__fill" style="width:${progressPct}%"></div>
@@ -1102,11 +1106,11 @@ window.Renderer = (() => {
           <div class="build-lab-card__cta-col">
             <button type="button" class="btn btn--primary build-lab-card__launch-btn" data-action="open-code-lab" data-lab-mode="guided">
               ${icons.terminal}
-              <span>Launch Guided Lab</span>
+              <span>Launch SQL Studio Lab</span>
             </button>
             <button type="button" class="btn btn--outline build-lab-card__launch-btn" data-action="open-code-lab" data-lab-mode="sandbox">
               ${icons.code}
-              <span>Open Full Solution</span>
+              <span>Open Reference SQL</span>
             </button>
           </div>
         </div>
@@ -1762,9 +1766,9 @@ window.Renderer = (() => {
           </div>
 
           <div class="project-card__actions">
-            <button type="button" class="btn btn--sm btn--secondary project-card__btn" data-action="open-repo-codelab" data-repo="${escapeHtml(project.githubRepo || ('innovatorved/' + project.name))}" data-title="${safeName}" title="Clone and explore ${safeName} inside the in-browser CodeLab IDE">
+            <button type="button" class="btn btn--sm btn--secondary project-card__btn" data-action="open-repo-codelab" data-repo="${escapeHtml(project.githubRepo || ('innovatorved/' + project.name))}" data-title="${safeName}" title="Inspect ${safeName} schema &amp; queries in the in-browser SQL Studio">
               ${icons.terminal}
-              <span>Explore in CodeLab</span>
+              <span>Explore in SQL Studio</span>
             </button>
             <a href="${project.githubUrl}" target="_blank" rel="noopener noreferrer" class="btn btn--sm btn--secondary project-card__btn" aria-label="${safeName} GitHub repository" data-repo-placement="card_footer_github">
               ${icons.github}
@@ -1808,7 +1812,7 @@ window.Renderer = (() => {
         <h1 class="lesson-header__title">SQL &amp; Database Internals Projects &amp; Case Studies</h1>
         <div class="lesson-header__actions" style="margin-top: var(--space-3); display: flex; gap: var(--space-3); flex-wrap: wrap;">
           <a href="/" data-nav="home" class="btn btn--sm btn--secondary">← Back to Curriculum</a>
-          <a href="https://code-lab-3dr.pages.dev" target="_blank" rel="noopener noreferrer" class="btn btn--sm btn--primary">${icons.code} Launch CodeLab Cloud IDE</a>
+          <a href="/sandbox/" data-nav="sandbox" class="btn btn--sm btn--primary">${icons.code} Launch Interactive SQL Workbench</a>
         </div>
       </div>
 

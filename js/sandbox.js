@@ -79,6 +79,25 @@
     _lastQueryBlueprint: null,
     _simMetrics: null,
 
+    // Top-level SQL Workbench Mode ('sql-studio' default | 'architecture-canvas')
+    _activeWorkbenchMode: 'sql-studio',
+    _sqlStudioDatasetId: '__unified__',
+    _sqlStudioEngine: 'postgres',
+    _sqlStudioQuery: [
+      '-- Interactive SQL & Table Studio (PostgreSQL 18 WASM & SQLite 3 WASM)',
+      '-- Press Cmd/Ctrl+Enter or click "▶ Execute SQL" to run & visualize each relational clause',
+      'SELECT c.tier,',
+      '       c.country,',
+      '       COUNT(DISTINCT c.customer_id) AS customers,',
+      '       COUNT(o.order_id) AS total_orders,',
+      '       ROUND(COALESCE(SUM(o.total_amount), 0), 2) AS gross_revenue',
+      'FROM customers c',
+      'LEFT JOIN orders o ON o.customer_id = c.customer_id AND o.status IN (\'paid\', \'shipped\', \'delivered\')',
+      'GROUP BY c.tier, c.country',
+      'ORDER BY gross_revenue DESC;'
+    ].join('\n'),
+    _sqlStudioVizHandle: null,
+
     // Active canvas state (synced with active board)
     _activeBlueprintId: 'sargable-composite-index-selector',
     _nodes: [],
@@ -716,111 +735,218 @@
     simulateActiveBoardInCodeLab: function() {
       var board = this._getActiveBoard();
       var title = (board && board.title) ? board.title : 'Architecture Topology';
-      var nodes = (this._nodes || []).map(function(n, idx) {
-        return {
-          id: n.id,
-          type: n.type || 'Microservice',
-          name: n.name || (n.type + '-' + (idx + 1)),
-          replicas: n.replicas || n.instances || 2,
-          port: 3000 + idx
-        };
-      });
-      var nodeById = {};
-      nodes.forEach(function(n) { nodeById[n.id] = n; });
-      var edges = (this._connections || []).map(function(c) {
-        var s = nodeById[c.from];
-        var t = nodeById[c.to];
-        if (!s || !t) return null;
-        return {
-          fromId: s.id,
-          toId: t.id,
-          fromName: s.name,
-          toName: t.name,
-          fromPort: s.port,
-          toPort: t.port,
-          label: c.label || 'RPC'
-        };
-      }).filter(Boolean);
+      var nodes = this._nodes || [];
+      var connections = this._connections || [];
+      var nodeListComment = nodes.map(function(n) {
+        return '--   Node: ' + (n.name || n.type) + ' [' + n.type + '] (' + (n.replicas || n.instances || 1) + 'x)';
+      }).join('\n');
 
-      var entryPort = nodes.length > 0 ? nodes[0].port : 3000;
-      var clusterCode = [
-        "const http = require('node:http');",
-        "const { Database } = require('bun:sqlite');",
-        "",
-        "// Generated from Architecture Whiteboard: " + title,
-        "const TOPOLOGY = " + JSON.stringify({ title: title, nodes: nodes, edges: edges }, null, 2) + ";",
-        "",
-        "const db = new Database('whiteboard-state.db');",
-        "db.exec('CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY, node TEXT, port INTEGER, path TEXT, ts INTEGER)');",
-        "",
-        "function requestUpstream(targetPort, path, fromPort) {",
-        "  return new Promise((resolve, reject) => {",
-        "    const req = http.request({ hostname: 'localhost', port: targetPort, path, method: 'GET', _fromPort: fromPort }, (res) => {",
-        "      let body = '';",
-        "      res.on('data', (c) => (body += c));",
-        "      res.on('end', () => resolve({ status: res.statusCode, body }));",
-        "    });",
-        "    req.on('error', reject);",
-        "    req.end();",
-        "  });",
-        "}",
-        "",
-        "async function bootTopology() {",
-        "  for (const node of TOPOLOGY.nodes) {",
-        "    const outEdges = TOPOLOGY.edges.filter((e) => e.fromPort === node.port);",
-        "    const srv = http.createServer(async (req, res) => {",
-        "      db.query('INSERT INTO events (node, port, path, ts) VALUES (?, ?, ?, ?)').run(node.name, node.port, req.url || '/', Date.now());",
-        "      const downstream = [];",
-        "      for (const edge of outEdges) {",
-        "        try {",
-        "          const up = await requestUpstream(edge.toPort, req.url || '/hop', node.port);",
-        "          downstream.push({ target: edge.toName, port: edge.toPort, protocol: edge.label, status: up.status });",
-        "        } catch (err) {",
-        "          downstream.push({ target: edge.toName, port: edge.toPort, error: err.code || err.message });",
-        "        }",
-        "      }",
-        "      const failed = downstream.some((d) => d.error || d.status >= 500);",
-        "      res.writeHead(failed ? 502 : 200, { 'content-type': 'application/json' });",
-        "      res.end(JSON.stringify({ service: node.name, type: node.type, port: node.port, replicas: node.replicas, downstream }));",
-        "    });",
-        "    await new Promise((r) => srv.listen(node.port, r));",
-        "    console.log('✓ [' + node.type + '] ' + node.name + ' listening on http://localhost:' + node.port);",
-        "  }",
-        "  console.log('\\n=== Live Topology Booted (' + TOPOLOGY.nodes.length + ' nodes, ' + TOPOLOGY.edges.length + ' edges) ===');",
-        "  console.log('Try in terminal:');",
-        "  console.log('  hey -n 40 -c 8 http://localhost:' + entryPort + '/api');",
-        "  console.log('  chaos latency ' + (TOPOLOGY.nodes[1] ? TOPOLOGY.nodes[1].port : entryPort) + ' 200');",
-        "  console.log('  sqlite3 -column -header whiteboard-state.db \"SELECT node, port, COUNT(*) AS hits FROM events GROUP BY node\"');",
-        "}",
-        "",
-        "bootTopology();"
-      ].join('\n') + '\n';
+      this._sqlStudioQuery = [
+        '-- Diagnostic SQL Query for Topology: ' + title + ' (' + nodes.length + ' nodes, ' + connections.length + ' edges)',
+        nodeListComment || '--   (Default relational cluster topology)',
+        'SELECT c.customer_id,',
+        '       c.name,',
+        '       c.tier,',
+        '       COUNT(o.order_id) AS order_count,',
+        '       ROUND(COALESCE(SUM(o.total_amount), 0), 2) AS total_spend,',
+        '       RANK() OVER (PARTITION BY c.tier ORDER BY COALESCE(SUM(o.total_amount), 0) DESC) AS tier_rank',
+        'FROM customers c',
+        'LEFT JOIN orders o ON o.customer_id = c.customer_id',
+        'GROUP BY c.customer_id, c.name, c.tier',
+        'ORDER BY total_spend DESC',
+        'LIMIT 15;'
+      ].join('\n');
+      this._activeWorkbenchMode = 'sql-studio';
+      this.render();
+    },
 
-      var readme = [
-        '# ' + title + ' — Live CodeLab Cluster Simulation',
-        '',
-        'Compiled directly from your **Architecture Whiteboard** (' + nodes.length + ' nodes, ' + edges.length + ' connections).',
-        '',
-        '### Quick Start',
-        '1. Click **Run** (or run `node cluster.js &` in the terminal) to bind every whiteboard node to its own virtual loopback port (`:' + entryPort + '` .. `:' + (entryPort + Math.max(0, nodes.length - 1)) + '`).',
-        '2. Open the **Ports** or **Network** tab in the bottom drawer to see the live **Service Topology Map**, **SLO Telemetry Bar**, and **1-Click Chaos Injection** controls (`+200ms`, `25% 503`, `Crash`).',
-        '3. Benchmark with `hey -n 50 -c 10 http://localhost:' + entryPort + '/api`!'
-      ].join('\n') + '\n';
+    _getSqlStudioTemplates: function() {
+      return [
+        {
+          id: 'join-agg',
+          label: '1. Multi-Table Join & Aggregation (customers + orders)',
+          datasetId: 'ecommerce',
+          sql: [
+            '-- Multi-Table LEFT JOIN & Revenue Aggregation across Customer Tiers',
+            'SELECT c.tier,',
+            '       c.country,',
+            '       COUNT(DISTINCT c.customer_id) AS customers,',
+            '       COUNT(o.order_id) AS total_orders,',
+            '       ROUND(COALESCE(SUM(o.total_amount), 0), 2) AS gross_revenue',
+            'FROM customers c',
+            'LEFT JOIN orders o ON o.customer_id = c.customer_id AND o.status IN (\'paid\', \'shipped\', \'delivered\')',
+            'GROUP BY c.tier, c.country',
+            'ORDER BY gross_revenue DESC;'
+          ].join('\n')
+        },
+        {
+          id: 'window-fn',
+          label: '2. Window Functions: RANK, LAG & Moving Average (salary_history)',
+          datasetId: 'org_hr',
+          sql: [
+            '-- Window Functions: Department Salary Ranking & Compensation Progression',
+            'SELECT e.emp_id,',
+            '       e.full_name,',
+            '       d.dept_name,',
+            '       e.title,',
+            '       e.salary_usd,',
+            '       RANK() OVER (PARTITION BY e.dept_id ORDER BY e.salary_usd DESC) AS dept_salary_rank,',
+            '       ROUND(e.salary_usd - AVG(e.salary_usd) OVER (PARTITION BY e.dept_id), 0) AS diff_from_dept_avg',
+            'FROM employees e',
+            'JOIN departments d ON d.dept_id = e.dept_id',
+            'ORDER BY d.dept_name ASC, dept_salary_rank ASC;'
+          ].join('\n')
+        },
+        {
+          id: 'recursive-cte',
+          label: '3. Recursive CTE: Organizational Reporting Hierarchy (employees)',
+          datasetId: 'org_hr',
+          sql: [
+            '-- Recursive CTE: Traverse Management Reporting Tree from CEO Downward',
+            'WITH RECURSIVE org_tree AS (',
+            '  SELECT emp_id, full_name, title, manager_id, 0 AS depth, full_name AS path',
+            '  FROM employees',
+            '  WHERE manager_id IS NULL',
+            '  UNION ALL',
+            '  SELECT e.emp_id, e.full_name, e.title, e.manager_id, t.depth + 1, t.path || \' -> \' || e.full_name',
+            '  FROM employees e',
+            '  JOIN org_tree t ON e.manager_id = t.emp_id',
+            ')',
+            'SELECT emp_id, depth, full_name, title, path',
+            'FROM org_tree',
+            'ORDER BY depth ASC, emp_id ASC;'
+          ].join('\n')
+        },
+        {
+          id: 'ledger-audit',
+          label: '4. Double-Entry Ledger Balance Verification (accounts + journal_entries)',
+          datasetId: 'fintech_ledger',
+          sql: [
+            '-- Double-Entry Ledger Invariant Check: Reconcile Posted Debits & Credits per Account',
+            'SELECT a.account_id,',
+            '       a.owner_name,',
+            '       a.account_type,',
+            '       ROUND(a.balance_cents / 100.0, 2) AS book_balance_usd,',
+            '       COUNT(j.entry_id) AS journal_postings,',
+            '       ROUND(COALESCE(SUM(CASE WHEN j.direction = \'CR\' THEN j.amount_cents ELSE -j.amount_cents END), 0) / 100.0, 2) AS net_journal_delta_usd',
+            'FROM accounts a',
+            'LEFT JOIN journal_entries j ON j.account_id = a.account_id',
+            'GROUP BY a.account_id, a.owner_name, a.account_type, a.balance_cents',
+            'ORDER BY a.account_id ASC;'
+          ].join('\n')
+        },
+        {
+          id: 'saas-cohort',
+          label: '5. SaaS Funnel & Telemetry Engagement Cohort (saas_users + user_events)',
+          datasetId: 'saas_telemetry',
+          sql: [
+            '-- SaaS Telemetry Cohort: Event Volume, P95 Latency & Plan MRR Breakdown',
+            'SELECT u.user_id,',
+            '       u.company_name,',
+            '       s.plan_name,',
+            '       s.mrr_usd,',
+            '       COUNT(e.event_id) AS total_events,',
+            '       ROUND(AVG(e.latency_ms), 1) AS avg_latency_ms,',
+            '       MAX(e.latency_ms) AS max_latency_ms',
+            'FROM saas_users u',
+            'LEFT JOIN subscriptions s ON s.user_id = u.user_id AND s.status = \'active\'',
+            'LEFT JOIN user_events e ON e.user_id = u.user_id',
+            'GROUP BY u.user_id, u.company_name, s.plan_name, s.mrr_usd',
+            'ORDER BY total_events DESC;'
+          ].join('\n')
+        },
+        {
+          id: 'explain-sargable',
+          label: '6. SARGable Index Probe & Composite Order Lookup (EXPLAIN QUERY PLAN)',
+          datasetId: 'ecommerce',
+          sql: [
+            '-- SARGable Composite Index Probe on idx_orders_customer_date (customer_id, created_at)',
+            'SELECT o.order_id,',
+            '       o.customer_id,',
+            '       c.name AS customer_name,',
+            '       o.status,',
+            '       o.total_amount,',
+            '       o.created_at',
+            'FROM orders o',
+            'JOIN customers c ON c.customer_id = o.customer_id',
+            'WHERE o.customer_id IN (1, 2, 4)',
+            '  AND o.created_at >= \'2025-02-01\'',
+            'ORDER BY o.created_at DESC;'
+          ].join('\n')
+        }
+      ];
+    },
 
-      if (root.App && typeof root.App.openGlobalCodeLab === 'function') {
-        root.App.openGlobalCodeLab({
-          labId: 'whiteboard-' + (this._activeBlueprintId || 'cluster'),
-          title: title + ' — Live Cluster Simulation',
-          summary: 'Multi-node HTTP & SQLite topology compiled from the Architecture Whiteboard (' + nodes.length + ' services)',
-          mode: 'sandbox',
-          entry: 'cluster.js',
-          files: {
-            'cluster.js': clusterCode,
-            'topology.json': JSON.stringify({ title: title, nodes: nodes, edges: edges }, null, 2) + '\n',
-            'README.md': readme
-          }
-        });
+    _renderSqlStudioSchemaExplorer: function() {
+      var datasets = root.SQL_DATASETS || {};
+      var dsKeys = Object.keys(datasets);
+      var activeDs = this._sqlStudioDatasetId || '__unified__';
+
+      return dsKeys.map(function(dsKey) {
+        var ds = datasets[dsKey];
+        if (!ds) return '';
+        var isCurrentDs = (activeDs === '__unified__' || activeDs === dsKey);
+        var tables = ds.tables || [];
+        var tablesHtml = tables.map(function(t) {
+          var cols = t.columns || [];
+          var colsHtml = cols.map(function(colStr) {
+            var parts = colStr.trim().split(/\s+/);
+            var colName = parts[0] || '';
+            var colType = parts[1] || 'TEXT';
+            var isPk = /PRIMARY\s+KEY/i.test(colStr) || /_id$|^id$/i.test(colName);
+            var isFk = /REFERENCES/i.test(colStr) || (!isPk && /_id$/i.test(colName));
+            return (
+              '<div style="display:flex;justify-content:space-between;align-items:center;padding:2px 6px;font-size:0.73rem;font-family:var(--font-mono);color:var(--fg-muted);">' +
+                '<span>' + escapeHtml(colName) +
+                  (isPk ? ' <span class="col-badge col-badge--pk" style="font-size:0.62rem;padding:0 4px;">PK</span>' : '') +
+                  (isFk ? ' <span class="col-badge" style="font-size:0.62rem;padding:0 4px;">FK</span>' : '') +
+                '</span>' +
+                '<span style="color:var(--fg-faint);">' + escapeHtml(colType) + '</span>' +
+              '</div>'
+            );
+          }).join('');
+
+          return (
+            '<div class="sql-schema-table-item" style="margin-bottom:6px;border:1px solid var(--border);border-radius:6px;background:var(--bg);overflow:hidden;">' +
+              '<button type="button" data-sql-preview-table="' + escapeHtml(t.name) + '" data-sql-preview-ds="' + escapeHtml(dsKey) + '" style="width:100%;display:flex;justify-content:space-between;align-items:center;padding:6px 8px;background:var(--surface);border:none;color:var(--fg);font-family:var(--font-mono);font-size:0.78rem;font-weight:600;cursor:pointer;text-align:left;" title="Click to preview SELECT * FROM ' + escapeHtml(t.name) + ' LIMIT 15;">' +
+                '<span>▤ ' + escapeHtml(t.name) + '</span>' +
+                '<span style="font-size:0.68rem;color:var(--fg-muted);font-weight:400;">' + (t.rowCount || 0) + ' rows</span>' +
+              '</button>' +
+              '<div style="padding:4px 4px 6px;border-top:1px solid var(--border);">' + colsHtml + '</div>' +
+            '</div>'
+          );
+        }).join('');
+
+        return (
+          '<details class="sql-schema-ds-group" ' + (isCurrentDs ? 'open' : '') + ' style="margin-bottom:10px;border:1px solid var(--border-strong);border-radius:8px;background:var(--surface);padding:6px 8px;">' +
+            '<summary style="cursor:pointer;font-size:0.8rem;font-weight:700;color:var(--fg);display:flex;justify-content:space-between;align-items:center;padding:2px 0;">' +
+              '<span>🗄️ ' + escapeHtml(ds.title || dsKey) + '</span>' +
+              '<span class="eco-pill" style="font-size:0.68rem;">' + tables.length + ' tables</span>' +
+            '</summary>' +
+            '<div style="margin-top:8px;">' + tablesHtml + '</div>' +
+          '</details>'
+        );
+      }).join('');
+    },
+
+    _mountSqlStudioVisualizer: function(opts) {
+      if (!this._container || this._activeWorkbenchMode !== 'sql-studio') return;
+      opts = opts || {};
+      var slot = this._container.querySelector('#wb-sql-studio-visualizer-slot');
+      var editor = this._container.querySelector('#wb-sql-studio-editor');
+      var sql = editor ? editor.value.trim() : this._sqlStudioQuery;
+      if (sql) this._sqlStudioQuery = sql;
+      if (!slot || !root.TableVisualizer || typeof root.TableVisualizer.mountClauseVisualizer !== 'function') return;
+
+      if (this._sqlStudioVizHandle && typeof this._sqlStudioVizHandle.stop === 'function') {
+        this._sqlStudioVizHandle.stop();
       }
+      this._sqlStudioVizHandle = root.TableVisualizer.mountClauseVisualizer(slot, sql, {
+        datasetId: this._sqlStudioDatasetId || '__unified__',
+        referenceSql: sql,
+        startAtFinal: opts.startAtFinal !== false,
+        runTests: Boolean(opts.runTests)
+      });
     },
 
     _triggerDownload: function(content, filename, mime) {
@@ -969,6 +1095,104 @@
       var inspectorHtml = this._renderInspectorPanel(blocks);
       var capacityPanelHtml = this._renderCapacityEstimator(cap);
 
+      var modeSwitcherHtml =
+        '<div class="wb-mode-switcher" role="tablist" aria-label="SQL Workbench Mode Switcher" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;margin-bottom:4px;">' +
+          '<button type="button" role="tab" aria-selected="' + (this._activeWorkbenchMode === 'sql-studio') + '" class="eco-btn ' + (this._activeWorkbenchMode === 'sql-studio' ? 'eco-btn--primary' : '') + '" data-workbench-mode="sql-studio">' +
+            '⚡ Interactive SQL &amp; Table Studio (PostgreSQL 18 / SQLite WASM)' +
+          '</button>' +
+          '<button type="button" role="tab" aria-selected="' + (this._activeWorkbenchMode === 'architecture-canvas') + '" class="eco-btn ' + (this._activeWorkbenchMode === 'architecture-canvas' ? 'eco-btn--primary' : '') + '" data-workbench-mode="architecture-canvas">' +
+            '🗺️ Database Architecture &amp; Sharding Canvas' +
+          '</button>' +
+        '</div>';
+
+      if (this._activeWorkbenchMode === 'sql-studio') {
+        var templates = this._getSqlStudioTemplates();
+        var templateOptionsHtml = '<option value="">— Select Curated SQL Query Template —</option>' +
+          templates.map(function(t) {
+            return '<option value="' + escapeHtml(t.id) + '">' + escapeHtml(t.label) + '</option>';
+          }).join('');
+
+        var schemaExplorerHtml = this._renderSqlStudioSchemaExplorer();
+
+        this._container.innerHTML =
+          '<div class="view-canvas sandbox-view">' +
+            '<header class="view-header">' +
+              '<div class="view-header__top">' +
+                '<div class="view-header__content">' +
+                  '<div class="view-badge-row">' +
+                    '<span class="eco-pill eco-pill--accent">Interactive SQL &amp; Table Studio</span>' +
+                    '<span class="eco-pill">PostgreSQL 18 (PGlite WASM) &amp; SQLite 3.46 WASM</span>' +
+                    '<span class="eco-pill">5 Relational Datasets · 27 Tables</span>' +
+                    '<span class="eco-pill">Step-by-Step Clause Visualizer</span>' +
+                  '</div>' +
+                  '<h1 class="view-title">SQL Workbench &amp; Relational Execution Studio</h1>' +
+                  '<p class="view-subtitle">Write and execute real SQL queries in your browser, inspect schemas &amp; foreign keys across 5 relational datasets, and step through every relational clause (FROM → JOIN → WHERE → GROUP BY → WINDOW → SELECT → ORDER BY).</p>' +
+                  modeSwitcherHtml +
+                '</div>' +
+              '</div>' +
+              '<div class="sandbox-blueprint-bar" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 14px;">' +
+                '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
+                  '<label style="font-size:0.78rem;font-weight:600;color:var(--fg-muted);display:flex;align-items:center;gap:6px;">' +
+                    '<span>Engine:</span>' +
+                    '<select id="wb-sql-engine-select" class="eco-search-input" style="padding:4px 8px;font-size:0.78rem;min-width:210px;">' +
+                      '<option value="postgres" ' + (this._sqlStudioEngine === 'postgres' ? 'selected' : '') + '>PostgreSQL 18 (PGlite WASM)</option>' +
+                      '<option value="sqlite" ' + (this._sqlStudioEngine === 'sqlite' ? 'selected' : '') + '>SQLite 3.46 (sql.js WASM)</option>' +
+                    '</select>' +
+                  '</label>' +
+                  '<label style="font-size:0.78rem;font-weight:600;color:var(--fg-muted);display:flex;align-items:center;gap:6px;">' +
+                    '<span>Dataset:</span>' +
+                    '<select id="wb-sql-dataset-select" class="eco-search-input" style="padding:4px 8px;font-size:0.78rem;min-width:190px;">' +
+                      '<option value="__unified__" ' + (this._sqlStudioDatasetId === '__unified__' ? 'selected' : '') + '>All 5 Datasets (Unified Sandbox)</option>' +
+                      '<option value="ecommerce" ' + (this._sqlStudioDatasetId === 'ecommerce' ? 'selected' : '') + '>E-Commerce &amp; Orders</option>' +
+                      '<option value="org_hr" ' + (this._sqlStudioDatasetId === 'org_hr' ? 'selected' : '') + '>Org Hierarchy &amp; HR</option>' +
+                      '<option value="fintech_ledger" ' + (this._sqlStudioDatasetId === 'fintech_ledger' ? 'selected' : '') + '>Double-Entry Fintech Ledger</option>' +
+                      '<option value="saas_telemetry" ' + (this._sqlStudioDatasetId === 'saas_telemetry' ? 'selected' : '') + '>SaaS Subscriptions &amp; Telemetry</option>' +
+                      '<option value="social_graph" ' + (this._sqlStudioDatasetId === 'social_graph' ? 'selected' : '') + '>Social Graph &amp; Content Feed</option>' +
+                    '</select>' +
+                  '</label>' +
+                  '<label style="font-size:0.78rem;font-weight:600;color:var(--fg-muted);display:flex;align-items:center;gap:6px;">' +
+                    '<span>Templates:</span>' +
+                    '<select id="wb-sql-template-select" class="eco-search-input" style="padding:4px 8px;font-size:0.78rem;min-width:260px;">' +
+                      templateOptionsHtml +
+                    '</select>' +
+                  '</label>' +
+                '</div>' +
+                '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+                  '<button type="button" class="eco-btn eco-btn--sm eco-btn--primary" data-sql-studio-action="execute">▶ Execute SQL (⌘↵)</button>' +
+                  '<button type="button" class="eco-btn eco-btn--sm" data-sql-studio-action="step-clauses">🔍 Step-by-Step Clause Visualizer</button>' +
+                  '<button type="button" class="eco-btn eco-btn--sm" data-sql-studio-action="explain">📊 EXPLAIN QUERY PLAN</button>' +
+                  '<button type="button" class="eco-btn eco-btn--sm" data-sql-studio-action="reset-db">↺ Reset DB</button>' +
+                '</div>' +
+              '</div>' +
+            '</header>' +
+            '<main class="view-body" id="sandbox-mount-target">' +
+              '<div class="sandbox-workspace" style="display:grid;grid-template-columns:280px 1fr;gap:16px;align-items:start;">' +
+                '<aside class="sandbox-palette" style="max-height:780px;overflow-y:auto;padding:12px;">' +
+                  '<div class="sandbox-palette__header" style="margin-bottom:10px;">' +
+                    '<h3 class="inspector-subtitle">Schema &amp; Table Explorer</h3>' +
+                    '<span class="sandbox-palette__hint">Click any table to preview rows</span>' +
+                  '</div>' +
+                  schemaExplorerHtml +
+                '</aside>' +
+                '<section class="sandbox-canvas-wrapper" style="display:flex;flex-direction:column;gap:14px;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;">' +
+                  '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">' +
+                    '<div style="display:flex;align-items:center;gap:8px;">' +
+                      '<span class="eco-pill eco-pill--accent">query.sql</span>' +
+                      '<span style="font-size:0.76rem;color:var(--fg-muted);">Write any SELECT, CTE, Window Function, JOIN, or DDL/DML statement</span>' +
+                    '</div>' +
+                    '<span style="font-size:0.74rem;color:var(--fg-faint);font-family:var(--font-mono);">Shortcut: Cmd/Ctrl + Enter to Run</span>' +
+                  '</div>' +
+                  '<textarea class="sql-studio-editor sql-inline-workbench__editor" id="wb-sql-studio-editor" spellcheck="false" rows="9" style="width:100%;min-height:175px;font-family:var(--font-mono);font-size:0.84rem;line-height:1.55;padding:12px;border-radius:8px;border:1px solid var(--border-strong);background:var(--bg);color:var(--fg);resize:vertical;">' + escapeHtml(this._sqlStudioQuery) + '</textarea>' +
+                  '<div id="wb-sql-studio-visualizer-slot"></div>' +
+                '</section>' +
+              '</div>' +
+            '</main>' +
+          '</div>';
+
+        this._mountSqlStudioVisualizer({ startAtFinal: true });
+        return;
+      }
+
       this._container.innerHTML =
         '<div class="view-canvas sandbox-view">' +
           '<header class="view-header">' +
@@ -981,8 +1205,9 @@
                   '<span class="eco-pill">' + this._connections.length + ' Connections</span>' +
                   '<span class="eco-pill">' + this._frames.length + ' Zone Frames</span>' +
                 '</div>' +
-                '<h1 class="view-title">Architecture Whiteboard &amp; Capacity Studio</h1>' +
-                '<p class="view-subtitle">Create multi-tab system topologies, drag blocks onto the canvas, connect ports, draw VPC zone boundaries, and simulate live QPS bottlenecks.</p>' +
+                '<h1 class="view-title">Database Architecture &amp; Sharding Canvas</h1>' +
+                '<p class="view-subtitle">Create multi-tab database topologies, drag engine blocks onto the canvas, connect ports, draw VPC zone boundaries, and simulate live QPS bottlenecks.</p>' +
+                modeSwitcherHtml +
               '</div>' +
             '</div>' +
 
@@ -1006,7 +1231,7 @@
                 bpButtonsHtml +
               '</div>' +
               '<div class="sandbox-canvas-actions">' +
-                '<button class="eco-btn eco-btn--sm eco-btn--primary" data-sandbox-action="simulate-cluster-codelab" title="Compile active whiteboard topology into a runnable multi-node cluster inside CodeLab">Simulate in CodeLab</button>' +
+                '<button class="eco-btn eco-btn--sm eco-btn--primary" data-sandbox-action="simulate-cluster-codelab" title="Run diagnostic SQL query for active topology in SQL Studio">Query Topology in SQL Studio</button>' +
                 '<button class="eco-btn eco-btn--sm ' + (this._connectMode || this._activeTool === 'connect' ? 'eco-btn--primary' : '') + '" data-sandbox-action="toggle-connect">' +
                   (this._connectMode || this._activeTool === 'connect' ? 'Connect Mode: ON' : 'Connect Nodes (C)') +
                 '</button>' +
@@ -1256,7 +1481,7 @@
         var blockMeta = (blocks || []).find(function(b) { return b.type === node.type; });
         var buildSlug = NODE_TYPE_TO_CODELAB[node.type] || NODE_TYPE_TO_CODELAB[String(node.type || '').toLowerCase()] || null;
         var codelabBtnHtml = buildSlug
-          ? '<a href="/build/' + escapeHtml(buildSlug) + '/?lab=open&amp;mode=guided" class="eco-btn eco-btn--sm eco-btn--primary" data-codelab-slug="' + escapeHtml(buildSlug) + '" title="Open ' + escapeHtml(buildSlug) + ' implementation in CodeLab">Inspect Internals in CodeLab →</a>'
+          ? '<a href="/build/' + escapeHtml(buildSlug) + '/?lab=open&amp;mode=guided" class="eco-btn eco-btn--sm eco-btn--primary" data-codelab-slug="' + escapeHtml(buildSlug) + '" title="Open ' + escapeHtml(buildSlug) + ' implementation in SQL Studio">Inspect Internals in SQL Studio →</a>'
           : '';
         return (
           '<div class="wb-inspector-bar" id="wb-inspector-bar">' +
@@ -1535,6 +1760,58 @@
           return;
         }
 
+        // Top-level Workbench Mode Switcher (SQL Studio vs Architecture Canvas)
+        var modeBtn = e.target.closest('[data-workbench-mode]');
+        if (modeBtn) {
+          var nextMode = modeBtn.getAttribute('data-workbench-mode');
+          if (nextMode && nextMode !== self._activeWorkbenchMode) {
+            var ed = container.querySelector('#wb-sql-studio-editor');
+            if (ed && ed.value.trim()) self._sqlStudioQuery = ed.value;
+            self._activeWorkbenchMode = nextMode;
+            self.render();
+          }
+          return;
+        }
+
+        // Schema Explorer table click -> preview SELECT * FROM <table> LIMIT 15;
+        var previewTblBtn = e.target.closest('[data-sql-preview-table]');
+        if (previewTblBtn) {
+          var tblName = previewTblBtn.getAttribute('data-sql-preview-table');
+          if (tblName) {
+            self._sqlStudioQuery = 'SELECT * FROM ' + tblName + ' LIMIT 15;';
+            var edEl = container.querySelector('#wb-sql-studio-editor');
+            if (edEl) edEl.value = self._sqlStudioQuery;
+            self._mountSqlStudioVisualizer({ startAtFinal: true });
+          }
+          return;
+        }
+
+        // SQL Studio toolbar actions
+        var sqlActBtn = e.target.closest('[data-sql-studio-action]');
+        if (sqlActBtn) {
+          var sqlAct = sqlActBtn.getAttribute('data-sql-studio-action');
+          var editorEl = container.querySelector('#wb-sql-studio-editor');
+          if (editorEl && editorEl.value.trim()) {
+            self._sqlStudioQuery = editorEl.value.trim();
+          }
+          if (sqlAct === 'execute') {
+            self._mountSqlStudioVisualizer({ startAtFinal: true });
+          } else if (sqlAct === 'step-clauses') {
+            self._mountSqlStudioVisualizer({ startAtFinal: false });
+          } else if (sqlAct === 'explain') {
+            self._mountSqlStudioVisualizer({ startAtFinal: true, runTests: false });
+          } else if (sqlAct === 'reset-db') {
+            if (root.SqlEngine && typeof root.SqlEngine.resetDatabase === 'function') {
+              root.SqlEngine.resetDatabase(self._sqlStudioDatasetId || '__unified__').then(function() {
+                self._mountSqlStudioVisualizer({ startAtFinal: true });
+              });
+            } else {
+              self._mountSqlStudioVisualizer({ startAtFinal: true });
+            }
+          }
+          return;
+        }
+
         // Tab close button
         var closeTabBtn = e.target.closest('[data-wb-tab-close]');
         if (closeTabBtn) {
@@ -1808,6 +2085,41 @@
               self.render();
             }
           }
+        }
+      }, sig);
+
+      // 2b. Change & Keydown handlers for SQL Studio selects & editor
+      container.addEventListener('change', function(e) {
+        if (e.target.id === 'wb-sql-engine-select') {
+          self._sqlStudioEngine = e.target.value || 'postgres';
+          self._mountSqlStudioVisualizer({ startAtFinal: true });
+          return;
+        }
+        if (e.target.id === 'wb-sql-dataset-select') {
+          self._sqlStudioDatasetId = e.target.value || '__unified__';
+          self.render();
+          return;
+        }
+        if (e.target.id === 'wb-sql-template-select') {
+          var tplId = e.target.value;
+          if (!tplId) return;
+          var tpls = self._getSqlStudioTemplates();
+          var foundTpl = tpls.find(function(t) { return t.id === tplId; });
+          if (foundTpl) {
+            self._sqlStudioQuery = foundTpl.sql;
+            var ed = container.querySelector('#wb-sql-studio-editor');
+            if (ed) ed.value = foundTpl.sql;
+            self._mountSqlStudioVisualizer({ startAtFinal: true });
+          }
+          return;
+        }
+      }, sig);
+
+      container.addEventListener('keydown', function(e) {
+        if (e.target.id === 'wb-sql-studio-editor' && (e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+          e.preventDefault();
+          self._sqlStudioQuery = e.target.value.trim();
+          self._mountSqlStudioVisualizer({ startAtFinal: true });
         }
       }, sig);
 

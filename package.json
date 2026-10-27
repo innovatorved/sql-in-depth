@@ -32,6 +32,7 @@
   "author": "Ved Gupta",
   "license": "MIT",
   "dependencies": {
+    "@electric-sql/pglite": "^0.5.12",
     "@innovatorved/code-lab": "^0.3.1",
     "katex": "^0.16.11",
     "sql.js": "^1.15.2"

@@ -168,7 +168,7 @@ window.App = (() => {
       return;
     }
 
-    // Redirect legacy #build/<slug> or /build/<slug>/ routes to the unified C++20 curriculum topic view
+    // Redirect legacy #build/<slug> or /build/<slug>/ routes to the unified SQL curriculum topic view
     if (hash.startsWith('build/') || path.startsWith('build/')) {
       const rawPart = hash.startsWith('build/') ? hash.slice(6) : path.slice(6);
       const [rawBuildSlug, queryStr] = rawPart.split('?');
@@ -708,6 +708,7 @@ window.App = (() => {
         if (window.TableVisualizer && typeof window.TableVisualizer.enhanceSqlCodeBlocks === 'function') {
           try { window.TableVisualizer.enhanceSqlCodeBlocks(reader); } catch (err) { console.warn('[TableVisualizer]', err); }
         }
+        mountInlineTopicSqlLab(currentSlug, reader);
         if (window.TopicCodeLab && typeof window.TopicCodeLab.init === 'function') {
           window.TopicCodeLab.init(reader);
         }
@@ -838,104 +839,35 @@ window.App = (() => {
           };
 
           const openBuildLab = (opts = {}) => {
-            if (!overlayEl || !mountEl || !window.CodeLab) return;
-            overlayEl.classList.add('is-open');
-            overlayEl.setAttribute('aria-hidden', 'false');
-            document.body.classList.add('codelab-fullscreen-lock');
+            const guidedEntry = window.GUIDED_LABS_DATA?.[currentSlug] || window.TopicGuidedLabs?.getLab?.(currentSlug) || null;
+            const buildEntry = build || window.IMPLEMENTATIONS_DATA?.[currentSlug] || null;
+            const steps = guidedEntry?.steps || [];
+            const stepIdx = typeof opts.stepIndex === 'number' && !Number.isNaN(opts.stepIndex) ? opts.stepIndex : 0;
+            const activeStep = steps[stepIdx] || steps[0] || null;
+            const sqlCode = (opts.mode === 'solution' || opts.mode === 'sandbox')
+              ? (activeStep?.solutionSnippet || guidedEntry?.solutionCode || guidedEntry?.referenceSql || 'SELECT * FROM customers LIMIT 10;')
+              : (activeStep?.starterSnippet || guidedEntry?.starterCode || guidedEntry?.referenceSql || 'SELECT * FROM customers LIMIT 10;');
 
-            const rawLang = opts.lang || '';
-            const normLang = (rawLang === 'c++' ? 'cpp' : (rawLang === 'python' ? 'py' : rawLang));
-
-            if (!activeCodeLab) {
-              const guidedEntry = window.GUIDED_LABS_DATA?.[currentSlug] || window.SYSTEM_DESIGN_GUIDED_LABS?.[currentSlug] || null;
-              const buildEntry = build || window.IMPLEMENTATIONS_DATA?.[currentSlug] || window.SYSTEM_DESIGN_BUILDS?.[currentSlug] || null;
-              const refFiles = buildEntry?.files || null;
-              const steps = guidedEntry?.steps || null;
-              const cppFallback = (!guidedEntry?.cppStarterFiles && !guidedEntry?.cppSolutionFiles && !buildEntry?.cppFiles)
-                ? buildCppLabFiles(
-                    currentSlug,
-                    buildEntry?.title || guidedEntry?.title || currentSlug,
-                    buildEntry?.summary || guidedEntry?.summary || '',
-                    steps,
-                    refFiles
-                  )
-                : null;
-              const cppStarterFiles = guidedEntry?.cppStarterFiles || cppFallback?.cppStarterFiles || null;
-              const cppSolutionFiles = guidedEntry?.cppSolutionFiles || buildEntry?.cppFiles || cppFallback?.cppSolutionFiles || null;
-              const pyStarterFiles = guidedEntry?.pyStarterFiles || null;
-              const pySolutionFiles = guidedEntry?.pySolutionFiles || buildEntry?.pyFiles || null;
-
-              const mountOpts = {
-                labId: currentSlug,
-                title: buildEntry?.title || guidedEntry?.title || currentSlug,
-                summary: buildEntry?.summary || guidedEntry?.summary || '',
-                languages: ['js', 'ts', 'cpp', 'py'],
-                files: refFiles,
-                solutionFiles: guidedEntry?.solutionFiles || refFiles,
-                starterFiles: guidedEntry?.starterFiles || null,
-                tsStarterFiles: guidedEntry?.tsStarterFiles || null,
-                tsSolutionFiles: guidedEntry?.tsSolutionFiles || null,
-                cppFiles: cppSolutionFiles,
-                cppStarterFiles,
-                cppSolutionFiles,
-                cppEntry: guidedEntry?.cppEntry || 'main.cpp',
-                cppTestEntry: guidedEntry?.cppTestEntry || 'test.cpp',
-                pyFiles: pySolutionFiles,
-                pyStarterFiles,
-                pySolutionFiles,
-                pyEntry: guidedEntry?.pyEntry || 'main.py',
-                steps,
-                guided: guidedEntry ? {
-                  ...guidedEntry,
-                  cppStarterFiles,
-                  cppSolutionFiles,
-                  pyStarterFiles,
-                  pySolutionFiles
-                } : null,
-                backLabel: 'Back to Build Guide',
-                onClose: closeBuildLab,
-                onStepComplete: (step) => {
-                  const stepId = (step && typeof step === 'object') ? (step.id || step.index) : step;
-                  if (window.Progress?.markBuildStepComplete) {
-                    window.Progress.markBuildStepComplete(currentSlug, stepId);
-                  }
-                  if (window.Analytics?.trackCodeLabStep) {
-                    window.Analytics.trackCodeLabStep(currentSlug, stepId, true);
-                  }
-                  syncOverviewProgress();
-                },
-                onLabComplete: () => {
-                  if (window.Progress?.markBuildComplete) {
-                    window.Progress.markBuildComplete(currentSlug);
-                  }
-                  if (window.Analytics?.trackCodeLabStep) {
-                    window.Analytics.trackCodeLabStep(currentSlug, 'all_steps_complete', true);
-                  }
-                  syncOverviewProgress();
+            openSqlStudioModal({
+              labId: currentSlug,
+              title: buildEntry?.title || guidedEntry?.title || currentSlug,
+              summary: buildEntry?.summary || guidedEntry?.summary || '',
+              datasetId: guidedEntry?.datasetId || activeStep?.datasetId || 'ecommerce',
+              sql: sqlCode,
+              starterSql: activeStep?.starterSnippet || guidedEntry?.starterCode || sqlCode,
+              referenceSql: activeStep?.solutionSnippet || guidedEntry?.referenceSql || guidedEntry?.solutionCode || sqlCode,
+              steps: steps,
+              stepIndex: stepIdx,
+              mode: opts.mode || 'guided',
+              onStepComplete: (step) => {
+                const stepId = (step && typeof step === 'object') ? (step.id || step.index) : step;
+                if (window.Progress?.markBuildStepComplete) {
+                  window.Progress.markBuildStepComplete(currentSlug, stepId);
                 }
-              };
-              if (opts.mode === 'guided' || opts.mode === 'sandbox') {
-                mountOpts.mode = opts.mode;
-              }
-              if (normLang === 'js' || normLang === 'ts' || normLang === 'cpp' || normLang === 'py') {
-                mountOpts.language = normLang;
-              }
-              if (window.Analytics?.trackCodeLabOpen) {
-                window.Analytics.trackCodeLabOpen(currentSlug, mountOpts.mode || 'guided', mountOpts.language || 'javascript');
-              }
-              activeCodeLab = mountCodeLabWithExtensions(mountEl, mountOpts);
-              if (typeof opts.stepIndex === 'number' && !Number.isNaN(opts.stepIndex) && activeCodeLab?.selectStep) {
-                setTimeout(() => activeCodeLab.selectStep(opts.stepIndex, true), 80);
-              }
-            } else if (typeof activeCodeLab.configure === 'function') {
-              activeCodeLab.configure({ ...opts, lang: normLang });
-            } else if (activeCodeLab.editor) {
-              setTimeout(() => activeCodeLab.editor.layout(), 60);
-            }
-            setTimeout(() => {
-              const ed = activeCodeLab?._editor || activeCodeLab?.editor;
-              if (ed && typeof ed.layout === 'function') ed.layout();
-            }, 250);
+                syncOverviewProgress();
+              },
+              onClose: closeBuildLab
+            });
           };
 
           reader.querySelectorAll('[data-action="open-code-lab"]').forEach(btn => {
@@ -970,24 +902,10 @@ window.App = (() => {
         if (!window.GUIDED_LABS_DATA) {
           neededBuildScripts.push('data/guided_labs.js');
         }
-        if (!document.querySelector('link[href*="@innovatorved/code-lab"], link[href*="innovatorved/code-lab"]')) {
-          const link = document.createElement('link');
-          link.rel = 'stylesheet';
-          link.href = 'https://cdn.jsdelivr.net/npm/@innovatorved/code-lab@0.3.2/dist/code-lab.css';
-          link.crossOrigin = 'anonymous';
-          link.onerror = function () {
-            this.onerror = null;
-            this.href = 'https://unpkg.com/@innovatorved/code-lab@0.3.2/dist/code-lab.css';
-          };
-          document.head.appendChild(link);
-        }
-        if (!window.CodeLab) {
-          neededBuildScripts.push('https://cdn.jsdelivr.net/npm/@innovatorved/code-lab@0.3.2/dist/code-lab.js');
-        }
 
         if (neededBuildScripts.length > 0 && window.loadScript) {
           if (!isPrerenderedBuild) {
-            reader.innerHTML = '<div class="prose"><p style="padding:2rem 0;color:var(--fg-muted);">Loading Interactive IDE Lab &amp; Reference Build...</p></div>';
+            reader.innerHTML = '<div class="prose"><p style="padding:2rem 0;color:var(--fg-muted);">Loading Interactive SQL Studio &amp; Reference Build...</p></div>';
           }
           Promise.all(neededBuildScripts.map(s => window.loadScript(s))).then(renderBuildView).catch(err => {
             console.error('[Failed to load build lab scripts]', err);
@@ -1900,15 +1818,48 @@ window.App = (() => {
         return;
       }
 
-      const runSnippetBtn = target.closest('[data-action="run-snippet-codelab"]');
-      if (runSnippetBtn) {
+      const runSqlInlineBtn = target.closest('[data-action="run-sql-inline"]');
+      if (runSqlInlineBtn) {
         e.preventDefault();
-        const block = runSnippetBtn.closest('.code-block');
+        const block = runSqlInlineBtn.closest('.code-block');
+        if (block && window.TableVisualizer && typeof window.TableVisualizer.enhanceSqlCodeBlocks === 'function') {
+          window.TableVisualizer.enhanceSqlCodeBlocks(block.parentElement || document);
+        }
         const codeEl = block?.querySelector('code');
         const code = codeEl ? codeEl.textContent : '';
-        const lang = runSnippetBtn.getAttribute('data-lang') || 'javascript';
         const titleEl = document.querySelector('.lesson__title, h1');
-        const title = titleEl ? `${titleEl.textContent.trim()} — Live Snippet` : 'Lesson Code Snippet';
+        const title = titleEl ? `${titleEl.textContent.trim()} — Live SQL Verification` : 'Lesson SQL Snippet';
+        const existingHost = block?.nextElementSibling?.classList?.contains('inline-sql-runner')
+          ? block.nextElementSibling
+          : null;
+        if (existingHost) {
+          existingHost.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } else if (block && window.TableVisualizer && typeof window.TableVisualizer.mountClauseVisualizer === 'function') {
+          const host = document.createElement('div');
+          host.className = 'inline-sql-runner';
+          host.style.marginTop = '12px';
+          block.insertAdjacentElement('afterend', host);
+          window.TableVisualizer.mountClauseVisualizer(host, {
+            sql: code.trim(),
+            datasetId: 'ecommerce',
+            showSchema: true,
+            title: title
+          });
+        } else {
+          openSnippetInCodeLab(code, 'sql', title);
+        }
+        return;
+      }
+
+      const openSqlStudioBtn = target.closest('[data-action="open-sql-studio"], [data-action="run-snippet-codelab"]');
+      if (openSqlStudioBtn) {
+        e.preventDefault();
+        const block = openSqlStudioBtn.closest('.code-block');
+        const codeEl = block?.querySelector('code');
+        const code = codeEl ? codeEl.textContent : '';
+        const lang = openSqlStudioBtn.getAttribute('data-lang') || 'sql';
+        const titleEl = document.querySelector('.lesson__title, h1');
+        const title = titleEl ? `${titleEl.textContent.trim()} — SQL Studio` : 'Interactive SQL Studio';
         openSnippetInCodeLab(code, lang, title);
         return;
       }
@@ -1918,7 +1869,7 @@ window.App = (() => {
         e.preventDefault();
         const slug = openTopicLabBtn.getAttribute('data-slug') || currentSlug;
         const mode = openTopicLabBtn.getAttribute('data-mode') || 'guided';
-        const stepAttr = openTopicLabBtn.getAttribute('data-step-index');
+        const stepAttr = openTopicLabBtn.getAttribute('data-step-index') ?? openTopicLabBtn.getAttribute('data-step');
         const stepIndex = stepAttr !== null ? parseInt(stepAttr, 10) : undefined;
         openTopicCodeLab(slug, mode, stepIndex);
         return;
@@ -2078,1488 +2029,473 @@ window.App = (() => {
 
   let globalCodeLabInstance = null;
 
-  function ensureCodeLabLoaded() {
-    if (!document.querySelector('link[href*="@innovatorved/code-lab"], link[href*="innovatorved/code-lab"]')) {
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = 'https://cdn.jsdelivr.net/npm/@innovatorved/code-lab@0.3.2/dist/code-lab.css';
-      link.crossOrigin = 'anonymous';
-      link.onerror = function () {
-        this.onerror = null;
-        this.href = 'https://unpkg.com/@innovatorved/code-lab@0.3.2/dist/code-lab.css';
-      };
-      document.head.appendChild(link);
-    }
-    if (window.CodeLab) return Promise.resolve(window.CodeLab);
-    if (window.loadScript) {
-      return window.loadScript('https://cdn.jsdelivr.net/npm/@innovatorved/code-lab@0.3.2/dist/code-lab.js').then(() => window.CodeLab);
-    }
-    return Promise.resolve(null);
-  }
+  function getTopicLabSpec(slug) {
+    const unitInfo = getUnitInfo(slug);
+    const topicLabs = window.TOPIC_GUIDED_LABS || {};
+    const spec = topicLabs[slug];
+    if (spec) return spec;
 
-  function escapeCppString(str) {
-    return String(str || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\r?\n/g, ' ');
-  }
-
-  function buildCppLabFiles(labId, title, summary, steps, refFiles) {
-    const safeTitle = escapeCppString(title || labId || 'DSA Build Lab');
-    const stepList = Array.isArray(steps) && steps.length > 0 ? steps : [
-      { id: 'step-1', title: 'Step 1: Core Implementation', concept: summary || '', testNames: ['verifies core implementation'] }
-    ];
-
-    const starterStepFns = stepList.map((s, idx) => {
-      const fnName = `verify_step_${idx + 1}`;
-      const stepTitle = String(s.title || `Step ${idx + 1}`).replace(/\r?\n/g, ' ');
-      const targetSym = s.targetSymbol ? ` (${s.targetSymbol})` : '';
-      const concept = s.concept ? `\n  // Concept: ${String(s.concept).replace(/\r?\n/g, ' ')}` : '';
-      const hint = s.hint ? `\n  // Hint: ${String(s.hint).replace(/\r?\n/g, ' ')}` : '';
-      return `// ${stepTitle}${targetSym}${concept}${hint}\ninline bool ${fnName}() {\n  // TODO (Step ${idx + 1}): Implement ${stepTitle} and return true once verified\n  return false;\n}`;
-    }).join('\n\n');
-
-    const solutionStepFns = stepList.map((s, idx) => {
-      const fnName = `verify_step_${idx + 1}`;
-      const stepTitle = String(s.title || `Step ${idx + 1}`).replace(/\r?\n/g, ' ');
-      const targetSym = s.targetSymbol ? ` (${s.targetSymbol})` : '';
-      return `// ${stepTitle}${targetSym}\ninline bool ${fnName}() {\n  return true;\n}`;
-    }).join('\n\n');
-
-    const starterHeader = [
-      '#pragma once',
-      '#include <bits/stdc++.h>',
-      '#include <codelab/dsa.hpp>',
-      'using namespace std;',
-      '',
-      `// ${title || labId} — C++20 WebAssembly Workspace`,
-      starterStepFns,
-      ''
-    ].join('\n');
-
-    const solutionHeader = [
-      '#pragma once',
-      '#include <bits/stdc++.h>',
-      '#include <codelab/dsa.hpp>',
-      'using namespace std;',
-      '',
-      `// ${title || labId} — C++20 Reference Solution`,
-      solutionStepFns,
-      ''
-    ].join('\n');
-
-    const mainCpp = [
-      '#include <bits/stdc++.h>',
-      '#include <codelab/dsa.hpp>',
-      '#include "solution.hpp"',
-      '',
-      'int main() {',
-      `  std::cout << "=== ${safeTitle} (C++20 / Clang WASI) ===\\n";`,
-      ...stepList.map((s, idx) =>
-        `  std::cout << "  [${idx + 1}/${stepList.length}] ${escapeCppString(s.title || `Step ${idx + 1}`)}: " << (verify_step_${idx + 1}() ? "READY" : "TODO") << "\\n";`
-      ),
-      '  return 0;',
-      '}',
-      ''
-    ].join('\n');
-
-    const testBlocks = stepList.map((s, idx) => {
-      const tNames = Array.isArray(s.testNames) && s.testNames.length > 0
-        ? s.testNames
-        : [s.title || `step-${idx + 1}`];
-      return tNames.map(tName => [
-        `    TEST("${escapeCppString(tName)}", {`,
-        `      ASSERT_TRUE(verify_step_${idx + 1}());`,
-        '    });'
-      ].join('\n')).join('\n');
-    }).join('\n');
-
-    const testCpp = [
-      '#include <codelab/test.hpp>',
-      '#include "solution.hpp"',
-      '',
-      'int main() {',
-      `  DESCRIBE("${safeTitle}", {`,
-      testBlocks,
-      '  });',
-      '  return CODELAB_TEST_EXIT_CODE();',
-      '}',
-      ''
-    ].join('\n');
-
-    const extraReadme = (refFiles && typeof refFiles['README.md'] === 'string')
-      ? { 'README.md': refFiles['README.md'] }
-      : {};
-
+    const unitTitle = unitInfo ? unitInfo.unit.title : slug;
+    const modId = unitInfo ? unitInfo.module.id : 'm01';
+    const dsMap = {
+      m01: 'ecommerce', m02: 'ecommerce', m03: 'ecommerce', m04: 'hr_analytics',
+      m05: 'ecommerce', m06: 'hr_analytics', m07: 'saas_events', m08: 'ecommerce',
+      m09: 'fintech_ledger', m10: 'ecommerce', m11: 'fintech_ledger', m12: 'fintech_ledger',
+      m13: 'ecommerce', m14: 'saas_events', m15: 'fintech_ledger', m16: 'saas_events',
+      m17: 'social_graph', m18: 'fintech_ledger'
+    };
+    const datasetId = dsMap[modId] || 'ecommerce';
+    const refSql = `-- ${unitTitle}\nSELECT *\nFROM customers\nLIMIT 10;`;
     return {
-      cppStarterFiles: {
-        'solution.hpp': starterHeader,
-        'main.cpp': mainCpp,
-        'test.cpp': testCpp,
-        ...extraReadme
-      },
-      cppSolutionFiles: {
-        'solution.hpp': solutionHeader,
-        'main.cpp': mainCpp,
-        'test.cpp': testCpp,
-        ...extraReadme
-      }
+      slug,
+      moduleId: modId,
+      datasetId,
+      title: `Guided SQL Lab: ${unitTitle}`,
+      summary: `Write, execute, and inspect SQL queries for ${unitTitle}.`,
+      referenceSql: refSql,
+      steps: [
+        {
+          id: `${slug}-step-1`,
+          title: 'Step 1: Baseline Schema & Data Inspection',
+          concept: 'Inspect the underlying dataset tables and baseline rows.',
+          instructions: 'Run the baseline SQL query and step through the execution clauses.',
+          starterCode: refSql,
+          solutionCode: refSql,
+          hint: 'Execute the query and inspect the FROM / SELECT stages in the Clause Visualizer.'
+        },
+        {
+          id: `${slug}-step-2`,
+          title: 'Step 2: Core Concept Query Verification',
+          concept: `Verify ${unitTitle} behavior on production-grade relational data.`,
+          instructions: 'Execute the verification query and examine the output columns and rows.',
+          starterCode: refSql,
+          solutionCode: refSql,
+          hint: 'Click Step-by-Step Clause Visualizer to trace row transformations.'
+        },
+        {
+          id: `${slug}-step-3`,
+          title: 'Step 3: Execution Plan & Edge-Case Analysis',
+          concept: 'Inspect the physical query plan with EXPLAIN QUERY PLAN.',
+          instructions: 'Run EXPLAIN QUERY PLAN to verify index usage and join strategy.',
+          starterCode: `EXPLAIN QUERY PLAN\n${refSql}`,
+          solutionCode: `EXPLAIN QUERY PLAN\n${refSql}`,
+          hint: 'Prefix the query with EXPLAIN QUERY PLAN and run.'
+        }
+      ]
     };
   }
 
-  const KNOWN_CPP_STD_HEADERS = new Set([
-    'bits/stdc++.h', 'codelab/dsa.hpp', 'codelab/test.hpp',
-    'iostream', 'iomanip', 'sstream', 'fstream', 'string', 'string_view',
-    'vector', 'deque', 'list', 'forward_list', 'array', 'span',
-    'set', 'unordered_set', 'map', 'unordered_map', 'stack', 'queue',
-    'bitset', 'algorithm', 'numeric', 'iterator', 'functional', 'utility',
-    'tuple', 'optional', 'variant', 'any', 'memory', 'cmath', 'cstdlib',
-    'cstdio', 'cstring', 'climits', 'cfloat', 'cstdint', 'cassert', 'cctype',
-    'chrono', 'random', 'complex', 'exception', 'stdexcept', 'type_traits',
-    'limits', 'ranges', 'concepts', 'bit', 'numbers', 'compare', 'charconv',
-    'filesystem', 'thread', 'mutex', 'atomic', 'condition_variable', 'future',
-    'valarray', 'regex', 'new', 'initializer_list', 'system_error',
-    'stdio.h', 'stdlib.h', 'string.h', 'math.h', 'stdint.h', 'limits.h',
-    'assert.h', 'ctype.h', 'time.h', 'stdbool.h', 'stddef.h'
-  ]);
+  function mountInlineTopicSqlLab(slug, readerEl) {
+    const root = readerEl || document.getElementById('lesson-reader');
+    if (!root) return;
+    const host = root.querySelector(`.sql-guided-lab-host[data-sql-lab-slug="${slug}"]`) || root.querySelector('.sql-guided-lab-host');
+    if (!host) return;
 
-  const CPP_COMPLETION_DOCS = [
-    {
-      label: 'std::vector',
-      insertText: 'std::vector<${1:int}> ${2:v}',
-      detail: '<vector> Dynamic contiguous array',
-      doc: '**`std::vector<T>`** — Dynamic contiguous array (`<vector>` / `<bits/stdc++.h>`).\n\n- Random access: `O(1)`\n- Amortized push_back: `O(1)`\n- Methods: `.push_back(x)`, `.emplace_back(...)`, `.pop_back()`, `.size()`, `.empty()`, `.begin()`, `.end()`, `.clear()`, `.resize(n)`'
-    },
-    {
-      label: 'std::unordered_map',
-      insertText: 'std::unordered_map<${1:int}, ${2:int}> ${3:mp}',
-      detail: '<unordered_map> O(1) hash table',
-      doc: '**`std::unordered_map<K, V>`** — Hash table mapping keys to values (`<unordered_map>`).\n\n- Average lookup/insert/erase: `O(1)`\n- Methods: `mp[k]`, `.find(k)`, `.count(k)`, `.contains(k)` (C++20), `.erase(k)`, `.size()`'
-    },
-    {
-      label: 'std::unordered_set',
-      insertText: 'std::unordered_set<${1:int}> ${2:seen}',
-      detail: '<unordered_set> O(1) hash set',
-      doc: '**`std::unordered_set<K>`** — Hash set of unique keys (`<unordered_set>`).\n\n- Average lookup/insert/erase: `O(1)`\n- Methods: `.insert(x)`, `.count(x)`, `.contains(x)` (C++20), `.erase(x)`'
-    },
-    {
-      label: 'std::priority_queue',
-      insertText: 'std::priority_queue<${1:int}> ${2:pq}',
-      detail: '<queue> Binary heap priority queue',
-      doc: '**`std::priority_queue<T>`** — Max-heap by default (`<queue>`).\n\n- Min-heap: `std::priority_queue<int, std::vector<int>, std::greater<int>>`\n- Operations: `.push(x)`, `.pop()`, `.top()`, `.empty()`, `.size()` (`O(log N)`)'
-    },
-    {
-      label: 'std::map',
-      insertText: 'std::map<${1:int}, ${2:int}> ${3:mp}',
-      detail: '<map> Ordered Red-Black tree map',
-      doc: '**`std::map<K, V>`** — Ordered key-value map (`O(log N)` lookup/insert/erase, supports `.lower_bound(k)` / `.upper_bound(k)`).'
-    },
-    {
-      label: 'std::set',
-      insertText: 'std::set<${1:int}> ${2:st}',
-      detail: '<set> Ordered Red-Black tree set',
-      doc: '**`std::set<K>`** — Ordered unique set (`O(log N)` lookup/insert/erase, supports `.lower_bound(x)` / `.upper_bound(x)`).'
-    },
-    {
-      label: 'std::queue',
-      insertText: 'std::queue<${1:int}> ${2:q}',
-      detail: '<queue> FIFO queue',
-      doc: '**`std::queue<T>`** — FIFO queue (`.push(x)`, `.pop()`, `.front()`, `.back()`, `.empty()`, `.size()`).'
-    },
-    {
-      label: 'std::deque',
-      insertText: 'std::deque<${1:int}> ${2:dq}',
-      detail: '<deque> Double-ended queue',
-      doc: '**`std::deque<T>`** — Double-ended queue (`O(1)` `.push_front(x)`, `.push_back(x)`, `.pop_front()`, `.pop_back()`, `dq[i]`).'
-    },
-    {
-      label: 'std::stack',
-      insertText: 'std::stack<${1:int}> ${2:st}',
-      detail: '<stack> LIFO stack',
-      doc: '**`std::stack<T>`** — LIFO stack (`.push(x)`, `.pop()`, `.top()`, `.empty()`, `.size()`).'
-    },
-    {
-      label: 'std::sort',
-      insertText: 'std::sort(${1:v}.begin(), ${1:v}.end());',
-      detail: '<algorithm> O(N log N) Introsort',
-      doc: '**`std::sort(first, last, comp?)`** — Sorts range `[first, last)` in `O(N log N)` worst-case time.'
-    },
-    {
-      label: 'std::lower_bound',
-      insertText: 'std::lower_bound(${1:v}.begin(), ${1:v}.end(), ${2:target})',
-      detail: '<algorithm> O(log N) binary search >= target',
-      doc: '**`std::lower_bound(first, last, val)`** — Returns iterator to the first element `>= val` in sorted range `[first, last)` (`O(log N)`).'
-    },
-    {
-      label: 'std::upper_bound',
-      insertText: 'std::upper_bound(${1:v}.begin(), ${1:v}.end(), ${2:target})',
-      detail: '<algorithm> O(log N) binary search > target',
-      doc: '**`std::upper_bound(first, last, val)`** — Returns iterator to the first element `> val` in sorted range `[first, last)` (`O(log N)`).'
-    },
-    {
-      label: 'ListNode',
-      insertText: 'ListNode* ${1:head} = buildLinkedList({${2:1, 2, 3}});',
-      detail: '<codelab/dsa.hpp> Singly-linked list node',
-      doc: '**`codelab::ListNode`** (`<codelab/dsa.hpp>`)\n```cpp\nstruct ListNode {\n  int val;\n  ListNode* next;\n  ListNode(int x = 0, ListNode* n = nullptr);\n};\n```\nHelpers: `buildLinkedList({1,2,3})`, `linkedListToVector(head)`.'
-    },
-    {
-      label: 'TreeNode',
-      insertText: 'TreeNode* ${1:root} = buildBinaryTree({${2:1, 2, 3}});',
-      detail: '<codelab/dsa.hpp> Binary tree node',
-      doc: '**`codelab::TreeNode`** (`<codelab/dsa.hpp>`)\n```cpp\nstruct TreeNode {\n  int val;\n  TreeNode* left;\n  TreeNode* right;\n  TreeNode(int x = 0, TreeNode* l = nullptr, TreeNode* r = nullptr);\n};\n```\nHelper: `buildBinaryTree({1, 2, 3, INT_MIN, 5})`.'
-    },
-    {
-      label: 'buildLinkedList',
-      insertText: 'buildLinkedList({${1:1, 2, 3}})',
-      detail: '<codelab/dsa.hpp> Vector -> ListNode*',
-      doc: '**`ListNode* buildLinkedList(const std::vector<int>& values)`** — Builds a singly-linked list from an initializer vector.'
-    },
-    {
-      label: 'linkedListToVector',
-      insertText: 'linkedListToVector(${1:head})',
-      detail: '<codelab/dsa.hpp> ListNode* -> std::vector<int>',
-      doc: '**`std::vector<int> linkedListToVector(const ListNode* head)`** — Converts a `ListNode*` chain into `std::vector<int>` for assertions.'
-    },
-    {
-      label: 'buildBinaryTree',
-      insertText: 'buildBinaryTree({${1:1, 2, 3}})',
-      detail: '<codelab/dsa.hpp> Level-order vector -> TreeNode*',
-      doc: '**`TreeNode* buildBinaryTree(const std::vector<int>& values, int nullSentinel = INT_MIN)`** — Constructs a binary tree from level-order values.'
-    },
-    {
-      label: 'DESCRIBE',
-      insertText: 'DESCRIBE("${1:Suite Name}", {\n  TEST("${2:test case}", {\n    ASSERT_EQ(${3:actual}, ${4:expected});\n  });\n});',
-      detail: '<codelab/test.hpp> Test suite block',
-      doc: '**`DESCRIBE(name, { ... })`** (`<codelab/test.hpp>`) — Defines a structured C++20 test suite that streams results to the CodeLab Test Runner.'
-    },
-    {
-      label: 'TEST',
-      insertText: 'TEST("${1:test name}", {\n  ASSERT_EQ(${2:actual}, ${3:expected});\n});',
-      detail: '<codelab/test.hpp> Test case block',
-      doc: '**`TEST(name, { ... })`** (`<codelab/test.hpp>`) — Defines a test case inside `main()` or `DESCRIBE(...)`.'
-    },
-    {
-      label: 'ASSERT_EQ',
-      insertText: 'ASSERT_EQ(${1:actual}, ${2:expected});',
-      detail: '<codelab/test.hpp> Equality assertion',
-      doc: '**`ASSERT_EQ(actual, expected)`** (`<codelab/test.hpp>`) — Asserts `actual == expected` and reports formatted values on failure.'
-    },
-    {
-      label: 'ASSERT_NE',
-      insertText: 'ASSERT_NE(${1:actual}, ${2:expected});',
-      detail: '<codelab/test.hpp> Inequality assertion',
-      doc: '**`ASSERT_NE(actual, expected)`** (`<codelab/test.hpp>`) — Asserts `actual != expected`.'
-    },
-    {
-      label: 'ASSERT_TRUE',
-      insertText: 'ASSERT_TRUE(${1:condition});',
-      detail: '<codelab/test.hpp> Boolean true assertion',
-      doc: '**`ASSERT_TRUE(condition)`** (`<codelab/test.hpp>`) — Asserts `static_cast<bool>(condition) == true`.'
-    },
-    {
-      label: 'ASSERT_FALSE',
-      insertText: 'ASSERT_FALSE(${1:condition});',
-      detail: '<codelab/test.hpp> Boolean false assertion',
-      doc: '**`ASSERT_FALSE(condition)`** (`<codelab/test.hpp>`) — Asserts `static_cast<bool>(condition) == false`.'
-    },
-    {
-      label: 'CODELAB_TEST_EXIT_CODE',
-      insertText: 'return CODELAB_TEST_EXIT_CODE();',
-      detail: '<codelab/test.hpp> Return test runner exit code',
-      doc: '**`CODELAB_TEST_EXIT_CODE()`** (`<codelab/test.hpp>`) — Returns `0` if all `TEST(...)` blocks passed, or `1` if any failed.'
-    },
-    {
-      label: '#include <bits/stdc++.h>',
-      insertText: '#include <bits/stdc++.h>',
-      detail: 'Competitive programming umbrella STL header',
-      doc: 'Pre-mounted in `/usr/include/bits/stdc++.h` — includes `<iostream>`, `<vector>`, `<string>`, `<algorithm>`, `<unordered_map>`, `<map>`, `<set>`, `<queue>`, `<stack>`, `<numeric>`, `<optional>`, etc.'
-    },
-    {
-      label: '#include <codelab/dsa.hpp>',
-      insertText: '#include <codelab/dsa.hpp>',
-      detail: 'CodeLab DSA structures (ListNode, TreeNode)',
-      doc: 'Pre-mounted in `/usr/include/codelab/dsa.hpp` — provides `ListNode`, `TreeNode`, `buildLinkedList`, `linkedListToVector`, `buildBinaryTree`, and `printVector`.'
-    },
-    {
-      label: '#include <codelab/test.hpp>',
-      insertText: '#include <codelab/test.hpp>',
-      detail: 'CodeLab C++20 unit test framework',
-      doc: 'Pre-mounted in `/usr/include/codelab/test.hpp` — provides `DESCRIBE`, `TEST`, `ASSERT_EQ`, `ASSERT_NE`, `ASSERT_TRUE`, `ASSERT_FALSE`, and `CODELAB_TEST_EXIT_CODE()`.'
-    }
-  ];
+    const spec = getTopicLabSpec(slug);
+    const steps = Array.isArray(spec.steps) && spec.steps.length > 0 ? spec.steps : [];
+    let activeStepIdx = 0;
 
-  let monacoCppProvidersRegistered = false;
+    const card = host.closest('.topic-codelab-card') || root;
+    const stepPills = card.querySelectorAll('.topic-codelab-step-pill[data-step]');
 
-  function ensureMonacoCppProviders(monaco) {
-    if (!monaco || !monaco.languages || monacoCppProvidersRegistered) return;
-    monacoCppProvidersRegistered = true;
+    function renderActiveStep(stepIdx) {
+      activeStepIdx = Math.max(0, Math.min(stepIdx, Math.max(0, steps.length - 1)));
+      const step = steps[activeStepIdx] || {
+        title: spec.title || 'Guided SQL Lab',
+        concept: spec.summary || '',
+        instructions: 'Run and inspect the SQL query below.',
+        starterCode: spec.referenceSql || 'SELECT * FROM customers LIMIT 10;',
+        solutionCode: spec.referenceSql || 'SELECT * FROM customers LIMIT 10;',
+        hint: 'Use the Step-by-Step Clause Visualizer to trace each relational stage.'
+      };
 
-    try {
-      if (typeof monaco.languages.registerCompletionItemProvider === 'function') {
-        monaco.languages.registerCompletionItemProvider('cpp', {
-          triggerCharacters: ['.', ':', '<', '"', '/'],
-          provideCompletionItems(model, position) {
-            const word = model.getWordUntilPosition(position);
-            const range = {
-              startLineNumber: position.lineNumber,
-              endLineNumber: position.lineNumber,
-              startColumn: word.startColumn,
-              endColumn: word.endColumn
-            };
-            const Kind = monaco.languages.CompletionItemKind || {};
-            const InsertRule = monaco.languages.CompletionItemInsertTextRule || {};
-            const suggestions = CPP_COMPLETION_DOCS.map((item) => ({
-              label: item.label,
-              kind: item.label.startsWith('#')
-                ? (Kind.Module || 8)
-                : item.label.startsWith('ASSERT') || item.label === 'DESCRIBE' || item.label === 'TEST'
-                  ? (Kind.Snippet || 27)
-                  : (Kind.Function || 1),
-              detail: item.detail,
-              documentation: { value: item.doc },
-              insertText: item.insertText,
-              insertTextRules: InsertRule.InsertAsSnippet || 4,
-              range
-            }));
-            return { suggestions };
-          }
-        });
-      }
-
-      if (typeof monaco.languages.registerHoverProvider === 'function') {
-        const hoverMap = new Map();
-        for (const item of CPP_COMPLETION_DOCS) {
-          hoverMap.set(item.label, item);
-          const shortName = item.label.replace(/^std::/, '');
-          if (!hoverMap.has(shortName)) hoverMap.set(shortName, item);
-        }
-        monaco.languages.registerHoverProvider('cpp', {
-          provideHover(model, position) {
-            const word = model.getWordAtPosition(position);
-            if (!word || !word.word) return null;
-            const entry = hoverMap.get(word.word) || hoverMap.get('std::' + word.word);
-            if (!entry) return null;
-            return {
-              range: new monaco.Range(
-                position.lineNumber,
-                word.startColumn,
-                position.lineNumber,
-                word.endColumn
-              ),
-              contents: [
-                { value: `**${entry.label}** — *${entry.detail}*` },
-                { value: entry.doc }
-              ]
-            };
-          }
-        });
-      }
-    } catch (err) {
-      console.warn('[CodeLab C++ IntelliSense registration warning]:', err);
-    }
-  }
-
-  function analyzeCppSource(filename, code, workspaceFiles = {}) {
-    const diagnostics = [];
-    const lines = String(code || '').split(/\r?\n/);
-    const hasUsingStd = /\busing\s+namespace\s+std\s*;/.test(code);
-    const hasAnyInclude = /^\s*#\s*include\b/m.test(code);
-
-    // 1. Validate #include directives & line-level patterns
-    for (let i = 0; i < lines.length; i++) {
-      const lineNum = i + 1;
-      const rawLine = lines[i];
-      const trimmed = rawLine.trim();
-
-      // Check #include <...> or #include "..."
-      const incMatch = trimmed.match(/^#\s*include\s*([<"])([^>"]+)([>"])$/);
-      if (incMatch) {
-        const bracket = incMatch[1];
-        const headerPath = incMatch[2].trim();
-        const startCol = rawLine.indexOf(headerPath) + 1;
-        const endCol = startCol + headerPath.length;
-        if (bracket === '<') {
-          if (!KNOWN_CPP_STD_HEADERS.has(headerPath) && !workspaceFiles[headerPath]) {
-            diagnostics.push({
-              line: lineNum,
-              col: startCol,
-              endLine: lineNum,
-              endCol,
-              severity: 'error',
-              code: 'CPP_INCLUDE_NOT_FOUND',
-              message: `Header '<${headerPath}>' not found in WASI sysroot (/usr/include). Try <bits/stdc++.h>, <codelab/dsa.hpp>, or <codelab/test.hpp>.`
-            });
-          }
-        } else if (bracket === '"') {
-          const dir = filename.includes('/') ? filename.slice(0, filename.lastIndexOf('/') + 1) : '';
-          const existsLocal =
-            workspaceFiles[headerPath] !== undefined ||
-            workspaceFiles[dir + headerPath] !== undefined ||
-            workspaceFiles['src/' + headerPath] !== undefined ||
-            KNOWN_CPP_STD_HEADERS.has(headerPath);
-          if (!existsLocal) {
-            diagnostics.push({
-              line: lineNum,
-              col: startCol,
-              endLine: lineNum,
-              endCol,
-              severity: 'error',
-              code: 'CPP_LOCAL_HEADER_MISSING',
-              message: `Local header '"${headerPath}"' does not exist in the workspace.`
-            });
-          }
-        }
-      }
-
-      // Check accidental single '=' inside if (...) condition (excluding ==, !=, <=, >=)
-      const withoutComments = rawLine.replace(/\/\/.*$/, '');
-      const ifAssignMatch = withoutComments.match(/\bif\s*\(\s*([a-zA-Z_]\w*)\s*=[^=]/);
-      if (ifAssignMatch) {
-        const col = rawLine.indexOf(ifAssignMatch[0]) + 1;
-        diagnostics.push({
-          line: lineNum,
-          col,
-          endLine: lineNum,
-          endCol: col + ifAssignMatch[0].length,
-          severity: 'warning',
-          code: 'CPP_ASSIGN_IN_COND',
-          message: `Using assignment '=' in 'if' condition; did you mean '=='?`
-        });
-      }
-    }
-
-    // 2. Lexical scan for bracket/brace/paren balance & unterminated strings/comments
-    const stack = [];
-    const pairs = { '{': '}', '(': ')', '[': ']' };
-    const closers = { '}': '{', ')': '(', ']': '[' };
-    let inBlockComment = false;
-    let blockCommentStart = null;
-
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      const lineNum = i + 1;
-      let inString = false;
-      let stringChar = '';
-      let stringStartCol = 1;
-
-      for (let j = 0; j < line.length; j++) {
-        const ch = line[j];
-        const next = line[j + 1] || '';
-        const col = j + 1;
-
-        if (inBlockComment) {
-          if (ch === '*' && next === '/') {
-            inBlockComment = false;
-            blockCommentStart = null;
-            j++;
-          }
-          continue;
-        }
-
-        if (inString) {
-          if (ch === '\\') {
-            j++;
-            continue;
-          }
-          if (ch === stringChar) {
-            inString = false;
-          }
-          continue;
-        }
-
-        if (ch === '/' && next === '/') {
-          break; // line comment
-        }
-        if (ch === '/' && next === '*') {
-          inBlockComment = true;
-          blockCommentStart = { line: lineNum, col };
-          j++;
-          continue;
-        }
-        if (ch === '"' || ch === "'") {
-          inString = true;
-          stringChar = ch;
-          stringStartCol = col;
-          continue;
-        }
-
-        if (pairs[ch]) {
-          stack.push({ ch, expected: pairs[ch], line: lineNum, col });
-        } else if (closers[ch]) {
-          if (stack.length === 0) {
-            diagnostics.push({
-              line: lineNum,
-              col,
-              endLine: lineNum,
-              endCol: col + 1,
-              severity: 'error',
-              code: 'CPP_UNMATCHED_CLOSER',
-              message: `Unmatched closing '${ch}' with no matching '${closers[ch]}'.`
-            });
-          } else {
-            const top = stack[stack.length - 1];
-            if (top.ch !== closers[ch]) {
-              diagnostics.push({
-                line: lineNum,
-                col,
-                endLine: lineNum,
-                endCol: col + 1,
-                severity: 'error',
-                code: 'CPP_MISMATCHED_BRACKET',
-                message: `Mismatched '${ch}': expected '${top.expected}' to close '${top.ch}' from line ${top.line}:${top.col}.`
-              });
-              stack.pop();
-            } else {
-              stack.pop();
-            }
-          }
-        }
-      }
-
-      if (inString && !line.endsWith('\\')) {
-        diagnostics.push({
-          line: lineNum,
-          col: stringStartCol,
-          endLine: lineNum,
-          endCol: line.length + 1,
-          severity: 'error',
-          code: 'CPP_UNTERMINATED_STRING',
-          message: `Unterminated ${stringChar === '"' ? 'string' : 'character'} literal.`
-        });
-      }
-    }
-
-    if (inBlockComment && blockCommentStart) {
-      diagnostics.push({
-        line: blockCommentStart.line,
-        col: blockCommentStart.col,
-        endLine: blockCommentStart.line,
-        endCol: blockCommentStart.col + 2,
-        severity: 'error',
-        code: 'CPP_UNTERMINATED_COMMENT',
-        message: `Unterminated '/*' block comment.`
+      stepPills.forEach((pill, i) => {
+        pill.classList.toggle('active', i === activeStepIdx);
       });
-    }
 
-    for (const unclosed of stack) {
-      diagnostics.push({
-        line: unclosed.line,
-        col: unclosed.col,
-        endLine: unclosed.line,
-        endCol: unclosed.col + 1,
-        severity: 'error',
-        code: 'CPP_UNCLOSED_DELIMITER',
-        message: `Unclosed '${unclosed.ch}'; expected matching '${unclosed.expected}'.`
-      });
-    }
+      const datasetId = spec.datasetId || 'ecommerce';
+      host.innerHTML = `
+        <div class="sql-guided-step-bar" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:12px 16px;background:var(--bg-elevated,rgba(15,23,42,0.65));border:1px solid var(--border-subtle,rgba(148,163,184,0.18));border-radius:10px 10px 0 0;margin-top:8px;">
+          <div style="flex:1;min-width:240px;">
+            <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--accent-primary,#38bdf8);margin-bottom:2px;">
+              Active Step ${activeStepIdx + 1} of ${steps.length || 1} · Dataset: <code>${escapeHtml(datasetId)}</code>
+            </div>
+            <div style="font-size:0.95rem;font-weight:600;color:var(--text-primary,#f8fafc);">${escapeHtml(step.title || '')}</div>
+            <div style="font-size:0.83rem;color:var(--text-secondary,#94a3b8);margin-top:2px;">${escapeHtml(step.instructions || step.concept || '')}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            ${steps.length > 1 ? `
+              <button type="button" class="btn btn-secondary btn-sm" data-sql-lab-nav="prev" ${activeStepIdx === 0 ? 'disabled' : ''}>← Prev Step</button>
+              <button type="button" class="btn btn-secondary btn-sm" data-sql-lab-nav="next" ${activeStepIdx >= steps.length - 1 ? 'disabled' : ''}>Next Step →</button>
+            ` : ''}
+            <button type="button" class="btn btn-secondary btn-sm" data-sql-lab-action="hint">💡 Hint</button>
+            <button type="button" class="btn btn-secondary btn-sm" data-sql-lab-action="solution">✓ Load Solution SQL</button>
+            <button type="button" class="btn btn-primary btn-sm" data-sql-lab-action="fullscreen">⤢ Full-Screen Studio</button>
+          </div>
+        </div>
+        <div class="sql-guided-step-hint" style="display:none;padding:10px 16px;background:rgba(56,189,248,0.08);border-left:3px solid #38bdf8;font-size:0.83rem;color:var(--text-secondary,#cbd5e1);">
+          <strong>Hint:</strong> ${escapeHtml(step.hint || 'Inspect the intermediate tables produced by each SQL clause.')}
+        </div>
+        <div class="sql-guided-visualizer-mount" style="border:1px solid var(--border-subtle,rgba(148,163,184,0.18));border-top:none;border-radius:0 0 10px 10px;overflow:hidden;"></div>
+      `;
 
-    // 3. Warn if unqualified STL symbols are used without `std::` or `using namespace std;`
-    if (!hasUsingStd && hasAnyInclude) {
-      for (let i = 0; i < lines.length; i++) {
-        const rawLine = lines[i].replace(/\/\/.*$/, '');
-        if (/^\s*#/.test(rawLine)) continue;
-        const unqualifiedMatch = rawLine.match(/(?:^|[^:\w])(vector|unordered_map|unordered_set|priority_queue|cout|cin|endl)\b/);
-        if (unqualifiedMatch) {
-          const sym = unqualifiedMatch[1];
-          const idx = rawLine.indexOf(sym);
-          const before = rawLine.slice(Math.max(0, idx - 5), idx);
-          if (before !== 'std::') {
-            diagnostics.push({
-              line: i + 1,
-              col: idx + 1,
-              endLine: i + 1,
-              endCol: idx + 1 + sym.length,
-              severity: 'warning',
-              code: 'CPP_UNQUALIFIED_STD',
-              message: `'${sym}' is in namespace 'std'. Qualify as 'std::${sym}' or add 'using namespace std;'.`
-            });
-          }
-        }
-      }
-    }
+      const mountSlot = host.querySelector('.sql-guided-visualizer-mount');
+      const hintEl = host.querySelector('.sql-guided-step-hint');
 
-    return diagnostics;
-  }
-
-  function applyCppMarkersToWorkbench(wb, filename, diagItems, owner = 'codelab-cpp-linter') {
-    if (!wb || !filename) return;
-    const monaco = wb.monaco || window.monaco;
-    const model = wb.models?.get(filename) || (typeof wb._getOrCreateModel === 'function' ? wb._getOrCreateModel(filename) : null);
-
-    if (monaco && monaco.editor && model && typeof monaco.editor.setModelMarkers === 'function') {
-      const Sev = monaco.MarkerSeverity || { Error: 8, Warning: 4, Info: 2, Hint: 1 };
-      const markers = diagItems.map((d) => ({
-        startLineNumber: d.line || 1,
-        startColumn: d.col || 1,
-        endLineNumber: d.endLine || d.line || 1,
-        endColumn: d.endCol || (d.col ? d.col + 1 : 100),
-        message: d.message,
-        code: d.code || owner,
-        source: owner,
-        severity: d.severity === 'error'
-          ? (Sev.Error || 8)
-          : d.severity === 'warning'
-            ? (Sev.Warning || 4)
-            : (Sev.Info || 2)
-      }));
-      monaco.editor.setModelMarkers(model, owner, markers);
-    }
-
-    // Sync with CodeLab's unified DiagnosticsStore (Problems panel)
-    const diagMod = window.CodeLab?.diagnostics || window.CodeLabDiagnostics;
-    if (!wb._diagnosticsStore && diagMod && typeof diagMod.createDiagnosticsStore === 'function') {
-      wb._diagnosticsStore = diagMod.createDiagnosticsStore();
-    }
-    if (wb._diagnosticsStore) {
-      const sourceTag = `${owner}:${filename}`;
-      if (typeof wb._diagnosticsStore.clear === 'function') {
-        wb._diagnosticsStore.clear(sourceTag);
-      }
-      if (typeof wb._diagnosticsStore.add === 'function') {
-        diagItems.forEach((d, idx) => {
-          wb._diagnosticsStore.add({
-            id: `${sourceTag}:${idx}:${d.line}:${d.col}`,
-            file: filename,
-            line: d.line || 1,
-            column: d.col || 1,
-            endLine: d.endLine || d.line || 1,
-            endColumn: d.endCol || (d.col ? d.col + 1 : 2),
-            message: d.message,
-            severity: d.severity || 'error',
-            source: sourceTag,
-            code: d.code || owner
+      const mountNow = () => {
+        if (window.TableVisualizer && typeof window.TableVisualizer.mountClauseVisualizer === 'function') {
+          window.TableVisualizer.mountClauseVisualizer(mountSlot, {
+            datasetId,
+            sql: step.starterCode || spec.referenceSql || 'SELECT * FROM customers LIMIT 10;',
+            title: step.title || spec.title || 'Guided SQL Lab'
           });
-        });
-      }
-    }
-  }
-
-  function applyClangStderrDiagnostics(wb, stderrText) {
-    if (!wb) return;
-    const files = Object.keys(wb.files || {}).filter(f => /\.(cpp|cc|cxx|hpp|h)$/i.test(f));
-    const perFile = new Map();
-    for (const f of files) perFile.set(f, []);
-
-    const regex = /^([^\s:]+):(\d+):(\d+):\s*(fatal error|error|warning|note):\s*(.+)$/gm;
-    let match;
-    while ((match = regex.exec(String(stderrText || ''))) !== null) {
-      const rawPath = match[1].replace(/^\/workspace\/+/, '').replace(/^\.\//, '');
-      const line = parseInt(match[2], 10) || 1;
-      const col = parseInt(match[3], 10) || 1;
-      const kind = match[4];
-      const msg = match[5];
-      if (kind === 'note') continue;
-
-      const targetFile = files.find(f => f === rawPath || f.endsWith('/' + rawPath) || rawPath.endsWith('/' + f)) || wb.activeFile;
-      if (targetFile) {
-        if (!perFile.has(targetFile)) perFile.set(targetFile, []);
-        perFile.get(targetFile).push({
-          line,
-          col,
-          endLine: line,
-          endCol: col + 8,
-          severity: kind === 'warning' ? 'warning' : 'error',
-          code: 'clang++',
-          message: `[clang++] ${msg}`
-        });
-      }
-    }
-
-    for (const [file, items] of perFile.entries()) {
-      applyCppMarkersToWorkbench(wb, file, items, 'clang-wasi');
-    }
-  }
-
-  function buildMinimalWasiBinary(stdoutText, exitCode = 0, stderrText = '') {
-    const outBytes = Array.from(new TextEncoder().encode(stdoutText));
-    const errBytes = Array.from(new TextEncoder().encode(stderrText));
-
-    function uleb(val) {
-      const out = [];
-      let v = val >>> 0;
-      do {
-        let byte = v & 0x7f;
-        v >>>= 7;
-        if (v !== 0) byte |= 0x80;
-        out.push(byte);
-      } while (v !== 0);
-      return out;
-    }
-
-    function sleb(val) {
-      const out = [];
-      let v = val | 0;
-      let more = true;
-      while (more) {
-        let byte = v & 0x7f;
-        v >>= 7;
-        if ((v === 0 && (byte & 0x40) === 0) || (v === -1 && (byte & 0x40) !== 0)) {
-          more = false;
-        } else {
-          byte |= 0x80;
         }
-        out.push(byte);
-      }
-      return out;
-    }
-
-    function encStr(str) {
-      const b = Array.from(new TextEncoder().encode(str));
-      return [...uleb(b.length), ...b];
-    }
-
-    function sec(id, payload) {
-      return [id, ...uleb(payload.length), ...payload];
-    }
-
-    const typeSec = sec(1, [
-      3,
-      0x60, 4, 0x7f, 0x7f, 0x7f, 0x7f, 1, 0x7f,
-      0x60, 1, 0x7f, 0,
-      0x60, 0, 0
-    ]);
-
-    const importSec = sec(2, [
-      2,
-      ...encStr('wasi_snapshot_preview1'),
-      ...encStr('fd_write'),
-      0x00, 0,
-      ...encStr('wasi_snapshot_preview1'),
-      ...encStr('proc_exit'),
-      0x00, 1
-    ]);
-
-    const funcSec = sec(3, [1, 2]);
-    const memSec = sec(5, [1, 0x00, 1]);
-    const exportSec = sec(7, [
-      2,
-      ...encStr('memory'), 0x02, 0,
-      ...encStr('_start'), 0x00, 2
-    ]);
-
-    const body = [
-      0,
-      0x41, ...sleb(0),
-      0x41, ...sleb(64),
-      0x36, 2, 0,
-      0x41, ...sleb(4),
-      0x41, ...sleb(outBytes.length),
-      0x36, 2, 0,
-      0x41, ...sleb(1),
-      0x41, ...sleb(0),
-      0x41, ...sleb(1),
-      0x41, ...sleb(16),
-      0x10, 0,
-      0x1a
-    ];
-
-    if (errBytes.length > 0) {
-      body.push(
-        0x41, ...sleb(8),
-        0x41, ...sleb(64 + outBytes.length),
-        0x36, 2, 0,
-        0x41, ...sleb(12),
-        0x41, ...sleb(errBytes.length),
-        0x36, 2, 0,
-        0x41, ...sleb(2),
-        0x41, ...sleb(8),
-        0x41, ...sleb(1),
-        0x41, ...sleb(16),
-        0x10, 0,
-        0x1a
-      );
-    }
-
-    if (exitCode !== 0) {
-      body.push(
-        0x41, ...sleb(exitCode),
-        0x10, 1
-      );
-    }
-
-    body.push(0x0b);
-
-    const codeSec = sec(10, [1, ...uleb(body.length), ...body]);
-    const combinedData = [...outBytes, ...errBytes];
-    const dataSec = sec(11, [
-      1,
-      0x00,
-      0x41, ...sleb(64), 0x0b,
-      ...uleb(combinedData.length),
-      ...combinedData
-    ]);
-
-    return new Uint8Array([
-      0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00,
-      ...typeSec,
-      ...importSec,
-      ...funcSec,
-      ...memSec,
-      ...exportSec,
-      ...codeSec,
-      ...dataSec
-    ]);
-  }
-
-  function createCppCompilerHook(wb) {
-    return async function cppCompilerHook(req = {}) {
-      const vfs = req.vfs || (wb && wb.vfs);
-      const rawSources = req.sourceFiles && req.sourceFiles.length > 0
-        ? req.sourceFiles
-        : (req.entry ? [req.entry] : ['/workspace/src/main.cpp']);
-      const sourceFiles = rawSources.map(s => s.startsWith('/') ? s : `/workspace/${s.replace(/^\/+/, '')}`);
-      const outputPath = req.outputPath || '/workspace/a.out';
-
-      let stdoutAcc = '';
-      let stderrAcc = '';
-      const emitOut = (t) => {
-        stdoutAcc += t;
-        if (typeof req.onStdout === 'function') req.onStdout(t);
-      };
-      const emitErr = (t) => {
-        stderrAcc += t;
-        if (typeof req.onStderr === 'function') req.onStderr(t);
       };
 
-      const primaryFile = sourceFiles[0];
-      let sourceCode = '';
-      try {
-        if (vfs && typeof vfs.readFileSync === 'function' && vfs.existsSync(primaryFile)) {
-          sourceCode = vfs.readFileSync(primaryFile, 'utf8');
-        } else if (vfs && typeof vfs.readFileSync === 'function' && vfs.existsSync('/workspace/src/main.cpp')) {
-          sourceCode = vfs.readFileSync('/workspace/src/main.cpp', 'utf8');
-        } else {
-          sourceCode = wb?.files?.[primaryFile] || wb?.files?.['src/main.cpp'] || '';
-        }
-      } catch (_) {
-        sourceCode = wb?.files?.[primaryFile] || wb?.files?.['src/main.cpp'] || '';
-      }
-
-      // Check for syntax issues
-      const diags = analyzeCppSource(primaryFile, sourceCode, wb?.files || {});
-      const fatalErrors = diags.filter(d => d.severity === 1 || d.severity === 'error');
-      if (fatalErrors.length > 0) {
-        for (const err of fatalErrors) {
-          emitErr(`clang++: error: ${err.message || 'syntax error'}\n`);
-        }
-        return {
-          ok: false,
-          exitCode: 1,
-          wasmBinary: null,
-          outputPath,
-          stdout: stdoutAcc,
-          stderr: stderrAcc
-        };
-      }
-
-      // Evaluate algorithmic logic & unit test assertions
-      let executionOutput = '';
-      let exitCode = 0;
-
-      // Check for unimplemented TODO markers in user code
-      const todoMatches = [...sourceCode.matchAll(/\/\/\s*TODO\b([^\n]*)/gi)];
-      const describeMatch = sourceCode.match(/DESCRIBE\s*\(\s*"([^"]+)"/);
-      const testMatches = [...sourceCode.matchAll(/TEST\s*\(\s*"([^"]+)"/g)];
-
-      if (todoMatches.length > 0 && (describeMatch || testMatches.length > 0 || /verify_step_\d+\s*\(/.test(sourceCode))) {
-        const suiteName = describeMatch ? describeMatch[1] : 'C++20 Guided Lab Verification';
-        const linesOut = [`=== ${suiteName} (Clang C++20 WASI Test Runner) ===`, ''];
-        let passedCount = 0;
-        let failedCount = 0;
-
-        const tests = testMatches.length > 0 ? testMatches.map(m => m[1]) : todoMatches.map((m, i) => `Step ${i + 1}${m[1]}`);
-        tests.forEach((tName, idx) => {
-          const stepNum = idx + 1;
-          const stepRegex = new RegExp(`TODO\\s*\\(\\s*Step\\s*${stepNum}\\b`, 'i');
-          const hasGenericTodo = todoMatches.some(m => !/Step\s*\d+/i.test(m[0]));
-          const stepIncomplete = stepRegex.test(sourceCode) || (hasGenericTodo && idx < todoMatches.length);
-          if (stepIncomplete) {
-            failedCount++;
-            linesOut.push(`  ✗ FAIL: ${tName}`);
-            linesOut.push(`    -> Unfinished implementation: replace // TODO (Step ${stepNum}) with working C++20 logic.`);
-          } else {
-            passedCount++;
-            linesOut.push(`  ✓ PASS: ${tName}`);
-          }
-        });
-
-        linesOut.push('');
-        linesOut.push(`Test Summary: ${passedCount} passed, ${failedCount} failed (${passedCount + failedCount} total)`);
-        if (failedCount > 0) {
-          exitCode = 1;
-          emitErr(`AssertionError: ${failedCount} guided step(s) still contain unimplemented // TODO placeholders.\n`);
-        }
-        executionOutput = linesOut.join('\n') + '\n';
-      } else if (/solveAkraBazziExponent\b|RecurrenceTerm\b|Akra-Bazzi/i.test(sourceCode)) {
-        function solveAkraBazzi(terms) {
-          const phi = (p) => terms.reduce((sum, t) => sum + t.a * Math.pow(t.b, p), 0);
-          let lo = -64.0, hi = 64.0;
-          for (let iter = 0; iter < 80; ++iter) {
-            const mid = 0.5 * (lo + hi);
-            if (phi(mid) > 1.0) lo = mid;
-            else hi = mid;
-          }
-          return 0.5 * (lo + hi);
-        }
-
-        const bfprtTerms = [{ a: 1.0, b: 0.2 }, { a: 1.0, b: 0.7 }];
-        const pBfprt = solveAkraBazzi(bfprtTerms);
-        const qsTerms = [{ a: 1.0, b: 0.1 }, { a: 1.0, b: 0.9 }];
-        const pQs = solveAkraBazzi(qsTerms);
-
-        executionOutput = [
-          '=== Akra-Bazzi Recurrence Solver (C++20 WASI) ===',
-          '',
-          '1. Recurrence: T(n) = T(n/5) + T(7n/10) + Theta(n) [BFPRT Median-of-Medians Selection]',
-          '   Contraction terms: a1=1.0, b1=0.20 | a2=1.0, b2=0.70',
-          '   Characteristic equation: (0.2)^p + (0.7)^p = 1.0',
-          `   Solved exponent p = ${pBfprt.toFixed(6)} (converged in 80 bisection steps, |phi(p)-1| < 1e-12)`,
-          '   Sum rule: sum(b_i) = 0.900000 < 1.0 ==> Contracting Subproblem Regime (p < 1)',
-          '   Asymptotic bound: T(n) = Theta(n)',
-          '',
-          '2. Recurrence: T(n) = T(n/10) + T(9n/10) + Theta(n) [Lopsided Quicksort 1:9]',
-          '   Contraction terms: a1=1.0, b1=0.10 | a2=1.0, b2=0.90',
-          '   Characteristic equation: (0.1)^p + (0.9)^p = 1.0',
-          `   Solved exponent p = ${pQs.toFixed(6)} ==> Measure-Preserving Split (p = 1)`,
-          '   Asymptotic bound: T(n) = Theta(n log n)',
-          '',
-          '✓ Execution finished with exit code 0.'
-        ].join('\n') + '\n';
-      } else if (describeMatch || testMatches.length > 0) {
-        const suiteName = describeMatch ? describeMatch[1] : 'C++20 Guided Lab Verification';
-        const tests = testMatches.length > 0 ? testMatches.map(m => m[1]) : ['verifies algorithm invariants'];
-        const linesOut = [`=== ${suiteName} (Clang C++20 WASI Test Runner) ===`, ''];
-        tests.forEach(tName => {
-          linesOut.push(`  ✓ PASS: ${tName}`);
-        });
-        linesOut.push('');
-        linesOut.push(`Test Summary: ${tests.length} passed, 0 failed (${tests.length} total)`);
-        linesOut.push('✓ All C++20 assertions verified (exit code 0).');
-        executionOutput = linesOut.join('\n') + '\n';
+      if (window.SQLEngine && typeof window.SQLEngine.init === 'function') {
+        window.SQLEngine.init().then(mountNow).catch(mountNow);
       } else {
-        const coutMatches = sourceCode.match(/std::cout\s*<<\s*("[^"]*")/g);
-        if (coutMatches && coutMatches.length > 0) {
-          executionOutput = coutMatches
-            .map(m => {
-              const sm = m.match(/"([^"]*)"/);
-              return sm ? sm[1].replace(/\\n/g, '\n').replace(/\\t/g, '\t') : '';
-            })
-            .join('');
-          if (!executionOutput.endsWith('\n')) executionOutput += '\n';
-        } else {
-          executionOutput = 'Compiled and executed with C++20 (Virtual WASI Runtime)!\n';
-        }
+        mountNow();
       }
 
-      emitOut(executionOutput);
-
-      const buildWasi = window.CodeLab?.extensions?.cpp?.buildWasiPrintWasm || buildMinimalWasiBinary;
-      const wasmBinary = buildWasi(executionOutput, exitCode, stderrAcc);
-
-      if (vfs && typeof vfs.writeFileSync === 'function') {
-        try {
-          vfs.writeFileSync(outputPath, wasmBinary);
-          if (typeof vfs.chmodSync === 'function') {
-            vfs.chmodSync(outputPath, 0o755);
-          }
-        } catch (_) {}
-      }
-
-      return {
-        ok: exitCode === 0,
-        exitCode,
-        wasmBinary,
-        outputPath,
-        stdout: stdoutAcc,
-        stderr: stderrAcc
-      };
-    };
-  }
-
-  function attachCppVscodeExtension(wb, mountOpts = {}) {
-    if (!wb || wb._cppVscodeExtAttached) return wb;
-    wb._cppVscodeExtAttached = true;
-
-    const ensureCppCore = () => {
-      const ext = window.CodeLab?.extensions || {};
-      if (!wb.cppToolchain && typeof ext.cpp === 'function') {
-        const origRenderShell = wb._renderShell;
-        const origBindEvents = wb._bindEvents;
-        wb._renderShell = function () {
-          if (typeof this._refreshLanguageSwitcher === 'function') this._refreshLanguageSwitcher();
-        };
-        wb._bindEvents = function () {};
-        try {
-          ext.cpp(wb, {
-            std: 'c++20',
-            optLevel: '-O2',
-            cacheInIndexedDB: true,
-            files: mountOpts.cppFiles || mountOpts.cppSolutionFiles,
-            starterFiles: mountOpts.cppStarterFiles,
-            solutionFiles: mountOpts.cppSolutionFiles,
-            activate: false,
-            compilerHook: mountOpts.compilerHook || createCppCompilerHook(wb)
-          });
-        } finally {
-          wb._renderShell = origRenderShell;
-          wb._bindEvents = origBindEvents;
-        }
-      }
-
-      // Wrap wb.cppCompiler once so Clang WASI compile errors/warnings become editor squiggles
-      if (wb.cppCompiler && !wb.cppCompiler._hasDiagnosticWrapper) {
-        const baseCompiler = wb.cppCompiler;
-        const wrappedCompiler = async (req = {}) => {
-          let stderrBuf = '';
-          const origStderr = req.onStderr;
-          const res = await baseCompiler({
-            ...req,
-            onStderr: (chunk) => {
-              stderrBuf += String(chunk || '');
-              if (typeof origStderr === 'function') origStderr(chunk);
-            }
-          });
-          applyClangStderrDiagnostics(wb, stderrBuf);
-          return res;
-        };
-        wrappedCompiler._hasDiagnosticWrapper = true;
-        wb.cppCompiler = wrappedCompiler;
-        window.__codelabCppCompiler = wrappedCompiler;
-      }
-    };
-
-    const runCppLintPass = (targetFilename) => {
-      const monaco = wb.monaco || window.monaco;
-      if (monaco) ensureMonacoCppProviders(monaco);
-      const filesMap = wb.files || {};
-      const candidates = targetFilename
-        ? [targetFilename].filter(f => /\.(cpp|cc|cxx|hpp|h)$/i.test(f))
-        : Object.keys(filesMap).filter(f => /\.(cpp|cc|cxx|hpp|h)$/i.test(f));
-
-      for (const fname of candidates) {
-        const content = filesMap[fname];
-        if (typeof content !== 'string') continue;
-        const diags = analyzeCppSource(fname, content, filesMap);
-        applyCppMarkersToWorkbench(wb, fname, diags, 'codelab-cpp-linter');
-      }
-    };
-
-    ensureCppCore();
-
-    // Hook setLanguage so switching to C++ always activates the C++ extension + VS Code linter/IntelliSense
-    if (typeof wb.setLanguage === 'function' && !wb._setLanguageCppHooked) {
-      const origSetLanguage = wb.setLanguage.bind(wb);
-      wb._setLanguageCppHooked = true;
-      wb.setLanguage = function (newLang) {
-        const normalized = newLang === 'c++' ? 'cpp' : newLang;
-        if (normalized === 'cpp') {
-          ensureCppCore();
-        }
-        const res = origSetLanguage(normalized);
-        if (normalized === 'cpp') {
-          setTimeout(() => runCppLintPass(), 40);
-        }
-        return res;
-      };
-    }
-
-    // Live debounced linting on C++ file edits
-    let lintTimer = null;
-    if (typeof wb.on === 'function') {
-      wb.on('codelab:code-change', (ev) => {
-        const fname = ev?.filename || ev?.path || wb.activeFile;
-        if (!fname || !/\.(cpp|cc|cxx|hpp|h)$/i.test(fname)) return;
-        if (lintTimer) clearTimeout(lintTimer);
-        lintTimer = setTimeout(() => runCppLintPass(fname), 150);
+      host.querySelectorAll('[data-sql-lab-nav]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const dir = btn.getAttribute('data-sql-lab-nav');
+          renderActiveStep(dir === 'next' ? activeStepIdx + 1 : activeStepIdx - 1);
+        });
       });
-    }
 
-    // Run initial pass once Monaco finishes loading
-    setTimeout(() => runCppLintPass(), 300);
-    setTimeout(() => runCppLintPass(), 1000);
-    return wb;
-  }
-
-  function mountCodeLabWithExtensions(mountEl, mountOpts = {}) {
-    const CodeLab = window.CodeLab;
-    if (!CodeLab || !mountEl) return null;
-
-    const targetLang = (mountOpts.language || mountOpts.lang || 'cpp').toLowerCase();
-    const isCppTarget = targetLang === 'cpp' || targetLang === 'c++';
-    const allowedLangs = Array.isArray(mountOpts.languages) && mountOpts.languages.length > 0
-      ? mountOpts.languages
-      : (isCppTarget ? ['cpp'] : [targetLang]);
-
-    if (isCppTarget) {
-      mountOpts.language = 'cpp';
-      mountOpts.lang = 'cpp';
-      mountOpts.languages = allowedLangs;
-      mountOpts.activeFile = mountOpts.activeFile || mountOpts.cppEntry || mountOpts.entry || 'src/main.cpp';
-      // Evict any stale JS/TS cached state in localStorage for this labId
-      try {
-        const lid = mountOpts.labId || mountOpts.id;
-        if (lid) {
-          for (const prefix of ['codelab:v1:', 'codelab_state_', 'sd-codelab-v1:', 'sd_codelab_']) {
-            const raw = localStorage.getItem(prefix + lid);
-            if (raw && (raw.includes('"lang":"js"') || raw.includes('"lang":"ts"') || raw.includes('index.js'))) {
-              localStorage.removeItem(prefix + lid);
-            }
-          }
-        }
-      } catch (_) {}
-    }
-
-    const wb = CodeLab.mount(mountEl, mountOpts);
-    const ext = CodeLab.extensions || {};
-    if (wb && typeof wb.use === 'function') {
-      // Prevent extension hooks from clobbering the active Monaco host DOM or duplicating container click listeners
-      const origRenderShell = wb._renderShell;
-      const origBindEvents = wb._bindEvents;
-      wb._renderShell = function () {
-        if (typeof this._refreshLanguageSwitcher === 'function') this._refreshLanguageSwitcher();
-      };
-      wb._bindEvents = function () {};
-
-      try {
-        if (allowedLangs.includes('ts') && typeof ext.typescript === 'function') {
-          wb.use((w) => ext.typescript(w, {
-            files: mountOpts.tsFiles || mountOpts.tsSolutionFiles,
-            starterFiles: mountOpts.tsStarterFiles,
-            solutionFiles: mountOpts.tsSolutionFiles,
-            activate: targetLang === 'ts'
-          }));
-        }
-        if ((allowedLangs.includes('cpp') || isCppTarget) && typeof ext.cpp === 'function') {
-          wb.use((w) => ext.cpp(w, {
-            std: 'c++20',
-            optLevel: '-O2',
-            cacheInIndexedDB: true,
-            files: mountOpts.cppFiles || mountOpts.files || mountOpts.cppSolutionFiles,
-            starterFiles: mountOpts.cppStarterFiles || mountOpts.starterFiles,
-            solutionFiles: mountOpts.cppSolutionFiles || mountOpts.solutionFiles,
-            activate: isCppTarget
-          }));
-        }
-        if (allowedLangs.includes('py') && typeof ext.python === 'function') {
-          wb.use((w) => ext.python(w, {
-            preloadPackages: ['numpy', 'pytest'],
-            files: mountOpts.pyFiles || mountOpts.pySolutionFiles,
-            starterFiles: mountOpts.pyStarterFiles,
-            solutionFiles: mountOpts.pySolutionFiles,
-            activate: targetLang === 'py' || targetLang === 'python'
-          }));
-          const vfs = wb.vfs || wb.shell?.vfs;
-          if (vfs && typeof window.CodeLab.seedPythonModulesIntoVfs === 'function') {
-            window.CodeLab.seedPythonModulesIntoVfs(vfs);
-          }
-        }
-        const guidedSteps = mountOpts.steps || mountOpts.guided?.steps;
-        if (typeof ext.guidedLab === 'function' && Array.isArray(guidedSteps) && guidedSteps.length > 0) {
-          wb.use((w) => ext.guidedLab(w, {
-            ...(mountOpts.guided || {}),
-            mode: mountOpts.mode,
-            lang: isCppTarget ? 'cpp' : targetLang,
-            language: isCppTarget ? 'cpp' : targetLang,
-            mainFile: isCppTarget ? 'src/main.cpp' : undefined,
-            stepIndex: mountOpts.stepIndex,
-            starterFiles: mountOpts.starterFiles || mountOpts.guided?.starterFiles,
-            solutionFiles: mountOpts.solutionFiles || mountOpts.guided?.solutionFiles,
-            tsStarterFiles: mountOpts.tsStarterFiles || mountOpts.guided?.tsStarterFiles,
-            tsSolutionFiles: mountOpts.tsSolutionFiles || mountOpts.guided?.tsSolutionFiles,
-            cppStarterFiles: mountOpts.cppStarterFiles || mountOpts.guided?.cppStarterFiles || mountOpts.starterFiles,
-            cppSolutionFiles: mountOpts.cppSolutionFiles || mountOpts.guided?.cppSolutionFiles || mountOpts.solutionFiles,
-            pyStarterFiles: mountOpts.pyStarterFiles || mountOpts.guided?.pyStarterFiles,
-            pySolutionFiles: mountOpts.pySolutionFiles || mountOpts.guided?.pySolutionFiles,
-            steps: guidedSteps,
-            onStepComplete: mountOpts.onStepComplete,
-            onLabComplete: mountOpts.onLabComplete
-          }));
-        }
-        wb.use((w) => attachCppVscodeExtension(w, mountOpts));
-      } finally {
-        wb._renderShell = origRenderShell;
-        wb._bindEvents = origBindEvents;
+      const hintBtn = host.querySelector('[data-sql-lab-action="hint"]');
+      if (hintBtn && hintEl) {
+        hintBtn.addEventListener('click', () => {
+          hintEl.style.display = hintEl.style.display === 'none' ? 'block' : 'none';
+        });
       }
 
-      if (isCppTarget && allowedLangs.length === 1 && allowedLangs[0] === 'cpp') {
-        wb.enabledLanguages = new Set(['cpp']);
-        wb.hasMultipleLanguages = false;
-        wb.lang = 'cpp';
-        const cppFilesMap = mountOpts.files || mountOpts.cppFiles || mountOpts.cppStarterFiles || {};
-        if (Object.keys(cppFilesMap).length > 0) {
-          wb.files = { ...cppFilesMap };
-          if (wb.vfs && typeof wb.vfs.writeFile === 'function') {
-            for (const [k, v] of Object.entries(wb.files)) {
-              try { wb.vfs.writeFile(k, v); } catch (_) {}
-            }
+      const solBtn = host.querySelector('[data-sql-lab-action="solution"]');
+      if (solBtn) {
+        solBtn.addEventListener('click', () => {
+          if (window.TableVisualizer && typeof window.TableVisualizer.mountClauseVisualizer === 'function') {
+            window.TableVisualizer.mountClauseVisualizer(mountSlot, {
+              datasetId,
+              sql: step.solutionCode || step.starterCode || spec.referenceSql,
+              title: `${step.title || 'Step'} (Solution SQL)`
+            });
           }
-        }
-        const entryCpp = mountOpts.activeFile || mountOpts.cppEntry || 'src/main.cpp';
-        wb.activeFile = wb.files[entryCpp] !== undefined ? entryCpp : Object.keys(wb.files)[0];
-        wb.openTabs = [wb.activeFile, ...(wb.files['README.md'] && wb.activeFile !== 'README.md' ? ['README.md'] : [])];
-        if (typeof wb.setLanguage === 'function') {
-          try { wb.setLanguage('cpp'); } catch (_) {}
-        }
-        if (typeof wb.openFile === 'function' && wb.activeFile) {
-          try { wb.openFile(wb.activeFile); } catch (_) {}
-        }
+        });
       }
 
-      if (typeof wb._refreshLanguageSwitcher === 'function') wb._refreshLanguageSwitcher();
-      if (typeof wb._renderStepPills === 'function') wb._renderStepPills();
-      if (typeof wb._renderGuidePane === 'function') wb._renderGuidePane();
-      if (typeof wb._renderFileLists === 'function') wb._renderFileLists();
-      if (typeof wb._renderTabs === 'function') wb._renderTabs();
+      const fullBtn = host.querySelector('[data-sql-lab-action="fullscreen"]');
+      if (fullBtn) {
+        fullBtn.addEventListener('click', () => {
+          const ta = mountSlot.querySelector('textarea');
+          const currentSql = ta ? ta.value : (step.starterCode || spec.referenceSql);
+          openSqlStudioModal({
+            slug,
+            title: spec.title || `SQL Studio — ${slug}`,
+            summary: spec.summary || '',
+            datasetId,
+            sql: currentSql,
+            steps,
+            activeStepIdx
+          });
+        });
+      }
     }
-    return wb;
+
+    stepPills.forEach((pill, idx) => {
+      pill.style.cursor = 'pointer';
+      pill.addEventListener('click', () => renderActiveStep(idx));
+    });
+
+    renderActiveStep(0);
   }
 
   function closeGlobalCodeLab() {
     const overlay = document.getElementById('global-codelab-overlay');
     if (overlay) {
+      overlay.classList.remove('open');
       overlay.classList.remove('is-open');
       overlay.setAttribute('aria-hidden', 'true');
+      overlay.innerHTML = '';
     }
+    document.body.style.overflow = '';
     document.body.classList.remove('codelab-fullscreen-lock');
-    if (globalCodeLabInstance) {
-      if (window.CodeLab?.unmount) window.CodeLab.unmount(globalCodeLabInstance);
-      else if (globalCodeLabInstance.destroy) globalCodeLabInstance.destroy();
-      globalCodeLabInstance = null;
-    }
+    globalCodeLabInstance = null;
   }
 
-  function openGlobalCodeLab(mountOpts = {}) {
+  function openSqlStudioModal(options) {
+    const opts = options || {};
     let overlay = document.getElementById('global-codelab-overlay');
     if (!overlay) {
       overlay = document.createElement('div');
       overlay.id = 'global-codelab-overlay';
-      overlay.className = 'build-lab-overlay';
-      overlay.setAttribute('aria-hidden', 'true');
-      overlay.innerHTML = '<div id="global-codelab-mount" class="build-lab-mount"></div>';
+      overlay.className = 'global-codelab-overlay build-lab-overlay';
       document.body.appendChild(overlay);
     }
-    const mountEl = document.getElementById('global-codelab-mount');
+
+    const spec = opts.slug ? getTopicLabSpec(opts.slug) : null;
+    const title = opts.title || (spec ? spec.title : 'Interactive SQL & Table Studio (PostgreSQL 18 / SQLite WASM)');
+    const summary = opts.summary || (spec ? spec.summary : 'Execute SQL against real relational datasets, inspect schemas, and step through clause-by-clause table transformations.');
+    const steps = Array.isArray(opts.steps) && opts.steps.length > 0 ? opts.steps : (spec && Array.isArray(spec.steps) ? spec.steps : []);
+    let activeStepIdx = typeof opts.activeStepIdx === 'number' ? opts.activeStepIdx : 0;
+    let activeDatasetId = opts.datasetId || (spec && spec.datasetId) || 'ecommerce';
+    let activeEngine = (window.SQLEngine && typeof window.SQLEngine.getActiveEngineType === 'function')
+      ? window.SQLEngine.getActiveEngineType()
+      : 'sqlite';
+
+    const initialSql = opts.sql || (steps[activeStepIdx] && steps[activeStepIdx].starterCode) || (spec && spec.referenceSql) || 'SELECT * FROM customers LIMIT 10;';
+    const datasets = window.SQL_DATASETS || {};
+    const datasetKeys = Object.keys(datasets).length > 0 ? Object.keys(datasets) : ['ecommerce', 'hr_analytics', 'saas_events', 'fintech_ledger', 'social_graph'];
+
+    overlay.innerHTML = `
+      <div class="global-codelab-shell sql-studio-modal-shell" style="display:flex;flex-direction:column;width:96vw;max-width:1560px;height:92vh;margin:4vh auto;background:var(--bg-primary,#0b0f19);border:1px solid var(--border-subtle,rgba(148,163,184,0.22));border-radius:14px;overflow:hidden;box-shadow:0 25px 70px rgba(0,0,0,0.65);">
+        <div class="global-codelab-topbar" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;background:var(--bg-elevated,#111827);border-bottom:1px solid var(--border-subtle,rgba(148,163,184,0.18));">
+          <div class="global-codelab-topbar-left" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <button class="btn btn-secondary btn-sm global-codelab-back-btn" id="global-codelab-close-btn">
+              ← ${escapeHtml(opts.backLabel || 'Back to Lesson')}
+            </button>
+            <div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span class="global-codelab-badge" style="background:rgba(56,189,248,0.15);color:#38bdf8;padding:2px 8px;border-radius:999px;font-size:0.72rem;font-weight:700;">SQL STUDIO</span>
+                <strong style="font-size:0.98rem;color:var(--text-primary,#f8fafc);">${escapeHtml(title)}</strong>
+              </div>
+              <div style="font-size:0.78rem;color:var(--text-secondary,#94a3b8);margin-top:2px;">${escapeHtml(summary)}</div>
+            </div>
+          </div>
+          <div class="global-codelab-topbar-right" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <label style="font-size:0.78rem;color:var(--text-secondary,#94a3b8);display:flex;align-items:center;gap:6px;">
+              Dataset:
+              <select id="sql-studio-modal-dataset" style="background:var(--bg-primary,#0b0f19);color:var(--text-primary,#f8fafc);border:1px solid var(--border-subtle,rgba(148,163,184,0.28));border-radius:6px;padding:4px 8px;font-size:0.8rem;">
+                ${datasetKeys.map(k => {
+                  const ds = datasets[k] || { label: k };
+                  return `<option value="${escapeHtml(k)}" ${k === activeDatasetId ? 'selected' : ''}>${escapeHtml(ds.label || k)}</option>`;
+                }).join('')}
+              </select>
+            </label>
+            <label style="font-size:0.78rem;color:var(--text-secondary,#94a3b8);display:flex;align-items:center;gap:6px;">
+              Engine:
+              <select id="sql-studio-modal-engine" style="background:var(--bg-primary,#0b0f19);color:var(--text-primary,#f8fafc);border:1px solid var(--border-subtle,rgba(148,163,184,0.28));border-radius:6px;padding:4px 8px;font-size:0.8rem;">
+                <option value="sqlite" ${activeEngine === 'sqlite' ? 'selected' : ''}>SQLite 3 (WASM)</option>
+                <option value="postgres" ${activeEngine === 'postgres' ? 'selected' : ''}>PostgreSQL 18 (PGlite WASM)</option>
+              </select>
+            </label>
+            <button class="btn btn-secondary btn-sm" id="sql-studio-modal-reset-btn">↺ Reset Dataset</button>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:260px 1fr;flex:1;min-height:0;overflow:hidden;">
+          <aside id="sql-studio-modal-schema" style="border-right:1px solid var(--border-subtle,rgba(148,163,184,0.18));background:var(--bg-secondary,#0f172a);padding:14px;overflow-y:auto;">
+            <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-secondary,#94a3b8);margin-bottom:10px;">Schema Explorer</div>
+            <div id="sql-studio-modal-schema-list" style="font-size:0.82rem;color:var(--text-primary,#e2e8f0);"></div>
+            ${steps.length > 0 ? `
+              <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-secondary,#94a3b8);margin:18px 0 8px;">Guided Lab Steps</div>
+              <div id="sql-studio-modal-steps" style="display:flex;flex-direction:column;gap:6px;">
+                ${steps.map((s, idx) => `
+                  <button type="button" data-modal-step="${idx}" style="text-align:left;padding:8px 10px;border-radius:8px;border:1px solid ${idx === activeStepIdx ? '#38bdf8' : 'rgba(148,163,184,0.18)'};background:${idx === activeStepIdx ? 'rgba(56,189,248,0.12)' : 'rgba(15,23,42,0.5)'};color:var(--text-primary,#f8fafc);cursor:pointer;font-size:0.8rem;">
+                    <div style="font-weight:700;color:#38bdf8;">Step ${idx + 1}</div>
+                    <div>${escapeHtml(s.title || `Step ${idx + 1}`)}</div>
+                  </button>
+                `).join('')}
+              </div>
+            ` : ''}
+          </aside>
+
+          <main style="display:flex;flex-direction:column;min-height:0;overflow-y:auto;padding:16px;gap:14px;">
+            ${steps.length > 0 ? `
+              <div id="sql-studio-modal-step-banner" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.25);border-radius:8px;">
+                <div>
+                  <strong id="sql-studio-modal-step-title" style="color:var(--text-primary,#f8fafc);font-size:0.9rem;">${escapeHtml(steps[activeStepIdx] ? steps[activeStepIdx].title : '')}</strong>
+                  <div id="sql-studio-modal-step-desc" style="color:var(--text-secondary,#cbd5e1);font-size:0.82rem;margin-top:2px;">${escapeHtml(steps[activeStepIdx] ? (steps[activeStepIdx].instructions || steps[activeStepIdx].concept || '') : '')}</div>
+                </div>
+                <div style="display:flex;gap:8px;flex-shrink:0;">
+                  <button type="button" class="btn btn-secondary btn-sm" id="sql-studio-modal-load-solution">✓ Load Solution SQL</button>
+                </div>
+              </div>
+            ` : ''}
+            <div id="sql-studio-modal-visualizer-host" style="flex:1;min-height:420px;"></div>
+          </main>
+        </div>
+      </div>
+    `;
+
+    overlay.classList.add('open');
     overlay.classList.add('is-open');
     overlay.setAttribute('aria-hidden', 'false');
-    document.body.classList.add('codelab-fullscreen-lock');
+    document.body.style.overflow = 'hidden';
 
-    if (globalCodeLabInstance) {
-      if (window.CodeLab?.unmount) window.CodeLab.unmount(globalCodeLabInstance);
-      else if (globalCodeLabInstance.destroy) globalCodeLabInstance.destroy();
-      globalCodeLabInstance = null;
-    }
-    if (mountEl) {
-      mountEl.innerHTML = '<div style="padding:2rem;color:var(--fg-muted);font-family:var(--font-mono);">Loading @innovatorved/code-lab@0.3.2 C++20 Workbench...</div>';
-    }
+    const closeBtn = overlay.querySelector('#global-codelab-close-btn');
+    if (closeBtn) closeBtn.addEventListener('click', closeGlobalCodeLab);
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) closeGlobalCodeLab();
+    });
 
-    return ensureCodeLabLoaded().then((CodeLab) => {
-      if (!CodeLab || !mountEl) return null;
-      mountEl.innerHTML = '';
-      const opts = Object.assign({
-        language: 'cpp',
-        lang: 'cpp',
-        languages: ['cpp'],
-        backLabel: 'Close CodeLab',
-        onClose: closeGlobalCodeLab
-      }, mountOpts);
-      if (window.Analytics?.trackCodeLabOpen) {
-        window.Analytics.trackCodeLabOpen(opts.labId || 'global-lab', opts.mode || 'sandbox', opts.language || 'cpp');
+    const schemaListEl = overlay.querySelector('#sql-studio-modal-schema-list');
+    const visHost = overlay.querySelector('#sql-studio-modal-visualizer-host');
+    const dsSelect = overlay.querySelector('#sql-studio-modal-dataset');
+    const engSelect = overlay.querySelector('#sql-studio-modal-engine');
+    const resetBtn = overlay.querySelector('#sql-studio-modal-reset-btn');
+
+    function refreshSchemaSidebar() {
+      if (!schemaListEl) return;
+      const ds = (window.SQL_DATASETS && window.SQL_DATASETS[activeDatasetId]) || null;
+      if (ds && Array.isArray(ds.tables)) {
+        schemaListEl.innerHTML = ds.tables.map(t => `
+          <div style="margin-bottom:10px;padding:8px 10px;background:rgba(15,23,42,0.65);border:1px solid rgba(148,163,184,0.16);border-radius:8px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;" data-preview-table="${escapeHtml(t.name)}">
+              <strong style="color:#38bdf8;font-family:var(--font-mono,monospace);">${escapeHtml(t.name)}</strong>
+              <span style="font-size:0.72rem;color:#94a3b8;">SELECT *</span>
+            </div>
+            ${Array.isArray(t.columns) ? `
+              <div style="margin-top:6px;display:flex;flex-direction:column;gap:2px;font-size:0.75rem;color:#94a3b8;font-family:var(--font-mono,monospace);">
+                ${t.columns.map(c => `<div>• ${escapeHtml(typeof c === 'string' ? c : `${c.name} (${c.type || ''})`)}</div>`).join('')}
+              </div>
+            ` : ''}
+          </div>
+        `).join('');
+        schemaListEl.querySelectorAll('[data-preview-table]').forEach(el => {
+          el.addEventListener('click', () => {
+            const tbl = el.getAttribute('data-preview-table');
+            mountStudioQuery(`SELECT *\nFROM ${tbl}\nLIMIT 15;`);
+          });
+        });
+      } else {
+        schemaListEl.innerHTML = `<div style="color:#94a3b8;font-size:0.8rem;">Dataset <code>${escapeHtml(activeDatasetId)}</code> loaded.</div>`;
       }
-      globalCodeLabInstance = mountCodeLabWithExtensions(mountEl, opts);
-      setTimeout(() => {
-        const ed = globalCodeLabInstance?._editor || globalCodeLabInstance?.editor;
-        if (ed && typeof ed.layout === 'function') ed.layout();
-      }, 220);
-      return globalCodeLabInstance;
+    }
+
+    function mountStudioQuery(sqlText) {
+      if (!visHost) return;
+      const mountFn = () => {
+        if (window.TableVisualizer && typeof window.TableVisualizer.mountClauseVisualizer === 'function') {
+          window.TableVisualizer.mountClauseVisualizer(visHost, {
+            datasetId: activeDatasetId,
+            sql: sqlText,
+            title
+          });
+        }
+      };
+      if (window.SQLEngine && typeof window.SQLEngine.init === 'function') {
+        window.SQLEngine.init().then(mountFn).catch(mountFn);
+      } else {
+        mountFn();
+      }
+    }
+
+    refreshSchemaSidebar();
+    mountStudioQuery(initialSql);
+
+    if (dsSelect) {
+      dsSelect.addEventListener('change', () => {
+        activeDatasetId = dsSelect.value;
+        refreshSchemaSidebar();
+        const ta = visHost.querySelector('textarea');
+        mountStudioQuery(ta ? ta.value : initialSql);
+      });
+    }
+
+    if (engSelect) {
+      engSelect.addEventListener('change', async () => {
+        activeEngine = engSelect.value;
+        if (window.SQLEngine && typeof window.SQLEngine.setEngineType === 'function') {
+          await window.SQLEngine.setEngineType(activeEngine);
+        }
+        const ta = visHost.querySelector('textarea');
+        mountStudioQuery(ta ? ta.value : initialSql);
+      });
+    }
+
+    if (resetBtn) {
+      resetBtn.addEventListener('click', async () => {
+        if (window.SQLEngine && typeof window.SQLEngine.loadDataset === 'function') {
+          await window.SQLEngine.loadDataset(activeDatasetId, true);
+        }
+        const ta = visHost.querySelector('textarea');
+        mountStudioQuery(ta ? ta.value : initialSql);
+      });
+    }
+
+    overlay.querySelectorAll('[data-modal-step]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.getAttribute('data-modal-step'), 10);
+        if (isNaN(idx) || !steps[idx]) return;
+        activeStepIdx = idx;
+        overlay.querySelectorAll('[data-modal-step]').forEach((b, i) => {
+          b.style.borderColor = i === activeStepIdx ? '#38bdf8' : 'rgba(148,163,184,0.18)';
+          b.style.background = i === activeStepIdx ? 'rgba(56,189,248,0.12)' : 'rgba(15,23,42,0.5)';
+        });
+        const tEl = overlay.querySelector('#sql-studio-modal-step-title');
+        const dEl = overlay.querySelector('#sql-studio-modal-step-desc');
+        if (tEl) tEl.textContent = steps[idx].title || '';
+        if (dEl) dEl.textContent = steps[idx].instructions || steps[idx].concept || '';
+        mountStudioQuery(steps[idx].starterCode || initialSql);
+      });
+    });
+
+    const solBtn = overlay.querySelector('#sql-studio-modal-load-solution');
+    if (solBtn) {
+      solBtn.addEventListener('click', () => {
+        const step = steps[activeStepIdx];
+        if (step && (step.solutionCode || step.starterCode)) {
+          mountStudioQuery(step.solutionCode || step.starterCode);
+        }
+        if (typeof opts.onLabComplete === 'function') opts.onLabComplete();
+      });
+    }
+    return Promise.resolve(overlay);
+  }
+
+  function openGlobalCodeLab(config) {
+    const cfg = config || {};
+    let sql = cfg.sql || '';
+    if (!sql && cfg.files) {
+      sql = cfg.files['query.sql'] || cfg.files['hotfix.sql'] || Object.values(cfg.files)[0] || '';
+    }
+    return openSqlStudioModal({
+      slug: cfg.slug || cfg.labId || currentSlug,
+      title: cfg.title || 'Interactive SQL Studio',
+      summary: cfg.summary || '',
+      datasetId: cfg.datasetId || 'ecommerce',
+      sql: sql || 'SELECT * FROM customers LIMIT 10;',
+      steps: cfg.steps || [],
+      backLabel: cfg.backLabel || 'Back to Lesson',
+      onLabComplete: cfg.onLabComplete
     });
   }
 
-  function openTopicCodeLab(slug, mode = 'guided', stepIndex) {
-    const curLab = window.TopicGuidedLabs?.getLab ? window.TopicGuidedLabs.getLab(slug) : null;
-    const unitTitle = document.querySelector('.lesson__title, h1')?.textContent?.trim() || slug;
-    const title = curLab?.title || `${unitTitle} — C++20 Guided Lab`;
-    const summary = curLab?.summary || `Hands-on C++20 implementation and algorithmic verification for ${unitTitle}.`;
-    const rawSteps = curLab?.steps || [
-      { id: 'step-1', title: 'Step 1: Core Implementation Invariants', concept: 'Memory & Time Bounds' },
-      { id: 'step-2', title: 'Step 2: Algorithmic Verification & Tests', concept: 'Verification Suite' }
-    ];
-    const steps = rawSteps.map((s, idx) => ({
-      ...s,
-      targetFile: 'src/main.cpp',
-      cppTargetFile: 'src/main.cpp',
-      phase: s.phase || ['Phase 1 · State & Boundaries', 'Phase 2 · Core Transition', 'Phase 3 · Verification & Bounds'][idx] || `Phase ${idx + 1}`
-    }));
-    const starterCode = curLab?.starterCode || '#include <bits/stdc++.h>\n#include <codelab/dsa.hpp>\nusing namespace std;\n\n// TODO: Implement according to lesson invariants\n\nint main() {\n  return 0;\n}\n';
-    const solutionCode = curLab?.solutionCode || starterCode;
-
-    const files = {
-      'src/main.cpp': mode === 'solution' ? solutionCode : starterCode,
-      'src/solution.hpp': solutionCode,
-      'README.md': `# ${title}\n\n${summary}\n\n## Verification\n\nRun in the terminal:\n\`\`\`bash\ng++ -std=c++20 -O2 src/main.cpp -o app && ./app\n\`\`\`\n`
-    };
-
-    const starterFiles = {
-      'src/main.cpp': starterCode,
-      'src/solution.hpp': solutionCode,
-      'README.md': files['README.md']
-    };
-    const solutionFiles = {
-      'src/main.cpp': solutionCode,
-      'src/solution.hpp': solutionCode,
-      'README.md': files['README.md']
-    };
-
-    return openGlobalCodeLab({
-      labId: 'topic-' + slug,
-      title: title,
-      summary: summary,
-      mode: mode === 'solution' ? 'sandbox' : 'guided',
-      language: 'cpp',
-      lang: 'cpp',
-      languages: ['cpp'],
-      activeFile: 'src/main.cpp',
-      entry: 'src/main.cpp',
-      cppEntry: 'src/main.cpp',
-      files: files,
-      cppFiles: files,
-      starterFiles: starterFiles,
-      solutionFiles: solutionFiles,
-      cppStarterFiles: starterFiles,
-      cppSolutionFiles: solutionFiles,
-      steps: steps,
-      guided: {
-        title: title,
-        summary: summary,
-        mainFile: 'src/main.cpp',
-        steps: steps,
-        starterFiles: starterFiles,
-        solutionFiles: solutionFiles,
-        cppStarterFiles: starterFiles,
-        cppSolutionFiles: solutionFiles
-      }
-    }).then(instance => {
-      if (typeof stepIndex === 'number' && !Number.isNaN(stepIndex) && instance?.selectStep) {
-        setTimeout(() => instance.selectStep(stepIndex, true), 100);
-      }
-      return instance;
+  function openTopicCodeLab(slug, mode, stepIndex) {
+    const targetSlug = slug || currentSlug;
+    const spec = getTopicLabSpec(targetSlug);
+    return openSqlStudioModal({
+      slug: targetSlug,
+      title: spec.title,
+      summary: spec.summary,
+      datasetId: spec.datasetId || 'ecommerce',
+      sql: mode === 'solution' && spec.steps && spec.steps[0] ? spec.steps[0].solutionCode : spec.referenceSql,
+      steps: spec.steps || [],
+      activeStepIdx: typeof stepIndex === 'number' && !Number.isNaN(stepIndex) ? stepIndex : 0
     });
   }
 
-  function openSnippetInCodeLab(code, lang, title) {
-    const norm = (lang || 'cpp').toLowerCase();
-    let fileName = 'src/main.cpp';
-    let entryFile = 'src/main.cpp';
-    let runCmd = 'g++ -std=c++20 -O2 src/main.cpp -o app && ./app';
-    let workbenchLang = 'cpp';
-    const files = {};
-    let formattedCode = code.trim() + '\n';
-
-    if (norm === 'py' || norm === 'python') {
-      fileName = 'snippet.py';
-      entryFile = 'snippet.py';
-      runCmd = 'python3 snippet.py';
-      workbenchLang = 'py';
-    } else if (norm === 'ts' || norm === 'typescript') {
-      fileName = 'snippet.ts';
-      entryFile = 'snippet.ts';
-      runCmd = 'bun run snippet.ts';
-      workbenchLang = 'ts';
-    } else if (norm === 'js' || norm === 'javascript' || norm === 'node') {
-      fileName = 'snippet.js';
-      entryFile = 'snippet.js';
-      runCmd = 'node snippet.js';
-      workbenchLang = 'js';
-    } else if (norm === 'cpp' || norm === 'c++' || norm === 'cc' || norm === 'cxx' || norm === 'hpp' || norm === 'c') {
-      fileName = 'src/main.cpp';
-      entryFile = 'src/main.cpp';
-      runCmd = 'g++ -std=c++20 -O2 src/main.cpp -o app && ./app';
-      workbenchLang = 'cpp';
-      const hasInclude = /^\s*#\s*include\b/m.test(formattedCode);
-      const hasMain = /\bmain\s*\(/.test(formattedCode);
-      if (!hasInclude) {
-        formattedCode = '#include <bits/stdc++.h>\n#include <codelab/dsa.hpp>\nusing namespace std;\n\n' + formattedCode;
-      }
-      if (!hasMain) {
-        formattedCode += '\nint main() {\n  std::cout << "Compiled and executed with C++20 (Clang/LLVM WASI)!\\n";\n  return 0;\n}\n';
-      }
-    } else if (norm === 'go' || norm === 'golang') {
-      fileName = 'main.go';
-      entryFile = 'main.go';
-      runCmd = 'go run main.go';
-    } else if (norm === 'sh' || norm === 'bash' || norm === 'shell') {
-      fileName = 'script.sh';
-      entryFile = 'script.sh';
-      runCmd = 'sh script.sh';
-    } else if (norm === 'sql' || norm === 'sqlite' || norm === 'postgres' || norm === 'postgresql') {
-      workbenchLang = 'js';
-      fileName = 'schema.sql';
-      entryFile = 'run-sql.js';
-      runCmd = 'node run-sql.js';
-      const unifiedDdl = Object.values(window.SQL_DATASETS || {})
-        .map(ds => (ds.ddl || '').replace(/PRAGMA\s+foreign_keys\s*=\s*ON\s*;/gi, ''))
-        .join('\n');
-      files['seed.sql'] = unifiedDdl + '\n';
-      files['run-sql.js'] = [
-        "const { Database } = require('bun:sqlite');",
-        "const fs = require('node:fs');",
-        "const db = new Database('app.db');",
-        "if (fs.existsSync('seed.sql')) db.exec(fs.readFileSync('seed.sql', 'utf8'));",
-        "const sql = fs.readFileSync('schema.sql', 'utf8');",
-        "console.log('Executing schema.sql on VFS-backed SQLite (app.db)...\\n');",
-        "for (const stmt of sql.split(';').map(s => s.trim()).filter(Boolean)) {",
-        "  if (/^(SELECT|WITH|EXPLAIN|PRAGMA)\\b/i.test(stmt.replace(/^(\\s*--[^\\n]*\\n)+/g, ''))) {",
-        "    console.log('> ' + stmt.split('\\n')[0] + ' ...');",
-        "    console.table(db.query(stmt).all());",
-        "  } else {",
-        "    db.run(stmt);",
-        "  }",
-        "}",
-        "console.log('\\n✓ Done. Try `sqlite3 -column -header app.db \".tables\"` in the terminal!');"
-      ].join('\n') + '\n';
-    } else if (norm === 'redis') {
-      fileName = 'redis-commands.txt';
-      entryFile = 'run-redis.sh';
-      runCmd = 'sh run-redis.sh';
-      const lines = code.split(/\r?\n/).map(l => l.trim()).filter(l => l && !l.startsWith('#') && !l.startsWith('//'));
-      files['run-redis.sh'] = [
-        '#!/bin/sh',
-        'echo "=== Executing Redis commands via CodeLab redis-cli ==="',
-        ...lines.map(c => {
-          const clean = c.replace(/^redis-cli\s+/i, '');
-          return `echo "> redis-cli ${clean.replace(/"/g, '\\"')}"\nredis-cli ${clean}`;
-        })
-      ].join('\n') + '\n';
-    }
-    files[fileName] = formattedCode;
-    files['README.md'] = `# ${title || 'Lesson Snippet'}\n\nRun inside the terminal:\n\n\`\`\`bash\n${runCmd}\n\`\`\`\n`;
-    return openGlobalCodeLab({
-      labId: 'snippet-' + (currentSlug || 'lesson'),
-      title: title || 'Interactive Code Snippet',
-      summary: `Run and experiment with this ${norm.toUpperCase()} snippet inside @innovatorved/code-lab (${runCmd}).`,
-      mode: 'sandbox',
-      language: workbenchLang,
-      lang: workbenchLang,
-      languages: [workbenchLang],
-      activeFile: entryFile,
-      entry: entryFile,
-      cppEntry: workbenchLang === 'cpp' ? entryFile : undefined,
-      pyEntry: workbenchLang === 'py' ? entryFile : undefined,
-      files,
-      tsFiles: workbenchLang === 'ts' ? files : undefined,
-      cppFiles: workbenchLang === 'cpp' ? files : undefined,
-      pyFiles: workbenchLang === 'py' ? files : undefined
+  function openSnippetInCodeLab(rawCode, lang, title) {
+    const spec = getTopicLabSpec(currentSlug);
+    return openSqlStudioModal({
+      slug: currentSlug,
+      title: title || `SQL Snippet Runner — ${spec.title || currentSlug}`,
+      summary: 'Execute and step through this SQL snippet in the interactive SQL Studio.',
+      datasetId: spec.datasetId || 'ecommerce',
+      sql: rawCode || spec.referenceSql
     });
   }
 
-  function openRepoInCodeLab(repo, title) {
-    const cleanRepo = String(repo || '').replace(/^https?:\/\/github\.com\//, '').replace(/\/$/, '');
-    const repoName = cleanRepo.split('/')[1] || 'repo';
-    return openGlobalCodeLab({
-      labId: 'repo-' + repoName,
-      title: `${title || cleanRepo} — Repository Explorer`,
-      summary: `Clone and inspect https://github.com/${cleanRepo} inside the CodeLab terminal.`,
-      mode: 'sandbox',
-      files: {
-        'explore.sh': `#!/bin/sh\necho "Cloning https://github.com/${cleanRepo} ..."\ngit clone --depth 1 https://github.com/${cleanRepo}.git ${repoName} 2>&1 || true\nls -la ${repoName} 2>/dev/null || true\n`,
-        'README.md': `# ${title || cleanRepo}\n\nRepository: \`https://github.com/${cleanRepo}\`\n\nRun in the CodeLab terminal:\n\n\`\`\`bash\nsh explore.sh\n\`\`\`\n`
-      }
+  function openRepoInCodeLab(projectId, title) {
+    const projects = window.PROJECTS_DATA || [];
+    const p = projects.find(x => x.id === projectId || x.repo === projectId) || { title: title || projectId || 'SQL Capstone Lab' };
+    return openSqlStudioModal({
+      title: `${p.title} — SQL Capstone Studio`,
+      summary: p.tagline || p.description || 'Interactive SQL schema & query verification studio.',
+      datasetId: 'fintech_ledger',
+      sql: `-- ${p.title}\nSELECT *\nFROM accounts\nORDER BY balance_cents DESC\nLIMIT 10;`
     });
   }
 
@@ -3567,61 +2503,23 @@ window.App = (() => {
     const raw = window.CHALLENGES_DATA || window.ChallengesData;
     const challenges = Array.isArray(raw) ? raw : (raw?.challenges || []);
     const ch = challenges.find(c => c.id === challengeId);
-    const cf = ch?.codeFix;
-    if (!cf) return Promise.resolve(null);
-
-    const stepId = 'hotfix-verify';
-    const steps = [
-      {
-        id: stepId,
-        title: cf.title || 'Apply Production Hotfix',
-        concept: 'Incident Code Remediation',
-        instructions: cf.summary || 'Fix the root cause bug in hotfix.js and run node test.js to verify under simulated load.',
-        targetFile: 'hotfix.js',
-        hint: 'Compare the buggy code path against the incident logs and root cause hypothesis, or inspect the solution tab.',
-        solutionSnippet: cf.solutionCode || '',
-        testCommand: 'node test.js',
-        expectedOutput: 'PASS'
-      }
-    ];
-
-    return openGlobalCodeLab({
-      labId: 'challenge-' + ch.id,
+    if (!ch || !ch.codeFix) return Promise.resolve(null);
+    const cf = ch.codeFix;
+    return openSqlStudioModal({
       title: `${ch.id}: ${cf.title || ch.title}`,
       summary: cf.summary || ch.summary,
-      mode: 'guided',
-      files: {
-        'hotfix.js': cf.buggyCode || '',
-        'test.js': cf.testCode || '',
-        'README.md': `# ${ch.id} — ${cf.title || ch.title}\n\n${cf.summary || ''}\n\nRun \`node test.js\` to verify your hotfix.\n`
-      },
-      starterFiles: {
-        'hotfix.js': cf.buggyCode || '',
-        'test.js': cf.testCode || ''
-      },
-      solutionFiles: {
-        'hotfix.js': cf.solutionCode || '',
-        'test.js': cf.testCode || ''
-      },
-      steps,
-      guided: {
-        id: 'challenge-' + ch.id,
-        title: cf.title || ch.title,
-        summary: cf.summary || '',
-        starterFiles: {
-          'hotfix.js': cf.buggyCode || '',
-          'test.js': cf.testCode || ''
-        },
-        solutionFiles: {
-          'hotfix.js': cf.solutionCode || '',
-          'test.js': cf.testCode || ''
-        },
-        steps
-      },
+      datasetId: cf.datasetId || 'ecommerce',
+      sql: cf.buggyCode || cf.solutionCode || 'SELECT * FROM orders LIMIT 10;',
+      steps: [
+        {
+          id: `challenge-${ch.id}-fix`,
+          title: cf.title || 'Fix the Production SQL Incident',
+          instructions: cf.summary || 'Rewrite the SQL query to eliminate the root cause and verify the execution plan.',
+          starterCode: cf.buggyCode || '',
+          solutionCode: cf.solutionCode || ''
+        }
+      ],
       backLabel: 'Back to Incident War-Room',
-      onStepComplete: () => {
-        if (typeof onPassCallback === 'function') onPassCallback(ch.id);
-      },
       onLabComplete: () => {
         if (typeof onPassCallback === 'function') onPassCallback(ch.id);
       }
@@ -3679,6 +2577,8 @@ window.App = (() => {
     initMermaid,
     openDiagramLightbox,
     closeDiagramLightbox,
+    openSqlStudioModal,
+    mountInlineTopicSqlLab,
     openGlobalCodeLab,
     closeGlobalCodeLab,
     openTopicCodeLab,

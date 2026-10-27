@@ -15,6 +15,13 @@
   Content-Type: application/wasm
   Cache-Control: public, max-age=31536000, immutable
 
+/js/vendor/pglite/*.wasm
+  Content-Type: application/wasm
+  Cache-Control: public, max-age=31536000, immutable
+
+/js/vendor/pglite/*.data
+  Cache-Control: public, max-age=31536000, immutable
+
 /js/*
   Cache-Control: public, max-age=31536000, immutable
 

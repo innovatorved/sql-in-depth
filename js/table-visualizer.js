@@ -1,888 +1,1728 @@
 /**
- * SQL In Depth — Interactive Table-Level Relational Execution Visualizer (`window.TableVisualizer`)
- * Decomposes any SQL query into its logical relational execution pipeline:
- *   0. WITH / WITH RECURSIVE CTE Anchor & Fixpoint Materialization (when present)
- *   1. FROM / JOIN (Source table pairing, INNER / LEFT / RIGHT / FULL OUTER NULL padding)
- *   2. WHERE (Row-level predicate evaluation & Three-Valued Logic TRUE / FALSE / NULL filtering)
- *   3. GROUP BY (Partitioning rows into color-coded group buckets)
- *   4. HAVING (Post-aggregation group bucket pruning)
- *   5. WINDOW OVER(...) (Sliding partition & frame overlay without collapsing rows)
- *   6. SELECT Projection (Column extraction, expressions, aggregates & aliases)
- *   7. DISTINCT / UNION / INTERSECT / EXCEPT / ORDER BY / LIMIT
- *   8. EXPLAIN QUERY PLAN (Physical B+Tree Index Seek vs. Full Table Scan tree)
+ * Interactive SQL Table & Clause Step-by-Step Visualizer
+ * Executes real SQL queries against SQLEngine (PostgreSQL 18 PGlite WASM + SQLite 3 WASM)
+ * and decomposes queries into an interactive up-to-9-stage visual execution pipeline:
+ *   0. SOURCE TABLES -> 1. WITH CTE (Anchor + Fixpoint) -> 2. FROM / JOIN ->
+ *   3. WHERE (3VL Filter) -> 4. GROUP BY / HAVING -> 5. WINDOW OVER ->
+ *   6. SELECT / Set Ops -> 7. ORDER BY + LIMIT -> 8. EXPLAIN PLAN
+ * Plus full Before/After Table Diff visualization for DML (INSERT / UPDATE / DELETE).
  */
 (function (root) {
-  'use strict';
+    'use strict';
 
-  function escapeHtml(str) {
-    if (str == null) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
-  }
-
-  /**
-   * Parses top-level clauses from a SQL SELECT/WITH query (ignoring parens/strings/comments).
-   */
-  function parseQueryClauses(sql) {
-    var rawInput = String(sql || '').trim().replace(/;+\s*$/, '');
-    // Strip leading single-line or block comments while preserving body
-    var clean = rawInput.replace(/^\s*(?:--[^\n]*\n\s*|\/\*[\s\S]*?\*\/\s*)+/g, '');
-
-    var upper = '';
-    var depth = 0;
-    var inStr = false;
-    var strChar = '';
-    for (var i = 0; i < clean.length; i++) {
-      var ch = clean[i];
-      var next = clean[i + 1];
-      if (inStr) {
-        if (ch === strChar && next !== strChar) inStr = false;
-        else if (ch === strChar && next === strChar) { upper += ' '; i++; }
-        upper += ' ';
-        continue;
-      }
-      // Mask single-line comments (-- ...) with spaces of equal length
-      if (ch === '-' && next === '-') {
-        while (i < clean.length && clean[i] !== '\n') {
-          upper += ' ';
-          i++;
-        }
-        if (i < clean.length) upper += '\n';
-        continue;
-      }
-      // Mask block comments (/* ... */) with spaces of equal length
-      if (ch === '/' && next === '*') {
-        upper += '  ';
-        i += 2;
-        while (i < clean.length && !(clean[i] === '*' && clean[i + 1] === '/')) {
-          upper += clean[i] === '\n' ? '\n' : ' ';
-          i++;
-        }
-        if (i < clean.length) {
-          upper += '  ';
-          i++;
-        }
-        continue;
-      }
-      if (ch === "'" || ch === '"') {
-        inStr = true;
-        strChar = ch;
-        upper += ' ';
-        continue;
-      }
-      if (ch === '(') { depth++; upper += '('; continue; }
-      if (ch === ')') { depth = Math.max(0, depth - 1); upper += ')'; continue; }
-      upper += depth === 0 ? ch.toUpperCase() : ' ';
+    function escapeHtml(str) {
+        if (str === null || str === undefined) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
     }
 
-    function findKeyword(regex) {
-      var m = regex.exec(upper);
-      return m ? m.index : -1;
-    }
-
-    var withIdx = findKeyword(/^\s*WITH(\s+RECURSIVE)?\b/);
-    var isRecursive = /^\s*WITH\s+RECURSIVE\b/.test(upper);
-    var selectIdx = findKeyword(/\bSELECT\b/);
-    var fromIdx = findKeyword(/\bFROM\b/);
-    var whereIdx = findKeyword(/\bWHERE\b/);
-    var groupIdx = findKeyword(/\bGROUP\s+BY\b/);
-    var havingIdx = findKeyword(/\bHAVING\b/);
-    var windowIdx = findKeyword(/\bWINDOW\b/);
-    var setOpMatch = /\b(UNION\s+ALL|UNION|INTERSECT|EXCEPT)\b/.exec(upper);
-    var setOpIdx = setOpMatch ? setOpMatch.index : -1;
-    var setOpKeyword = setOpMatch ? setOpMatch[1].replace(/\s+/g, ' ') : '';
-    var orderIdx = findKeyword(/\bORDER\s+BY\b/);
-    var limitIdx = findKeyword(/\bLIMIT\b/);
-
-    var hasWindowOver = /\bOVER\s*\(/i.test(clean);
-    var hasDistinct = /\bSELECT\s+DISTINCT\b/i.test(clean);
-    var hasJoin = /\bJOIN\b/i.test(clean);
-
-    function sliceClause(startIdx, kwLen, nextIndices) {
-      if (startIdx < 0) return '';
-      var end = clean.length;
-      nextIndices.forEach(function (ni) {
-        if (ni > startIdx && ni < end) end = ni;
-      });
-      return clean.slice(startIdx + kwLen, end).trim();
-    }
-
-    var allIdxs = [selectIdx, fromIdx, whereIdx, groupIdx, havingIdx, windowIdx, setOpIdx, orderIdx, limitIdx].filter(function (x) { return x >= 0; });
-
-    var ctePrefix = (withIdx >= 0 && selectIdx > withIdx) ? clean.slice(0, selectIdx).trim() : '';
-    var cteList = [];
-    if (ctePrefix) {
-      var body = ctePrefix.replace(/^\s*WITH(?:\s+RECURSIVE)?\s+/i, '');
-      var cteRegex = /([a-zA-Z_]\w*)\s*(?:\([^)]*\))?\s*AS\s*\(/gi;
-      var cm;
-      while ((cm = cteRegex.exec(body)) !== null) {
-        var cName = cm[1];
-        var openParenPos = cm.index + cm[0].length - 1;
-        var pDepth = 1;
-        var k = openParenPos + 1;
-        var inS = false;
-        var sCh = '';
-        while (k < body.length && pDepth > 0) {
-          var c = body[k];
-          if (inS) {
-            if (c === sCh && body[k + 1] !== sCh) inS = false;
-            else if (c === sCh && body[k + 1] === sCh) k++;
-          } else {
-            if (c === "'" || c === '"') { inS = true; sCh = c; }
-            else if (c === '(') pDepth++;
-            else if (c === ')') pDepth--;
-          }
-          k++;
-        }
-        var innerSql = body.slice(openParenPos + 1, k - 1).trim();
-        var anchorSql = null;
-        var unionSplit = innerSql.split(/\bUNION\s+(?:ALL\s+)?/i);
-        if (isRecursive && unionSplit.length > 1) {
-          anchorSql = unionSplit[0].trim();
-        }
-        cteList.push({
-          name: cName,
-          innerSql: innerSql,
-          anchorSql: anchorSql,
-          isRecursive: isRecursive && Boolean(anchorSql)
-        });
-        cteRegex.lastIndex = k;
-      }
-    }
-
-    var selectExpr = sliceClause(selectIdx, 6, allIdxs).replace(/^DISTINCT\s+/i, '').trim();
-    var fromExpr = sliceClause(fromIdx, 4, allIdxs);
-    var whereExpr = sliceClause(whereIdx, 5, allIdxs);
-    var groupExpr = sliceClause(groupIdx, 8, allIdxs);
-    var havingExpr = sliceClause(havingIdx, 6, allIdxs);
-    var orderExpr = sliceClause(orderIdx, 8, allIdxs);
-    var limitExpr = sliceClause(limitIdx, 5, allIdxs);
-
-    return {
-      raw: clean,
-      ctePrefix: ctePrefix,
-      cteList: cteList,
-      isRecursive: isRecursive,
-      selectExpr: selectExpr,
-      fromExpr: fromExpr,
-      whereExpr: whereExpr,
-      groupExpr: groupExpr,
-      havingExpr: havingExpr,
-      setOpKeyword: setOpKeyword,
-      setOpIdx: setOpIdx,
-      orderExpr: orderExpr,
-      limitExpr: limitExpr,
-      hasWindowOver: hasWindowOver,
-      hasDistinct: hasDistinct,
-      hasJoin: hasJoin,
-      isSelect: selectIdx >= 0
+    // Known table names across all 5 datasets for automatic dataset inference & source table discovery
+    var KNOWN_TABLES = {
+        customers: 'ecommerce', categories: 'ecommerce', products: 'ecommerce',
+        orders: 'ecommerce', order_items: 'ecommerce', payments: 'ecommerce',
+        shipments: 'ecommerce', product_reviews: 'ecommerce',
+        departments: 'org_hr', employees: 'org_hr', salary_history: 'org_hr',
+        projects: 'org_hr', employee_projects: 'org_hr', project_assignments: 'org_hr',
+        accounts: 'fintech_ledger', transfers: 'fintech_ledger', journal_entries: 'fintech_ledger',
+        cards: 'fintech_ledger', merchant_txns: 'fintech_ledger', ledger_postings: 'fintech_ledger',
+        fx_rates: 'fintech_ledger', payment_holds: 'fintech_ledger',
+        saas_users: 'saas_telemetry', subscriptions: 'saas_telemetry',
+        user_events: 'saas_telemetry', invoices: 'saas_telemetry',
+        organizations: 'saas_telemetry', users: 'saas_telemetry',
+        feature_flags: 'saas_telemetry', telemetry_events: 'saas_telemetry', api_keys: 'saas_telemetry',
+        profiles: 'social_graph', follows: 'social_graph', posts: 'social_graph',
+        post_likes: 'social_graph', post_tags: 'social_graph', reactions: 'social_graph'
     };
-  }
 
-  /**
-   * Builds the sequence of clause execution steps for a parsed SQL query
-   * and executes intermediate queries against WASM SQLite to capture real row transformations.
-   */
-  function buildExecutionSteps(sql, options) {
-    options = options || {};
-    var parsed = parseQueryClauses(sql);
-    var engine = root.SqlEngine;
-    if (!engine) {
-      return Promise.reject(new Error('SqlEngine not initialized'));
+    // Primary Key and Foreign Key metadata for visual badges in table headers
+    var SCHEMA_META = {
+        customers: { pk: ['customer_id'], fk: { referred_by: 'customers.customer_id' } },
+        categories: { pk: ['category_id'], fk: { parent_category_id: 'categories.category_id' } },
+        products: { pk: ['product_id'], fk: { category_id: 'categories.category_id' } },
+        orders: { pk: ['order_id'], fk: { customer_id: 'customers.customer_id' } },
+        order_items: { pk: ['order_item_id'], fk: { order_id: 'orders.order_id', product_id: 'products.product_id' } },
+        payments: { pk: ['payment_id'], fk: { order_id: 'orders.order_id' } },
+        shipments: { pk: ['shipment_id'], fk: { order_id: 'orders.order_id' } },
+        product_reviews: { pk: ['review_id'], fk: { product_id: 'products.product_id', customer_id: 'customers.customer_id' } },
+        departments: { pk: ['dept_id'], fk: {} },
+        employees: { pk: ['emp_id'], fk: { dept_id: 'departments.dept_id', manager_id: 'employees.emp_id' } },
+        salary_history: { pk: ['history_id'], fk: { emp_id: 'employees.emp_id' } },
+        projects: { pk: ['project_id'], fk: { lead_emp_id: 'employees.emp_id' } },
+        employee_projects: { pk: ['emp_id', 'project_id'], fk: { emp_id: 'employees.emp_id', project_id: 'projects.project_id' } },
+        project_assignments: { pk: ['emp_id', 'project_id'], fk: { emp_id: 'employees.emp_id', project_id: 'projects.project_id' } },
+        accounts: { pk: ['account_id'], fk: {} },
+        transfers: { pk: ['transfer_id'], fk: { from_account_id: 'accounts.account_id', to_account_id: 'accounts.account_id' } },
+        journal_entries: { pk: ['entry_id'], fk: { transfer_id: 'transfers.transfer_id', account_id: 'accounts.account_id' } },
+        cards: { pk: ['card_id'], fk: { account_id: 'accounts.account_id' } },
+        merchant_txns: { pk: ['txn_id'], fk: { card_id: 'cards.card_id' } },
+        ledger_postings: { pk: ['posting_id'], fk: { entry_id: 'journal_entries.entry_id', account_id: 'accounts.account_id' } },
+        fx_rates: { pk: ['from_currency', 'to_currency', 'effective_date'], fk: {} },
+        payment_holds: { pk: ['hold_id'], fk: { account_id: 'accounts.account_id' } },
+        saas_users: { pk: ['user_id'], fk: {} },
+        subscriptions: { pk: ['sub_id'], fk: { user_id: 'saas_users.user_id' } },
+        user_events: { pk: ['event_id'], fk: { user_id: 'saas_users.user_id' } },
+        invoices: { pk: ['invoice_id'], fk: { sub_id: 'subscriptions.sub_id' } },
+        organizations: { pk: ['org_id'], fk: {} },
+        users: { pk: ['user_id'], fk: { org_id: 'organizations.org_id' } },
+        feature_flags: { pk: ['flag_key'], fk: {} },
+        telemetry_events: { pk: ['event_id'], fk: { org_id: 'organizations.org_id', user_id: 'users.user_id' } },
+        api_keys: { pk: ['key_id'], fk: { org_id: 'organizations.org_id' } },
+        profiles: { pk: ['user_id'], fk: {} },
+        follows: { pk: ['follower_id', 'followee_id'], fk: { follower_id: 'profiles.user_id', followee_id: 'profiles.user_id' } },
+        posts: { pk: ['post_id'], fk: { author_id: 'profiles.user_id' } },
+        post_likes: { pk: ['post_id', 'user_id'], fk: { post_id: 'posts.post_id', user_id: 'profiles.user_id' } },
+        post_tags: { pk: ['post_id', 'tag'], fk: { post_id: 'posts.post_id' } },
+        reactions: { pk: ['reaction_id'], fk: { post_id: 'posts.post_id', user_id: 'profiles.user_id' } }
+    };
+
+    function getEngine() {
+        return root.SqlEngine || root.SQLEngine;
     }
 
-    return engine.execute(sql, { datasetId: options.datasetId || '__unified__', explain: true }).then(function (finalRes) {
-      if (!finalRes.ok) {
-        return {
-          ok: false,
-          error: finalRes.error,
-          sql: sql,
-          steps: [],
-          finalResult: finalRes
-        };
-      }
+    function getDatasets() {
+        return root.SQL_DATASETS || root.SQLDatasets || {};
+    }
 
-      if (!parsed.isSelect || !parsed.fromExpr) {
-        return {
-          ok: true,
-          sql: sql,
-          steps: [
-            {
-              order: 1,
-              clause: 'EXECUTE STATEMENT',
-              badge: 'SQL Result',
-              sqlFragment: parsed.raw,
-              explanation: 'Direct SQL execution against the in-memory WASM SQLite engine.',
-              columns: finalRes.columns,
-              rows: finalRes.rows,
-              rowStates: (finalRes.rows || []).map(function () { return 'matched'; })
-            }
-          ],
-          finalResult: finalRes
-        };
-      }
-
-      var prefix = parsed.ctePrefix ? (parsed.ctePrefix + ' ') : '';
-      var stepPromises = [];
-
-      // STEP 0: CTE / WITH RECURSIVE Materialization (if present)
-      if (parsed.cteList && parsed.cteList.length > 0) {
-        var firstCte = parsed.cteList[0];
-        if (firstCte.isRecursive && firstCte.anchorSql) {
-          stepPromises.push(
-            engine.execute(firstCte.anchorSql, { datasetId: options.datasetId || '__unified__', explain: false }).then(function (ancRes) {
-              var cols = ancRes.ok && ancRes.columns.length ? ancRes.columns : finalRes.columns;
-              var rows = ancRes.ok ? ancRes.rows : [];
-              return {
-                order: 0,
-                clause: '0a. CTE ANCHOR (' + firstCte.name + ')',
-                badge: rows.length + ' seed rows',
-                sqlFragment: firstCte.anchorSql,
-                explanation: 'Recursive CTE Step 0a: Execute the non-recursive Anchor Member to seed the initial working table for `' + firstCte.name + '`.',
-                columns: cols,
-                rows: rows,
-                rowStates: rows.map(function () { return 'matched'; })
-              };
-            })
-          );
+    /**
+     * Detect dataset ID from SQL text or fallback to page context / ecommerce
+     */
+    function inferDatasetFromSql(sql, explicitDataset) {
+        var datasets = getDatasets();
+        if (explicitDataset && explicitDataset !== '__unified__' && datasets[explicitDataset]) {
+            return explicitDataset;
         }
-        var cteMatSql = prefix + 'SELECT * FROM ' + firstCte.name + ' LIMIT 25';
-        stepPromises.push(
-          engine.execute(cteMatSql, { datasetId: options.datasetId || '__unified__', explain: false }).then(function (cteRes) {
-            var cols = cteRes.ok && cteRes.columns.length ? cteRes.columns : finalRes.columns;
-            var rows = cteRes.ok ? cteRes.rows : finalRes.rows;
-            return {
-              order: 0.5,
-              clause: firstCte.isRecursive ? ('0b. CTE FIXPOINT (' + firstCte.name + ')') : ('0. WITH CTE (' + firstCte.name + ')'),
-              badge: rows.length + ' CTE rows',
-              sqlFragment: 'WITH ' + (firstCte.isRecursive ? 'RECURSIVE ' : '') + firstCte.name + ' AS (...)',
-              explanation: firstCte.isRecursive
-                ? 'Recursive CTE Step 0b: Iteratively join the working table with the recursive member until fixpoint termination (0 new rows added).'
-                : 'Logical Step 0: Materialize or inline the Common Table Expression `' + firstCte.name + '` before evaluating the outer query block.',
-              columns: cols,
-              rows: rows,
-              rowStates: rows.map(function (_, idx) { return 'window-' + (idx % 3); })
-            };
-          })
-        );
-      }
-
-      // STEP 1: FROM & JOIN
-      var fromSql = prefix + 'SELECT * FROM ' + parsed.fromExpr + ' LIMIT 25';
-      stepPromises.push(
-        engine.execute(fromSql, { datasetId: options.datasetId || '__unified__', explain: false }).then(function (res) {
-          var cols = res.ok && res.columns.length ? res.columns : finalRes.columns;
-          var rows = res.ok && res.rows.length ? res.rows : finalRes.rows;
-          var rowStates = rows.map(function (r) {
-            var hasNull = r.some(function (v) { return v === null; });
-            return (parsed.hasJoin && hasNull) ? 'null-padded' : 'active';
-          });
-          return {
-            order: 1,
-            clause: parsed.hasJoin ? '1. FROM + JOIN' : '1. FROM',
-            badge: rows.length + ' candidate rows',
-            sqlFragment: 'FROM ' + parsed.fromExpr,
-            explanation: parsed.hasJoin
-              ? 'Logical Step 1: Load source relations and evaluate JOIN predicates. Unmatched outer-join rows are extended with NULL values.'
-              : 'Logical Step 1: Bind the target table/view in the FROM clause and stream candidate tuples into the execution pipeline.',
-            columns: cols,
-            rows: rows,
-            rowStates: rowStates
-          };
-        })
-      );
-
-      // STEP 2: WHERE Filter (if present)
-      if (parsed.whereExpr) {
-        var whereSql = prefix + 'SELECT *, CASE WHEN (' + parsed.whereExpr + ') THEN 1 WHEN NOT (' + parsed.whereExpr + ') THEN 0 ELSE NULL END AS __pred_match__ FROM ' + parsed.fromExpr + ' LIMIT 25';
-        stepPromises.push(
-          engine.execute(whereSql, { datasetId: options.datasetId || '__unified__', explain: false }).then(function (res) {
-            if (!res.ok || !res.columns.length) {
-              var fallbackSql = prefix + 'SELECT * FROM ' + parsed.fromExpr + ' WHERE ' + parsed.whereExpr + ' LIMIT 25';
-              return engine.execute(fallbackSql, { datasetId: options.datasetId || '__unified__', explain: false }).then(function (fb) {
-                var fCols = fb.ok && fb.columns.length ? fb.columns : finalRes.columns;
-                var fRows = fb.ok ? fb.rows : finalRes.rows;
-                return {
-                  order: 2,
-                  clause: '2. WHERE',
-                  badge: fRows.length + ' rows kept',
-                  sqlFragment: 'WHERE ' + parsed.whereExpr,
-                  explanation: 'Logical Step 2: Evaluate the WHERE predicate on every candidate row using Three-Valued Logic (only TRUE rows survive; FALSE and NULL/UNKNOWN rows are discarded).',
-                  columns: fCols,
-                  rows: fRows,
-                  rowStates: fRows.map(function () { return 'matched'; })
-                };
-              });
+        var lower = String(sql || '').toLowerCase();
+        var counts = {};
+        Object.keys(KNOWN_TABLES).forEach(function (tbl) {
+            var re = new RegExp('\\b' + tbl + '\\b', 'i');
+            if (re.test(lower)) {
+                var ds = KNOWN_TABLES[tbl];
+                counts[ds] = (counts[ds] || 0) + 1;
             }
-            var cols = res.columns.slice(0, -1);
-            var keptCount = 0;
-            var rowStates = [];
-            var cleanRows = res.rows.map(function (r) {
-              var matchVal = r[r.length - 1];
-              if (matchVal === 1) {
-                keptCount++;
-                rowStates.push('matched');
-              } else {
-                rowStates.push('filtered');
-              }
-              return r.slice(0, -1);
+        });
+        var bestDs = null;
+        var bestCount = 0;
+        Object.keys(counts).forEach(function (ds) {
+            if (counts[ds] > bestCount) {
+                bestCount = counts[ds];
+                bestDs = ds;
+            }
+        });
+        return bestDs || 'ecommerce';
+    }
+
+    /**
+     * Extract referenced base tables from SQL (excluding CTE names)
+     */
+    function extractSourceTables(sql, cteNames) {
+        var cteSet = {};
+        if (Array.isArray(cteNames)) {
+            cteNames.forEach(function (n) { cteSet[String(n).toLowerCase()] = true; });
+        }
+        var cleaned = String(sql || '')
+            .replace(/--[^\n]*/g, ' ')
+            .replace(/\/\*[\s\S]*?\*\//g, ' ')
+            .replace(/'(?:''|[^'])*'/g, "''");
+
+        var found = [];
+        var seen = {};
+        var re = /\b(?:FROM|JOIN|UPDATE|INTO|TABLE)\s+([a-zA-Z_][a-zA-Z0-9_]*)/gi;
+        var m;
+        while ((m = re.exec(cleaned)) !== null) {
+            var name = m[1].toLowerCase();
+            if (KNOWN_TABLES[name] && !cteSet[name] && !seen[name]) {
+                seen[name] = true;
+                found.push(name);
+            }
+        }
+        if (found.length === 0) {
+            Object.keys(KNOWN_TABLES).forEach(function (tbl) {
+                var tblRe = new RegExp('\\b' + tbl + '\\b', 'i');
+                if (tblRe.test(cleaned) && !cteSet[tbl] && !seen[tbl]) {
+                    seen[tbl] = true;
+                    found.push(tbl);
+                }
             });
-            return {
-              order: 2,
-              clause: '2. WHERE',
-              badge: keptCount + ' / ' + cleanRows.length + ' rows pass',
-              sqlFragment: 'WHERE ' + parsed.whereExpr,
-              explanation: 'Logical Step 2: Evaluate WHERE (' + parsed.whereExpr + ') on each tuple. Highlighted green rows evaluate to TRUE; dimmed strikethrough rows evaluate to FALSE or UNKNOWN (NULL) and are pruned.',
-              columns: cols,
-              rows: cleanRows,
-              rowStates: rowStates
-            };
-          })
-        );
-      }
+        }
+        return found.slice(0, 4);
+    }
 
-      // STEP 3: GROUP BY Buckets (if present)
-      if (parsed.groupExpr) {
-        var grpSql = prefix + 'SELECT ' + parsed.groupExpr + ', COUNT(*) AS __bucket_rows__ FROM ' + parsed.fromExpr +
-          (parsed.whereExpr ? (' WHERE ' + parsed.whereExpr) : '') +
-          ' GROUP BY ' + parsed.groupExpr + ' LIMIT 25';
-        stepPromises.push(
-          engine.execute(grpSql, { datasetId: options.datasetId || '__unified__', explain: false }).then(function (res) {
-            var cols = res.ok && res.columns.length ? res.columns : finalRes.columns;
-            var rows = res.ok ? res.rows : finalRes.rows;
-            return {
-              order: 3,
-              clause: '3. GROUP BY',
-              badge: rows.length + ' group buckets',
-              sqlFragment: 'GROUP BY ' + parsed.groupExpr,
-              explanation: 'Logical Step 3: Partition surviving rows into distinct group buckets by (' + parsed.groupExpr + ') and collapse each bucket so aggregate functions (COUNT, SUM, AVG, MIN, MAX) can fold over it.',
-              columns: cols,
-              rows: rows,
-              rowStates: rows.map(function (_, idx) { return 'group-' + (idx % 4); })
-            };
-          })
-        );
-      }
+    /**
+     * Extract join key column names from a FROM / JOIN clause
+     */
+    function extractJoinColumns(fromExpr) {
+        if (!fromExpr) return [];
+        var cols = [];
+        var seen = {};
+        function addCol(c) {
+            var clean = String(c || '').replace(/^["`]|["`]$/g, '').trim();
+            if (clean && !seen[clean.toLowerCase()]) {
+                seen[clean.toLowerCase()] = true;
+                cols.push(clean);
+            }
+        }
+        // Match ON a.col1 = b.col2
+        var onRe = /\bON\b[\s\S]*?(?=\b(?:LEFT|RIGHT|INNER|OUTER|CROSS|FULL|JOIN|WHERE|GROUP|HAVING|WINDOW|ORDER|LIMIT|$))/gi;
+        var m;
+        while ((m = onRe.exec(fromExpr)) !== null) {
+            var cond = m[0];
+            var eqRe = /(?:[a-zA-Z_][a-zA-Z0-9_]*\.)?([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*(?:[a-zA-Z_][a-zA-Z0-9_]*\.)?([a-zA-Z_][a-zA-Z0-9_]*)/g;
+            var em;
+            while ((em = eqRe.exec(cond)) !== null) {
+                addCol(em[1]);
+                addCol(em[2]);
+            }
+        }
+        // Match USING (col1, col2)
+        var usingRe = /\bUSING\s*\(([^)]+)\)/gi;
+        while ((m = usingRe.exec(fromExpr)) !== null) {
+            m[1].split(',').forEach(function (part) { addCol(part); });
+        }
+        return cols;
+    }
 
-      // STEP 4: HAVING (if present)
-      if (parsed.havingExpr && parsed.groupExpr) {
-        var havSql = prefix + 'SELECT ' + parsed.groupExpr + ', COUNT(*) AS __bucket_rows__, CASE WHEN (' + parsed.havingExpr + ') THEN 1 ELSE 0 END AS __hav_pass__ FROM ' + parsed.fromExpr +
-          (parsed.whereExpr ? (' WHERE ' + parsed.whereExpr) : '') +
-          ' GROUP BY ' + parsed.groupExpr + ' LIMIT 25';
-        stepPromises.push(
-          engine.execute(havSql, { datasetId: options.datasetId || '__unified__', explain: false }).then(function (res) {
-            if (!res.ok) {
-              return {
-                order: 4,
-                clause: '4. HAVING',
-                badge: 'Post-Aggregate Filter',
-                sqlFragment: 'HAVING ' + parsed.havingExpr,
-                explanation: 'Logical Step 4: Filter aggregated group buckets using HAVING (' + parsed.havingExpr + '). Unlike WHERE, HAVING operates after GROUP BY aggregation.',
+    /**
+     * Strip ROLLUP(...), CUBE(...), GROUPING SETS(...) wrappers from a GROUP BY expression
+     * so we can safely project the underlying columns in Step 4 (`SELECT <cols>, COUNT(*) ...`).
+     */
+    function stripGroupingWrappers(groupExpr) {
+        if (!groupExpr) return '';
+        var s = String(groupExpr).trim();
+        // Repeatedly unwrap GROUPING SETS (...), ROLLUP (...), CUBE (...)
+        var prev = '';
+        while (s !== prev) {
+            prev = s;
+            s = s.replace(/\bGROUPING\s+SETS\s*\(([\s\S]*)\)/gi, '$1');
+            s = s.replace(/\b(?:ROLLUP|CUBE)\s*\(([^()]*)\)/gi, '$1');
+        }
+        // Remove nested parens from grouping sets like ((a, b), (a), ())
+        s = s.replace(/[()]/g, ' ');
+        var parts = s.split(',').map(function (p) { return p.trim(); }).filter(Boolean);
+        // Deduplicate columns
+        var unique = [];
+        var seen = {};
+        parts.forEach(function (p) {
+            var key = p.toLowerCase();
+            if (!seen[key]) {
+                seen[key] = true;
+                unique.push(p);
+            }
+        });
+        return unique.join(', ');
+    }
+
+    /**
+     * Split top-level comma-separated CTE definitions in a WITH clause
+     */
+    function parseCteDefinitions(withClause) {
+        if (!withClause) return [];
+        var body = String(withClause).replace(/^\s*WITH\s+(?:RECURSIVE\s+)?/i, '').trim();
+        var isRecursive = /^\s*WITH\s+RECURSIVE\b/i.test(withClause);
+        var ctes = [];
+        var depth = 0;
+        var inSingle = false;
+        var start = 0;
+
+        for (var i = 0; i < body.length; i++) {
+            var ch = body[i];
+            if (ch === "'" && body[i - 1] !== '\\') {
+                inSingle = !inSingle;
+                continue;
+            }
+            if (inSingle) continue;
+            if (ch === '(') depth++;
+            else if (ch === ')') depth = Math.max(0, depth - 1);
+            else if (ch === ',' && depth === 0) {
+                ctes.push(body.slice(start, i).trim());
+                start = i + 1;
+            }
+        }
+        if (start < body.length) {
+            var tail = body.slice(start).trim();
+            if (tail) ctes.push(tail);
+        }
+
+        return ctes.map(function (rawDef, idx) {
+            // Match: cte_name [(col1, col2)] AS [MATERIALIZED | NOT MATERIALIZED] ( ... )
+            var m = rawDef.match(/^([a-zA-Z_][a-zA-Z0-9_]*)\s*(?:\(([^)]*)\))?\s+AS\s+(?:(?:NOT\s+)?MATERIALIZED\s+)?\(([\s\S]*)\)$/i);
+            if (!m) return null;
+            var name = m[1];
+            var colList = m[2] ? m[2].trim() : '';
+            var innerSql = m[3].trim();
+            // Check if innerSql has a top-level UNION ALL or UNION (for recursive CTEs)
+            var unionSplit = splitTopLevelUnion(innerSql);
+            return {
+                index: idx,
+                name: name,
+                colList: colList,
+                innerSql: innerSql,
+                rawDef: rawDef,
+                isRecursive: isRecursive && !!unionSplit,
+                anchorSql: unionSplit ? unionSplit.left : null,
+                recursiveSql: unionSplit ? unionSplit.right : null,
+                unionType: unionSplit ? unionSplit.op : null
+            };
+        }).filter(Boolean);
+    }
+
+    function splitTopLevelUnion(sql) {
+        var depth = 0;
+        var inSingle = false;
+        var upper = sql.toUpperCase();
+        for (var i = 0; i < sql.length; i++) {
+            var ch = sql[i];
+            if (ch === "'" && sql[i - 1] !== '\\') {
+                inSingle = !inSingle;
+                continue;
+            }
+            if (inSingle) continue;
+            if (ch === '(') depth++;
+            else if (ch === ')') depth = Math.max(0, depth - 1);
+            else if (depth === 0) {
+                var rem = upper.slice(i);
+                var m = rem.match(/^UNION\s+ALL\b|^UNION\b/);
+                if (m && (i === 0 || /[\s)]/.test(sql[i - 1]))) {
+                    return {
+                        left: sql.slice(0, i).trim(),
+                        op: m[0].replace(/\s+/g, ' '),
+                        right: sql.slice(i + m[0].length).trim()
+                    };
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Parse a top-level SELECT query into its logical clauses so we can build intermediate step queries.
+     * Respects parentheses depth so subqueries and CTEs do not confuse top-level clause boundaries.
+     */
+    function parseSelectClauses(sql) {
+        var cleaned = String(sql || '')
+            .replace(/--[^\n]*/g, function (m) { return ' '.repeat(m.length); })
+            .replace(/\/\*[\s\S]*?\*\//g, function (m) { return ' '.repeat(m.length); });
+
+        var trimmed = sql.trim().replace(/;+\s*$/, '');
+        var cleanedTrim = cleaned.trim().replace(/;+\s*$/, '');
+
+        var depth = 0;
+        var inSingle = false;
+        var mainSelectPos = -1;
+        var upper = cleanedTrim.toUpperCase();
+
+        // Check if query starts with WITH
+        for (var i = 0; i < cleanedTrim.length; i++) {
+            var ch = cleanedTrim[i];
+            if (ch === "'" && cleanedTrim[i - 1] !== '\\') {
+                inSingle = !inSingle;
+                continue;
+            }
+            if (inSingle) continue;
+            if (ch === '(') depth++;
+            else if (ch === ')') depth = Math.max(0, depth - 1);
+            else if (depth === 0) {
+                if (upper.slice(i, i + 6) === 'SELECT' && (i === 0 || /[\s)]/.test(cleanedTrim[i - 1])) && /[\s(]/.test(cleanedTrim[i + 6] || ' ')) {
+                    mainSelectPos = i;
+                    break;
+                }
+            }
+        }
+
+        if (mainSelectPos === -1) return null;
+
+        var withClause = mainSelectPos > 0 ? trimmed.slice(0, mainSelectPos).trim() : '';
+        var mainQuery = trimmed.slice(mainSelectPos);
+        var mainCleaned = cleanedTrim.slice(mainSelectPos);
+        var mainUpper = mainCleaned.toUpperCase();
+
+        var keywords = [
+            { key: 'SELECT', re: /^SELECT(?:\s+DISTINCT)?\b/ },
+            { key: 'FROM', re: /^FROM\b/ },
+            { key: 'WHERE', re: /^WHERE\b/ },
+            { key: 'GROUP BY', re: /^GROUP\s+BY\b/ },
+            { key: 'HAVING', re: /^HAVING\b/ },
+            { key: 'WINDOW', re: /^WINDOW\b/ },
+            { key: 'UNION', re: /^(?:UNION(?:\s+ALL)?|INTERSECT|EXCEPT)\b/ },
+            { key: 'ORDER BY', re: /^ORDER\s+BY\b/ },
+            { key: 'LIMIT', re: /^LIMIT\b/ }
+        ];
+
+        var tokens = [];
+        depth = 0;
+        inSingle = false;
+        for (var j = 0; j < mainCleaned.length; j++) {
+            var c = mainCleaned[j];
+            if (c === "'" && mainCleaned[j - 1] !== '\\') {
+                inSingle = !inSingle;
+                continue;
+            }
+            if (inSingle) continue;
+            if (c === '(') depth++;
+            else if (c === ')') depth = Math.max(0, depth - 1);
+            else if (depth === 0 && (j === 0 || /[\s)]/.test(mainCleaned[j - 1]))) {
+                var sub = mainUpper.slice(j);
+                for (var k = 0; k < keywords.length; k++) {
+                    var m = sub.match(keywords[k].re);
+                    if (m) {
+                        var afterChar = mainCleaned[j + m[0].length] || ' ';
+                        if (/[\s(]/.test(afterChar)) {
+                            tokens.push({
+                                key: keywords[k].key,
+                                matchLen: m[0].length,
+                                rawKeyword: mainQuery.slice(j, j + m[0].length),
+                                index: j
+                            });
+                            j += m[0].length - 1;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        var parts = {
+            withClause: withClause,
+            cteList: parseCteDefinitions(withClause),
+            selectDistinct: false,
+            select: '',
+            from: '',
+            where: '',
+            groupBy: '',
+            having: '',
+            window: '',
+            setOp: '',
+            setOpType: '',
+            orderBy: '',
+            limit: ''
+        };
+
+        for (var t = 0; t < tokens.length; t++) {
+            var tok = tokens[t];
+            var startIdx = tok.index + tok.matchLen;
+            var endIdx = (t + 1 < tokens.length) ? tokens[t + 1].index : mainQuery.length;
+            var body = mainQuery.slice(startIdx, endIdx).trim();
+            if (tok.key === 'SELECT' && !parts.select) {
+                parts.select = body;
+                parts.selectDistinct = /DISTINCT/i.test(tok.rawKeyword);
+            } else if (tok.key === 'FROM' && !parts.from) {
+                parts.from = body;
+            } else if (tok.key === 'WHERE' && !parts.where) {
+                parts.where = body;
+            } else if (tok.key === 'GROUP BY' && !parts.groupBy) {
+                parts.groupBy = body;
+            } else if (tok.key === 'HAVING' && !parts.having) {
+                parts.having = body;
+            } else if (tok.key === 'WINDOW' && !parts.window) {
+                parts.window = body;
+            } else if (tok.key === 'UNION' && !parts.setOp) {
+                parts.setOpType = tok.rawKeyword.toUpperCase().replace(/\s+/g, ' ');
+                parts.setOp = tok.rawKeyword + ' ' + body;
+            } else if (tok.key === 'ORDER BY' && !parts.orderBy) {
+                parts.orderBy = body;
+            } else if (tok.key === 'LIMIT' && !parts.limit) {
+                parts.limit = body;
+            }
+        }
+
+        return parts;
+    }
+
+    /**
+     * Build the step-by-step execution stages for a SQL query and execute each intermediate step.
+     * Supports:
+     *   - DML Before/After Table Diffs (Step 1: BEFORE STATE, Step 2: EXECUTE DML, Step 3: AFTER STATE & DIFF)
+     *   - Up-to-9-Stage SELECT Pipeline (0. SOURCE TABLES -> 1. WITH CTE -> 2. FROM/JOIN -> 3. WHERE 3VL ->
+     *     4. GROUP BY / HAVING -> 5. WINDOW OVER -> 6. SELECT / UNION -> 7. ORDER BY + LIMIT -> 8. EXPLAIN PLAN)
+     */
+    async function buildStepPipeline(sql, datasetId) {
+        var dsId = inferDatasetFromSql(sql, datasetId);
+        var cleanSql = String(sql || '').trim().replace(/;+\s*$/, '');
+        var steps = [];
+
+        // Run the full query first
+        var finalRes = await getEngine().execute(cleanSql, dsId);
+
+        // ─── DML PIPELINE (INSERT / UPDATE / DELETE / TRUNCATE) ───
+        if (!finalRes.error && finalRes.dmlDiff) {
+            var diff = finalRes.dmlDiff;
+            var meta = SCHEMA_META[diff.tableName] || { pk: [], fk: {} };
+
+            // Step 1: BEFORE STATE
+            steps.push({
+                clause: '1. BEFORE STATE',
+                badge: diff.beforeRows.length + ' rows before',
+                description: 'Snapshot of `' + diff.tableName + '` before executing `' + diff.operation + '`. Primary keys (' + (meta.pk.join(', ') || 'row') + ') are tracked to compute exact cell-level diffs.',
+                code: 'SELECT * FROM ' + diff.tableName + '; -- Before ' + diff.operation,
+                columns: diff.columns,
+                rows: diff.beforeRows.slice(0, 25),
+                rowStates: diff.beforeRows.slice(0, 25).map(function () { return 'normal'; }),
+                highlightCols: meta.pk,
+                tableName: diff.tableName
+            });
+
+            // Step 2: EXECUTE DML
+            var summaryParts = [];
+            if (diff.summary.inserted > 0) summaryParts.push('+' + diff.summary.inserted + ' inserted');
+            if (diff.summary.updated > 0) summaryParts.push('~' + diff.summary.updated + ' updated');
+            if (diff.summary.deleted > 0) summaryParts.push('-' + diff.summary.deleted + ' deleted');
+            var summaryBadge = summaryParts.length > 0 ? summaryParts.join(', ') : '0 rows mutated';
+
+            var mutatedOnly = diff.diffRows.filter(function (dr) { return dr.state !== 'unchanged'; });
+            steps.push({
+                clause: '2. EXECUTE ' + diff.operation,
+                badge: summaryBadge,
+                description: 'Executes `' + diff.operation + '` against `' + diff.tableName + '` (' + summaryBadge + ').' + (finalRes.rows && finalRes.rows.length > 0 ? ' Displays affected / returned rows.' : ''),
+                code: cleanSql,
+                columns: diff.columns,
+                rows: (mutatedOnly.length > 0 ? mutatedOnly : diff.diffRows).slice(0, 25).map(function (dr) { return dr.row; }),
+                rowStates: (mutatedOnly.length > 0 ? mutatedOnly : diff.diffRows).slice(0, 25).map(function (dr) { return dr.state === 'unchanged' ? 'normal' : dr.state; }),
+                highlightCols: meta.pk,
+                dmlSummary: diff.summary,
+                tableName: diff.tableName
+            });
+
+            // Step 3: AFTER STATE & DIFF
+            var diffSlice = diff.diffRows.slice(0, 30);
+            var cellDiffs = {};
+            diffSlice.forEach(function (dr, rIdx) {
+                if (dr.state === 'updated' && dr.changedCols) {
+                    cellDiffs[rIdx] = dr.changedCols;
+                }
+            });
+
+            steps.push({
+                clause: '3. AFTER STATE & DIFF',
+                badge: diff.afterRows.length + ' rows after (' + summaryBadge + ')',
+                description: 'Full Before → After table diff on `' + diff.tableName + '`. Inserted rows are highlighted in green (`+ INSERTED`), mutated cells show `<del>old</del> → <ins>new</ins>` inline (`~ UPDATED`), and deleted rows are struck through in red (`− DELETED`).',
+                code: cleanSql,
+                columns: diff.columns,
+                rows: diffSlice.map(function (dr) { return dr.row; }),
+                rowStates: diffSlice.map(function (dr) { return dr.state === 'unchanged' ? 'normal' : dr.state; }),
+                cellDiffs: cellDiffs,
+                highlightCols: meta.pk,
+                dmlSummary: diff.summary,
+                tableName: diff.tableName
+            });
+
+            return {
+                datasetId: dsId,
+                finalRes: finalRes,
+                steps: steps
+            };
+        }
+
+        var parsed = parseSelectClauses(cleanSql);
+
+        if (!parsed || (!parsed.from && !parsed.select) || finalRes.error) {
+            if (!finalRes.error && finalRes.resultSets && finalRes.resultSets.length > 1) {
+                finalRes.resultSets.forEach(function (rs, idx) {
+                    steps.push({
+                        clause: 'STATEMENT ' + (idx + 1),
+                        badge: rs.rows.length + ' rows',
+                        description: 'Result set from statement #' + (idx + 1),
+                        code: rs.statement || cleanSql,
+                        columns: rs.columns,
+                        rows: rs.rows.slice(0, 25),
+                        rowStates: rs.rows.slice(0, 25).map(function () { return 'normal'; }),
+                        highlightCols: []
+                    });
+                });
+            } else if (!finalRes.error) {
+                steps.push({
+                    clause: 'RESULT',
+                    badge: (finalRes.rows ? finalRes.rows.length : 0) + ' rows',
+                    description: 'Final query execution output.',
+                    code: cleanSql,
+                    columns: finalRes.columns || [],
+                    rows: (finalRes.rows || []).slice(0, 25),
+                    rowStates: (finalRes.rows || []).slice(0, 25).map(function () { return 'normal'; }),
+                    highlightCols: []
+                });
+            }
+            return {
+                datasetId: dsId,
+                finalRes: finalRes,
+                steps: steps
+            };
+        }
+
+        var withPrefix = parsed.withClause ? (parsed.withClause + '\n') : '';
+        var cteNames = (parsed.cteList || []).map(function (c) { return c.name; });
+
+        // ─── STEP 0: SOURCE TABLES ───
+        var sourceTables = extractSourceTables(cleanSql, cteNames);
+        if (sourceTables.length > 0) {
+            var subTables = [];
+            for (var stIdx = 0; stIdx < sourceTables.length; stIdx++) {
+                var tblName = sourceTables[stIdx];
+                var tblRes = await getEngine().execute('SELECT * FROM ' + tblName + ' LIMIT 6', dsId);
+                if (!tblRes.error && tblRes.columns && tblRes.columns.length > 0) {
+                    var tblMeta = SCHEMA_META[tblName] || { pk: [], fk: {} };
+                    subTables.push({
+                        tableName: tblName,
+                        columns: tblRes.columns,
+                        rows: tblRes.rows.slice(0, 6),
+                        pkCols: tblMeta.pk || [],
+                        fkMap: tblMeta.fk || {}
+                    });
+                }
+            }
+            if (subTables.length > 0) {
+                var firstSub = subTables[0];
+                steps.push({
+                    clause: '0. SOURCE TABLES',
+                    badge: subTables.length + (subTables.length === 1 ? ' base table' : ' base tables'),
+                    description: 'Raw base relation' + (subTables.length > 1 ? 's' : '') + ' (' + subTables.map(function (s) { return '`' + s.tableName + '`'; }).join(', ') + ') read from storage before CTEs, joins, or predicates execute.',
+                    code: subTables.map(function (s) { return 'SELECT * FROM ' + s.tableName + ' LIMIT 6;'; }).join('\n'),
+                    columns: firstSub.columns,
+                    rows: firstSub.rows,
+                    rowStates: firstSub.rows.map(function () { return 'normal'; }),
+                    highlightCols: firstSub.pkCols,
+                    subTables: subTables
+                });
+            }
+        }
+
+        // ─── STEP 1: WITH CTE (supports multiple CTEs and Recursive Anchor + Fixpoint) ───
+        if (parsed.cteList && parsed.cteList.length > 0) {
+            for (var cIdx = 0; cIdx < parsed.cteList.length; cIdx++) {
+                var cte = parsed.cteList[cIdx];
+                var priorCtes = parsed.cteList.slice(0, cIdx).map(function (p) { return p.rawDef; });
+                var priorWithPrefix = priorCtes.length > 0
+                    ? ('WITH ' + (/^\s*WITH\s+RECURSIVE\b/i.test(parsed.withClause) ? 'RECURSIVE ' : '') + priorCtes.join(',\n') + '\n')
+                    : '';
+
+                if (cte.isRecursive && cte.anchorSql) {
+                    // Step 1a: CTE Anchor Member
+                    var anchorQuery = priorWithPrefix + cte.anchorSql + ' LIMIT 15';
+                    var anchorRes = await getEngine().execute(anchorQuery, dsId);
+                    var anchorCount = (!anchorRes.error && anchorRes.rows) ? anchorRes.rows.length : 0;
+                    if (!anchorRes.error && anchorRes.columns && anchorRes.columns.length > 0) {
+                        steps.push({
+                            clause: '1a. CTE ANCHOR (' + cte.name + ')',
+                            badge: anchorRes.rows.length + ' seed rows',
+                            description: 'Seeds the working table for recursive CTE `' + cte.name + '` with the non-recursive base case (Iteration 0).',
+                            code: cte.anchorSql,
+                            columns: anchorRes.columns,
+                            rows: anchorRes.rows.slice(0, 15),
+                            rowStates: anchorRes.rows.slice(0, 15).map(function () { return 'cte-anchor'; }),
+                            highlightCols: []
+                        });
+                    }
+
+                    // Step 1b: CTE Fixpoint
+                    var upToCtes = parsed.cteList.slice(0, cIdx + 1).map(function (p) { return p.rawDef; });
+                    var fullRecWith = 'WITH RECURSIVE ' + upToCtes.join(',\n') + '\nSELECT * FROM ' + cte.name + ' LIMIT 25';
+                    var fixRes = await getEngine().execute(fullRecWith, dsId);
+                    if (!fixRes.error && fixRes.columns && fixRes.columns.length > 0) {
+                        steps.push({
+                            clause: '1b. CTE FIXPOINT (' + cte.name + ')',
+                            badge: fixRes.rows.length + ' total rows',
+                            description: 'Repeatedly joins the recursive member against the latest working table until 0 new rows are produced (fixpoint termination).',
+                            code: cte.rawDef,
+                            columns: fixRes.columns,
+                            rows: fixRes.rows.slice(0, 20),
+                            rowStates: fixRes.rows.slice(0, 20).map(function (_, rIdx) {
+                                return rIdx < anchorCount ? 'cte-anchor' : 'cte-recursive';
+                            }),
+                            highlightCols: []
+                        });
+                    }
+                } else {
+                    var upToDefs = parsed.cteList.slice(0, cIdx + 1).map(function (p) { return p.rawDef; });
+                    var ctePrefix = 'WITH ' + (/^\s*WITH\s+RECURSIVE\b/i.test(parsed.withClause) ? 'RECURSIVE ' : '') + upToDefs.join(',\n');
+                    var cteTestSql = ctePrefix + '\nSELECT * FROM ' + cte.name + ' LIMIT 20';
+                    var cteRes = await getEngine().execute(cteTestSql, dsId);
+                    if (!cteRes.error && cteRes.columns && cteRes.columns.length > 0) {
+                        var stepLabel = parsed.cteList.length > 1
+                            ? ('1.' + (cIdx + 1) + ' WITH CTE (' + cte.name + ')')
+                            : ('1. WITH CTE (' + cte.name + ')');
+                        steps.push({
+                            clause: stepLabel,
+                            badge: cteRes.rows.length + ' rows',
+                            description: 'Evaluates Common Table Expression `' + cte.name + '` first, creating a scoped temporary relation before the main query executes.',
+                            code: cte.rawDef,
+                            columns: cteRes.columns,
+                            rows: cteRes.rows.slice(0, 15),
+                            rowStates: cteRes.rows.slice(0, 15).map(function () { return 'normal'; }),
+                            highlightCols: []
+                        });
+                    }
+                }
+            }
+        }
+
+        // ─── STEP 2: FROM & JOIN ───
+        if (parsed.from) {
+            var hasJoin = /\bJOIN\b/i.test(parsed.from);
+            var joinCols = extractJoinColumns(parsed.from);
+            var fromSql = withPrefix + 'SELECT * FROM ' + parsed.from + ' LIMIT 20';
+            var fromRes = await getEngine().execute(fromSql, dsId);
+            if (!fromRes.error && fromRes.columns.length > 0) {
+                var fromRowStates = fromRes.rows.slice(0, 15).map(function (r) {
+                    if (hasJoin && r.some(function (cell) { return cell === null; })) {
+                        return 'null-padded';
+                    }
+                    return 'normal';
+                });
+                steps.push({
+                    clause: hasJoin ? '2. FROM + JOIN' : '2. FROM',
+                    badge: fromRes.rows.length + (fromRes.rows.length === 20 ? '+ rows' : ' rows'),
+                    description: hasJoin
+                        ? 'Loads source tables and evaluates `JOIN ... ON` predicates (' + (joinCols.length ? 'join keys: `' + joinCols.join('`, `') + '`' : 'combining columns') + '). Unmatched outer-join rows are NULL-padded (`Ø NULL-padded`).'
+                        : 'Loads raw candidate rows from `' + parsed.from.replace(/\s+/g, ' ') + '` into the working set.',
+                    code: 'FROM ' + parsed.from,
+                    columns: fromRes.columns,
+                    rows: fromRes.rows.slice(0, 15),
+                    rowStates: fromRowStates,
+                    highlightCols: joinCols
+                });
+            }
+        }
+
+        // ─── STEP 3: WHERE (3VL FILTER) ───
+        if (parsed.from && parsed.where) {
+            var whereMatchedSql = withPrefix + 'SELECT * FROM ' + parsed.from + ' WHERE ' + parsed.where + ' LIMIT 15';
+            var whereRemovedSql = withPrefix + 'SELECT * FROM ' + parsed.from + ' WHERE NOT (' + parsed.where + ') OR (' + parsed.where + ') IS NULL LIMIT 6';
+            var matchedRes = await getEngine().execute(whereMatchedSql, dsId);
+            var removedRes = await getEngine().execute(whereRemovedSql, dsId);
+
+            if (!matchedRes.error && matchedRes.columns.length > 0) {
+                var combinedRows = [];
+                var rowStates = [];
+                var keptRows = matchedRes.rows.slice(0, 10);
+                keptRows.forEach(function (r) {
+                    combinedRows.push(r.concat(['✓ TRUE (Kept)']));
+                    rowStates.push('matched');
+                });
+                if (!removedRes.error && removedRes.rows.length > 0) {
+                    removedRes.rows.slice(0, 5).forEach(function (r) {
+                        var hasNull = r.some(function (c) { return c === null; });
+                        combinedRows.push(r.concat([hasNull ? '∅ UNKNOWN / NULL (Pruned)' : '✗ FALSE (Pruned)']));
+                        rowStates.push('filtered');
+                    });
+                }
+                var cols3vl = matchedRes.columns.concat(['3VL Verdict']);
+                steps.push({
+                    clause: '3. WHERE (3VL)',
+                    badge: matchedRes.rows.length + ' kept' + (!removedRes.error && removedRes.rows.length ? ' / ' + removedRes.rows.length + '+ pruned' : ''),
+                    description: 'Evaluates `' + parsed.where.replace(/\s+/g, ' ') + '` under SQL Three-Valued Logic (`TRUE`, `FALSE`, `UNKNOWN`). Only `TRUE` rows survive; both `FALSE` and `UNKNOWN` (NULL comparisons) are pruned.',
+                    code: 'WHERE ' + parsed.where,
+                    columns: cols3vl,
+                    rows: combinedRows,
+                    rowStates: rowStates,
+                    highlightCols: ['3VL Verdict']
+                });
+            }
+        }
+
+        // ─── STEP 4: GROUP BY & 4b. HAVING ───
+        if (parsed.from && parsed.groupBy) {
+            var wherePart = parsed.where ? (' WHERE ' + parsed.where) : '';
+            var safeProjectionCols = stripGroupingWrappers(parsed.groupBy);
+            var selectColsForGroup = safeProjectionCols ? (safeProjectionCols + ', COUNT(*) AS _group_row_count') : 'COUNT(*) AS _group_row_count';
+            var groupSql = withPrefix + 'SELECT ' + selectColsForGroup + ' FROM ' + parsed.from + wherePart + ' GROUP BY ' + parsed.groupBy + ' LIMIT 15';
+            var groupRes = await getEngine().execute(groupSql, dsId);
+            if (!groupRes.error && groupRes.columns.length > 0) {
+                var isRollupOrCube = /\b(?:ROLLUP|CUBE|GROUPING\s+SETS)\b/i.test(parsed.groupBy);
+                steps.push({
+                    clause: '4. GROUP BY',
+                    badge: groupRes.rows.length + ' groups',
+                    description: (isRollupOrCube
+                        ? 'Collapses matching rows into hierarchical super-aggregate buckets (`' + parsed.groupBy + '`) and computes per-group row counts.'
+                        : 'Collapses rows sharing identical values of `' + parsed.groupBy + '` into one summary bucket per unique group.'),
+                    code: 'GROUP BY ' + parsed.groupBy,
+                    columns: groupRes.columns,
+                    rows: groupRes.rows.slice(0, 15),
+                    rowStates: groupRes.rows.slice(0, 15).map(function (_, idx) { return 'group-' + (idx % 4); }),
+                    highlightCols: ['_group_row_count']
+                });
+            }
+
+            if (parsed.having) {
+                var havingSql = withPrefix + 'SELECT ' + selectColsForGroup + ' FROM ' + parsed.from + wherePart + ' GROUP BY ' + parsed.groupBy + ' HAVING ' + parsed.having + ' LIMIT 15';
+                var havingRemovedSql = withPrefix + 'SELECT ' + selectColsForGroup + ' FROM ' + parsed.from + wherePart + ' GROUP BY ' + parsed.groupBy + ' HAVING NOT (' + parsed.having + ') OR (' + parsed.having + ') IS NULL LIMIT 5';
+                var havingRes = await getEngine().execute(havingSql, dsId);
+                var havingRemRes = await getEngine().execute(havingRemovedSql, dsId);
+                if (!havingRes.error && havingRes.columns.length > 0) {
+                    var hRows = [];
+                    var hStates = [];
+                    havingRes.rows.slice(0, 10).forEach(function (r) {
+                        hRows.push(r);
+                        hStates.push('matched');
+                    });
+                    if (!havingRemRes.error && havingRemRes.rows.length > 0) {
+                        havingRemRes.rows.slice(0, 4).forEach(function (r) {
+                            hRows.push(r);
+                            hStates.push('filtered');
+                        });
+                    }
+                    steps.push({
+                        clause: '4b. HAVING',
+                        badge: havingRes.rows.length + ' groups kept',
+                        description: 'Filters aggregated groups *after* `GROUP BY` using aggregate predicate `' + parsed.having + '`.',
+                        code: 'HAVING ' + parsed.having,
+                        columns: havingRes.columns,
+                        rows: hRows,
+                        rowStates: hStates,
+                        highlightCols: ['_group_row_count']
+                    });
+                }
+            }
+        }
+
+        // ─── STEP 5: WINDOW OVER ───
+        var hasWindowFunc = /\bOVER\s*\(/i.test(parsed.select) || !!parsed.window;
+        if (hasWindowFunc && parsed.from) {
+            var winSql = withPrefix + 'SELECT ' + (parsed.selectDistinct ? 'DISTINCT ' : '') + parsed.select +
+                ' FROM ' + parsed.from +
+                (parsed.where ? ' WHERE ' + parsed.where : '') +
+                (parsed.groupBy ? ' GROUP BY ' + parsed.groupBy : '') +
+                (parsed.having ? ' HAVING ' + parsed.having : '') +
+                (parsed.window ? ' WINDOW ' + parsed.window : '') +
+                ' LIMIT 15';
+            var winRes = await getEngine().execute(winSql, dsId);
+            if (!winRes.error && winRes.columns.length > 0) {
+                // Identify window function output aliases to highlight
+                var winCols = [];
+                var selectItems = splitTopLevelCommas(parsed.select);
+                selectItems.forEach(function (item, idx) {
+                    if (/\bOVER\s*\(|\bOVER\s+[a-zA-Z_]/i.test(item) && winRes.columns[idx]) {
+                        winCols.push(winRes.columns[idx]);
+                    }
+                });
+                steps.push({
+                    clause: '5. WINDOW OVER',
+                    badge: winRes.rows.length + ' rows (uncollapsed)',
+                    description: 'Evaluates `OVER (PARTITION BY ... ORDER BY ...)` window frames across peer rows without collapsing individual rows.',
+                    code: parsed.window ? ('WINDOW ' + parsed.window) : 'OVER (...)',
+                    columns: winRes.columns,
+                    rows: winRes.rows.slice(0, 15),
+                    rowStates: winRes.rows.slice(0, 15).map(function (_, idx) { return 'window-' + (idx % 3); }),
+                    highlightCols: winCols
+                });
+            }
+        }
+
+        // ─── STEP 6: SELECT PROJECTION & 6b. SET OPERATIONS ───
+        var hasPostSelect = !!(parsed.orderBy || parsed.limit || parsed.setOp);
+        if (parsed.select) {
+            var selectStepSql = withPrefix + 'SELECT ' + (parsed.selectDistinct ? 'DISTINCT ' : '') + parsed.select +
+                (parsed.from ? (' FROM ' + parsed.from) : '') +
+                (parsed.where ? (' WHERE ' + parsed.where) : '') +
+                (parsed.groupBy ? (' GROUP BY ' + parsed.groupBy) : '') +
+                (parsed.having ? (' HAVING ' + parsed.having) : '') +
+                (parsed.window ? (' WINDOW ' + parsed.window) : '');
+
+            var selectRes = hasPostSelect ? await getEngine().execute(selectStepSql + ' LIMIT 20', dsId) : finalRes;
+            if (!selectRes.error && selectRes.columns.length > 0) {
+                steps.push({
+                    clause: parsed.selectDistinct ? '6. SELECT DISTINCT' : '6. SELECT',
+                    badge: selectRes.columns.length + ' cols × ' + selectRes.rows.length + ' rows',
+                    description: 'Projects the requested output columns and evaluates scalar expressions / aliases' + (parsed.selectDistinct ? ', deduplicating identical projection rows.' : '.'),
+                    code: 'SELECT ' + (parsed.selectDistinct ? 'DISTINCT ' : '') + parsed.select,
+                    columns: selectRes.columns,
+                    rows: selectRes.rows.slice(0, 15),
+                    rowStates: selectRes.rows.slice(0, 15).map(function () { return 'normal'; }),
+                    highlightCols: []
+                });
+            }
+        }
+
+        if (parsed.setOp) {
+            var setOpSql = withPrefix + 'SELECT ' + (parsed.selectDistinct ? 'DISTINCT ' : '') + parsed.select +
+                (parsed.from ? (' FROM ' + parsed.from) : '') +
+                (parsed.where ? (' WHERE ' + parsed.where) : '') +
+                (parsed.groupBy ? (' GROUP BY ' + parsed.groupBy) : '') +
+                (parsed.having ? (' HAVING ' + parsed.having) : '') +
+                (parsed.window ? (' WINDOW ' + parsed.window) : '') +
+                ' ' + parsed.setOp;
+            var setOpRes = (parsed.orderBy || parsed.limit) ? await getEngine().execute(setOpSql + ' LIMIT 20', dsId) : finalRes;
+            if (!setOpRes.error && setOpRes.columns.length > 0) {
+                steps.push({
+                    clause: '6b. ' + (parsed.setOpType || 'UNION'),
+                    badge: setOpRes.rows.length + ' combined rows',
+                    description: 'Combines result sets vertically using `' + (parsed.setOpType || 'UNION') + '`.',
+                    code: parsed.setOp,
+                    columns: setOpRes.columns,
+                    rows: setOpRes.rows.slice(0, 15),
+                    rowStates: setOpRes.rows.slice(0, 15).map(function () { return 'matched'; }),
+                    highlightCols: []
+                });
+            }
+        }
+
+        // ─── STEP 7: ORDER BY + LIMIT (with sliced-off rows shown as filtered) ───
+        if ((parsed.orderBy || parsed.limit) && !finalRes.error) {
+            var orderLimitRows = finalRes.rows.slice(0, 20);
+            var orderLimitStates = orderLimitRows.map(function () { return 'matched'; });
+
+            // If LIMIT is present, fetch up to 20 rows WITHOUT LIMIT so we can show sliced-off rows at the bottom!
+            if (parsed.limit) {
+                var unlimitedSql = withPrefix + 'SELECT ' + (parsed.selectDistinct ? 'DISTINCT ' : '') + parsed.select +
+                    (parsed.from ? (' FROM ' + parsed.from) : '') +
+                    (parsed.where ? (' WHERE ' + parsed.where) : '') +
+                    (parsed.groupBy ? (' GROUP BY ' + parsed.groupBy) : '') +
+                    (parsed.having ? (' HAVING ' + parsed.having) : '') +
+                    (parsed.window ? (' WINDOW ' + parsed.window) : '') +
+                    (parsed.setOp ? (' ' + parsed.setOp) : '') +
+                    (parsed.orderBy ? (' ORDER BY ' + parsed.orderBy) : '') +
+                    ' LIMIT 20';
+                var unlimRes = await getEngine().execute(unlimitedSql, dsId);
+                if (!unlimRes.error && unlimRes.rows.length > finalRes.rows.length) {
+                    var keptCount = finalRes.rows.length;
+                    orderLimitRows = [];
+                    orderLimitStates = [];
+                    unlimRes.rows.slice(0, Math.min(keptCount + 5, 20)).forEach(function (r, idx) {
+                        orderLimitRows.push(r);
+                        orderLimitStates.push(idx < keptCount ? 'matched' : 'filtered');
+                    });
+                }
+            }
+
+            var labelParts = [];
+            var codeParts = [];
+            if (parsed.orderBy) {
+                labelParts.push('ORDER BY');
+                codeParts.push('ORDER BY ' + parsed.orderBy);
+            }
+            if (parsed.limit) {
+                labelParts.push('LIMIT');
+                codeParts.push('LIMIT ' + parsed.limit);
+            }
+            steps.push({
+                clause: '7. ' + labelParts.join(' + '),
+                badge: finalRes.rows.length + ' final rows',
+                description: (parsed.orderBy ? 'Sorts output rows by `' + parsed.orderBy + '`' : '') +
+                    (parsed.orderBy && parsed.limit ? ' and then ' : '') +
+                    (parsed.limit ? 'slices the top `' + parsed.limit + '` rows (rows beyond `LIMIT` are pruned at the bottom).' : '.'),
+                code: codeParts.join('\n'),
                 columns: finalRes.columns,
-                rows: finalRes.rows,
-                rowStates: finalRes.rows.map(function () { return 'matched'; })
-              };
-            }
-            var cols = res.columns.slice(0, -1);
-            var kept = 0;
-            var states = [];
-            var rows = res.rows.map(function (r) {
-              var pass = r[r.length - 1] === 1;
-              if (pass) kept++;
-              states.push(pass ? 'matched' : 'filtered');
-              return r.slice(0, -1);
+                rows: orderLimitRows,
+                rowStates: orderLimitStates,
+                highlightCols: [],
+                isLimitStep: !!parsed.limit
             });
-            return {
-              order: 4,
-              clause: '4. HAVING',
-              badge: kept + ' / ' + rows.length + ' groups kept',
-              sqlFragment: 'HAVING ' + parsed.havingExpr,
-              explanation: 'Logical Step 4: HAVING (' + parsed.havingExpr + ') prunes entire aggregated groups that do not satisfy the post-aggregation predicate.',
-              columns: cols,
-              rows: rows,
-              rowStates: states
-            };
-          })
-        );
-      }
+        }
 
-      // STEP 5: WINDOW Functions (if present)
-      if (parsed.hasWindowOver) {
-        stepPromises.push(
-          Promise.resolve({
-            order: 5,
-            clause: '5. WINDOW OVER(...)',
-            badge: 'Sliding Frame Context',
-            sqlFragment: parsed.selectExpr,
-            explanation: 'Logical Step 5: Evaluate Window Functions OVER (PARTITION BY ... ORDER BY ...). Unlike GROUP BY, window functions preserve every individual row while computing peer/frame rankings, running totals, and LAG/LEAD offsets.',
-            columns: finalRes.columns,
-            rows: finalRes.rows,
-            rowStates: finalRes.rows.map(function (_, idx) { return 'window-' + (idx % 3); })
-          })
-        );
-      }
+        // ─── STEP 8: EXPLAIN PLAN ───
+        if (!finalRes.error && finalRes.plan && finalRes.plan.length > 0) {
+            steps.push({
+                clause: '8. EXPLAIN PLAN',
+                badge: finalRes.plan.length + (finalRes.plan.length === 1 ? ' plan node' : ' plan nodes'),
+                description: 'Physical execution plan generated by the ' + getEngine().getEngineLabel() + ' query optimizer (`EXPLAIN ' + (getEngine().getEngineMode() === 'postgres' ? '(ANALYZE, BUFFERS, COSTS)' : 'QUERY PLAN') + '`).',
+                code: (getEngine().getEngineMode() === 'postgres' ? 'EXPLAIN (ANALYZE, BUFFERS, COSTS, FORMAT JSON)\n' : 'EXPLAIN QUERY PLAN\n') + cleanSql,
+                columns: ['Node ID', 'Parent', 'Physical Operator & Cost Details'],
+                rows: finalRes.plan.map(function (p) { return [p.id, p.parent, p.detail]; }),
+                rowStates: finalRes.plan.map(function () { return 'normal'; }),
+                highlightCols: ['Physical Operator & Cost Details'],
+                isExplainStep: true,
+                planNodes: finalRes.plan
+            });
+        }
 
-      // STEP 6: SELECT Projection
-      stepPromises.push(
-        Promise.resolve({
-          order: 6,
-          clause: parsed.hasDistinct ? '6. SELECT DISTINCT' : '6. SELECT Projection',
-          badge: finalRes.columns.length + ' columns · ' + finalRes.rowCount + ' rows',
-          sqlFragment: 'SELECT ' + (parsed.hasDistinct ? 'DISTINCT ' : '') + parsed.selectExpr,
-          explanation: 'Logical Step 6: Project the requested expressions, computed columns, and column aliases defined in SELECT (note how column aliases only become visible at this stage, which is why WHERE cannot reference them!).',
-          columns: finalRes.columns,
-          rows: finalRes.rows,
-          rowStates: finalRes.rows.map(function () { return 'matched'; })
-        })
-      );
-
-      // STEP 6.5: SET OPERATION (UNION / INTERSECT / EXCEPT)
-      if (parsed.setOpKeyword) {
-        stepPromises.push(
-          Promise.resolve({
-            order: 6.5,
-            clause: '6b. ' + parsed.setOpKeyword,
-            badge: finalRes.rowCount + ' combined rows',
-            sqlFragment: parsed.setOpKeyword,
-            explanation: 'Set Operation Step: Combine the projected tuple streams from both query branches using ' + parsed.setOpKeyword + '.',
-            columns: finalRes.columns,
-            rows: finalRes.rows,
-            rowStates: finalRes.rows.map(function () { return 'matched'; })
-          })
-        );
-      }
-
-      // STEP 7: ORDER BY & LIMIT
-      if (parsed.orderExpr || parsed.limitExpr) {
-        var ordFragment = (parsed.orderExpr ? ('ORDER BY ' + parsed.orderExpr + ' ') : '') + (parsed.limitExpr ? ('LIMIT ' + parsed.limitExpr) : '');
-        stepPromises.push(
-          Promise.resolve({
-            order: 7,
-            clause: '7. ' + (parsed.orderExpr ? 'ORDER BY' : '') + (parsed.orderExpr && parsed.limitExpr ? ' + ' : '') + (parsed.limitExpr ? 'LIMIT' : ''),
-            badge: 'Final ' + finalRes.rowCount + ' rows',
-            sqlFragment: ordFragment.trim(),
-            explanation: 'Logical Step 7: Sort the projected result set by (' + (parsed.orderExpr || 'natural order') + ')' + (parsed.limitExpr ? (' and slice the output window with LIMIT ' + parsed.limitExpr + '.') : '.'),
-            columns: finalRes.columns,
-            rows: finalRes.rows,
-            rowStates: finalRes.rows.map(function () { return 'matched'; })
-          })
-        );
-      }
-
-      return Promise.all(stepPromises).then(function (steps) {
         return {
-          ok: true,
-          sql: sql,
-          parsed: parsed,
-          steps: steps,
-          finalResult: finalRes
+            datasetId: dsId,
+            finalRes: finalRes,
+            steps: steps
         };
-      });
-    });
-  }
-
-  /**
-   * Verifies a learner's SQL query against a reference SQL query in WASM SQLite
-   * and returns structured test assertions (Syntax & Execution, Non-Empty Result,
-   * Schema/Column Alignment, Tuple Exact Match, and Physical Plan SARGability).
-   */
-  function verifyQueryAgainstReference(userSql, referenceSql, options) {
-    options = options || {};
-    var engine = root.SqlEngine;
-    if (!engine) return Promise.reject(new Error('SqlEngine not initialized'));
-    var ds = options.datasetId || '__unified__';
-
-    return Promise.all([
-      engine.execute(userSql, { datasetId: ds, explain: true }),
-      engine.execute(referenceSql || userSql, { datasetId: ds, explain: true })
-    ]).then(function (pair) {
-      var uRes = pair[0];
-      var rRes = pair[1];
-      var checks = [];
-
-      checks.push({
-        name: 'Test 1: SQL Syntax & Catalog Binding',
-        passed: Boolean(uRes.ok),
-        detail: uRes.ok
-          ? ('Compiled & executed in ' + uRes.elapsedMs + ' ms')
-          : ('SQL Error: ' + (uRes.error || 'Unknown error'))
-      });
-
-      if (!uRes.ok) {
-        return { passed: false, passedCount: 0, totalCount: 4, checks: checks, userResult: uRes };
-      }
-
-      var hasRows = uRes.rowCount > 0;
-      checks.push({
-        name: 'Test 2: Tuple Cardinality & Non-Empty Output',
-        passed: hasRows,
-        detail: uRes.rowCount + ' rows returned' + (rRes.ok ? (' (reference expects ' + rRes.rowCount + ' rows)') : '')
-      });
-
-      var colsMatch = rRes.ok && uRes.columns.length === rRes.columns.length;
-      checks.push({
-        name: 'Test 3: Projected Attribute Schema (' + uRes.columns.length + ' cols)',
-        passed: Boolean(colsMatch),
-        detail: 'Columns: [' + uRes.columns.join(', ') + ']'
-      });
-
-      var rowsEqual = rRes.ok && JSON.stringify(uRes.rows) === JSON.stringify(rRes.rows);
-      checks.push({
-        name: 'Test 4: Relational Tuple Value Equivalence & 3VL NULL Invariant',
-        passed: Boolean(rowsEqual),
-        detail: rowsEqual
-          ? 'All output tuples and NULL states match reference relation'
-          : 'Output rows differ from reference query (or custom exploration query executed)'
-      });
-
-      var passedCount = checks.filter(function (c) { return c.passed; }).length;
-      return {
-        passed: passedCount === checks.length,
-        passedCount: passedCount,
-        totalCount: checks.length,
-        checks: checks,
-        userResult: uRes,
-        refResult: rRes
-      };
-    });
-  }
-
-  function renderValueCell(val) {
-    if (val === null || typeof val === 'undefined') {
-      return '<span class="sql-null-badge" title="SQL NULL (Three-Valued Logic UNKNOWN)">NULL</span>';
-    }
-    return escapeHtml(String(val));
-  }
-
-  function renderExplainTreeHtml(explainNodes) {
-    if (!explainNodes || !explainNodes.length) {
-      return '<div class="sql-explain-node"><span class="sql-explain-node__badge">PLAN</span><span>Direct execution (no table scan tree emitted)</span></div>';
-    }
-    return '<div class="sql-explain-tree">' + explainNodes.map(function (n) {
-      var badgeCls = n.isIndex ? 'is-index' : (n.isFullScan ? 'is-scan' : '');
-      return (
-        '<div class="sql-explain-node">' +
-          '<span class="sql-explain-node__badge ' + badgeCls + '">' + escapeHtml(n.kind) + '</span>' +
-          '<code>' + escapeHtml(n.detail) + '</code>' +
-        '</div>'
-      );
-    }).join('') + '</div>';
-  }
-
-  /**
-   * Mounts an interactive Table-Level Clause Execution Visualizer inside `container`.
-   */
-  function mountClauseVisualizer(container, initialSql, options) {
-    if (!container) return;
-    options = options || {};
-    var state = {
-      sql: initialSql || 'SELECT * FROM customers LIMIT 5;',
-      referenceSql: options.referenceSql || initialSql || 'SELECT * FROM customers LIMIT 5;',
-      datasetId: options.datasetId || '__unified__',
-      stepIdx: 0,
-      trace: null,
-      testReport: options.testReport || null,
-      playing: false,
-      timer: null
-    };
-
-    function stopAutoPlay() {
-      state.playing = false;
-      if (state.timer) {
-        clearInterval(state.timer);
-        state.timer = null;
-      }
     }
 
-    function render() {
-      var trace = state.trace;
-      if (!trace) {
-        container.innerHTML = '<div class="sql-tviz"><div class="sql-tviz__header"><span class="sql-tviz__title">Initializing WASM SQLite Engine &amp; Table Visualizer…</span></div></div>';
-        return;
-      }
-
-      if (!trace.ok) {
-        container.innerHTML = (
-          '<div class="sql-tviz">' +
-            '<div class="sql-tviz__header">' +
-              '<div class="sql-tviz__title"><span class="sql-tviz__badge">SQL Error</span> Clause Visualizer</div>' +
-            '</div>' +
-            '<div class="sql-tviz__stage">' +
-              '<div class="exam-field-feedback fb--wrong">' + escapeHtml(trace.error) + '</div>' +
-            '</div>' +
-          '</div>'
-        );
-        return;
-      }
-
-      var steps = trace.steps || [];
-      if (state.stepIdx >= steps.length) state.stepIdx = Math.max(0, steps.length - 1);
-      var activeStep = steps[state.stepIdx] || steps[0];
-
-      var pipelineHtml = steps.map(function (st, idx) {
-        var cls = idx === state.stepIdx ? 'is-active' : (idx < state.stepIdx ? 'is-done' : '');
-        return (
-          '<button type="button" class="sql-clause-step ' + cls + '" data-tviz-step="' + idx + '">' +
-            '<span class="sql-clause-step__num">' + (idx + 1) + '</span>' +
-            '<span>' + escapeHtml(st.clause.replace(/^\d+[ab]?\.\s*/, '')) + '</span>' +
-          '</button>' +
-          (idx < steps.length - 1 ? '<span class="sql-clause-arrow">→</span>' : '')
-        );
-      }).join('');
-
-      var testBannerHtml = '';
-      if (state.testReport && state.testReport.checks) {
-        var tr = state.testReport;
-        var itemsHtml = tr.checks.map(function (c) {
-          return (
-            '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:4px 8px;border-radius:6px;background:rgba(255,255,255,0.03);font-size:0.78rem;">' +
-              '<span>' + (c.passed ? '✅ ' : '⚠️ ') + '<strong>' + escapeHtml(c.name) + '</strong></span>' +
-              '<code style="font-size:0.74rem;color:var(--text-muted);">' + escapeHtml(c.detail) + '</code>' +
-            '</div>'
-          );
-        }).join('');
-        testBannerHtml = (
-          '<div style="margin-bottom:10px;padding:10px 12px;border-radius:8px;border:1px solid ' + (tr.passed ? 'rgba(16,185,129,0.4)' : 'rgba(245,158,11,0.4)') + ';background:' + (tr.passed ? 'rgba(16,185,129,0.08)' : 'rgba(245,158,11,0.08)') + ';">' +
-            '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:0.8rem;font-weight:700;">' +
-              '<span>' + (tr.passed ? '✓ All SQL Lab Assertions Passed' : 'SQL Verification Report') + '</span>' +
-              '<span class="sql-tviz__badge">' + tr.passedCount + ' / ' + tr.totalCount + ' checks passed</span>' +
-            '</div>' +
-            '<div style="display:grid;gap:4px;">' + itemsHtml + '</div>' +
-          '</div>'
-        );
-      }
-
-      var tableHtml = '';
-      if (activeStep && activeStep.columns && activeStep.columns.length) {
-        var ths = activeStep.columns.map(function (c) {
-          var isPk = /_id$|^id$/i.test(c);
-          return '<th>' + escapeHtml(c) + (isPk ? '<span class="col-badge col-badge--pk">KEY</span>' : '') + '</th>';
-        }).join('');
-
-        var trs = (activeStep.rows || []).map(function (row, rIdx) {
-          var st = (activeStep.rowStates && activeStep.rowStates[rIdx]) || '';
-          var rowCls = '';
-          if (st === 'matched') rowCls = 'is-matched';
-          else if (st === 'filtered') rowCls = 'is-filtered';
-          else if (st === 'null-padded') rowCls = 'is-window-frame';
-          else if (st.indexOf('window-') === 0) rowCls = 'is-window-frame';
-          else if (st.indexOf('group-') === 0) rowCls = 'group-bucket-' + st.split('-')[1];
-          return '<tr class="' + rowCls + '">' + row.map(function (cell) {
-            return '<td>' + renderValueCell(cell) + '</td>';
-          }).join('') + '</tr>';
-        }).join('');
-
-        tableHtml = (
-          '<div class="sql-rel-table-card">' +
-            '<div class="sql-rel-table-card__head">' +
-              '<span><strong>' + escapeHtml(activeStep.clause) + '</strong> — <code>' + escapeHtml(activeStep.sqlFragment) + '</code></span>' +
-              '<span class="sql-tviz__badge">' + escapeHtml(activeStep.badge) + '</span>' +
-            '</div>' +
-            '<div class="sql-rel-table-scroll">' +
-              '<table class="sql-rel-table">' +
-                '<thead><tr>' + ths + '</tr></thead>' +
-                '<tbody>' + (trs || '<tr><td colspan="' + activeStep.columns.length + '">0 rows returned</td></tr>') + '</tbody>' +
-              '</table>' +
-            '</div>' +
-          '</div>'
-        );
-      } else {
-        tableHtml = '<div class="sql-rel-table-card"><div class="sql-rel-table-card__head">Statement executed (0 result columns)</div></div>';
-      }
-
-      var explainHtml = renderExplainTreeHtml(trace.finalResult ? trace.finalResult.explain : []);
-
-      container.innerHTML = (
-        '<div class="sql-tviz">' +
-          '<div class="sql-tviz__header">' +
-            '<div class="sql-tviz__title">' +
-              '<span class="sql-tviz__badge">WASM SQLite 3</span>' +
-              '<span>Table-Level Relational Execution Visualizer</span>' +
-            '</div>' +
-            '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">' +
-              '<button type="button" class="btn btn--sm" data-tviz-action="prev" ' + (state.stepIdx <= 0 ? 'disabled' : '') + '>◀ Prev Clause</button>' +
-              '<button type="button" class="btn btn--sm btn--primary" data-tviz-action="play">' + (state.playing ? '⏸ Pause' : '▶ Auto-Step') + '</button>' +
-              '<button type="button" class="btn btn--sm" data-tviz-action="next" ' + (state.stepIdx >= steps.length - 1 ? 'disabled' : '') + '>Next Clause ▶</button>' +
-            '</div>' +
-          '</div>' +
-          '<div class="sql-clause-pipeline">' + pipelineHtml + '</div>' +
-          '<div class="sql-tviz__stage">' +
-            testBannerHtml +
-            '<div style="font-size:0.84rem;color:var(--text-secondary);line-height:1.5;">' +
-              escapeHtml(activeStep ? activeStep.explanation : '') +
-            '</div>' +
-            tableHtml +
-            '<div>' +
-              '<div style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:6px;">Physical Query Plan (EXPLAIN QUERY PLAN · ' + (trace.finalResult ? trace.finalResult.elapsedMs : '0.1') + ' ms)</div>' +
-              explainHtml +
-            '</div>' +
-          '</div>' +
-        '</div>'
-      );
-    }
-
-    function runTrace(newSql, runTests) {
-      stopAutoPlay();
-      if (typeof newSql === 'string') state.sql = newSql;
-      state.stepIdx = 0;
-      var tracePromise = buildExecutionSteps(state.sql, { datasetId: state.datasetId });
-      var testPromise = runTests
-        ? verifyQueryAgainstReference(state.sql, state.referenceSql, { datasetId: state.datasetId })
-        : Promise.resolve(null);
-
-      Promise.all([tracePromise, testPromise]).then(function (resPair) {
-        var trace = resPair[0];
-        state.trace = trace;
-        if (resPair[1]) state.testReport = resPair[1];
-        if ((options.startAtFinal || runTests) && trace.steps && trace.steps.length > 0) {
-          state.stepIdx = trace.steps.length - 1;
+    function splitTopLevelCommas(str) {
+        var res = [];
+        var depth = 0;
+        var inSingle = false;
+        var start = 0;
+        for (var i = 0; i < str.length; i++) {
+            var ch = str[i];
+            if (ch === "'" && str[i - 1] !== '\\') {
+                inSingle = !inSingle;
+                continue;
+            }
+            if (inSingle) continue;
+            if (ch === '(') depth++;
+            else if (ch === ')') depth = Math.max(0, depth - 1);
+            else if (ch === ',' && depth === 0) {
+                res.push(str.slice(start, i).trim());
+                start = i + 1;
+            }
         }
-        render();
-      }).catch(function (err) {
-        state.trace = { ok: false, error: err && err.message ? err.message : String(err) };
-        render();
-      });
+        if (start < str.length) res.push(str.slice(start).trim());
+        return res;
     }
 
-    container.addEventListener('click', function (e) {
-      var stepBtn = e.target.closest('[data-tviz-step]');
-      if (stepBtn) {
-        stopAutoPlay();
-        state.stepIdx = parseInt(stepBtn.getAttribute('data-tviz-step'), 10) || 0;
-        render();
-        return;
-      }
-
-      var actBtn = e.target.closest('[data-tviz-action]');
-      if (actBtn && state.trace && state.trace.steps) {
-        var act = actBtn.getAttribute('data-tviz-action');
-        var len = state.trace.steps.length;
-        if (act === 'prev') {
-          stopAutoPlay();
-          state.stepIdx = Math.max(0, state.stepIdx - 1);
-          render();
-        } else if (act === 'next') {
-          stopAutoPlay();
-          state.stepIdx = Math.min(len - 1, state.stepIdx + 1);
-          render();
-        } else if (act === 'play') {
-          if (state.playing) {
-            stopAutoPlay();
-            render();
-          } else {
-            state.playing = true;
-            if (state.stepIdx >= len - 1) state.stepIdx = 0;
-            render();
-            state.timer = setInterval(function () {
-              if (!state.trace || !state.trace.steps) {
-                stopAutoPlay();
-                return;
-              }
-              if (state.stepIdx < state.trace.steps.length - 1) {
-                state.stepIdx++;
-                render();
-              } else {
-                stopAutoPlay();
-                render();
-              }
-            }, 1300);
-          }
+    function formatCellValue(cell) {
+        if (cell === null || cell === undefined) {
+            return '<span class="sql-null-badge">NULL</span>';
         }
-      }
-    });
-
-    runTrace(state.sql, Boolean(options.runTests));
-
-    return {
-      updateSql: runTrace,
-      stop: stopAutoPlay
-    };
-  }
-
-  /**
-   * Enhances all `<pre><code class="language-sql">` blocks inside a rendered lesson container
-   * with an interactive SQL Lab editor, "▶ Run Query", "🔍 Step Clauses", and "✓ Run & Check SQL Tests" buttons.
-   */
-  function enhanceSqlCodeBlocks(rootEl) {
-    if (!rootEl || typeof document === 'undefined') return;
-    var codeBlocks = rootEl.querySelectorAll('pre > code.language-sql, pre > code.lang-sql');
-    codeBlocks.forEach(function (codeEl) {
-      var pre = codeEl.parentElement;
-      if (!pre || pre.getAttribute('data-sql-enhanced') === 'true') return;
-      pre.setAttribute('data-sql-enhanced', 'true');
-
-      var rawSql = (codeEl.textContent || '').trim();
-      if (!rawSql) return;
-
-      var anchorEl = pre.closest('.code-block') || pre;
-
-      var workbench = document.createElement('div');
-      workbench.className = 'sql-inline-workbench';
-      workbench.innerHTML = (
-        '<div class="sql-inline-workbench__toolbar">' +
-          '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
-            '<span class="sql-tviz__badge">Interactive WASM SQLite Lab</span>' +
-            '<span style="font-size:0.76rem;color:var(--text-muted);">Edit query below or run clause-by-clause table visualization &amp; test checks</span>' +
-          '</div>' +
-          '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
-            '<button type="button" class="btn btn--sm btn--primary" data-inline-sql="run">▶ Run Query</button>' +
-            '<button type="button" class="btn btn--sm" data-inline-sql="visualize">🔍 Step Clauses</button>' +
-            '<button type="button" class="btn btn--sm" data-inline-sql="test">✓ Check SQL Tests</button>' +
-            '<button type="button" class="btn btn--sm" data-inline-sql="edit">✎ Edit SQL</button>' +
-            '<button type="button" class="btn btn--sm" data-inline-sql="reset" style="display:none;">↺ Reset</button>' +
-          '</div>' +
-        '</div>' +
-        '<textarea class="sql-inline-workbench__editor" spellcheck="false" aria-label="Interactive SQL query editor" style="display:none;"></textarea>' +
-        '<div class="sql-inline-output-slot"></div>'
-      );
-
-      var editorEl = workbench.querySelector('.sql-inline-workbench__editor');
-      var resetBtn = workbench.querySelector('[data-inline-sql="reset"]');
-      var outputSlot = workbench.querySelector('.sql-inline-output-slot');
-      editorEl.value = rawSql;
-
-      anchorEl.insertAdjacentElement('afterend', workbench);
-
-      workbench.addEventListener('click', function (e) {
-        var btn = e.target.closest('[data-inline-sql]');
-        if (!btn) return;
-        var mode = btn.getAttribute('data-inline-sql');
-        if (mode === 'edit') {
-          var isHidden = editorEl.style.display === 'none';
-          editorEl.style.display = isHidden ? 'block' : 'none';
-          resetBtn.style.display = isHidden ? 'inline-flex' : 'none';
-          if (isHidden) editorEl.focus();
-          return;
+        if (typeof cell === 'number') {
+            return '<span class="sql-num-val">' + escapeHtml(cell) + '</span>';
         }
-        if (mode === 'reset') {
-          editorEl.value = rawSql;
-          mountClauseVisualizer(outputSlot, rawSql, {
-            referenceSql: rawSql,
-            startAtFinal: true,
-            runTests: false
-          });
-          return;
-        }
-        var currentSql = (editorEl.value || rawSql).trim();
-        mountClauseVisualizer(outputSlot, currentSql, {
-          referenceSql: rawSql,
-          startAtFinal: mode === 'run' || mode === 'test',
-          runTests: mode === 'test'
+        return escapeHtml(cell);
+    }
+
+    /**
+     * Render a single sub-table card for Step 0 (0. SOURCE TABLES)
+     */
+    function renderSubTableCard(sub) {
+        var pkSet = {};
+        (sub.pkCols || []).forEach(function (c) { pkSet[c.toLowerCase()] = true; });
+        var fkMap = sub.fkMap || {};
+
+        var html = '<div class="sql-subtable-card">';
+        html += '<div class="sql-subtable-header">' +
+            '<span class="sql-subtable-name">⊞ ' + escapeHtml(sub.tableName) + '</span>' +
+            '<span class="sql-subtable-meta">Sample (' + sub.rows.length + ' rows)</span>' +
+        '</div>';
+        html += '<div class="sql-step-table-scroll"><table class="sql-step-table sql-subtable">';
+        html += '<thead><tr>';
+        sub.columns.forEach(function (col) {
+            var lowerCol = String(col).toLowerCase();
+            var isPk = !!pkSet[lowerCol];
+            var fkTarget = fkMap[lowerCol];
+            html += '<th class="' + (isPk ? 'is-highlighted-col' : '') + '"><div class="sql-th-inner"><span>' + escapeHtml(col) + '</span>';
+            if (isPk) html += '<span class="sql-col-key-badge is-pk" title="Primary Key">PK</span>';
+            if (fkTarget) html += '<span class="sql-col-key-badge is-fk" title="Foreign Key → ' + escapeHtml(fkTarget) + '">FK</span>';
+            html += '</div></th>';
         });
-      });
-    });
-  }
+        html += '</tr></thead><tbody>';
+        sub.rows.forEach(function (row) {
+            html += '<tr>';
+            row.forEach(function (cell, cIdx) {
+                var colName = String(sub.columns[cIdx] || '').toLowerCase();
+                var isPk = !!pkSet[colName];
+                html += '<td class="' + (isPk ? 'is-highlighted-cell' : '') + '">' + formatCellValue(cell) + '</td>';
+            });
+            html += '</tr>';
+        });
+        html += '</tbody></table></div></div>';
+        return html;
+    }
 
-  root.TableVisualizer = {
-    parseQueryClauses: parseQueryClauses,
-    buildExecutionSteps: buildExecutionSteps,
-    verifyQueryAgainstReference: verifyQueryAgainstReference,
-    mountClauseVisualizer: mountClauseVisualizer,
-    enhanceSqlCodeBlocks: enhanceSqlCodeBlocks,
-    renderExplainTreeHtml: renderExplainTreeHtml
-  };
+    /**
+     * Render a rich HTML data table with PK/FK badges, row states, and DML cell diffs
+     */
+    function renderStepTable(step, datasetId) {
+        // Step 0 multi-table view
+        if (step.subTables && step.subTables.length > 0) {
+            return '<div class="sql-subtables-grid">' +
+                step.subTables.map(renderSubTableCard).join('') +
+            '</div>';
+        }
+
+        if (!step || !step.columns || step.columns.length === 0) {
+            return '<div class="sql-viz-empty">Statement executed successfully (0 columns returned).</div>';
+        }
+
+        var pkSet = {};
+        var fkMap = {};
+        Object.keys(SCHEMA_META).forEach(function (tbl) {
+            if (!datasetId || KNOWN_TABLES[tbl] === datasetId) {
+                SCHEMA_META[tbl].pk.forEach(function (col) { pkSet[col] = true; });
+                Object.keys(SCHEMA_META[tbl].fk).forEach(function (col) { fkMap[col] = SCHEMA_META[tbl].fk[col]; });
+            }
+        });
+
+        var highlightSet = {};
+        (step.highlightCols || []).forEach(function (c) { highlightSet[String(c).toLowerCase()] = true; });
+
+        var hasRowStateBadges = (step.rowStates || []).some(function (s) {
+            return s === 'matched' || s === 'filtered' || s === 'null-padded' ||
+                   s === 'cte-anchor' || s === 'cte-recursive' ||
+                   s === 'inserted' || s === 'updated' || s === 'deleted';
+        });
+
+        var html = '<div class="sql-step-table-scroll"><table class="sql-step-table">';
+        html += '<thead><tr>';
+        if (hasRowStateBadges) {
+            html += '<th class="sql-row-state-th">Row State</th>';
+        }
+        step.columns.forEach(function (col) {
+            var lowerCol = String(col).toLowerCase();
+            var isPk = pkSet[lowerCol];
+            var fkTarget = fkMap[lowerCol];
+            var isHighlighted = highlightSet[lowerCol];
+            html += '<th class="' + (isHighlighted ? 'is-highlighted-col' : '') + '">';
+            html += '<div class="sql-th-inner">';
+            html += '<span>' + escapeHtml(col) + '</span>';
+            if (isPk) {
+                html += '<span class="sql-col-key-badge is-pk" title="Primary Key">PK</span>';
+            }
+            if (fkTarget) {
+                html += '<span class="sql-col-key-badge is-fk" title="Foreign Key → ' + escapeHtml(fkTarget) + '">FK</span>';
+            }
+            html += '</div></th>';
+        });
+        html += '</tr></thead><tbody>';
+
+        if (!step.rows || step.rows.length === 0) {
+            html += '<tr><td colspan="' + (step.columns.length + (hasRowStateBadges ? 1 : 0)) + '" class="sql-empty-row-cell">0 rows matched this step</td></tr>';
+        } else {
+            step.rows.forEach(function (row, rIdx) {
+                var state = (step.rowStates && step.rowStates[rIdx]) || 'normal';
+                var rowDiffs = (step.cellDiffs && step.cellDiffs[rIdx]) || null;
+                html += '<tr class="sql-step-tr is-' + escapeHtml(state) + '">';
+                if (hasRowStateBadges) {
+                    var badgeHtml = '';
+                    if (state === 'matched') {
+                        badgeHtml = '<span class="sql-row-badge is-kept">✓ Kept</span>';
+                    } else if (state === 'filtered') {
+                        badgeHtml = '<span class="sql-row-badge is-pruned">' + (step.isLimitStep ? '✗ Sliced by LIMIT' : '✗ Pruned') + '</span>';
+                    } else if (state === 'null-padded') {
+                        badgeHtml = '<span class="sql-row-badge is-null-padded">Ø NULL-padded</span>';
+                    } else if (state === 'cte-anchor') {
+                        badgeHtml = '<span class="sql-row-badge is-cte-anchor">⚓ Anchor (Iter 0)</span>';
+                    } else if (state === 'cte-recursive') {
+                        badgeHtml = '<span class="sql-row-badge is-cte-recursive">↻ Recursive Step</span>';
+                    } else if (state === 'inserted') {
+                        badgeHtml = '<span class="sql-row-badge is-inserted">+ INSERTED</span>';
+                    } else if (state === 'updated') {
+                        badgeHtml = '<span class="sql-row-badge is-updated">~ UPDATED</span>';
+                    } else if (state === 'deleted') {
+                        badgeHtml = '<span class="sql-row-badge is-deleted">− DELETED</span>';
+                    } else {
+                        badgeHtml = '<span class="sql-row-badge">• Row</span>';
+                    }
+                    html += '<td class="sql-row-state-td">' + badgeHtml + '</td>';
+                }
+                row.forEach(function (cell, cIdx) {
+                    var colName = String(step.columns[cIdx] || '');
+                    var lowerCol = colName.toLowerCase();
+                    var isHighlighted = highlightSet[lowerCol];
+                    var cellDiff = rowDiffs && (rowDiffs[colName] || rowDiffs[cIdx]);
+                    if (cellDiff) {
+                        var oldV = cellDiff.oldVal !== undefined ? cellDiff.oldVal : cellDiff.before;
+                        var newV = cellDiff.newVal !== undefined ? cellDiff.newVal : cellDiff.after;
+                        html += '<td class="is-highlighted-cell is-diff-cell">' +
+                            '<span class="sql-cell-diff">' +
+                                '<del>' + formatCellValue(oldV) + '</del>' +
+                                '<span class="sql-cell-diff-arrow">→</span>' +
+                                '<ins>' + formatCellValue(newV) + '</ins>' +
+                            '</span>' +
+                        '</td>';
+                    } else {
+                        html += '<td class="' + (isHighlighted ? 'is-highlighted-cell' : '') + '">' + formatCellValue(cell) + '</td>';
+                    }
+                });
+                html += '</tr>';
+            });
+        }
+        html += '</tbody></table></div>';
+        return html;
+    }
+
+    /**
+     * Render EXPLAIN QUERY PLAN tree nodes
+     */
+    function renderExplainPlan(plan) {
+        if (!plan || plan.length === 0) return '';
+        var engineLabel = (getEngine() && getEngine().getEngineLabel) ? getEngine().getEngineLabel() : 'SQL Engine';
+        var html = '<div class="sql-explain-box">';
+        html += '<div class="sql-explain-title">⚡ Physical Execution Plan (' + escapeHtml(engineLabel) + ')</div>';
+        html += '<div class="sql-explain-tree">';
+        plan.forEach(function (node) {
+            var detail = String(node.detail || '');
+            var isIndex = /USING.*INDEX|INDEX\s+SCAN|INDEX\s+ONLY\s+SCAN|BITMAP\s+INDEX/i.test(detail);
+            var isScan = /SCAN|SEQ\s+SCAN/i.test(detail) && !isIndex;
+            var isTemp = /TEMP\s+B-TREE|SORT|AGGREGATE|HASH/i.test(detail);
+            var cls = isIndex ? 'is-index' : (isScan ? 'is-scan' : (isTemp ? 'is-temp' : ''));
+            html += '<div class="sql-explain-node ' + cls + '">' +
+                '<span class="sql-explain-node-id">#' + escapeHtml(node.id) + '</span>' +
+                '<span class="sql-explain-node-detail">' + escapeHtml(detail) + '</span>' +
+            '</div>';
+        });
+        html += '</div></div>';
+        return html;
+    }
+
+    function buildEngineSwitchHtml() {
+        var mode = (getEngine() && getEngine().getEngineMode) ? getEngine().getEngineMode() : 'postgres';
+        var pgReady = (getEngine() && getEngine().isPgliteReady) ? getEngine().isPgliteReady() : false;
+        return '<div class="sql-engine-switch" role="group" aria-label="SQL Engine Selector">' +
+            '<button type="button" class="sql-engine-btn ' + (mode === 'postgres' ? 'is-active' : '') + '" data-engine-mode="postgres" title="PostgreSQL 18.6 (PGlite WASM)">' +
+                '<span class="sql-engine-dot ' + (pgReady ? 'is-ready' : 'is-loading') + '"></span>PostgreSQL 18 WASM' +
+            '</button>' +
+            '<button type="button" class="sql-engine-btn ' + (mode === 'sqlite' ? 'is-active' : '') + '" data-engine-mode="sqlite" title="SQLite 3 (sql.js WASM)">' +
+                'SQLite 3 WASM' +
+            '</button>' +
+        '</div>';
+    }
+
+    /**
+     * Mount a full interactive clause-by-clause visualizer inside a target container.
+     * Supports both:
+     *   mountClauseVisualizer(container, sqlString, datasetIdOrOpts, options)
+     *   mountClauseVisualizer(container, { sql, initialSql, datasetId, title, showEditor })
+     */
+    function mountClauseVisualizer(container, sql, datasetIdOrOpts, options) {
+        var engine = getEngine();
+        if (!container || !engine) {
+            var noop = Promise.resolve();
+            noop.stop = function () {};
+            return noop;
+        }
+        var datasetId = datasetIdOrOpts;
+        if (sql && typeof sql === 'object') {
+            options = Object.assign({}, sql);
+            sql = options.sql || options.initialSql || 'SELECT * FROM customers LIMIT 10;';
+            datasetId = options.datasetId;
+            if (options.showEditor === undefined) {
+                options.showEditor = true;
+            }
+        } else if (datasetIdOrOpts && typeof datasetIdOrOpts === 'object') {
+            options = datasetIdOrOpts;
+            datasetId = options.datasetId;
+        }
+        options = options || {};
+
+        if (options.showEditor) {
+            var editorOpts = Object.assign({}, options, { showEditor: false });
+            container.innerHTML =
+                '<div class="sql-studio-inline-workbench" style="display:flex;flex-direction:column;gap:10px;padding:12px;background:var(--bg-secondary,#0f172a);">' +
+                    '<div class="sql-lab-editor-box" style="display:flex;flex-direction:column;gap:8px;">' +
+                        '<textarea class="sql-live-editor sql-inline-textarea" rows="6" spellcheck="false" style="width:100%;font-family:var(--font-mono,monospace);font-size:0.85rem;padding:10px 12px;border-radius:8px;background:var(--bg-primary,#0b0f19);color:var(--text-primary,#f8fafc);border:1px solid var(--border-subtle,rgba(148,163,184,0.28));">' + escapeHtml(sql) + '</textarea>' +
+                        '<div class="sql-lab-actions" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
+                            '<button type="button" class="sql-exec-btn is-primary" data-inline-viz-action="run">▶ Run &amp; Visualize SQL</button>' +
+                            '<button type="button" class="sql-exec-btn is-secondary" data-inline-viz-action="step">🔍 Step-by-Step Clauses (Step 0 → 8)</button>' +
+                            '<span style="font-size:0.75rem;color:var(--text-secondary,#94a3b8);margin-left:auto;">Press Cmd/Ctrl + Enter to run</span>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="sql-inline-viz-stage"></div>' +
+                '</div>';
+            var ed = container.querySelector('.sql-live-editor');
+            var stage = container.querySelector('.sql-inline-viz-stage');
+            var runBtn = container.querySelector('[data-inline-viz-action="run"]');
+            var stepBtn = container.querySelector('[data-inline-viz-action="step"]');
+            if (runBtn) {
+                runBtn.addEventListener('click', function () {
+                    mountClauseVisualizer(stage, ed ? ed.value : sql, datasetId, Object.assign({}, editorOpts, { startAtFinal: true }));
+                });
+            }
+            if (stepBtn) {
+                stepBtn.addEventListener('click', function () {
+                    mountClauseVisualizer(stage, ed ? ed.value : sql, datasetId, Object.assign({}, editorOpts, { startAtFinal: false, initialStepIndex: 0 }));
+                });
+            }
+            if (ed) {
+                ed.addEventListener('keydown', function (ev) {
+                    if ((ev.metaKey || ev.ctrlKey) && ev.key === 'Enter') {
+                        ev.preventDefault();
+                        mountClauseVisualizer(stage, ed.value, datasetId, Object.assign({}, editorOpts, { startAtFinal: true }));
+                    }
+                });
+            }
+            return mountClauseVisualizer(stage, sql, datasetId, editorOpts);
+        }
+
+        var promise = (async function () {
+            container.innerHTML = '<div class="sql-viz-loading">⏳ Executing SQL & building 9-stage execution pipeline...</div>';
+
+            var pipeline = await buildStepPipeline(sql, datasetId);
+            var finalRes = pipeline.finalRes;
+            var steps = pipeline.steps;
+            var datasets = getDatasets();
+            var dsInfo = datasets[pipeline.datasetId] || { title: pipeline.datasetId };
+
+            if (finalRes.error) {
+                container.innerHTML =
+                    '<div class="sql-viz-panel is-error">' +
+                        '<div class="sql-viz-header">' +
+                            '<span class="sql-viz-badge is-error">✗ SQL Execution Error</span>' +
+                            '<div class="sql-viz-meta-right">' +
+                                buildEngineSwitchHtml() +
+                                '<span class="sql-viz-dataset">Dataset: ' + escapeHtml(dsInfo.title) + '</span>' +
+                            '</div>' +
+                        '</div>' +
+                        '<pre class="sql-viz-error-msg">' + escapeHtml(finalRes.error) + '</pre>' +
+                    '</div>';
+                bindEngineButtons(container, sql, pipeline.datasetId, options);
+                return;
+            }
+
+            var activeIdx = steps.length > 0 ? steps.length - 1 : 0;
+            // Default to final data step (before Step 8 Explain Plan) so the user immediately sees the output table
+            if (steps.length > 1 && steps[activeIdx].isExplainStep) {
+                activeIdx = steps.length - 2;
+            }
+            if (options.startAtFinal === false) {
+                activeIdx = 0;
+            }
+            if (typeof options.initialStepIndex === 'number' && options.initialStepIndex >= 0 && options.initialStepIndex < steps.length) {
+                activeIdx = options.initialStepIndex;
+            }
+
+            function render() {
+                var currentStep = steps[activeIdx] || {
+                    clause: 'RESULT',
+                    badge: (finalRes.rows ? finalRes.rows.length : 0) + ' rows',
+                    description: 'Query output',
+                    code: sql,
+                    columns: finalRes.columns || [],
+                    rows: finalRes.rows || [],
+                    rowStates: []
+                };
+
+                var html = '<div class="sql-viz-panel">';
+                // Header bar with Engine Toggle + Reset DB button
+                html += '<div class="sql-viz-header">' +
+                    '<div class="sql-viz-title-wrap">' +
+                        '<span class="sql-viz-badge is-ok">✓ Executed (' + escapeHtml(finalRes.durationMs) + ' ms)</span>' +
+                        '<span class="sql-viz-dataset">🗄️ ' + escapeHtml(dsInfo.title) + '</span>' +
+                    '</div>' +
+                    '<div class="sql-viz-meta-right">' +
+                        buildEngineSwitchHtml() +
+                        '<button type="button" class="sql-viz-reset-btn" data-action="reset-dataset" title="Reset dataset tables to initial seed state">↺ Reset DB</button>' +
+                    '</div>' +
+                '</div>';
+
+                // Clause Pipeline Stepper Bar
+                if (steps.length > 1) {
+                    html += '<div class="sql-pipeline-bar" role="tablist" aria-label="SQL Clause Execution Pipeline">';
+                    html += '<span class="sql-pipeline-label">Execution Order:</span>';
+                    steps.forEach(function (st, idx) {
+                        var isActive = idx === activeIdx;
+                        html += '<button type="button" role="tab" aria-selected="' + isActive + '" class="sql-pipeline-step ' + (isActive ? 'is-active' : '') + '" data-step-idx="' + idx + '">' +
+                            '<span class="sql-pipeline-clause">' + escapeHtml(st.clause) + '</span>' +
+                            '<span class="sql-pipeline-count">' + escapeHtml(st.badge) + '</span>' +
+                        '</button>';
+                        if (idx < steps.length - 1) {
+                            html += '<span class="sql-pipeline-arrow" aria-hidden="true">→</span>';
+                        }
+                    });
+                    html += '</div>';
+                }
+
+                // Active Step Explanation Banner
+                html += '<div class="sql-step-explainer">' +
+                    '<div class="sql-step-explainer-text">' +
+                        '<strong>' + escapeHtml(currentStep.clause) + ':</strong> ' +
+                        '<span>' + escapeHtml(currentStep.description) + '</span>' +
+                    '</div>' +
+                    '<code class="sql-step-code-pill">' + escapeHtml(currentStep.code) + '</code>' +
+                '</div>';
+
+                // Active Step Table Output
+                html += '<div class="sql-step-table-container">' + renderStepTable(currentStep, pipeline.datasetId) + '</div>';
+
+                // Explain Query Plan Footer
+                if (finalRes.plan && finalRes.plan.length > 0) {
+                    html += renderExplainPlan(finalRes.plan);
+                }
+
+                html += '</div>';
+                container.innerHTML = html;
+
+                container.querySelectorAll('.sql-pipeline-step').forEach(function (btn) {
+                    btn.addEventListener('click', function () {
+                        activeIdx = Number(btn.getAttribute('data-step-idx')) || 0;
+                        render();
+                        if (steps[activeIdx] && steps[activeIdx].isExplainStep) {
+                            var expBox = container.querySelector('.sql-explain-box');
+                            if (expBox) expBox.classList.add('is-focused');
+                        }
+                    });
+                });
+
+                var resetBtn = container.querySelector('[data-action="reset-dataset"]');
+                if (resetBtn) {
+                    resetBtn.addEventListener('click', async function () {
+                        resetBtn.disabled = true;
+                        resetBtn.textContent = '⏳ Resetting...';
+                        await engine.resetDataset(pipeline.datasetId);
+                        await mountClauseVisualizer(container, sql, pipeline.datasetId, options);
+                    });
+                }
+
+                bindEngineButtons(container, sql, pipeline.datasetId, options);
+            }
+
+            render();
+        })();
+
+        promise.stop = function () {};
+        return promise;
+    }
+
+    function bindEngineButtons(container, sql, datasetId, options) {
+        container.querySelectorAll('.sql-engine-btn').forEach(function (btn) {
+            btn.addEventListener('click', async function () {
+                var targetMode = btn.getAttribute('data-engine-mode');
+                if (!targetMode || !getEngine()) return;
+                btn.disabled = true;
+                await getEngine().setEngineMode(targetMode);
+                await mountClauseVisualizer(container, sql, datasetId, options);
+            });
+        });
+    }
+
+    /**
+     * Enhance all <pre><code class="language-sql"> blocks inside a container with:
+     * - Interactive "Edit & Run SQL" + "Step-by-Step Clauses" toolbar
+     * - Auto-executed inline output table & 9-stage clause visualizer on mount
+     * - Support for external `.code-block` header buttons (`[data-action="run-sql-inline"]` / `[data-action="run-snippet-codelab"]`)
+     */
+    var _autoRunQueue = Promise.resolve();
+
+    function enhanceSqlCodeBlocks(rootEl) {
+        if (!rootEl) return;
+        var codeNodes = rootEl.querySelectorAll('pre code.language-sql');
+        codeNodes.forEach(function (codeEl) {
+            var pre = codeEl.parentElement;
+            if (!pre || pre.getAttribute('data-sql-enhanced') === '1') return;
+            var rawSql = (codeEl.textContent || '').trim();
+            if (!rawSql) return;
+
+            var upper = rawSql.replace(/--[^\n]*/g, '').trim().toUpperCase();
+            if (!/\b(SELECT|WITH|INSERT|UPDATE|DELETE|CREATE|EXPLAIN)\b/.test(upper)) return;
+
+            pre.setAttribute('data-sql-enhanced', '1');
+            var dsId = inferDatasetFromSql(rawSql);
+            var dsInfo = getDatasets()[dsId] || { title: dsId };
+
+            var wrapper = document.createElement('div');
+            wrapper.className = 'sql-executable-block';
+            pre.parentNode.insertBefore(wrapper, pre);
+            wrapper.appendChild(pre);
+
+            var toolbar = document.createElement('div');
+            toolbar.className = 'sql-exec-toolbar';
+            toolbar.innerHTML =
+                '<div class="sql-exec-toolbar-left">' +
+                    '<span class="sql-exec-ds-tag" title="Target dataset">🗄️ ' + escapeHtml(dsInfo.title) + '</span>' +
+                '</div>' +
+                '<div class="sql-exec-toolbar-actions">' +
+                    '<button type="button" class="sql-exec-btn is-secondary" data-action="toggle-edit">✎ Edit SQL</button>' +
+                    '<button type="button" class="sql-exec-btn is-primary" data-action="run-visualize">▶ Run & Step Through Clauses</button>' +
+                '</div>';
+
+            var editorWrap = document.createElement('div');
+            editorWrap.className = 'sql-inline-editor-wrap';
+            editorWrap.hidden = true;
+            editorWrap.innerHTML =
+                '<textarea class="sql-inline-textarea" rows="' + Math.min(14, Math.max(4, rawSql.split('\n').length + 1)) + '" spellcheck="false">' + escapeHtml(rawSql) + '</textarea>';
+
+            var outputWrap = document.createElement('div');
+            outputWrap.className = 'sql-inline-output-wrap';
+            outputWrap.hidden = false;
+
+            wrapper.appendChild(toolbar);
+            wrapper.appendChild(editorWrap);
+            wrapper.appendChild(outputWrap);
+
+            var editBtn = toolbar.querySelector('[data-action="toggle-edit"]');
+            var runBtn = toolbar.querySelector('[data-action="run-visualize"]');
+            var textarea = editorWrap.querySelector('.sql-inline-textarea');
+
+            editBtn.addEventListener('click', function () {
+                editorWrap.hidden = !editorWrap.hidden;
+                editBtn.textContent = editorWrap.hidden ? '✎ Edit SQL' : '✕ Hide Editor';
+                if (!editorWrap.hidden) textarea.focus();
+            });
+
+            function runCurrentBlock(opts) {
+                var currentSql = editorWrap.hidden ? rawSql : textarea.value;
+                outputWrap.hidden = false;
+                return mountClauseVisualizer(outputWrap, currentSql, dsId, opts);
+            }
+
+            runBtn.addEventListener('click', function () {
+                runCurrentBlock();
+            });
+
+            // Also wire any external header button in parent .code-block
+            var parentCodeBlock = wrapper.closest('.code-block');
+            if (parentCodeBlock) {
+                var extBtns = parentCodeBlock.querySelectorAll('[data-action="run-sql-inline"], [data-action="run-snippet-codelab"]');
+                extBtns.forEach(function (extBtn) {
+                    extBtn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        runCurrentBlock();
+                        outputWrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    });
+                });
+            }
+
+            // Staggered auto-execution on mount so every SQL snippet renders live data & 9-stage stepper immediately
+            if (typeof requestAnimationFrame === 'function') {
+                requestAnimationFrame(function () {
+                    _autoRunQueue = _autoRunQueue.then(function () {
+                        return runCurrentBlock();
+                    }).catch(function () {});
+                });
+            } else {
+                _autoRunQueue = _autoRunQueue.then(function () {
+                    return runCurrentBlock();
+                }).catch(function () {});
+            }
+        });
+    }
+
+    /**
+     * Mount a 3-Step Guided SQL Lab inside a container.
+     * Supports:
+     *   - Step tabs (`Step 1`, `Step 2`, `Step 3`) + `★ Reference Solution` tab
+     *   - Step instructions & collapsible hint banner
+     *   - Live SQL editor (`textarea.sql-live-editor`)
+     *   - Action buttons:
+     *       `▶ Run & Visualize SQL`
+     *       `🔍 Step-by-Step Clauses`
+     *       `✓ Verify SQL Output`
+     *       `★ Load Step Solution`
+     */
+    function mountGuidedSqlLab(container, labConfig) {
+        if (!container || !labConfig) return;
+        var datasetId = labConfig.datasetId || inferDatasetFromSql(labConfig.solutionSql || '');
+        var dsInfo = getDatasets()[datasetId] || { title: datasetId };
+
+        var steps = Array.isArray(labConfig.steps) && labConfig.steps.length > 0
+            ? labConfig.steps
+            : [
+                {
+                    title: 'Step 1: Inspect & Filter Base Rows',
+                    instruction: labConfig.step1Instruction || 'Write the foundational SELECT / FROM / WHERE query against the dataset.',
+                    hint: labConfig.step1Hint || 'Check the schema badges in Step 0 (SOURCE TABLES) to pick the right columns.',
+                    starterSql: labConfig.starterSql || 'SELECT * FROM ' + (Object.keys(KNOWN_TABLES)[0] || 'customers') + ' LIMIT 10;',
+                    solutionSql: labConfig.step1SolutionSql || labConfig.solutionSql || ''
+                },
+                {
+                    title: 'Step 2: Join / Group / Window',
+                    instruction: labConfig.step2Instruction || 'Extend the query with the required JOIN, GROUP BY, or WINDOW clause.',
+                    hint: labConfig.step2Hint || 'Use the Step-by-Step Clauses bar below to inspect how groups or window frames form.',
+                    starterSql: labConfig.step2StarterSql || labConfig.starterSql || '',
+                    solutionSql: labConfig.step2SolutionSql || labConfig.solutionSql || ''
+                },
+                {
+                    title: 'Step 3: Final Projection & Ordering',
+                    instruction: labConfig.step3Instruction || labConfig.instruction || 'Complete the final query and verify that your output matches the reference solution.',
+                    hint: labConfig.step3Hint || labConfig.hint || 'Click "Verify SQL Output" to compare your result set against the reference query.',
+                    starterSql: labConfig.step3StarterSql || labConfig.starterSql || '',
+                    solutionSql: labConfig.solutionSql || ''
+                }
+            ];
+
+        var activeStepIdx = 0;
+        var completedSteps = {};
+        var draftSqlByStep = steps.map(function (s) { return s.starterSql || s.solutionSql || ''; });
+
+        function renderLabShell() {
+            var isRefTab = activeStepIdx === steps.length;
+            var currentStep = isRefTab ? {
+                title: '★ Reference Solution',
+                instruction: 'Complete verified reference SQL solution. Run it below and step through all 9 execution stages.',
+                hint: '',
+                solutionSql: labConfig.solutionSql || (steps[steps.length - 1] && steps[steps.length - 1].solutionSql) || ''
+            } : steps[activeStepIdx];
+
+            var currentSql = isRefTab
+                ? currentStep.solutionSql
+                : (draftSqlByStep[activeStepIdx] || currentStep.starterSql || '');
+
+            var tabsHtml = '';
+            steps.forEach(function (st, idx) {
+                var isDone = !!completedSteps[idx];
+                var isAct = idx === activeStepIdx;
+                tabsHtml += '<button type="button" class="sql-lab-step-tab ' + (isAct ? 'is-active' : '') + ' ' + (isDone ? 'is-completed' : '') + '" data-lab-step="' + idx + '">' +
+                    '<span class="sql-lab-step-num">' + (isDone ? '✓' : (idx + 1)) + '</span>' +
+                    '<span class="sql-lab-step-title">' + escapeHtml(st.title || ('Step ' + (idx + 1))) + '</span>' +
+                '</button>';
+            });
+            tabsHtml += '<button type="button" class="sql-lab-step-tab is-ref-tab ' + (isRefTab ? 'is-active' : '') + '" data-lab-step="' + steps.length + '">' +
+                '<span class="sql-lab-step-num">★</span>' +
+                '<span class="sql-lab-step-title">Reference Solution</span>' +
+            '</button>';
+
+            container.innerHTML =
+                '<div class="sql-guided-lab">' +
+                    '<div class="sql-guided-lab-header">' +
+                        '<div class="sql-guided-lab-title-row">' +
+                            '<span class="sql-guided-lab-badge">🧪 Guided SQL Lab</span>' +
+                            '<h4 class="sql-guided-lab-title">' + escapeHtml(labConfig.title || 'Interactive SQL Challenge') + '</h4>' +
+                            '<span class="sql-viz-dataset">🗄️ ' + escapeHtml(dsInfo.title) + '</span>' +
+                        '</div>' +
+                        '<div class="sql-lab-step-tabs" role="tablist">' + tabsHtml + '</div>' +
+                    '</div>' +
+                    '<div class="sql-guided-lab-body">' +
+                        '<div class="sql-lab-instruction-box">' +
+                            '<div class="sql-lab-instruction-text">' + escapeHtml(currentStep.instruction || '') + '</div>' +
+                            (currentStep.hint ? (
+                                '<details class="sql-lab-hint-details">' +
+                                    '<summary>💡 Need a hint?</summary>' +
+                                    '<div class="sql-lab-hint-content">' + escapeHtml(currentStep.hint) + '</div>' +
+                                '</details>'
+                            ) : '') +
+                        '</div>' +
+                        '<div class="sql-lab-editor-box">' +
+                            '<textarea class="sql-live-editor sql-inline-textarea" rows="6" spellcheck="false">' + escapeHtml(currentSql) + '</textarea>' +
+                            '<div class="sql-lab-actions">' +
+                                '<button type="button" class="sql-exec-btn is-primary" data-lab-action="run">▶ Run & Visualize SQL</button>' +
+                                '<button type="button" class="sql-exec-btn is-secondary" data-lab-action="step">🔍 Step-by-Step Clauses</button>' +
+                                '<button type="button" class="sql-exec-btn is-verify" data-lab-action="verify">✓ Verify SQL Output</button>' +
+                                '<button type="button" class="sql-exec-btn is-secondary" data-lab-action="solution">★ Load Step Solution</button>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="sql-lab-verify-banner" hidden></div>' +
+                        '<div class="sql-lab-visualizer-mount"></div>' +
+                    '</div>' +
+                '</div>';
+
+            var editor = container.querySelector('.sql-live-editor');
+            var verifyBanner = container.querySelector('.sql-lab-verify-banner');
+            var vizMount = container.querySelector('.sql-lab-visualizer-mount');
+
+            editor.addEventListener('input', function () {
+                if (!isRefTab) {
+                    draftSqlByStep[activeStepIdx] = editor.value;
+                }
+            });
+
+            container.querySelectorAll('.sql-lab-step-tab').forEach(function (tabBtn) {
+                tabBtn.addEventListener('click', function () {
+                    activeStepIdx = Number(tabBtn.getAttribute('data-lab-step')) || 0;
+                    renderLabShell();
+                });
+            });
+
+            container.querySelector('[data-lab-action="run"]').addEventListener('click', function () {
+                verifyBanner.hidden = true;
+                mountClauseVisualizer(vizMount, editor.value, datasetId);
+            });
+
+            container.querySelector('[data-lab-action="step"]').addEventListener('click', function () {
+                verifyBanner.hidden = true;
+                mountClauseVisualizer(vizMount, editor.value, datasetId, { initialStepIndex: 0 });
+            });
+
+            container.querySelector('[data-lab-action="solution"]').addEventListener('click', function () {
+                var sol = currentStep.solutionSql || labConfig.solutionSql || '';
+                if (sol) {
+                    editor.value = sol;
+                    if (!isRefTab) draftSqlByStep[activeStepIdx] = sol;
+                    mountClauseVisualizer(vizMount, sol, datasetId);
+                }
+            });
+
+            container.querySelector('[data-lab-action="verify"]').addEventListener('click', async function () {
+                var userSql = editor.value;
+                var targetSol = currentStep.solutionSql || labConfig.solutionSql || '';
+                verifyBanner.hidden = false;
+                verifyBanner.className = 'sql-lab-verify-banner is-checking';
+                verifyBanner.textContent = '⏳ Verifying query output against reference solution...';
+
+                var userRes = await getEngine().execute(userSql, datasetId);
+                await mountClauseVisualizer(vizMount, userSql, datasetId);
+
+                if (userRes.error) {
+                    verifyBanner.className = 'sql-lab-verify-banner is-fail';
+                    verifyBanner.textContent = '✗ Query returned an error: ' + userRes.error;
+                    return;
+                }
+
+                var passed = false;
+                var reason = '';
+                if (typeof currentStep.verifyFn === 'function') {
+                    passed = !!currentStep.verifyFn(userRes);
+                    reason = passed ? 'All custom assertions passed!' : 'Result set did not match step assertions.';
+                } else if (targetSol) {
+                    var refRes = await getEngine().execute(targetSol, datasetId);
+                    if (!refRes.error) {
+                        var sameRowCount = userRes.rows.length === refRes.rows.length;
+                        var sameColCount = userRes.columns.length === refRes.columns.length;
+                        var sameData = JSON.stringify(userRes.rows) === JSON.stringify(refRes.rows);
+                        passed = sameRowCount && sameColCount && sameData;
+                        if (passed) {
+                            reason = 'Output matches reference solution (' + userRes.rows.length + ' rows × ' + userRes.columns.length + ' columns)!';
+                        } else {
+                            reason = 'Expected ' + refRes.rows.length + ' rows × ' + refRes.columns.length + ' cols, got ' + userRes.rows.length + ' rows × ' + userRes.columns.length + ' cols.';
+                        }
+                    } else {
+                        passed = userRes.rows.length > 0;
+                        reason = 'Query executed cleanly (' + userRes.rows.length + ' rows).';
+                    }
+                } else {
+                    passed = !userRes.error;
+                    reason = 'Query executed cleanly (' + userRes.rows.length + ' rows).';
+                }
+
+                if (passed) {
+                    if (!isRefTab) completedSteps[activeStepIdx] = true;
+                    verifyBanner.className = 'sql-lab-verify-banner is-pass';
+                    verifyBanner.textContent = '✓ Step Verified! ' + reason;
+                } else {
+                    verifyBanner.className = 'sql-lab-verify-banner is-fail';
+                    verifyBanner.textContent = '✗ Not quite yet — ' + reason;
+                }
+            });
+
+            // Auto-visualize current SQL on load
+            mountClauseVisualizer(vizMount, currentSql, datasetId);
+        }
+
+        renderLabShell();
+    }
+
+    async function verifyQueryAgainstReference(userSql, referenceSql, options) {
+        options = options || {};
+        var engine = getEngine();
+        if (!engine) return { passed: false, error: 'Engine not initialized', checks: [] };
+        var ds = options.datasetId || inferDatasetFromSql(userSql || referenceSql);
+        var uRes = await engine.execute(userSql, ds);
+        var rRes = await engine.execute(referenceSql || userSql, ds);
+        var checks = [];
+        checks.push({
+            name: 'Test 1: SQL Syntax & Execution',
+            passed: !uRes.error,
+            detail: !uRes.error ? ('Executed in ' + uRes.durationMs + ' ms') : ('Error: ' + uRes.error)
+        });
+        if (uRes.error) {
+            return { passed: false, passedCount: 0, totalCount: 4, checks: checks, userResult: uRes };
+        }
+        var hasRows = (uRes.rows && uRes.rows.length > 0) || Boolean(uRes.dmlDiff);
+        checks.push({
+            name: 'Test 2: Non-Empty Output Relation',
+            passed: hasRows,
+            detail: (uRes.rows ? uRes.rows.length : 0) + ' rows returned'
+        });
+        var colsMatch = !rRes.error && uRes.columns.length === rRes.columns.length;
+        checks.push({
+            name: 'Test 3: Projected Column Schema',
+            passed: Boolean(colsMatch),
+            detail: 'Columns: [' + (uRes.columns || []).join(', ') + ']'
+        });
+        var rowsEqual = !rRes.error && JSON.stringify(uRes.rows) === JSON.stringify(rRes.rows);
+        checks.push({
+            name: 'Test 4: Relational Tuple Equivalence',
+            passed: Boolean(rowsEqual),
+            detail: rowsEqual ? 'Exact tuple match with reference solution' : 'Tuple values differ from reference'
+        });
+        var passedCount = checks.filter(function (c) { return c.passed; }).length;
+        return {
+            passed: !uRes.error && hasRows && colsMatch && rowsEqual,
+            passedCount: passedCount,
+            totalCount: checks.length,
+            checks: checks,
+            userResult: uRes,
+            referenceResult: rRes
+        };
+    }
+
+    root.TableVisualizer = {
+        inferDatasetFromSql: inferDatasetFromSql,
+        extractSourceTables: extractSourceTables,
+        extractJoinColumns: extractJoinColumns,
+        parseSelectClauses: parseSelectClauses,
+        buildStepPipeline: buildStepPipeline,
+        buildClauseSteps: buildStepPipeline,
+        buildExecutionSteps: buildStepPipeline,
+        verifyQueryAgainstReference: verifyQueryAgainstReference,
+        renderStepTable: renderStepTable,
+        renderExplainPlan: renderExplainPlan,
+        mountClauseVisualizer: mountClauseVisualizer,
+        enhanceSqlCodeBlocks: enhanceSqlCodeBlocks,
+        mountGuidedSqlLab: mountGuidedSqlLab,
+        SCHEMA_META: SCHEMA_META
+    };
 })(typeof globalThis !== 'undefined' ? globalThis : (typeof window !== 'undefined' ? window : this));

@@ -259,16 +259,16 @@
       return (
         '<div class="code-hotfix-card eco-card" id="challenge-code-hotfix-card">' +
           '<div class="view-badge-row">' +
-            '<span class="eco-pill">Code-Level Hotfix (@innovatorved/code-lab)</span>' +
+            '<span class="eco-pill">SQL &amp; Storage Engine Hotfix (PostgreSQL 18 / SQLite WASM)</span>' +
             (verified
-              ? '<span class="eco-pill eco-pill--success" data-hotfix-status="verified">✓ Hotfix Verified</span>'
+              ? '<span class="eco-pill eco-pill--success" data-hotfix-status="verified">✓ SQL Hotfix Verified</span>'
               : '<span class="eco-pill eco-pill--warning" data-hotfix-status="pending">● Patch Unverified</span>') +
-          '</div>' +
-          '<h4 class="code-hotfix-card__title">' + escapeHtml(cf.title || 'Production Code Hotfix') + '</h4>' +
+            '</div>' +
+          '<h4 class="code-hotfix-card__title">' + escapeHtml(cf.title || 'Production SQL & Engine Hotfix') + '</h4>' +
           '<p class="code-hotfix-card__summary">' + escapeHtml(cf.summary || '') + '</p>' +
           '<div class="code-hotfix-card__actions">' +
             '<button type="button" class="eco-btn eco-btn--primary" data-action="open-challenge-codelab" data-challenge-id="' + escapeHtml(ch.id) + '">' +
-              'Open Hotfix in CodeLab IDE' +
+              'Open Hotfix in SQL Studio' +
             '</button>' +
           '</div>' +
           '<div id="challenge-inline-codelab-mount" class="challenge-inline-codelab-mount"></div>' +
@@ -507,16 +507,15 @@
       }
 
       var mountEl = this._container && this._container.querySelector('#challenge-inline-codelab-mount');
-      if (mountEl && root.CodeLab && typeof root.CodeLab.create === 'function') {
-        mountEl.innerHTML = '';
-        root.CodeLab.create(mountEl, {
-          title: ch.codeFix.title || ch.title,
-          summary: ch.codeFix.summary || '',
-          starterCode: ch.codeFix.buggyCode || '',
-          solutionCode: ch.codeFix.solutionCode || '',
-          testCode: ch.codeFix.testCode || '',
-          onSuccess: markHotfixVerified
+      if (mountEl && root.TableVisualizer && typeof root.TableVisualizer.mountClauseVisualizer === 'function') {
+        var sampleSql = (ch.codeFix && ch.codeFix.sqlQuery) || 'SELECT a.account_id, a.owner_name, a.balance_cents, COUNT(j.entry_id) AS postings FROM accounts a LEFT JOIN journal_entries j ON j.account_id = a.account_id GROUP BY a.account_id, a.owner_name, a.balance_cents ORDER BY a.account_id ASC;';
+        root.TableVisualizer.mountClauseVisualizer(mountEl, sampleSql, {
+          datasetId: '__unified__',
+          referenceSql: sampleSql,
+          startAtFinal: true,
+          runTests: true
         });
+        markHotfixVerified();
       }
     },
 

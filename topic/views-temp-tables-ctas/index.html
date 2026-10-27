@@ -33,14 +33,14 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
   <link rel="stylesheet" href="css/variables.css?v=ad04c4a441">
   <link rel="stylesheet" href="css/layout.css?v=a384f455dc">
-  <link rel="stylesheet" href="css/components.css?v=58f14d9639">
+  <link rel="stylesheet" href="css/components.css?v=2a60b55973">
   <link rel="stylesheet" href="css/content.css?v=98b657b5e4">
   <link rel="stylesheet" href="css/landing.css?v=14b77b8c3d">
-  <link rel="stylesheet" href="css/simulators.css?v=f6ec29cd93">
+  <link rel="stylesheet" href="css/simulators.css?v=ae2dd1d1f2">
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=59c953e95f"></script>
-  <script src="js/manifest.js?v=f99ef6551e"></script>
+  <script src="js/manifest.js?v=9a9ff5d494"></script>
 
   <script type="application/ld+json">
 {
@@ -91,7 +91,7 @@
         <a href="/roadmap" class="topbar__nav-link" data-nav="roadmap">Roadmap</a>
         <a href="/challenges" class="topbar__nav-link" data-nav="challenges">Challenges</a>
         <a href="/dashboard" class="topbar__nav-link" data-nav="dashboard">Dashboard</a>
-        <a href="/sandbox" class="topbar__nav-link" data-nav="sandbox">Workbench</a>
+        <a href="/sandbox" class="topbar__nav-link" data-nav="sandbox">SQL Workbench</a>
         <a href="/glossary/" class="topbar__nav-link" data-nav="glossary">Glossary</a>
       </nav>
 
@@ -938,7 +938,7 @@
             
               <a class="topic-quick-jump__sec-link" href="#topic-sec-6" data-action="quick-jump" data-target="topic-sec-6">
                 <span class="topic-quick-jump__sec-num">06</span>
-                <span>Under the Hood: Storage &amp; Execution Engine Implementation (C++20)</span>
+                <span>Live Verification, Catalog Introspection &amp; Execution Plan Lab (SQL)</span>
               </a>
             
               <a class="topic-quick-jump__sec-link" href="#topic-sec-7" data-action="quick-jump" data-target="topic-sec-7">
@@ -1243,7 +1243,7 @@ erDiagram
 
 <h2 id="topic-sec-4">4. Live WASM SQL Lab, Clause-by-Clause Visualizer &amp; Automated Test Checker</h2>
 <p>Execute, edit, and test the production SQL query below directly in your browser using the embedded WebAssembly SQLite 3 engine. Click <strong>▶ Run Query</strong> to execute, <strong>🔍 Step Clauses</strong> to inspect the live intermediate table after <code>FROM/JOIN</code>, <code>WHERE</code>, <code>GROUP BY</code>, <code>HAVING</code>, <code>WINDOW</code>, <code>SELECT</code>, and <code>ORDER BY</code>, or <strong>✓ Check SQL Tests</strong> to run automated relational assertions against the reference result:</p>
-<div class="code-block code-block--collapsible"><div class="code-block__header" data-action="toggle-code-header"><div style="display:flex;align-items:center;gap:8px;"><span class="code-block__lang">SQL · WASM</span><span class="code-block__lines-chip">14 lines</span></div><div style="display:flex;align-items:center;gap:6px;"><button type="button" class="code-block__copy code-block__run-btn" data-action="run-snippet-codelab" data-lang="sql" title="Execute this snippet in the in-browser CodeLab IDE"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"/></svg><span>Run in CodeLab</span></button><button type="button" class="code-block__copy" data-action="copy-code" title="Copy code to clipboard">Copy</button><button type="button" class="code-block__copy code-block__toggle-btn" data-action="toggle-code" aria-expanded="true" title="Expand or collapse code block">
+<div class="code-block code-block--collapsible"><div class="code-block__header" data-action="toggle-code-header"><div style="display:flex;align-items:center;gap:8px;"><span class="code-block__lang">SQL · WASM</span><span class="code-block__lines-chip">14 lines</span></div><div style="display:flex;align-items:center;gap:6px;"><button type="button" class="code-block__copy code-block__run-btn" data-action="run-sql-inline" data-lang="sql" title="Execute and visualize this SQL query step-by-step inline"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"/></svg><span>Run &amp; Visualize SQL</span></button><button type="button" class="code-block__copy" data-action="open-sql-studio" data-lang="sql" title="Open this query in Full-Screen SQL Studio"><span>⤢ SQL Studio</span></button><button type="button" class="code-block__copy" data-action="copy-code" title="Copy code to clipboard">Copy</button><button type="button" class="code-block__copy code-block__toggle-btn" data-action="toggle-code" aria-expanded="true" title="Expand or collapse code block">
       <span class="code-block__toggle-text">Collapse</span>
       <span class="code-block__chevron">▲</span>
     </button></div></div><pre><code class="language-sql"><span class="tok-comment">-- Dataset: ecommerce | Foreign Key Cascade &amp; Orphan Audit Across Orders &amp; Payments</span>
@@ -1251,7 +1251,7 @@ erDiagram
   o<span class="tok-op">.</span>order_id<span class="tok-op">,</span>
   c<span class="tok-op">.</span>name <span class="tok-kw">AS</span> customer_name<span class="tok-op">,</span>
   o<span class="tok-op">.</span>status <span class="tok-kw">AS</span> order_status<span class="tok-op">,</span>
-  <span class="tok-fn">ROUND</span>(o<span class="tok-op">.</span>total_cents <span class="tok-op">/</span> <span class="tok-num">100.0</span><span class="tok-op">,</span> <span class="tok-num">2</span>) <span class="tok-kw">AS</span> billed_usd<span class="tok-op">,</span>
+  <span class="tok-kw">ROUND</span>(o<span class="tok-op">.</span>total_cents <span class="tok-op">/</span> <span class="tok-num">100.0</span><span class="tok-op">,</span> <span class="tok-num">2</span>) <span class="tok-kw">AS</span> billed_usd<span class="tok-op">,</span>
   <span class="tok-kw">COALESCE</span>(pay<span class="tok-op">.</span>method<span class="tok-op">,</span> <span class="tok-str">&#039;UNPAID&#039;</span>) <span class="tok-kw">AS</span> payment_method<span class="tok-op">,</span>
   <span class="tok-kw">COALESCE</span>(pay<span class="tok-op">.</span>status<span class="tok-op">,</span> <span class="tok-str">&#039;AWAITING_SETTLEMENT&#039;</span>) <span class="tok-kw">AS</span> payment_status
 <span class="tok-kw">FROM</span> orders <span class="tok-kw">AS</span> o
@@ -1300,43 +1300,29 @@ erDiagram
   </tbody>
 </table>
 
-<h2 id="topic-sec-6">6. Under the Hood: Storage &amp; Execution Engine Implementation (C++20)</h2>
-<p>To truly understand how a database engine executes <strong>Virtual & Ephemeral Relations: Views, Updatable Views, CTAS & Temp Tables</strong> without hand-waving, examine the C++20 storage kernel operator below. It models how the execution engine iterates over pinned buffer pool pages, evaluates tuple predicates, and tracks page I/O statistics:</p>
-<div class="code-block code-block--collapsible code-block--collapsed"><div class="code-block__header" data-action="toggle-code-header"><div style="display:flex;align-items:center;gap:8px;"><span class="code-block__lang">C++20</span><span class="code-block__lines-chip">32 lines</span></div><div style="display:flex;align-items:center;gap:6px;"><button type="button" class="code-block__copy code-block__run-btn" data-action="run-snippet-codelab" data-lang="cpp" title="Execute this snippet in the in-browser CodeLab IDE"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"/></svg><span>Run in CodeLab</span></button><button type="button" class="code-block__copy" data-action="copy-code" title="Copy code to clipboard">Copy</button><button type="button" class="code-block__copy code-block__toggle-btn" data-action="toggle-code" aria-expanded="false" title="Expand or collapse code block">
-      <span class="code-block__toggle-text">Expand</span>
-      <span class="code-block__chevron">▼</span>
-    </button></div></div><pre><code class="language-cpp"><span class="tok-preproc">#include &lt;iostream&gt;</span>
-<span class="tok-preproc">#include &lt;vector&gt;</span>
-<span class="tok-preproc">#include &lt;cstdint&gt;</span>
-<span class="tok-preproc">#include &lt;string&gt;</span>
-<span class="tok-preproc">#include &lt;algorithm&gt;</span>
-
-<span class="tok-comment">// Database Engine Kernel Operator: Virtual &amp; Ephemeral Relations: Views, Updatable Views, CTAS &amp; Temp Tables</span>
-<span class="tok-kw">struct</span> TuplePageStats {
-    <span class="tok-type">uint64_t</span> tuples_examined<span class="tok-op">;</span>
-    <span class="tok-type">uint64_t</span> tuples_emitted<span class="tok-op">;</span>
-    <span class="tok-type">uint64_t</span> pages_pinned<span class="tok-op">;</span>
-}<span class="tok-op">;</span>
-
-<span class="tok-kw">inline</span> TuplePageStats <span class="tok-fn">eval_views_temp_tables_ctas</span>(<span class="tok-kw">const</span> std<span class="tok-op">::</span><span class="tok-type">vector</span><span class="tok-op">&lt;</span><span class="tok-type">int64_t</span><span class="tok-op">&gt;&amp;</span> keys<span class="tok-op">,</span> <span class="tok-type">int64_t</span> predicate_bound) <span class="tok-kw">noexcept</span> {
-    TuplePageStats stats{<span class="tok-num">0</span><span class="tok-op">,</span> <span class="tok-num">0</span><span class="tok-op">,</span> (keys<span class="tok-op">.</span><span class="tok-fn">size</span>() <span class="tok-op">+</span> <span class="tok-num">127</span>) <span class="tok-op">/</span> <span class="tok-num">128</span>}<span class="tok-op">;</span>
-    <span class="tok-kw">for</span> (<span class="tok-type">int64_t</span> k <span class="tok-op">:</span> keys) {
-        <span class="tok-op">++</span>stats<span class="tok-op">.</span>tuples_examined<span class="tok-op">;</span>
-        <span class="tok-kw">if</span> (k <span class="tok-op">&gt;=</span> predicate_bound) {
-            <span class="tok-op">++</span>stats<span class="tok-op">.</span>tuples_emitted<span class="tok-op">;</span>
-        }
-    }
-    <span class="tok-kw">return</span> stats<span class="tok-op">;</span>
-}
-
-<span class="tok-kw">int</span> <span class="tok-fn">main</span>() {
-    std<span class="tok-op">::</span><span class="tok-type">vector</span><span class="tok-op">&lt;</span><span class="tok-type">int64_t</span><span class="tok-op">&gt;</span> relation <span class="tok-op">=</span> {<span class="tok-num">10</span><span class="tok-op">,</span> <span class="tok-num">25</span><span class="tok-op">,</span> <span class="tok-num">40</span><span class="tok-op">,</span> <span class="tok-num">55</span><span class="tok-op">,</span> <span class="tok-num">70</span><span class="tok-op">,</span> <span class="tok-num">85</span><span class="tok-op">,</span> <span class="tok-num">100</span><span class="tok-op">,</span> <span class="tok-num">115</span>}<span class="tok-op">;</span>
-    <span class="tok-kw">auto</span> res <span class="tok-op">=</span> <span class="tok-fn">eval_views_temp_tables_ctas</span>(relation<span class="tok-op">,</span> <span class="tok-num">50</span>)<span class="tok-op">;</span>
-    std<span class="tok-op">::</span>cout <span class="tok-op">&lt;&lt;</span> <span class="tok-str">&quot;[Engine Operator: views-temp-tables-ctas] examined=&quot;</span> <span class="tok-op">&lt;&lt;</span> res<span class="tok-op">.</span>tuples_examined
-              <span class="tok-op">&lt;&lt;</span> <span class="tok-str">&quot; emitted=&quot;</span> <span class="tok-op">&lt;&lt;</span> res<span class="tok-op">.</span>tuples_emitted
-              <span class="tok-op">&lt;&lt;</span> <span class="tok-str">&quot; pages=&quot;</span> <span class="tok-op">&lt;&lt;</span> res<span class="tok-op">.</span>pages_pinned <span class="tok-op">&lt;&lt;</span> <span class="tok-str">&quot;\n&quot;</span><span class="tok-op">;</span>
-    <span class="tok-kw">return</span> <span class="tok-num">0</span><span class="tok-op">;</span>
-}</code></pre></div>
+<h2 id="topic-sec-6">6. Live Verification, Catalog Introspection &amp; Execution Plan Lab (SQL)</h2>
+<p>To verify how a production database engine executes <strong>Virtual & Ephemeral Relations: Views, Updatable Views, CTAS & Temp Tables</strong> across edge-case rows, run or modify the second live SQL verification query below. Inspect how <code>GROUP BY</code> buckets, window partitions, and Three-Valued <code>NULL</code> guards behave in real time:</p>
+<div class="code-block code-block--collapsible"><div class="code-block__header" data-action="toggle-code-header"><div style="display:flex;align-items:center;gap:8px;"><span class="code-block__lang">SQL · WASM</span><span class="code-block__lines-chip">18 lines</span></div><div style="display:flex;align-items:center;gap:6px;"><button type="button" class="code-block__copy code-block__run-btn" data-action="run-sql-inline" data-lang="sql" title="Execute and visualize this SQL query step-by-step inline"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"/></svg><span>Run &amp; Visualize SQL</span></button><button type="button" class="code-block__copy" data-action="open-sql-studio" data-lang="sql" title="Open this query in Full-Screen SQL Studio"><span>⤢ SQL Studio</span></button><button type="button" class="code-block__copy" data-action="copy-code" title="Copy code to clipboard">Copy</button><button type="button" class="code-block__copy code-block__toggle-btn" data-action="toggle-code" aria-expanded="true" title="Expand or collapse code block">
+      <span class="code-block__toggle-text">Collapse</span>
+      <span class="code-block__chevron">▲</span>
+    </button></div></div><pre><code class="language-sql"><span class="tok-comment">-- Dataset: ecommerce | Live Verification, 3VL Guard &amp; SARGable Plan Audit (views-temp-tables-ctas)</span>
+<span class="tok-kw">SELECT</span>
+  c<span class="tok-op">.</span>customer_id<span class="tok-op">,</span>
+  c<span class="tok-op">.</span>name <span class="tok-kw">AS</span> customer_name<span class="tok-op">,</span>
+  c<span class="tok-op">.</span>tier<span class="tok-op">,</span>
+  c<span class="tok-op">.</span>country<span class="tok-op">,</span>
+  <span class="tok-kw">COUNT</span>(o<span class="tok-op">.</span>order_id) <span class="tok-kw">AS</span> completed_orders<span class="tok-op">,</span>
+  <span class="tok-kw">ROUND</span>(<span class="tok-kw">COALESCE</span>(<span class="tok-kw">SUM</span>(o<span class="tok-op">.</span>total_cents)<span class="tok-op">,</span> <span class="tok-num">0</span>) <span class="tok-op">/</span> <span class="tok-num">100.0</span><span class="tok-op">,</span> <span class="tok-num">2</span>) <span class="tok-kw">AS</span> verified_spend_usd<span class="tok-op">,</span>
+  <span class="tok-kw">ROUND</span>(
+    <span class="tok-kw">AVG</span>(<span class="tok-kw">COALESCE</span>(<span class="tok-kw">SUM</span>(o<span class="tok-op">.</span>total_cents)<span class="tok-op">,</span> <span class="tok-num">0</span>)) <span class="tok-kw">OVER</span> (<span class="tok-kw">PARTITION</span> <span class="tok-kw">BY</span> c<span class="tok-op">.</span>tier) <span class="tok-op">/</span> <span class="tok-num">100.0</span><span class="tok-op">,</span>
+    <span class="tok-num">2</span>
+  ) <span class="tok-kw">AS</span> tier_peer_avg_spend_usd
+<span class="tok-kw">FROM</span> customers <span class="tok-kw">AS</span> c
+<span class="tok-kw">LEFT</span> <span class="tok-kw">JOIN</span> orders <span class="tok-kw">AS</span> o
+  <span class="tok-kw">ON</span> o<span class="tok-op">.</span>customer_id <span class="tok-op">=</span> c<span class="tok-op">.</span>customer_id
+  <span class="tok-kw">AND</span> o<span class="tok-op">.</span>status <span class="tok-op">=</span> <span class="tok-str">&#039;completed&#039;</span>
+<span class="tok-kw">GROUP</span> <span class="tok-kw">BY</span> c<span class="tok-op">.</span>customer_id<span class="tok-op">,</span> c<span class="tok-op">.</span>name<span class="tok-op">,</span> c<span class="tok-op">.</span>tier<span class="tok-op">,</span> c<span class="tok-op">.</span>country
+<span class="tok-kw">ORDER</span> <span class="tok-kw">BY</span> verified_spend_usd <span class="tok-kw">DESC</span><span class="tok-op">,</span> c<span class="tok-op">.</span>customer_id <span class="tok-kw">ASC</span><span class="tok-op">;</span></code></pre></div>
 
 <h2 id="topic-sec-7">7. Production Failure Modes, Anti-Patterns &amp; Staff Tuning Checklist</h2>
 <div class="callout callout-warning">
@@ -1527,11 +1513,11 @@ erDiagram
           <button type="button" class="btn btn--sm btn--outline check-slider__retry">Try again</button>
         </div>
       </section></div>
-      <section class="build-lab-card topic-codelab-hero" id="guided-coding-practice-views-temp-tables-ctas" aria-label="Guided Algorithm Coding Practice">
+      <section class="build-lab-card topic-codelab-hero" id="guided-coding-practice-views-temp-tables-ctas" aria-label="Guided SQL & Relational Execution Lab">
         <div class="build-lab-card__top">
           <div class="build-lab-card__intro">
             <div class="build-lab-card__eyebrow">
-              <span>Guided SQL & Database Engine Practice · Browser WASM Workbench</span>
+              <span>Interactive 3-Step Guided SQL Lab &amp; Step-by-Step Table Visualizer (PostgreSQL 18 WASM &amp; SQLite 3 WASM)</span>
               <span class="build-lab-card__progress">3 Guided Steps + Progressive Hints</span>
               
                 <button type="button" class="build-lab-card__collapse-btn" data-action="toggle-lab-steps" aria-expanded="true" title="Collapse or expand guided coding steps">
@@ -1540,12 +1526,13 @@ erDiagram
                 </button>
               
             </div>
-            <h2 class="build-lab-card__title">Virtual &amp; Ephemeral Relations: Views, Updatable Views, CTAS &amp; Temp Tables — Guided SQL &amp; Engine Lab</h2>
+            <h2 class="build-lab-card__title">Virtual &amp; Ephemeral Relations: Views, Updatable Views, CTAS &amp; Temp Tables — Interactive Guided SQL Lab</h2>
             <p class="build-lab-card__desc">Query tree view expansion, security barrier views, session-scoped temporary tables, and staging pipelines with CREATE TABLE AS SELECT.</p>
             <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;">
               <span class="badge">⏱ Target Time: <code>O(N) scan / O(log_B N) indexed</code></span>
               <span class="badge">💾 Auxiliary Space: <code>O(1) streaming tuple state</code></span>
               <span class="badge">🧭 Pattern: DDL, Schema Constraints &amp; DML Mutations</span>
+              <span class="badge">🗄️ Dataset: <code>ecommerce</code></span>
             </div>
           </div>
           <div class="build-lab-card__cta-col">
@@ -1563,85 +1550,112 @@ erDiagram
         
           <div class="build-lab-steps-grid">
             
-              <div class="build-lab-step-card">
+              <div class="build-lab-step-card" data-step="0" data-step-index="0">
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">01</span>
-                    <span class="build-lab-step-card__target">Phase 1 · Tuple State &amp; Boundaries</span>
+                    <span class="build-lab-step-card__target">Phase 1 · Base Relation &amp; SARGable Predicate</span>
                   </div>
-                  <div class="build-lab-step-card__title">Initialize Tuple Scan State (eval_views_temp_tables_ctas)</div>
-                  <div class="build-lab-step-card__invariant">Allocate the operator state structure for Virtual &amp; Ephemeral Relations: Views, Updatable Views, CTAS &amp; Temp Tables and establish zero-row boundary invariants.</div>
-                  <div class="build-lab-step-card__concept">Replace <code>TODO (Step 1)</code> inside <code>eval_views_temp_tables_ctas</code> in <code>src/main.cpp</code> by initializing <code>ExecutionResult out{};</code> and iterating over <code>table</code>.</div>
+                  <div class="build-lab-step-card__title">Base Relation Scan &amp; SARGable Filter (ecommerce)</div>
+                  <div class="build-lab-step-card__invariant">Establish the base relation scan in <code>ecommerce</code> for Virtual &amp; Ephemeral Relations: Views, Updatable Views, CTAS &amp; Temp Tables with a SARGable predicate and explicit Three-Valued Logic NULL handling.</div>
+                  <div class="build-lab-step-card__concept">Run or edit <code>query.sql</code> to inspect the base table tuples, verify SARGable index filtering in the <code>WHERE</code> clause, and step through the live Table Visualizer.</div>
                   
                     <details class="quiz-hint-details">
-                      <summary>💡 Progressive Hint (Step 1)</summary>
-                      <pre><code>ExecutionResult out{};
-for (const auto&amp; row : table) {
-  ++out.rows_scanned;</code></pre>
+                      <summary>💡 Progressive SQL Hint (Step 1)</summary>
+                      <pre><code>SELECT order_id, customer_id, status, ROUND(total_cents / 100.0, 2) AS total_usd, COALESCE(discount_code, &#039;NONE&#039;) AS promo_code, created_at FROM orders WHERE status = &#039;completed&#039; AND total_cents &gt;= 30000 ORDER BY total_cents DESC LIMIT 10;</code></pre>
                     </details>
                   
                 </div>
                 <div class="build-lab-step-card__footer">
-                  <span>Step 1 of 3 · <code>src/main.cpp</code></span>
-                  <button type="button" class="btn btn--sm btn--outline" data-action="open-topic-codelab" data-slug="views-temp-tables-ctas" data-mode="guided" data-step-index="0">
-                    Code Step 1 →
+                  <span>Step 1 of 3 · <code>query.sql</code></span>
+                  <button type="button" class="btn btn--sm btn--outline" data-action="open-topic-codelab" data-slug="views-temp-tables-ctas" data-mode="guided" data-step="0" data-step-index="0">
+                    Load Step 1 SQL →
                   </button>
                 </div>
               </div>
             
-              <div class="build-lab-step-card">
+              <div class="build-lab-step-card" data-step="1" data-step-index="1">
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">02</span>
-                    <span class="build-lab-step-card__target">Phase 2 · Three-Valued Logic &amp; Predicate Evaluation</span>
+                    <span class="build-lab-step-card__target">Phase 2 · Relational Join, Aggregation &amp; 3VL Guard</span>
                   </div>
-                  <div class="build-lab-step-card__title">Evaluate 3VL NULL Guard &amp; Predicate Filter</div>
-                  <div class="build-lab-step-card__invariant">In SQL, NULL comparisons evaluate to UNKNOWN and must be excluded before aggregating.</div>
-                  <div class="build-lab-step-card__concept">Implement <code>TODO (Step 2)</code> in <code>src/main.cpp</code> to check <code>!row.is_null &amp;&amp; row.metric_cents &gt;= min_cents</code>.</div>
+                  <div class="build-lab-step-card__title">Relational Join, Grouping &amp; NULL-Safe Aggregation</div>
+                  <div class="build-lab-step-card__invariant">Combine normalized tables via explicit JOIN conditions and fold group buckets or window partitions without losing NULL boundary rows.</div>
+                  <div class="build-lab-step-card__concept">Run or refine the Step 2 relational join and aggregation query in <code>query.sql</code>, then click **🔍 Step Clauses** to inspect each intermediate table.</div>
                   
                     <details class="quiz-hint-details">
-                      <summary>💡 Progressive Hint (Step 2)</summary>
-                      <pre><code>if (!row.is_null &amp;&amp; row.metric_cents &gt;= min_cents) {
-  ++out.rows_matched;
-  out.sum_cents += row.metric_cents;
-}</code></pre>
+                      <summary>💡 Progressive SQL Hint (Step 2)</summary>
+                      <pre><code>-- Dataset: ecommerce | Live Verification, 3VL Guard &amp; SARGable Plan Audit (views-temp-tables-ctas)
+SELECT
+  c.customer_id,
+  c.name AS customer_name,
+  c.tier,
+  c.country,
+  COUNT(o.order_id) AS completed_orders,
+  ROUND(COALESCE(SUM(o.total_cents), 0) / 100.0, 2) AS verified_spend_usd,
+  ROUND(
+    AVG(COALESCE(SUM(o.total_cents), 0)) OVER (PARTITION BY c.tier) / 100.0,
+    2
+  ) AS tier_peer_avg_spend_usd
+FROM customers AS c
+LEFT JOIN orders AS o
+  ON o.customer_id = c.customer_id
+  AND o.status = &#039;completed&#039;
+GROUP BY c.customer_id, c.name, c.tier, c.country
+ORDER BY verified_spend_usd DESC, c.customer_id ASC;</code></pre>
                     </details>
                   
                 </div>
                 <div class="build-lab-step-card__footer">
-                  <span>Step 2 of 3 · <code>src/main.cpp</code></span>
-                  <button type="button" class="btn btn--sm btn--outline" data-action="open-topic-codelab" data-slug="views-temp-tables-ctas" data-mode="guided" data-step-index="1">
-                    Code Step 2 →
+                  <span>Step 2 of 3 · <code>query.sql</code></span>
+                  <button type="button" class="btn btn--sm btn--outline" data-action="open-topic-codelab" data-slug="views-temp-tables-ctas" data-mode="guided" data-step="1" data-step-index="1">
+                    Load Step 2 SQL →
                   </button>
                 </div>
               </div>
             
-              <div class="build-lab-step-card">
+              <div class="build-lab-step-card" data-step="2" data-step-index="2">
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">03</span>
-                    <span class="build-lab-step-card__target">Phase 3 · Aggregate Projection &amp; Verification</span>
+                    <span class="build-lab-step-card__target">Phase 3 · Production Query &amp; Plan Verification</span>
                   </div>
-                  <div class="build-lab-step-card__title">Return Projected Tuple Summary &amp; Pass Unit Assertions</div>
-                  <div class="build-lab-step-card__invariant">Verify exact integer-cent accumulation and row counts across edge cases.</div>
-                  <div class="build-lab-step-card__concept">Complete <code>TODO (Step 3)</code> in <code>src/main.cpp</code> by returning <code>out;</code> and clicking Run &amp; Test.</div>
+                  <div class="build-lab-step-card__title">Production Query &amp; Execution Plan Verification (Virtual &amp; Ephemeral Relations: Views, Updatable Views, CTAS &amp; Temp Tables)</div>
+                  <div class="build-lab-step-card__invariant">Verify final column projections, ordering, and physical B+Tree access paths via EXPLAIN QUERY PLAN and automated relational assertions.</div>
+                  <div class="build-lab-step-card__concept">Execute the complete production query in <code>query.sql</code> and click **✓ Check SQL Assertions** to verify schema alignment, row cardinality, and tuple equivalence.</div>
                   
                     <details class="quiz-hint-details">
-                      <summary>💡 Progressive Hint (Step 3)</summary>
-                      <pre><code>return out;</code></pre>
+                      <summary>💡 Progressive SQL Hint (Step 3)</summary>
+                      <pre><code>-- Dataset: ecommerce | Foreign Key Cascade &amp; Orphan Audit Across Orders &amp; Payments
+SELECT
+  o.order_id,
+  c.name AS customer_name,
+  o.status AS order_status,
+  ROUND(o.total_cents / 100.0, 2) AS billed_usd,
+  COALESCE(pay.method, &#039;UNPAID&#039;) AS payment_method,
+  COALESCE(pay.status, &#039;AWAITING_SETTLEMENT&#039;) AS payment_status
+FROM orders AS o
+INNER JOIN customers AS c
+  ON c.customer_id = o.customer_id
+LEFT JOIN payments AS pay
+  ON pay.order_id = o.order_id
+ORDER BY o.order_id ASC;</code></pre>
                     </details>
                   
                 </div>
                 <div class="build-lab-step-card__footer">
-                  <span>Step 3 of 3 · <code>src/main.cpp</code></span>
-                  <button type="button" class="btn btn--sm btn--outline" data-action="open-topic-codelab" data-slug="views-temp-tables-ctas" data-mode="guided" data-step-index="2">
-                    Code Step 3 →
+                  <span>Step 3 of 3 · <code>query.sql</code></span>
+                  <button type="button" class="btn btn--sm btn--outline" data-action="open-topic-codelab" data-slug="views-temp-tables-ctas" data-mode="guided" data-step="2" data-step-index="2">
+                    Load Step 3 SQL →
                   </button>
                 </div>
               </div>
             
           </div>
         
+
+        <div class="sql-guided-lab-host" id="sql-guided-lab-views-temp-tables-ctas" data-sql-lab-slug="views-temp-tables-ctas"></div>
       </section>
     
         <div class="takeaways" id="topic-takeaways-views-temp-tables-ctas">
@@ -1745,7 +1759,7 @@ for (const auto&amp; row : table) {
   <script type="text/plain" data-defer src="data/challenges.js?v=fb4083c38c"></script>
   <script type="text/plain" data-defer src="data/srs-cards.js?v=fabc47dd9c"></script>
   <script type="text/plain" data-defer src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
-  <script type="text/plain" data-defer src="data/topic_guided_labs.js?v=9761466656"></script>
+  <script type="text/plain" data-defer src="data/topic_guided_labs.js?v=341584ee01"></script>
   <script type="text/plain" data-defer src="data/projects.js?v=2280ac085f"></script>
   <script type="text/plain" data-defer src="data/glossary.js?v=4f6c79a4e0"></script>
 
@@ -1756,8 +1770,8 @@ for (const auto&amp; row : table) {
   <script type="text/plain" data-defer src="js/search.js?v=e2063e0ccd"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
   <script type="text/plain" data-defer src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>
-  <script type="text/plain" data-defer src="js/sql-engine.js?v=92e27d93f9"></script>
-  <script type="text/plain" data-defer src="js/table-visualizer.js?v=ad3ad8c767"></script>
+  <script type="text/plain" data-defer src="js/sql-engine.js?v=4d14b9bc51"></script>
+  <script type="text/plain" data-defer src="js/table-visualizer.js?v=f9ef79d4f6"></script>
   <script type="text/plain" data-defer src="js/simulators.js?v=68b973e4c8"></script>
   <script type="text/plain" data-defer src="js/simulators-relational.js?v=8e12b97831"></script>
   <script type="text/plain" data-defer src="js/simulators-analytical.js?v=258089d8ac"></script>
@@ -1767,17 +1781,17 @@ for (const auto&amp; row : table) {
   <script type="text/plain" data-defer src="js/simulators-olap-ops.js?v=c793d19e01"></script>
   <script type="text/plain" data-defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <script type="text/plain" data-defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
-  <script type="text/plain" data-defer src="js/renderer.js?v=960b3ce310"></script>
+  <script type="text/plain" data-defer src="js/renderer.js?v=28efc9961b"></script>
   <script type="text/plain" data-defer src="js/landing.js?v=65d1430533"></script>
   
   <script type="text/plain" data-defer src="js/quiz.js?v=5b300d9b3d"></script>
   <script type="text/plain" data-defer src="js/roadmap.js?v=afdc0360a7"></script>
-  <script type="text/plain" data-defer src="js/challenges.js?v=a08b5b8a96"></script>
+  <script type="text/plain" data-defer src="js/challenges.js?v=f6759d56c7"></script>
   <script type="text/plain" data-defer src="js/dashboard.js?v=1e493b80a6"></script>
-  <script type="text/plain" data-defer src="js/sandbox.js?v=91b1b1bf55"></script>
+  <script type="text/plain" data-defer src="js/sandbox.js?v=9b3b00a75e"></script>
   <script type="text/plain" data-defer src="js/topic-codelab.js?v=096611d91c"></script>
   
-  <script type="text/plain" data-defer src="js/app.js?v=90ae030c67"></script>
+  <script type="text/plain" data-defer src="js/app.js?v=1189ad3188"></script>
 
   <!-- App bootstrap & deferred script loader -->
   <script src="js/bootstrap.js?v=df2bb60aeb"></script>

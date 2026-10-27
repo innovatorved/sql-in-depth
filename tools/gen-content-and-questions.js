@@ -217,8 +217,8 @@ INNER JOIN categories AS cat
   ON cat.category_id = p.category_id
 WHERE p.is_active = 1
 ORDER BY
-  cat.name ASC,
-  p.price_cents DESC
+  category_name ASC,
+  price_usd DESC
 LIMIT 8 OFFSET 0;`,
       `-- Dataset: ecommerce | Conditional Searched CASE Expressions & Tier Classification
 SELECT
@@ -631,40 +631,95 @@ GROUP BY u.plan_tier, e.event_type
 ORDER BY event_count DESC, avg_latency_ms DESC;`;
 }
 
-function buildUnitCppSnippet(modId, uIdx, slug, title) {
-  const safeFunc = 'eval_' + slug.replace(/[^a-z0-9]/g, '_').slice(0, 28);
-  return `#include <iostream>
-#include <vector>
-#include <cstdint>
-#include <string>
-#include <algorithm>
+function buildUnitVerificationSqlSnippet(modId, uIdx, slug, title) {
+  const primarySql = buildUnitSqlSnippet(modId, uIdx, slug, title);
+  const dsMatch = primarySql.match(/Dataset:\s*([a-z_]+)/i);
+  const datasetId = dsMatch ? dsMatch[1] : 'ecommerce';
 
-// Database Engine Kernel Operator: ${title}
-struct TuplePageStats {
-    uint64_t tuples_examined;
-    uint64_t tuples_emitted;
-    uint64_t pages_pinned;
-};
+  if (datasetId === 'org_hr') {
+    return `-- Dataset: org_hr | Live Verification & Departmental Window Audit (${slug})
+WITH dept_rollup AS (
+  SELECT
+    d.dept_id,
+    d.name AS dept_name,
+    COUNT(e.emp_id) AS staff_count,
+    ROUND(AVG(e.salary_usd), 0) AS avg_salary_usd,
+    MAX(e.salary_usd) AS top_salary_usd,
+    SUM(e.salary_usd) AS total_payroll_usd,
+    d.annual_budget_usd
+  FROM departments AS d
+  LEFT JOIN employees AS e
+    ON e.dept_id = d.dept_id
+  GROUP BY d.dept_id, d.name, d.annual_budget_usd
+)
+SELECT
+  dept_id,
+  dept_name,
+  staff_count,
+  avg_salary_usd,
+  top_salary_usd,
+  total_payroll_usd,
+  ROUND((total_payroll_usd * 100.0) / annual_budget_usd, 1) AS budget_utilization_pct
+FROM dept_rollup
+WHERE staff_count >= 1
+ORDER BY total_payroll_usd DESC;`;
+  }
 
-inline TuplePageStats ${safeFunc}(const std::vector<int64_t>& keys, int64_t predicate_bound) noexcept {
-    TuplePageStats stats{0, 0, (keys.size() + 127) / 128};
-    for (int64_t k : keys) {
-        ++stats.tuples_examined;
-        if (k >= predicate_bound) {
-            ++stats.tuples_emitted;
-        }
-    }
-    return stats;
-}
+  if (datasetId === 'fintech_ledger') {
+    return `-- Dataset: fintech_ledger | Double-Entry Conservation & Account Audit (${slug})
+SELECT
+  a.account_id,
+  a.owner_name,
+  a.account_type,
+  COUNT(je.entry_id) AS journal_postings,
+  SUM(CASE WHEN je.direction = 'credit' THEN je.amount_cents ELSE 0 END) AS credit_cents,
+  SUM(CASE WHEN je.direction = 'debit' THEN je.amount_cents ELSE 0 END) AS debit_cents,
+  SUM(CASE WHEN je.direction = 'credit' THEN je.amount_cents ELSE -je.amount_cents END) AS computed_balance_cents,
+  a.posted_balance_cents
+FROM accounts AS a
+INNER JOIN journal_entries AS je
+  ON je.account_id = a.account_id
+GROUP BY a.account_id, a.owner_name, a.account_type, a.posted_balance_cents
+ORDER BY a.account_id ASC;`;
+  }
 
-int main() {
-    std::vector<int64_t> relation = {10, 25, 40, 55, 70, 85, 100, 115};
-    auto res = ${safeFunc}(relation, 50);
-    std::cout << "[Engine Operator: ${slug}] examined=" << res.tuples_examined
-              << " emitted=" << res.tuples_emitted
-              << " pages=" << res.pages_pinned << "\\n";
-    return 0;
-}`;
+  if (datasetId === 'saas_telemetry') {
+    return `-- Dataset: saas_telemetry | Cohort Retention, MRR & Event Latency Verification (${slug})
+SELECT
+  u.user_id,
+  u.org_name,
+  u.plan_tier,
+  COALESCE(s.mrr_usd, 0) AS active_mrr_usd,
+  COUNT(e.event_id) AS total_events,
+  ROUND(AVG(e.latency_ms), 1) AS avg_event_latency_ms,
+  MAX(e.event_ts) AS last_seen_ts
+FROM saas_users AS u
+LEFT JOIN subscriptions AS s
+  ON s.user_id = u.user_id AND s.status = 'active'
+LEFT JOIN user_events AS e
+  ON e.user_id = u.user_id
+GROUP BY u.user_id, u.org_name, u.plan_tier, s.mrr_usd
+ORDER BY active_mrr_usd DESC, total_events DESC;`;
+  }
+
+  return `-- Dataset: ecommerce | Live Verification, 3VL Guard & SARGable Plan Audit (${slug})
+SELECT
+  c.customer_id,
+  c.name AS customer_name,
+  c.tier,
+  c.country,
+  COUNT(o.order_id) AS completed_orders,
+  ROUND(COALESCE(SUM(o.total_cents), 0) / 100.0, 2) AS verified_spend_usd,
+  ROUND(
+    AVG(COALESCE(SUM(o.total_cents), 0)) OVER (PARTITION BY c.tier) / 100.0,
+    2
+  ) AS tier_peer_avg_spend_usd
+FROM customers AS c
+LEFT JOIN orders AS o
+  ON o.customer_id = c.customer_id
+  AND o.status = 'completed'
+GROUP BY c.customer_id, c.name, c.tier, c.country
+ORDER BY verified_spend_usd DESC, c.customer_id ASC;`;
 }
 
 function escapeXml(s) {
@@ -956,7 +1011,7 @@ function generateUnitContent(mod, unit, globalIdx, uIdx) {
   const altVid = modVids[(uIdx + 1) % modVids.length];
 
   const sqlSnippet = buildUnitSqlSnippet(mod.id, uIdx, slug, title);
-  const cppSnippet = buildUnitCppSnippet(mod.id, uIdx, slug, title);
+  const verificationSqlSnippet = buildUnitVerificationSqlSnippet(mod.id, uIdx, slug, title);
   const svgDiagram = buildUnitSvgDiagram(mod.id, uIdx, slug, title, tags);
   const mermaidBlock = buildUnitMermaid(mod.id, uIdx, slug, title, tags);
 
@@ -1033,9 +1088,9 @@ ${mermaidBlock}
   </tbody>
 </table>
 
-<h2>6. Under the Hood: Storage &amp; Execution Engine Implementation (C++20)</h2>
-<p>To truly understand how a database engine executes <strong>${title}</strong> without hand-waving, examine the C++20 storage kernel operator below. It models how the execution engine iterates over pinned buffer pool pages, evaluates tuple predicates, and tracks page I/O statistics:</p>
-<pre><code class="language-cpp">${cppSnippet}</code></pre>
+<h2>6. Live Verification, Catalog Introspection &amp; Execution Plan Lab (SQL)</h2>
+<p>To verify how a production database engine executes <strong>${title}</strong> across edge-case rows, run or modify the second live SQL verification query below. Inspect how <code>GROUP BY</code> buckets, window partitions, and Three-Valued <code>NULL</code> guards behave in real time:</p>
+<pre><code class="language-sql">${verificationSqlSnippet}</code></pre>
 
 <h2>7. Production Failure Modes, Anti-Patterns &amp; Staff Tuning Checklist</h2>
 <div class="callout callout-warning">
@@ -1172,115 +1227,97 @@ function generateGuidedLabEntry(mod, unit, uIdx) {
   const slug = unit.slug;
   const title = unit.title;
   const excerpt = unit.archive?.excerpt || title;
-  const safeFunc = 'eval_' + slug.replace(/[^a-z0-9]/g, '_').slice(0, 28);
   const referenceSql = buildUnitSqlSnippet(mod.id, uIdx || 0, slug, title);
+  const verificationSql = buildUnitVerificationSqlSnippet(mod.id, uIdx || 0, slug, title);
+  const dsMatch = referenceSql.match(/Dataset:\s*([a-z_]+)/i);
+  const datasetId = dsMatch ? dsMatch[1] : 'ecommerce';
 
-  const starterCode = `#include <bits/stdc++.h>
-#include <codelab/dsa.hpp>
-#include <codelab/test.hpp>
-using namespace std;
+  let step1Solution = '';
+  let step1Starter = '';
+  let step1Hint = '';
+  if (datasetId === 'org_hr') {
+    step1Solution = `-- Step 1 (${slug}): Base Relation & SARGable Predicate Selection on employees
+SELECT
+  emp_id,
+  name,
+  title,
+  dept_id,
+  manager_id,
+  salary_usd,
+  hired_at
+FROM employees
+WHERE salary_usd >= 170000
+ORDER BY salary_usd DESC
+LIMIT 10;`;
+    step1Starter = `-- TODO (Step 1): Filter employees with a SARGable predicate (salary_usd >= 170000) and order by salary_usd DESC
+${step1Solution}`;
+    step1Hint = `SELECT emp_id, name, title, dept_id, manager_id, salary_usd, hired_at FROM employees WHERE salary_usd >= 170000 ORDER BY salary_usd DESC LIMIT 10;`;
+  } else if (datasetId === 'fintech_ledger') {
+    step1Solution = `-- Step 1 (${slug}): Base Relation & SARGable Predicate Selection on accounts & transfers
+SELECT
+  transfer_id,
+  idempotency_key,
+  from_account_id,
+  to_account_id,
+  ROUND(amount_cents / 100.0, 2) AS amount_usd,
+  status,
+  created_at
+FROM transfers
+WHERE status = 'posted'
+  AND amount_cents >= 25000
+ORDER BY transfer_id ASC
+LIMIT 10;`;
+    step1Starter = `-- TODO (Step 1): Select posted transfers with amount_cents >= 25000 ordered by transfer_id ASC
+${step1Solution}`;
+    step1Hint = `SELECT transfer_id, idempotency_key, from_account_id, to_account_id, ROUND(amount_cents / 100.0, 2) AS amount_usd, status, created_at FROM transfers WHERE status = 'posted' AND amount_cents >= 25000 ORDER BY transfer_id ASC LIMIT 10;`;
+  } else if (datasetId === 'saas_telemetry') {
+    step1Solution = `-- Step 1 (${slug}): Base Relation & SARGable Predicate Selection on user_events
+SELECT
+  event_id,
+  user_id,
+  event_type,
+  latency_ms,
+  event_ts
+FROM user_events
+WHERE latency_ms IS NOT NULL
+  AND event_ts >= '2025-01-01'
+ORDER BY event_ts ASC
+LIMIT 10;`;
+    step1Starter = `-- TODO (Step 1): Query user_events with NULL-safe latency filter and SARGable timestamp predicate
+${step1Solution}`;
+    step1Hint = `SELECT event_id, user_id, event_type, latency_ms, event_ts FROM user_events WHERE latency_ms IS NOT NULL AND event_ts >= '2025-01-01' ORDER BY event_ts ASC LIMIT 10;`;
+  } else {
+    step1Solution = `-- Step 1 (${slug}): Base Relation & SARGable Predicate Selection on orders
+SELECT
+  order_id,
+  customer_id,
+  status,
+  ROUND(total_cents / 100.0, 2) AS total_usd,
+  COALESCE(discount_code, 'NONE') AS promo_code,
+  created_at
+FROM orders
+WHERE status = 'completed'
+  AND total_cents >= 30000
+ORDER BY total_cents DESC
+LIMIT 10;`;
+    step1Starter = `-- TODO (Step 1): Select completed orders with total_cents >= 30000 using NULL-safe COALESCE for discount_code
+${step1Solution}`;
+    step1Hint = `SELECT order_id, customer_id, status, ROUND(total_cents / 100.0, 2) AS total_usd, COALESCE(discount_code, 'NONE') AS promo_code, created_at FROM orders WHERE status = 'completed' AND total_cents >= 30000 ORDER BY total_cents DESC LIMIT 10;`;
+  }
 
-// SQL & Storage Engine Operator Lab: ${title} (${slug})
-struct RelationTuple {
-    int64_t id;
-    int64_t metric_cents;
-    bool is_null;
-};
-
-struct ExecutionResult {
-    size_t rows_scanned = 0;
-    size_t rows_matched = 0;
-    int64_t sum_cents = 0;
-};
-
-ExecutionResult ${safeFunc}(const vector<RelationTuple>& table, int64_t min_cents) noexcept {
-    // TODO (Step 1): Initialize ExecutionResult state and scan counters
-    // TODO (Step 2): Filter tuples applying Three-Valued NULL semantics (!row.is_null && row.metric_cents >= min_cents)
-    // TODO (Step 3): Accumulate matched row count and sum_cents, then return verified result
-    return {};
-}
-
-int main() {
-  DESCRIBE("${title.replace(/"/g, '\\"')} — Guided Engine Verification", {
-    TEST("Step 1: initializes relation scan state and handles empty table", {
-      vector<RelationTuple> empty_rel;
-      auto r = ${safeFunc}(empty_rel, 100);
-      ASSERT_EQ(r.rows_scanned, 0u);
-      ASSERT_EQ(r.rows_matched, 0u);
-    });
-    TEST("Step 2: filters NULL tuples (3VL UNKNOWN) and applies predicate bound", {
-      vector<RelationTuple> rel = {{1, 500, false}, {2, 900, true}, {3, 200, false}, {4, 800, false}};
-      auto r = ${safeFunc}(rel, 400);
-      ASSERT_EQ(r.rows_scanned, 4u);
-      ASSERT_EQ(r.rows_matched, 2u);
-    });
-    TEST("Step 3: computes exact aggregate sum_cents without float drift", {
-      vector<RelationTuple> rel = {{1, 500, false}, {2, 900, true}, {3, 200, false}, {4, 800, false}};
-      auto r = ${safeFunc}(rel, 400);
-      ASSERT_EQ(r.sum_cents, 1300);
-    });
-  });
-  return CODELAB_TEST_EXIT_CODE();
-}
-`;
-
-  const solutionCode = `#include <bits/stdc++.h>
-#include <codelab/dsa.hpp>
-#include <codelab/test.hpp>
-using namespace std;
-
-// SQL & Storage Engine Operator Lab: ${title} (${slug})
-struct RelationTuple {
-    int64_t id;
-    int64_t metric_cents;
-    bool is_null;
-};
-
-struct ExecutionResult {
-    size_t rows_scanned = 0;
-    size_t rows_matched = 0;
-    int64_t sum_cents = 0;
-};
-
-ExecutionResult ${safeFunc}(const vector<RelationTuple>& table, int64_t min_cents) noexcept {
-    ExecutionResult out{};
-    for (const auto& row : table) {
-        ++out.rows_scanned;
-        if (!row.is_null && row.metric_cents >= min_cents) {
-            ++out.rows_matched;
-            out.sum_cents += row.metric_cents;
-        }
-    }
-    return out;
-}
-
-int main() {
-  DESCRIBE("${title.replace(/"/g, '\\"')} — Guided Engine Verification", {
-    TEST("Step 1: initializes relation scan state and handles empty table", {
-      vector<RelationTuple> empty_rel;
-      auto r = ${safeFunc}(empty_rel, 100);
-      ASSERT_EQ(r.rows_scanned, 0u);
-      ASSERT_EQ(r.rows_matched, 0u);
-    });
-    TEST("Step 2: filters NULL tuples (3VL UNKNOWN) and applies predicate bound", {
-      vector<RelationTuple> rel = {{1, 500, false}, {2, 900, true}, {3, 200, false}, {4, 800, false}};
-      auto r = ${safeFunc}(rel, 400);
-      ASSERT_EQ(r.rows_scanned, 4u);
-      ASSERT_EQ(r.rows_matched, 2u);
-    });
-    TEST("Step 3: computes exact aggregate sum_cents without float drift", {
-      vector<RelationTuple> rel = {{1, 500, false}, {2, 900, true}, {3, 200, false}, {4, 800, false}};
-      auto r = ${safeFunc}(rel, 400);
-      ASSERT_EQ(r.sum_cents, 1300);
-    });
-  });
-  return CODELAB_TEST_EXIT_CODE();
-}
-`;
+  const step2Solution = verificationSql;
+  const step2Starter = `-- TODO (Step 2): Compose relational JOIN, GROUP BY aggregation, and Three-Valued Logic NULL guards for ${title}
+${verificationSql}`;
+  const step3Solution = referenceSql;
+  const step3Starter = `-- TODO (Step 3): Execute and verify the production SQL query & EXPLAIN QUERY PLAN for ${title} (${slug})
+${referenceSql}`;
 
   return {
-    title: `${title} — Guided SQL & Engine Lab`,
+    title: `${title} — Interactive Guided SQL Lab`,
     summary: excerpt,
+    language: 'sql',
+    activeFile: 'query.sql',
+    datasetId,
     referenceSql,
     complexity: {
       time: 'O(N) scan / O(log_B N) indexed',
@@ -1290,40 +1327,43 @@ int main() {
     steps: [
       {
         id: 'step-1',
-        phase: 'Phase 1 · Tuple State & Boundaries',
-        title: `Step 1: Initialize Tuple Scan State (${safeFunc})`,
-        concept: `Allocate the operator state structure for ${title} and establish zero-row boundary invariants.`,
-        instructions: `Replace \`TODO (Step 1)\` inside \`${safeFunc}\` in \`src/main.cpp\` by initializing \`ExecutionResult out{};\` and iterating over \`table\`.`,
-        hint: `ExecutionResult out{};\nfor (const auto& row : table) {\n  ++out.rows_scanned;`,
-        targetSymbol: safeFunc,
-        targetFile: 'src/main.cpp',
-        cppTargetFile: 'src/main.cpp'
+        phase: 'Phase 1 · Base Relation & SARGable Predicate',
+        title: `Step 1: Base Relation Scan & SARGable Filter (${datasetId})`,
+        concept: `Establish the base relation scan in \`${datasetId}\` for ${title} with a SARGable predicate and explicit Three-Valued Logic NULL handling.`,
+        instructions: `Run or edit \`query.sql\` to inspect the base table tuples, verify SARGable index filtering in the \`WHERE\` clause, and step through the live Table Visualizer.`,
+        hint: step1Hint,
+        file: 'query.sql',
+        targetFile: 'query.sql',
+        starterCode: step1Starter,
+        solutionCode: step1Solution
       },
       {
         id: 'step-2',
-        phase: 'Phase 2 · Three-Valued Logic & Predicate Evaluation',
-        title: 'Step 2: Evaluate 3VL NULL Guard & Predicate Filter',
-        concept: 'In SQL, NULL comparisons evaluate to UNKNOWN and must be excluded before aggregating.',
-        instructions: `Implement \`TODO (Step 2)\` in \`src/main.cpp\` to check \`!row.is_null && row.metric_cents >= min_cents\`.`,
-        hint: `if (!row.is_null && row.metric_cents >= min_cents) {\n  ++out.rows_matched;\n  out.sum_cents += row.metric_cents;\n}`,
-        targetSymbol: safeFunc,
-        targetFile: 'src/main.cpp',
-        cppTargetFile: 'src/main.cpp'
+        phase: 'Phase 2 · Relational Join, Aggregation & 3VL Guard',
+        title: 'Step 2: Relational Join, Grouping & NULL-Safe Aggregation',
+        concept: 'Combine normalized tables via explicit JOIN conditions and fold group buckets or window partitions without losing NULL boundary rows.',
+        instructions: `Run or refine the Step 2 relational join and aggregation query in \`query.sql\`, then click **🔍 Step Clauses** to inspect each intermediate table.`,
+        hint: step2Solution,
+        file: 'query.sql',
+        targetFile: 'query.sql',
+        starterCode: step2Starter,
+        solutionCode: step2Solution
       },
       {
         id: 'step-3',
-        phase: 'Phase 3 · Aggregate Projection & Verification',
-        title: 'Step 3: Return Projected Tuple Summary & Pass Unit Assertions',
-        concept: 'Verify exact integer-cent accumulation and row counts across edge cases.',
-        instructions: `Complete \`TODO (Step 3)\` in \`src/main.cpp\` by returning \`out;\` and clicking Run & Test.`,
-        hint: `return out;`,
-        targetSymbol: safeFunc,
-        targetFile: 'src/main.cpp',
-        cppTargetFile: 'src/main.cpp'
+        phase: 'Phase 3 · Production Query & Plan Verification',
+        title: `Step 3: Production Query & Execution Plan Verification (${title})`,
+        concept: 'Verify final column projections, ordering, and physical B+Tree access paths via EXPLAIN QUERY PLAN and automated relational assertions.',
+        instructions: `Execute the complete production query in \`query.sql\` and click **✓ Check SQL Assertions** to verify schema alignment, row cardinality, and tuple equivalence.`,
+        hint: step3Solution,
+        file: 'query.sql',
+        targetFile: 'query.sql',
+        starterCode: step3Starter,
+        solutionCode: step3Solution
       }
     ],
-    starterCode,
-    solutionCode
+    starterCode: step1Starter,
+    solutionCode: referenceSql
   };
 }
 
@@ -1375,9 +1415,68 @@ const guidedLabsJs = `// Interactive Guided SQL & Engine Topic Labs — SQL In D
 
   var labs = ${JSON.stringify(allGuidedLabs, null, 2)};
 
+  function buildFallbackSqlLab(slug, title, fallbackSql) {
+    var safeTitle = title || slug || 'Interactive SQL Lab';
+    var refSql = fallbackSql || "SELECT c.customer_id, c.name, c.tier, COUNT(o.order_id) AS completed_orders, ROUND(COALESCE(SUM(o.total_cents), 0) / 100.0, 2) AS spend_usd FROM customers c LEFT JOIN orders o ON o.customer_id = c.customer_id AND o.status = 'completed' GROUP BY c.customer_id, c.name, c.tier ORDER BY spend_usd DESC;";
+    return {
+      title: safeTitle + ' — Interactive Guided SQL Lab',
+      summary: 'Step-by-step relational query construction, clause-by-clause table visualization, and execution plan verification.',
+      language: 'sql',
+      activeFile: 'query.sql',
+      datasetId: 'ecommerce',
+      referenceSql: refSql,
+      complexity: {
+        time: 'O(N) scan / O(log_B N) indexed',
+        space: 'O(1) streaming tuple state',
+        pattern: 'Relational SQL Execution'
+      },
+      steps: [
+        {
+          id: 'step-1',
+          phase: 'Phase 1 · Base Relation & SARGable Predicate',
+          title: 'Step 1: Base Relation Scan & SARGable Filter',
+          concept: 'Inspect base tuples and apply a SARGable WHERE predicate.',
+          instructions: 'Run or edit query.sql to inspect the base table tuples and step through the live Table Visualizer.',
+          hint: "SELECT order_id, customer_id, status, total_cents FROM orders WHERE status = 'completed' ORDER BY total_cents DESC LIMIT 10;",
+          file: 'query.sql',
+          targetFile: 'query.sql',
+          starterCode: "-- TODO (Step 1): Select completed orders ordered by total_cents DESC\\nSELECT order_id, customer_id, status, total_cents FROM orders WHERE status = 'completed' ORDER BY total_cents DESC LIMIT 10;",
+          solutionCode: "SELECT order_id, customer_id, status, total_cents FROM orders WHERE status = 'completed' ORDER BY total_cents DESC LIMIT 10;"
+        },
+        {
+          id: 'step-2',
+          phase: 'Phase 2 · Relational Join, Aggregation & 3VL Guard',
+          title: 'Step 2: Relational Join & NULL-Safe Aggregation',
+          concept: 'Combine normalized tables and fold group buckets without losing NULL boundary rows.',
+          instructions: 'Run the Step 2 JOIN and GROUP BY query and click Step Clauses to inspect each intermediate table.',
+          hint: refSql,
+          file: 'query.sql',
+          targetFile: 'query.sql',
+          starterCode: '-- TODO (Step 2): Join customers and orders with NULL-safe aggregation\\n' + refSql,
+          solutionCode: refSql
+        },
+        {
+          id: 'step-3',
+          phase: 'Phase 3 · Production Query & Plan Verification',
+          title: 'Step 3: Production Query & Execution Plan Verification',
+          concept: 'Verify final column projections, ordering, and physical B+Tree access paths.',
+          instructions: 'Execute the complete production query in query.sql and run automated SQL assertions.',
+          hint: refSql,
+          file: 'query.sql',
+          targetFile: 'query.sql',
+          starterCode: '-- TODO (Step 3): Verify full production SQL query & EXPLAIN QUERY PLAN\\n' + refSql,
+          solutionCode: refSql
+        }
+      ],
+      starterCode: '-- TODO (Step 1): Run and verify SQL query\\n' + refSql,
+      solutionCode: refSql
+    };
+  }
+
+  window.TOPIC_GUIDED_LABS = labs;
   window.TopicGuidedLabs = {
-    getLab: function(slug) {
-      return labs[slug] || null;
+    getLab: function(slug, fallbackTitle, fallbackSql) {
+      return labs[slug] || buildFallbackSqlLab(slug, fallbackTitle, fallbackSql);
     },
     hasCuratedLab: function(slug) {
       return Boolean(labs[slug]);

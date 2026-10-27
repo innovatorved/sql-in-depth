@@ -908,4 +908,181 @@
   color: #fbbf24;
 }
 
+/* 9-Stage Table Visualizer & DML Diff Enhancements */
+.sql-viz-meta-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sql-engine-switch {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  background: rgba(9, 9, 11, 0.7);
+}
+
+.sql-engine-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--font-mono, monospace);
+  background: transparent;
+  color: var(--text-muted, #a1a1aa);
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.sql-engine-btn:hover {
+  color: var(--text-primary, #f4f4f5);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.sql-engine-btn.is-active {
+  background: rgba(99, 102, 241, 0.25);
+  color: #c7d2fe;
+}
+
+.sql-engine-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #f59e0b;
+}
+
+.sql-engine-dot.is-ready {
+  background: #10b981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.7);
+}
+
+.sql-viz-reset-btn {
+  padding: 3px 9px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary, #d4d4d8);
+  cursor: pointer;
+}
+
+.sql-viz-reset-btn:hover {
+  background: rgba(239, 68, 68, 0.14);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+}
+
+.sql-subtables-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+  padding: 10px 12px;
+}
+
+.sql-subtable-card {
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  border-radius: 8px;
+  background: rgba(9, 9, 11, 0.65);
+  overflow: hidden;
+}
+
+.sql-subtable-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  background: rgba(99, 102, 241, 0.12);
+  border-bottom: 1px solid rgba(99, 102, 241, 0.22);
+  font-family: var(--font-mono, monospace);
+  font-size: 11.5px;
+}
+
+.sql-subtable-name {
+  font-weight: 700;
+  color: #c7d2fe;
+}
+
+.sql-subtable-meta {
+  font-size: 10.5px;
+  color: var(--text-muted, #a1a1aa);
+}
+
+/* DML Row States & Cell Diffs */
+.sql-step-table tr.is-inserted td {
+  background: rgba(16, 185, 129, 0.14);
+  color: #d1fae5;
+}
+
+.sql-step-table tr.is-updated td {
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.sql-step-table tr.is-deleted td {
+  background: rgba(239, 68, 68, 0.1);
+  color: #fca5a5;
+  text-decoration: line-through;
+  opacity: 0.72;
+}
+
+.sql-row-badge.is-inserted {
+  background: rgba(16, 185, 129, 0.22);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.45);
+}
+
+.sql-row-badge.is-updated {
+  background: rgba(245, 158, 11, 0.22);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.45);
+}
+
+.sql-row-badge.is-deleted {
+  background: rgba(239, 68, 68, 0.22);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.45);
+  text-decoration: none;
+}
+
+.sql-cell-diff {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono, monospace);
+}
+
+.sql-cell-diff del {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.16);
+  padding: 1px 4px;
+  border-radius: 3px;
+  text-decoration: line-through;
+}
+
+.sql-cell-diff ins {
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.18);
+  padding: 1px 5px;
+  border-radius: 3px;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.sql-cell-diff-arrow {
+  color: var(--text-muted, #a1a1aa);
+  font-size: 11px;
+}
+
+.sql-explain-box.is-focused {
+  outline: 2px solid rgba(99, 102, 241, 0.7);
+  background: rgba(99, 102, 241, 0.08);
+}
+
+
 

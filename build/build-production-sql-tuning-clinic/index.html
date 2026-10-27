@@ -33,14 +33,14 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
   <link rel="stylesheet" href="css/variables.css?v=ad04c4a441">
   <link rel="stylesheet" href="css/layout.css?v=a384f455dc">
-  <link rel="stylesheet" href="css/components.css?v=58f14d9639">
+  <link rel="stylesheet" href="css/components.css?v=2a60b55973">
   <link rel="stylesheet" href="css/content.css?v=98b657b5e4">
   <link rel="stylesheet" href="css/landing.css?v=14b77b8c3d">
-  <link rel="stylesheet" href="css/simulators.css?v=f6ec29cd93">
+  <link rel="stylesheet" href="css/simulators.css?v=ae2dd1d1f2">
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=59c953e95f"></script>
-  <script src="js/manifest.js?v=f99ef6551e"></script>
+  <script src="js/manifest.js?v=9a9ff5d494"></script>
 
   <script type="application/ld+json">
 {
@@ -91,7 +91,7 @@
         <a href="/roadmap" class="topbar__nav-link" data-nav="roadmap">Roadmap</a>
         <a href="/challenges" class="topbar__nav-link" data-nav="challenges">Challenges</a>
         <a href="/dashboard" class="topbar__nav-link" data-nav="dashboard">Dashboard</a>
-        <a href="/sandbox" class="topbar__nav-link" data-nav="sandbox">Workbench</a>
+        <a href="/sandbox" class="topbar__nav-link" data-nav="sandbox">SQL Workbench</a>
         <a href="/glossary/" class="topbar__nav-link" data-nav="glossary">Glossary</a>
       </nav>
 
@@ -816,16 +816,16 @@
         </div>
       </div>
 
-      <section class="build-lab-card" aria-label="Guided Algorithm Lab Overview">
+      <section class="build-lab-card" aria-label="Guided SQL & Storage Engine Lab Overview">
         <div class="build-lab-card__top">
           <div class="build-lab-card__intro">
             <div class="build-lab-card__eyebrow">
-              <span>Guided Algorithm Coding Lab</span>
+              <span>Guided SQL &amp; Storage Engine Lab</span>
               <span class="build-lab-card__progress" id="build-lab-progress-badge">0/4 Steps Completed</span>
             </div>
-            <h2 class="build-lab-card__title">Code &amp; Verify SQL &amp; Storage Engine Invariants in the Browser Workbench</h2>
+            <h2 class="build-lab-card__title">Execute &amp; Verify SQL &amp; Storage Engine Invariants in the Browser SQL Studio</h2>
             <p class="build-lab-card__desc">
-              Complete 4 progressive algorithmic steps with guided hints in <strong>C++20 (WebAssembly)</strong>, <strong>TypeScript</strong>, or <strong>JavaScript</strong> against automated unit test assertions — zero local setup required.
+              Complete 4 progressive relational steps with guided hints in <strong>PostgreSQL 18 WASM, SQLite 3 &amp; Step-by-Step Relational Table Visualizer</strong> against automated result-set and query-plan assertions — zero local setup required.
             </p>
             <div class="build-lab-progress-track" aria-hidden="true">
               <div class="build-lab-progress-track__fill" style="width:0%"></div>
@@ -834,11 +834,11 @@
           <div class="build-lab-card__cta-col">
             <button type="button" class="btn btn--primary build-lab-card__launch-btn" data-action="open-code-lab" data-lab-mode="guided">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
-              <span>Launch Guided Lab</span>
+              <span>Launch SQL Studio Lab</span>
             </button>
             <button type="button" class="btn btn--outline build-lab-card__launch-btn" data-action="open-code-lab" data-lab-mode="sandbox">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-              <span>Open Full Solution</span>
+              <span>Open Reference SQL</span>
             </button>
           </div>
         </div>
@@ -1026,7 +1026,7 @@
   <script type="text/plain" data-defer src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
   <script type="text/plain" data-defer src="data/implementations_code.js?v=fce884f8a8"></script>
   <script type="text/plain" data-defer src="data/guided_labs.js?v=3bd996e9dc"></script>
-  <script type="text/plain" data-defer src="data/topic_guided_labs.js?v=9761466656"></script>
+  <script type="text/plain" data-defer src="data/topic_guided_labs.js?v=341584ee01"></script>
   <script type="text/plain" data-defer src="data/projects.js?v=2280ac085f"></script>
   <script type="text/plain" data-defer src="data/glossary.js?v=4f6c79a4e0"></script>
 
@@ -1037,8 +1037,8 @@
   <script type="text/plain" data-defer src="js/search.js?v=e2063e0ccd"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
   <script type="text/plain" data-defer src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>
-  <script type="text/plain" data-defer src="js/sql-engine.js?v=92e27d93f9"></script>
-  <script type="text/plain" data-defer src="js/table-visualizer.js?v=ad3ad8c767"></script>
+  <script type="text/plain" data-defer src="js/sql-engine.js?v=4d14b9bc51"></script>
+  <script type="text/plain" data-defer src="js/table-visualizer.js?v=f9ef79d4f6"></script>
   <script type="text/plain" data-defer src="js/simulators.js?v=68b973e4c8"></script>
   <script type="text/plain" data-defer src="js/simulators-relational.js?v=8e12b97831"></script>
   <script type="text/plain" data-defer src="js/simulators-analytical.js?v=258089d8ac"></script>
@@ -1048,17 +1048,17 @@
   <script type="text/plain" data-defer src="js/simulators-olap-ops.js?v=c793d19e01"></script>
   <script type="text/plain" data-defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <script type="text/plain" data-defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
-  <script type="text/plain" data-defer src="js/renderer.js?v=960b3ce310"></script>
+  <script type="text/plain" data-defer src="js/renderer.js?v=28efc9961b"></script>
   <script type="text/plain" data-defer src="js/landing.js?v=65d1430533"></script>
   
   <script type="text/plain" data-defer src="js/quiz.js?v=5b300d9b3d"></script>
   <script type="text/plain" data-defer src="js/roadmap.js?v=afdc0360a7"></script>
-  <script type="text/plain" data-defer src="js/challenges.js?v=a08b5b8a96"></script>
+  <script type="text/plain" data-defer src="js/challenges.js?v=f6759d56c7"></script>
   <script type="text/plain" data-defer src="js/dashboard.js?v=1e493b80a6"></script>
-  <script type="text/plain" data-defer src="js/sandbox.js?v=91b1b1bf55"></script>
+  <script type="text/plain" data-defer src="js/sandbox.js?v=9b3b00a75e"></script>
   <script type="text/plain" data-defer src="js/topic-codelab.js?v=096611d91c"></script>
   
-  <script type="text/plain" data-defer src="js/app.js?v=90ae030c67"></script>
+  <script type="text/plain" data-defer src="js/app.js?v=1189ad3188"></script>
 
   <!-- App bootstrap & deferred script loader -->
   <script src="js/bootstrap.js?v=df2bb60aeb"></script>
