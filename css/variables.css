@@ -83,8 +83,9 @@
   /* ── Layout ──────────────────────────────────────────────── */
   --topbar-h: 52px;
   --sidebar-w: 280px;
-  --content-max: 760px;
-  --reading-max: 680px;
+  --content-max: 1140px;
+  --reading-max: 1140px;
+  --prose-line-max: 74ch;
 
   /* ── Transitions ─────────────────────────────────────────── */
   --dur-fast: 120ms;
@@ -307,13 +308,15 @@
   --border-color: var(--border);
   --text: var(--fg);
   --text-color: var(--fg);
+  --text-primary: var(--fg);
+  --text-secondary: var(--fg-prose);
   --text-muted: var(--fg-muted);
   --bg-body: var(--bg);
   --bg-surface: var(--surface);
   --bg-card-alt: var(--surface-hover);
   --bg-input: var(--bg-alt);
   --bg-primary: var(--bg);
-  --text-primary: var(--fg);
+  --accent-primary: var(--info);
   --c-accent: var(--info);
   --c-bg-alt: var(--surface-active);
   --c-border: var(--border);

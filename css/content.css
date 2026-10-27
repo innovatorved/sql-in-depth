@@ -125,9 +125,12 @@
 }
 
 /* Paragraphs */
-.prose p {
+.prose p,
+.prose > ul,
+.prose > ol {
   color: var(--fg-prose);
   line-height: 1.7;
+  max-width: var(--prose-line-max, 76ch);
 }
 
 /* Links */

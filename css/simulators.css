@@ -1773,6 +1773,132 @@
   border-right-color: #f1f5f9;
 }
 
+/* Additional SQL Table Output, Badges, Responsive Studio Layout & Light Theme Support */
+.sql-Output-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  color: var(--fg);
+}
+
+.sql-Output-table th {
+  padding: 7px 10px;
+  background: var(--surface-hover);
+  color: var(--fg);
+  font-weight: 700;
+  text-align: left;
+  border-bottom: 1px solid var(--border-strong);
+  border-right: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.sql-Output-table td {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.sql-null-pill {
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--warning-muted);
+  color: var(--warning);
+  border: 1px solid var(--warning-border);
+}
+
+.col-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 9.5px;
+  font-weight: 700;
+  font-family: var(--font-mono, monospace);
+  background: rgba(99, 102, 241, 0.16);
+  color: var(--info);
+  border: 1px solid rgba(99, 102, 241, 0.35);
+}
+
+.col-badge--pk {
+  background: var(--warning-muted);
+  color: var(--warning);
+  border-color: var(--warning-border);
+}
+
+.col-badge--fk {
+  background: var(--info-muted);
+  color: var(--info);
+  border-color: var(--info-border);
+}
+
+@media (max-width: 960px) {
+  .wb-sql-studio-layout {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+[data-theme="light"] .sql-pipeline-step {
+  background: #ffffff;
+  color: #334155;
+  border-color: #cbd5e1;
+}
+
+[data-theme="light"] .sql-pipeline-step:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+[data-theme="light"] .sql-pipeline-step.is-active {
+  background: #eff6ff;
+  border-color: #2563eb;
+  color: #1d4ed8;
+}
+
+[data-theme="light"] .sql-step-count {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+[data-theme="light"] .sql-subtable-card {
+  background: #ffffff;
+  border-color: #cbd5e1;
+}
+
+[data-theme="light"] .sql-subtable-header {
+  background: #f1f5f9;
+  color: #0f172a;
+  border-bottom-color: #cbd5e1;
+}
+
+[data-theme="light"] .sql-explain-node {
+  background: #ffffff;
+  color: #1e293b;
+  border: 1px solid #e2e8f0;
+  border-left: 3px solid #4f46e5;
+}
+
+[data-theme="light"] .sql-explain-node.is-index {
+  background: #ecfdf5;
+  color: #065f46;
+  border-left-color: #10b981;
+}
+
+[data-theme="light"] .sql-explain-node.is-scan {
+  background: #fffbeb;
+  color: #92400e;
+  border-left-color: #f59e0b;
+}
+
+[data-theme="light"] .sql-num-val {
+  color: #2563eb;
+}
+
+
 
 
 

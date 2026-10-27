@@ -141,7 +141,71 @@ window.App = (() => {
   // ── Routing ───────────────────────────────────────────────
   function parseRoute() {
     const path = window.location.pathname.replace(/^\/|\/$/g, '');
-    const hash = window.location.hash.slice(1);
+    const hash = window.location.hash.slice(1).replace(/^\/+/, '');
+    const searchParams = new URLSearchParams(window.location.search);
+    const viewParam = (searchParams.get('view') || '').toLowerCase();
+
+    // 0. Explicit ?view=... query-parameter routing (when no hash override is active)
+    if (viewParam && !hash) {
+      currentRouteParams = searchParams;
+      if (viewParam === 'home') {
+        currentView = 'home';
+        currentSlug = null;
+        activeTab = 'curriculum';
+        syncSidebarTabs();
+        return;
+      }
+      if (viewParam === 'topic' || viewParam === 'build') {
+        const rawSlug = (searchParams.get('slug') || searchParams.get('id') || 'rdbms-filesystems-codds-rules').replace(/\/+$/, '');
+        currentSlug = rawSlug === 'write-ahead-log' ? 'database-wal-and-recovery' : rawSlug;
+        currentView = 'topic';
+        activeTab = 'curriculum';
+        syncSidebarTabs();
+        return;
+      }
+      if (viewParam === 'sandbox' || viewParam === 'blueprint') {
+        currentView = 'sandbox';
+        currentSlug = searchParams.get('blueprint') || null;
+        activeTab = 'curriculum';
+        syncSidebarTabs();
+        return;
+      }
+      if (viewParam === 'challenges') {
+        currentView = 'challenges';
+        currentSlug = searchParams.get('id') || searchParams.get('slug') || null;
+        activeTab = 'curriculum';
+        syncSidebarTabs();
+        return;
+      }
+      if (viewParam === 'cheatsheet' || viewParam === 'patterns') {
+        currentView = 'cheatsheet';
+        currentSlug = searchParams.get('module') || searchParams.get('id') || 'm01';
+        activeTab = 'curriculum';
+        syncSidebarTabs();
+        return;
+      }
+      if (viewParam === 'roadmap') {
+        currentView = 'roadmap';
+        currentSlug = searchParams.get('tab') || 'graph';
+        activeTab = 'curriculum';
+        syncSidebarTabs();
+        return;
+      }
+      if (viewParam === 'dashboard' || viewParam === 'srs') {
+        currentView = 'dashboard';
+        currentSlug = viewParam === 'srs' ? 'cards' : (searchParams.get('tab') || 'overview');
+        activeTab = 'curriculum';
+        syncSidebarTabs();
+        return;
+      }
+      if (viewParam === 'glossary') {
+        currentView = 'glossary';
+        currentSlug = null;
+        activeTab = 'curriculum';
+        syncSidebarTabs();
+        return;
+      }
+    }
 
     // Clean up legacy #projects hash to /projects
     if (hash === 'projects' || hash.startsWith('projects/') || hash.startsWith('project/')) {
@@ -181,8 +245,27 @@ window.App = (() => {
       return;
     }
 
+    // Cheat Sheet & SQL Patterns route (checked BEFORE path.startsWith('topic/') so #cheatsheet/m01 works from topic pages)
+    if (
+      hash === 'cheatsheet' || hash.startsWith('cheatsheet/') ||
+      hash === 'patterns' || hash.startsWith('patterns/') ||
+      path === 'cheatsheet' || path.startsWith('cheatsheet/') ||
+      path === 'patterns' || path.startsWith('patterns/')
+    ) {
+      let modId = 'm01';
+      if (hash.startsWith('cheatsheet/')) modId = hash.slice(11).split('?')[0].replace(/\/+$/, '') || 'm01';
+      else if (hash.startsWith('patterns/')) modId = hash.slice(9).split('?')[0].replace(/\/+$/, '') || 'm01';
+      else if (path.startsWith('cheatsheet/')) modId = path.slice(11).replace(/\/+$/, '') || 'm01';
+      else if (path.startsWith('patterns/')) modId = path.slice(9).replace(/\/+$/, '') || 'm01';
+      currentView = 'cheatsheet';
+      currentSlug = modId;
+      activeTab = 'curriculum';
+      syncSidebarTabs();
+      return;
+    }
+
     // Roadmap route: /roadmap or #/roadmap
-    if (path === 'roadmap' || path.startsWith('roadmap/') || hash === 'roadmap' || hash === '/roadmap' || hash.startsWith('roadmap/') || hash.startsWith('/roadmap')) {
+    if (path === 'roadmap' || path.startsWith('roadmap/') || hash === 'roadmap' || hash.startsWith('roadmap/')) {
       const query = window.location.search || (hash.includes('?') ? '?' + hash.split('?')[1] : '');
       currentRouteParams = new URLSearchParams(query);
       let sub = null;
@@ -196,7 +279,7 @@ window.App = (() => {
     }
 
     // Challenges route: /challenges, /challenges/<id> or #/challenges
-    if (path === 'challenges' || path.startsWith('challenges/') || hash === 'challenges' || hash === '/challenges' || hash.startsWith('challenges/') || hash.startsWith('/challenges')) {
+    if (path === 'challenges' || path.startsWith('challenges/') || hash === 'challenges' || hash.startsWith('challenges/')) {
       let sub = null;
       if (path.startsWith('challenges/')) {
         sub = path.slice(11).replace(/\/+$/, '');
@@ -212,7 +295,7 @@ window.App = (() => {
     }
 
     // SRS alias route: /srs or #/srs
-    if (path === 'srs' || path.startsWith('srs/') || hash === 'srs' || hash === '/srs') {
+    if (path === 'srs' || path.startsWith('srs/') || hash === 'srs') {
       currentView = 'dashboard';
       currentSlug = 'cards';
       activeTab = 'curriculum';
@@ -221,7 +304,7 @@ window.App = (() => {
     }
 
     // Blueprint alias route: /blueprint or #/blueprint
-    if (path === 'blueprint' || path.startsWith('blueprint/') || hash === 'blueprint' || hash === '/blueprint') {
+    if (path === 'blueprint' || path.startsWith('blueprint/') || hash === 'blueprint') {
       currentView = 'sandbox';
       currentSlug = null;
       activeTab = 'curriculum';
@@ -230,7 +313,7 @@ window.App = (() => {
     }
 
     // Dashboard route: /dashboard or #/dashboard
-    if (path === 'dashboard' || path.startsWith('dashboard/') || hash === 'dashboard' || hash === '/dashboard' || hash.startsWith('dashboard/') || hash.startsWith('/dashboard')) {
+    if (path === 'dashboard' || path.startsWith('dashboard/') || hash === 'dashboard' || hash.startsWith('dashboard/')) {
       const query = window.location.search || (hash.includes('?') ? '?' + hash.split('?')[1] : '');
       currentRouteParams = new URLSearchParams(query);
       let sub = null;
@@ -244,7 +327,7 @@ window.App = (() => {
     }
 
     // Sandbox route: /sandbox, /sandbox/<id> or #/sandbox
-    if (path === 'sandbox' || path.startsWith('sandbox/') || hash === 'sandbox' || hash === '/sandbox' || hash.startsWith('sandbox/') || hash.startsWith('/sandbox')) {
+    if (path === 'sandbox' || path.startsWith('sandbox/') || hash === 'sandbox' || hash.startsWith('sandbox/')) {
       let sub = null;
       if (path.startsWith('sandbox/')) {
         sub = path.slice(8).replace(/\/+$/, '');
@@ -259,20 +342,13 @@ window.App = (() => {
       return;
     }
 
-    if (hash === '/review' || hash === 'review' || hash === '/cards' || hash === 'cards') {
+    if (hash === 'review' || hash === 'cards') {
       window.location.hash = '';
       return;
     }
-    if (hash === '/glossary' || hash === 'glossary' || path === 'glossary' || path.startsWith('glossary/')) {
+    if (hash === 'glossary' || path === 'glossary' || path.startsWith('glossary/')) {
       currentView = 'glossary';
       currentSlug = null;
-      activeTab = 'curriculum';
-      syncSidebarTabs();
-      return;
-    }
-    if (hash.startsWith('cheatsheet/')) {
-      currentView = 'cheatsheet';
-      currentSlug = hash.slice(11);
       activeTab = 'curriculum';
       syncSidebarTabs();
       return;
@@ -296,7 +372,7 @@ window.App = (() => {
       return;
     }
 
-    if (!hash || hash === '/') {
+    if (!hash) {
       currentView = 'home';
       currentSlug = null;
       activeTab = 'curriculum';
@@ -2150,53 +2226,117 @@ window.App = (() => {
         ? (step.solutionCode || step.starterCode || spec.referenceSql || 'SELECT * FROM customers LIMIT 10;')
         : (step.starterCode || spec.referenceSql || 'SELECT * FROM customers LIMIT 10;');
       const refSql = step.solutionCode || spec.referenceSql || initialSql;
+      const dsObj = (window.SQL_DATASETS && window.SQL_DATASETS[datasetId]) || null;
+      const dsTables = (dsObj && Array.isArray(dsObj.tables)) ? dsObj.tables : [];
+      const schemaCardsHtml = dsTables.map(t => {
+        const rowCnt = t.rowCount || (Array.isArray(t.rows) ? t.rows.length : 0);
+        const colsHtml = (t.columns || []).map(c => {
+          const cName = typeof c === 'string' ? c.split(/\s+/)[0] : (c.name || '');
+          const cType = typeof c === 'string' ? (c.split(/\s+/)[1] || 'TEXT') : (c.type || 'TEXT');
+          const isPk = Boolean(c && c.pk);
+          const fkRef = c && c.fk ? String(c.fk) : '';
+          return `
+            <div class="sql-inline-schema-col">
+              <span>
+                <strong style="color:var(--fg);">${escapeHtml(cName)}</strong>
+                ${isPk ? ' <span class="col-badge col-badge--pk">PK</span>' : ''}
+                ${fkRef ? ` <span class="col-badge col-badge--fk" title="Foreign Key → ${escapeHtml(fkRef)}">FK → ${escapeHtml(fkRef)}</span>` : ''}
+              </span>
+              <span style="color:var(--fg-faint);font-size:10px;">${escapeHtml(cType)}</span>
+            </div>
+          `;
+        }).join('');
+        return `
+          <div class="sql-inline-schema-card">
+            <button type="button" class="sql-inline-schema-card__head" data-lab-preview-table="${escapeHtml(t.name)}" title="Click to preview SELECT * FROM ${escapeHtml(t.name)} LIMIT 15;">
+              <span>▤ ${escapeHtml(t.name)}</span>
+              <span style="font-size:10.5px;color:var(--fg-muted);font-weight:400;">${rowCnt} rows</span>
+            </button>
+            <div class="sql-inline-schema-card__cols">${colsHtml}</div>
+          </div>
+        `;
+      }).join('');
 
       host.innerHTML = `
-        <div class="sql-guided-step-bar" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:12px 16px;background:var(--bg-elevated,rgba(15,23,42,0.65));border:1px solid var(--border-subtle,rgba(148,163,184,0.18));border-radius:10px 10px 0 0;margin-top:8px;">
+        <div class="sql-guided-step-bar" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:12px 16px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:10px 10px 0 0;margin-top:8px;">
           <div style="flex:1;min-width:240px;">
-            <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--accent-primary,#38bdf8);margin-bottom:2px;">
-              Active Step ${activeStepIdx + 1} of ${steps.length || 1} · Dataset: <code>${escapeHtml(datasetId)}</code>
+            <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--info);margin-bottom:2px;">
+              Active Step ${activeStepIdx + 1} of ${steps.length || 1} · Dataset: <code>${escapeHtml(dsObj ? (dsObj.title || datasetId) : datasetId)}</code>
             </div>
-            <div style="font-size:0.95rem;font-weight:600;color:var(--text-primary,#f8fafc);">${escapeHtml(step.title || '')}</div>
-            <div style="font-size:0.83rem;color:var(--text-secondary,#94a3b8);margin-top:2px;">${escapeHtml((step.instructions || step.concept || '').replace(/\*\*([^*]+)\*\*/g, '$1'))}</div>
+            <div style="font-size:0.95rem;font-weight:600;color:var(--fg);">${escapeHtml(step.title || '')}</div>
+            <div style="font-size:0.83rem;color:var(--fg-muted);margin-top:2px;">${escapeHtml((step.instructions || step.concept || '').replace(/\*\*([^*]+)\*\*/g, '$1'))}</div>
           </div>
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
             ${steps.length > 1 ? `
-              <button type="button" class="btn btn-secondary btn-sm" data-sql-lab-nav="prev" ${activeStepIdx === 0 ? 'disabled' : ''}>← Prev Step</button>
-              <button type="button" class="btn btn-secondary btn-sm" data-sql-lab-nav="next" ${activeStepIdx >= steps.length - 1 ? 'disabled' : ''}>Next Step →</button>
+              <button type="button" class="btn btn--secondary btn--sm" data-sql-lab-nav="prev" ${activeStepIdx === 0 ? 'disabled' : ''}>← Prev Step</button>
+              <button type="button" class="btn btn--secondary btn--sm" data-sql-lab-nav="next" ${activeStepIdx >= steps.length - 1 ? 'disabled' : ''}>Next Step →</button>
             ` : ''}
-            <button type="button" class="btn btn-secondary btn-sm" data-sql-lab-action="verify" style="border-color:rgba(16,185,129,0.45);color:#34d399;">✓ Check SQL Assertions</button>
-            <button type="button" class="btn btn-secondary btn-sm" data-sql-lab-action="hint">💡 Hint</button>
-            <button type="button" class="btn btn-secondary btn-sm" data-sql-lab-action="solution">★ Load Solution SQL</button>
-            <button type="button" class="btn btn-primary btn-sm" data-sql-lab-action="fullscreen">⤢ Full-Screen Studio</button>
+            <button type="button" class="btn btn--secondary btn--sm" data-sql-lab-action="verify" style="border-color:var(--success-border);color:var(--success);">✓ Check SQL Assertions</button>
+            <button type="button" class="btn btn--secondary btn--sm" data-sql-lab-action="hint">💡 Hint</button>
+            <button type="button" class="btn btn--secondary btn--sm" data-sql-lab-action="solution">★ Load Solution SQL</button>
+            <button type="button" class="btn btn--primary btn--sm" data-sql-lab-action="fullscreen">⤢ Full-Screen Studio</button>
           </div>
         </div>
-        <div class="sql-guided-step-hint" style="display:none;padding:10px 16px;background:rgba(56,189,248,0.08);border-left:3px solid #38bdf8;font-size:0.83rem;color:var(--text-secondary,#cbd5e1);">
+        ${dsTables.length > 0 ? `
+          <details class="sql-inline-schema-drawer" style="border-left:1px solid var(--border);border-right:1px solid var(--border);">
+            <summary>
+              <span>🗄️ <strong>Dataset Schema &amp; PK/FK Relationship Explorer</strong> (${escapeHtml(dsObj ? dsObj.title : datasetId)} · ${dsTables.length} tables — click any table to preview rows)</span>
+              <span class="badge badge--secondary">Expand Schema ▾</span>
+            </summary>
+            <div class="sql-inline-schema-grid">${schemaCardsHtml}</div>
+          </details>
+        ` : ''}
+        <div class="sql-guided-step-hint" style="display:none;padding:10px 16px;background:var(--info-bg);border-left:3px solid var(--info);border-right:1px solid var(--border);font-size:0.83rem;color:var(--fg);">
           <strong>Hint:</strong> ${escapeHtml(step.hint || 'Inspect the intermediate tables produced by each SQL clause.')}
         </div>
-        <div class="sql-guided-visualizer-mount" style="border:1px solid var(--border-subtle,rgba(148,163,184,0.18));border-top:none;border-radius:0 0 10px 10px;overflow:hidden;"></div>
+        <div class="sql-guided-visualizer-mount" style="border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;overflow:hidden;"></div>
       `;
 
       const mountSlot = host.querySelector('.sql-guided-visualizer-mount');
       const hintEl = host.querySelector('.sql-guided-step-hint');
 
-      const mountNow = () => {
+      const mountNow = (sqlOverride) => {
         if (window.TableVisualizer && typeof window.TableVisualizer.mountClauseVisualizer === 'function') {
           window.TableVisualizer.mountClauseVisualizer(mountSlot, {
             datasetId,
-            sql: initialSql,
+            sql: sqlOverride || initialSql,
             referenceSql: refSql,
             autoVerify: Boolean(opts.autoVerify),
-            title: step.title || spec.title || 'Guided SQL Lab'
+            title: step.title || spec.title || 'Guided SQL Lab',
+            onVerify: (vRes) => {
+              if (vRes && vRes.passed) {
+                const labCard = host.closest('.build-lab-card');
+                if (labCard) {
+                  const stepCard = labCard.querySelector(`.build-lab-step-card[data-step-idx="${activeStepIdx}"]`);
+                  if (stepCard) {
+                    stepCard.classList.add('is-completed');
+                    const statusBadge = stepCard.querySelector('.build-lab-step-card__status');
+                    if (statusBadge) {
+                      statusBadge.textContent = '✓ Verified';
+                      statusBadge.style.color = 'var(--success)';
+                    }
+                  }
+                }
+              }
+            }
           });
         }
       };
 
       if (window.SQLEngine && typeof window.SQLEngine.init === 'function') {
-        window.SQLEngine.init().then(mountNow).catch(mountNow);
+        window.SQLEngine.init().then(() => mountNow()).catch(() => mountNow());
       } else {
         mountNow();
       }
+
+      host.querySelectorAll('[data-lab-preview-table]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tblName = btn.getAttribute('data-lab-preview-table');
+          if (tblName) {
+            mountNow(`SELECT *\nFROM ${tblName}\nLIMIT 15;`);
+          }
+        });
+      });
 
       host.querySelectorAll('[data-sql-lab-nav]').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -2306,24 +2446,24 @@ window.App = (() => {
     const datasetKeys = Object.keys(datasets).length > 0 ? Object.keys(datasets) : ['ecommerce', 'org_hr', 'saas_telemetry', 'fintech_ledger', 'social_graph'];
 
     overlay.innerHTML = `
-      <div class="global-codelab-shell sql-studio-modal-shell" style="display:flex;flex-direction:column;width:96vw;max-width:1560px;height:92vh;margin:4vh auto;background:var(--bg-primary,#0b0f19);border:1px solid var(--border-subtle,rgba(148,163,184,0.22));border-radius:14px;overflow:hidden;box-shadow:0 25px 70px rgba(0,0,0,0.65);">
-        <div class="global-codelab-topbar" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;background:var(--bg-elevated,#111827);border-bottom:1px solid var(--border-subtle,rgba(148,163,184,0.18));">
+      <div class="global-codelab-shell sql-studio-modal-shell" style="display:flex;flex-direction:column;width:96vw;max-width:1560px;height:92vh;margin:4vh auto;background:var(--bg);border:1px solid var(--border-strong);border-radius:14px;overflow:hidden;box-shadow:var(--shadow-xl);">
+        <div class="global-codelab-topbar" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;background:var(--surface);border-bottom:1px solid var(--border);">
           <div class="global-codelab-topbar-left" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-            <button class="btn btn-secondary btn-sm global-codelab-back-btn" id="global-codelab-close-btn">
+            <button class="btn btn--secondary btn--sm global-codelab-back-btn" id="global-codelab-close-btn">
               ← ${escapeHtml(opts.backLabel || 'Back to Lesson')}
             </button>
             <div>
               <div style="display:flex;align-items:center;gap:8px;">
-                <span class="global-codelab-badge" style="background:rgba(56,189,248,0.15);color:#38bdf8;padding:2px 8px;border-radius:999px;font-size:0.72rem;font-weight:700;">SQL STUDIO</span>
-                <strong style="font-size:0.98rem;color:var(--text-primary,#f8fafc);">${escapeHtml(title)}</strong>
+                <span class="global-codelab-badge" style="background:var(--info-muted);color:var(--info);padding:2px 8px;border-radius:999px;font-size:0.72rem;font-weight:700;">SQL STUDIO</span>
+                <strong style="font-size:0.98rem;color:var(--fg);">${escapeHtml(title)}</strong>
               </div>
-              <div style="font-size:0.78rem;color:var(--text-secondary,#94a3b8);margin-top:2px;">${escapeHtml(summary)}</div>
+              <div style="font-size:0.78rem;color:var(--fg-muted);margin-top:2px;">${escapeHtml(summary)}</div>
             </div>
           </div>
           <div class="global-codelab-topbar-right" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-            <label style="font-size:0.78rem;color:var(--text-secondary,#94a3b8);display:flex;align-items:center;gap:6px;">
+            <label style="font-size:0.78rem;color:var(--fg-muted);display:flex;align-items:center;gap:6px;">
               Dataset:
-              <select id="sql-studio-modal-dataset" style="background:var(--bg-primary,#0b0f19);color:var(--text-primary,#f8fafc);border:1px solid var(--border-subtle,rgba(148,163,184,0.28));border-radius:6px;padding:4px 8px;font-size:0.8rem;">
+              <select id="sql-studio-modal-dataset" style="background:var(--bg);color:var(--fg);border:1px solid var(--border-strong);border-radius:6px;padding:4px 8px;font-size:0.8rem;">
                 <option value="__unified__" ${activeDatasetId === '__unified__' ? 'selected' : ''}>All 5 Datasets (Unified Sandbox)</option>
                 ${datasetKeys.map(k => {
                   const ds = datasets[k] || { title: k };
@@ -2331,27 +2471,27 @@ window.App = (() => {
                 }).join('')}
               </select>
             </label>
-            <label style="font-size:0.78rem;color:var(--text-secondary,#94a3b8);display:flex;align-items:center;gap:6px;">
+            <label style="font-size:0.78rem;color:var(--fg-muted);display:flex;align-items:center;gap:6px;">
               Engine:
-              <select id="sql-studio-modal-engine" style="background:var(--bg-primary,#0b0f19);color:var(--text-primary,#f8fafc);border:1px solid var(--border-subtle,rgba(148,163,184,0.28));border-radius:6px;padding:4px 8px;font-size:0.8rem;">
+              <select id="sql-studio-modal-engine" style="background:var(--bg);color:var(--fg);border:1px solid var(--border-strong);border-radius:6px;padding:4px 8px;font-size:0.8rem;">
                 <option value="sqlite" ${activeEngine === 'sqlite' ? 'selected' : ''}>SQLite 3 (WASM)</option>
                 <option value="postgres" ${activeEngine === 'postgres' ? 'selected' : ''}>PostgreSQL 18 (PGlite WASM)</option>
               </select>
             </label>
-            <button class="btn btn-secondary btn-sm" id="sql-studio-modal-reset-btn">↺ Reset Dataset</button>
+            <button class="btn btn--secondary btn--sm" id="sql-studio-modal-reset-btn">↺ Reset Dataset</button>
           </div>
         </div>
 
-        <div style="display:grid;grid-template-columns:260px 1fr;flex:1;min-height:0;overflow:hidden;">
-          <aside id="sql-studio-modal-schema" style="border-right:1px solid var(--border-subtle,rgba(148,163,184,0.18));background:var(--bg-secondary,#0f172a);padding:14px;overflow-y:auto;">
-            <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-secondary,#94a3b8);margin-bottom:10px;">Schema Explorer</div>
-            <div id="sql-studio-modal-schema-list" style="font-size:0.82rem;color:var(--text-primary,#e2e8f0);"></div>
+        <div style="display:grid;grid-template-columns:280px 1fr;flex:1;min-height:0;overflow:hidden;">
+          <aside id="sql-studio-modal-schema" style="border-right:1px solid var(--border);background:var(--bg-alt);padding:14px;overflow-y:auto;">
+            <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--fg-muted);margin-bottom:10px;">Schema &amp; PK/FK Explorer</div>
+            <div id="sql-studio-modal-schema-list" style="font-size:0.82rem;color:var(--fg);"></div>
             ${steps.length > 0 ? `
-              <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-secondary,#94a3b8);margin:18px 0 8px;">Guided Lab Steps</div>
+              <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--fg-muted);margin:18px 0 8px;">Guided Lab Steps</div>
               <div id="sql-studio-modal-steps" style="display:flex;flex-direction:column;gap:6px;">
                 ${steps.map((s, idx) => `
-                  <button type="button" data-modal-step="${idx}" style="text-align:left;padding:8px 10px;border-radius:8px;border:1px solid ${idx === activeStepIdx ? '#38bdf8' : 'rgba(148,163,184,0.18)'};background:${idx === activeStepIdx ? 'rgba(56,189,248,0.12)' : 'rgba(15,23,42,0.5)'};color:var(--text-primary,#f8fafc);cursor:pointer;font-size:0.8rem;">
-                    <div style="font-weight:700;color:#38bdf8;">Step ${idx + 1}</div>
+                  <button type="button" data-modal-step="${idx}" style="text-align:left;padding:8px 10px;border-radius:8px;border:1px solid ${idx === activeStepIdx ? 'var(--info)' : 'var(--border)'};background:${idx === activeStepIdx ? 'var(--info-bg)' : 'var(--surface)'};color:var(--fg);cursor:pointer;font-size:0.8rem;">
+                    <div style="font-weight:700;color:var(--info);">Step ${idx + 1}</div>
                     <div>${escapeHtml(s.title || `Step ${idx + 1}`)}</div>
                   </button>
                 `).join('')}
@@ -2361,13 +2501,13 @@ window.App = (() => {
 
           <main style="display:flex;flex-direction:column;min-height:0;overflow-y:auto;padding:16px;gap:14px;">
             ${steps.length > 0 ? `
-              <div id="sql-studio-modal-step-banner" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.25);border-radius:8px;">
+              <div id="sql-studio-modal-step-banner" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;background:var(--info-bg);border:1px solid var(--info-border);border-radius:8px;">
                 <div>
-                  <strong id="sql-studio-modal-step-title" style="color:var(--text-primary,#f8fafc);font-size:0.9rem;">${escapeHtml(steps[activeStepIdx] ? steps[activeStepIdx].title : '')}</strong>
-                  <div id="sql-studio-modal-step-desc" style="color:var(--text-secondary,#cbd5e1);font-size:0.82rem;margin-top:2px;">${escapeHtml(steps[activeStepIdx] ? (steps[activeStepIdx].instructions || steps[activeStepIdx].concept || '') : '')}</div>
+                  <strong id="sql-studio-modal-step-title" style="color:var(--fg);font-size:0.9rem;">${escapeHtml(steps[activeStepIdx] ? steps[activeStepIdx].title : '')}</strong>
+                  <div id="sql-studio-modal-step-desc" style="color:var(--fg-prose);font-size:0.82rem;margin-top:2px;">${escapeHtml(steps[activeStepIdx] ? (steps[activeStepIdx].instructions || steps[activeStepIdx].concept || '') : '')}</div>
                 </div>
                 <div style="display:flex;gap:8px;flex-shrink:0;">
-                  <button type="button" class="btn btn-secondary btn-sm" id="sql-studio-modal-load-solution">✓ Load Solution SQL</button>
+                  <button type="button" class="btn btn--secondary btn--sm" id="sql-studio-modal-load-solution">✓ Load Solution SQL</button>
                 </div>
               </div>
             ` : ''}
@@ -2414,14 +2554,28 @@ window.App = (() => {
         schemaListEl.innerHTML = tables.map(t => {
           const rowCnt = t.rowCount || (Array.isArray(t.rows) ? t.rows.length : 0);
           return `
-            <div style="margin-bottom:10px;padding:8px 10px;background:rgba(15,23,42,0.65);border:1px solid rgba(148,163,184,0.16);border-radius:8px;">
-              <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;" data-preview-table="${escapeHtml(t.name)}">
-                <strong style="color:#38bdf8;font-family:var(--font-mono,monospace);">${escapeHtml(t.name)}</strong>
-                <span style="font-size:0.72rem;color:#94a3b8;">${rowCnt ? `${rowCnt} rows` : 'SELECT *'}</span>
+            <div style="margin-bottom:10px;padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;" data-preview-table="${escapeHtml(t.name)}" title="Click to preview SELECT * FROM ${escapeHtml(t.name)} LIMIT 15;">
+                <strong style="color:var(--info);font-family:var(--font-mono,monospace);">▤ ${escapeHtml(t.name)}</strong>
+                <span style="font-size:0.72rem;color:var(--fg-muted);">${rowCnt ? `${rowCnt} rows` : 'SELECT *'}</span>
               </div>
               ${Array.isArray(t.columns) ? `
-                <div style="margin-top:6px;display:flex;flex-direction:column;gap:2px;font-size:0.75rem;color:#94a3b8;font-family:var(--font-mono,monospace);">
-                  ${t.columns.map(c => `<div>• ${escapeHtml(typeof c === 'string' ? c : `${c.name} (${c.type || ''})`)}</div>`).join('')}
+                <div style="margin-top:6px;display:flex;flex-direction:column;gap:3px;font-size:0.74rem;color:var(--fg-muted);font-family:var(--font-mono,monospace);">
+                  ${t.columns.map(c => {
+                    if (typeof c === 'string') return `<div>• ${escapeHtml(c)}</div>`;
+                    const isPk = Boolean(c.pk);
+                    const fkRef = c.fk ? String(c.fk) : '';
+                    return `
+                      <div style="display:flex;align-items:center;justify-content:space-between;gap:4px;">
+                        <span>
+                          <strong style="color:var(--fg);">${escapeHtml(c.name || '')}</strong>
+                          ${isPk ? ' <span class="col-badge col-badge--pk">PK</span>' : ''}
+                          ${fkRef ? ` <span class="col-badge col-badge--fk" title="Foreign Key → ${escapeHtml(fkRef)}">FK→${escapeHtml(fkRef)}</span>` : ''}
+                        </span>
+                        <span style="color:var(--fg-faint);font-size:0.68rem;">${escapeHtml(c.type || '')}</span>
+                      </div>
+                    `;
+                  }).join('')}
                 </div>
               ` : ''}
             </div>
@@ -2509,8 +2663,8 @@ window.App = (() => {
         if (isNaN(idx) || !steps[idx]) return;
         activeStepIdx = idx;
         overlay.querySelectorAll('[data-modal-step]').forEach((b, i) => {
-          b.style.borderColor = i === activeStepIdx ? '#38bdf8' : 'rgba(148,163,184,0.18)';
-          b.style.background = i === activeStepIdx ? 'rgba(56,189,248,0.12)' : 'rgba(15,23,42,0.5)';
+          b.style.borderColor = i === activeStepIdx ? 'var(--info)' : 'var(--border)';
+          b.style.background = i === activeStepIdx ? 'var(--info-bg)' : 'var(--surface)';
         });
         const tEl = overlay.querySelector('#sql-studio-modal-step-title');
         const dEl = overlay.querySelector('#sql-studio-modal-step-desc');

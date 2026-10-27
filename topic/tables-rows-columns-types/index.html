@@ -31,12 +31,12 @@
 
   <!-- Stylesheets -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
-  <link rel="stylesheet" href="css/variables.css?v=ad04c4a441">
+  <link rel="stylesheet" href="css/variables.css?v=b68ab27ba0">
   <link rel="stylesheet" href="css/layout.css?v=a384f455dc">
-  <link rel="stylesheet" href="css/components.css?v=2a60b55973">
-  <link rel="stylesheet" href="css/content.css?v=98b657b5e4">
+  <link rel="stylesheet" href="css/components.css?v=924f7bd273">
+  <link rel="stylesheet" href="css/content.css?v=178f3a2481">
   <link rel="stylesheet" href="css/landing.css?v=14b77b8c3d">
-  <link rel="stylesheet" href="css/simulators.css?v=71a2e312cd">
+  <link rel="stylesheet" href="css/simulators.css?v=160cf62986">
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=59c953e95f"></script>
@@ -1270,7 +1270,7 @@ erDiagram
 
 <h2 id="topic-sec-4">4. Live WASM SQL Lab, Clause-by-Clause Visualizer &amp; Automated Test Checker</h2>
 <p>Execute, edit, and test the production SQL query below directly in your browser using the embedded WebAssembly SQLite 3 engine. Click <strong>▶ Run Query</strong> to execute, <strong>🔍 Step Clauses</strong> to inspect the live intermediate table after <code>FROM/JOIN</code>, <code>WHERE</code>, <code>GROUP BY</code>, <code>HAVING</code>, <code>WINDOW</code>, <code>SELECT</code>, and <code>ORDER BY</code>, or <strong>✓ Check SQL Tests</strong> to run automated relational assertions against the reference result:</p>
-<div class="code-block code-block--collapsible"><div class="code-block__header" data-action="toggle-code-header"><div style="display:flex;align-items:center;gap:8px;"><span class="code-block__lang">SQL · WASM</span><span class="code-block__lines-chip">15 lines</span></div><div style="display:flex;align-items:center;gap:6px;"><button type="button" class="code-block__copy code-block__run-btn" data-action="run-sql-inline" data-lang="sql" title="Execute this SQL query and view the interactive output table &amp; editor"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"/></svg><span>Run Query</span></button><button type="button" class="code-block__copy" data-action="edit-sql-inline" data-lang="sql" title="Edit and test variations of this SQL query inline"><span>✎ Edit &amp; Try</span></button><button type="button" class="code-block__copy" data-action="open-sql-studio" data-lang="sql" title="Open this query in Full-Screen SQL Studio"><span>⤢ SQL Studio</span></button><button type="button" class="code-block__copy" data-action="copy-code" title="Copy code to clipboard">Copy</button><button type="button" class="code-block__copy code-block__toggle-btn" data-action="toggle-code" aria-expanded="true" title="Expand or collapse code block">
+<div class="code-block code-block--collapsible"><div class="code-block__header" data-action="toggle-code-header"><div style="display:flex;align-items:center;gap:8px;"><span class="code-block__lang">SQL · WASM</span><span class="code-block__lines-chip">15 lines</span></div><div style="display:flex;align-items:center;gap:6px;"><button type="button" class="code-block__copy" data-action="copy-code" title="Copy code to clipboard">Copy</button><button type="button" class="code-block__copy code-block__toggle-btn" data-action="toggle-code" aria-expanded="true" title="Expand or collapse code block">
       <span class="code-block__toggle-text">Collapse</span>
       <span class="code-block__chevron">▲</span>
     </button></div></div><pre><code class="language-sql"><span class="tok-comment">-- Dataset: ecommerce | Strict Domain Types &amp; Exact Cents vs Float Precision</span>
@@ -1330,7 +1330,7 @@ erDiagram
 
 <h2 id="topic-sec-6">6. Live Verification, Catalog Introspection &amp; Execution Plan Lab (SQL)</h2>
 <p>To verify how a production database engine executes <strong>Relations, Tuples, Attributes, Domains & SQL Data Types</strong> across edge-case rows, run or modify the second live SQL verification query below. Inspect how <code>GROUP BY</code> buckets, window partitions, and Three-Valued <code>NULL</code> guards behave in real time:</p>
-<div class="code-block code-block--collapsible"><div class="code-block__header" data-action="toggle-code-header"><div style="display:flex;align-items:center;gap:8px;"><span class="code-block__lang">SQL · WASM</span><span class="code-block__lines-chip">18 lines</span></div><div style="display:flex;align-items:center;gap:6px;"><button type="button" class="code-block__copy code-block__run-btn" data-action="run-sql-inline" data-lang="sql" title="Execute this SQL query and view the interactive output table &amp; editor"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"/></svg><span>Run Query</span></button><button type="button" class="code-block__copy" data-action="edit-sql-inline" data-lang="sql" title="Edit and test variations of this SQL query inline"><span>✎ Edit &amp; Try</span></button><button type="button" class="code-block__copy" data-action="open-sql-studio" data-lang="sql" title="Open this query in Full-Screen SQL Studio"><span>⤢ SQL Studio</span></button><button type="button" class="code-block__copy" data-action="copy-code" title="Copy code to clipboard">Copy</button><button type="button" class="code-block__copy code-block__toggle-btn" data-action="toggle-code" aria-expanded="true" title="Expand or collapse code block">
+<div class="code-block code-block--collapsible"><div class="code-block__header" data-action="toggle-code-header"><div style="display:flex;align-items:center;gap:8px;"><span class="code-block__lang">SQL · WASM</span><span class="code-block__lines-chip">18 lines</span></div><div style="display:flex;align-items:center;gap:6px;"><button type="button" class="code-block__copy" data-action="copy-code" title="Copy code to clipboard">Copy</button><button type="button" class="code-block__copy code-block__toggle-btn" data-action="toggle-code" aria-expanded="true" title="Expand or collapse code block">
       <span class="code-block__toggle-text">Collapse</span>
       <span class="code-block__chevron">▲</span>
     </button></div></div><pre><code class="language-sql"><span class="tok-comment">-- Dataset: ecommerce | Live Verification, 3VL Guard &amp; SARGable Plan Audit (tables-rows-columns-types)</span>
@@ -1813,17 +1813,17 @@ ORDER BY inventory_valuation_usd DESC;</code></pre>
   <script type="text/plain" data-defer src="js/simulators-olap-ops.js?v=c793d19e01"></script>
   <script type="text/plain" data-defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <script type="text/plain" data-defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
-  <script type="text/plain" data-defer src="js/renderer.js?v=8caa0312c7"></script>
+  <script type="text/plain" data-defer src="js/renderer.js?v=64c27ef0a7"></script>
   <script type="text/plain" data-defer src="js/landing.js?v=e3f781ab53"></script>
   
   <script type="text/plain" data-defer src="js/quiz.js?v=5b300d9b3d"></script>
   <script type="text/plain" data-defer src="js/roadmap.js?v=afdc0360a7"></script>
   <script type="text/plain" data-defer src="js/challenges.js?v=1a9fcc6383"></script>
   <script type="text/plain" data-defer src="js/dashboard.js?v=1e493b80a6"></script>
-  <script type="text/plain" data-defer src="js/sandbox.js?v=77320ec21b"></script>
+  <script type="text/plain" data-defer src="js/sandbox.js?v=de24de6ada"></script>
   <script type="text/plain" data-defer src="js/topic-codelab.js?v=096611d91c"></script>
   
-  <script type="text/plain" data-defer src="js/app.js?v=15365fe7c9"></script>
+  <script type="text/plain" data-defer src="js/app.js?v=f461f53b51"></script>
 
   <!-- App bootstrap & deferred script loader -->
   <script src="js/bootstrap.js?v=df2bb60aeb"></script>

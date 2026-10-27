@@ -510,10 +510,11 @@ window.Renderer = (() => {
     const collapsedClass = isLong ? ' code-block--collapsed' : '';
     const initialExpanded = !isLong;
 
-    const runBtn = isRunnable
-      ? `<button type="button" class="code-block__copy code-block__run-btn" data-action="run-sql-inline" data-lang="${escapeHtml(cleanLang)}" title="Execute this SQL query and view the interactive output table &amp; editor"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"/></svg><span>Run Query</span></button>` +
-        `<button type="button" class="code-block__copy" data-action="edit-sql-inline" data-lang="${escapeHtml(cleanLang)}" title="Edit and test variations of this SQL query inline"><span>✎ Edit &amp; Try</span></button>` +
-        `<button type="button" class="code-block__copy" data-action="open-sql-studio" data-lang="${escapeHtml(cleanLang)}" title="Open this query in Full-Screen SQL Studio"><span>⤢ SQL Studio</span></button>`
+    // TableVisualizer.enhanceSqlCodeBlocks attaches the unified SQL execution toolbar below <pre> for SQL blocks
+    const runBtn = (isRunnable && !isSqlLang)
+      ? `<button type="button" class="code-block__copy code-block__run-btn" data-action="run-sql-inline" data-lang="${escapeHtml(cleanLang)}" title="Execute this query and view the interactive output table &amp; editor"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"/></svg><span>Run Query</span></button>` +
+        `<button type="button" class="code-block__copy" data-action="edit-sql-inline" data-lang="${escapeHtml(cleanLang)}" title="Edit and test variations inline"><span>✎ Edit &amp; Try</span></button>` +
+        `<button type="button" class="code-block__copy" data-action="open-sql-studio" data-lang="${escapeHtml(cleanLang)}" title="Open in Full-Screen SQL Studio"><span>⤢ SQL Studio</span></button>`
       : '';
 
     const copyBtn = `<button type="button" class="code-block__copy" data-action="copy-code" title="Copy code to clipboard">Copy</button>`;
@@ -1885,20 +1886,25 @@ window.Renderer = (() => {
   }
 
   /**
-   * Render Printable Module Cheat Sheet
+   * Render Printable Module Cheat Sheet & SQL Patterns Reference
    */
   function renderCheatSheet(moduleId) {
     const data = window.CURRICULUM_DATA;
+    const effectiveId = moduleId || 'm01';
     let targetMod = null;
-    if (data) {
+    const allModules = [];
+    if (data && Array.isArray(data.parts)) {
       for (const p of data.parts) {
-        for (const m of p.modules) {
-          if (m.id === moduleId || m.number === moduleId) {
+        for (const m of (p.modules || [])) {
+          allModules.push(m);
+          if (m.id === effectiveId || m.number === effectiveId || `m${m.number}` === effectiveId) {
             targetMod = m;
-            break;
           }
         }
       }
+    }
+    if (!targetMod && allModules.length > 0) {
+      targetMod = allModules[0];
     }
 
     if (!targetMod) {
@@ -1906,31 +1912,45 @@ window.Renderer = (() => {
     }
 
     const modContent = window.MODULE_CONTENT?.[targetMod.id] || {};
+    const switcherHtml = allModules.length > 0 ? `
+      <div class="cheatsheet-module-switcher" role="navigation" aria-label="Module Cheat Sheet Switcher">
+        <span style="font-size:11px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:0.05em;color:var(--fg-muted);margin-right:4px;">Modules &amp; Patterns:</span>
+        ${allModules.map(m => {
+          const isAct = m.id === targetMod.id;
+          return `<a href="#cheatsheet/${escapeHtml(m.id)}" class="cheatsheet-module-pill ${isAct ? 'is-active' : ''}" title="Module ${escapeHtml(m.number)}: ${escapeHtml(m.title)}">M${escapeHtml(m.number)} · ${escapeHtml(m.title.split(',')[0].split('&')[0].trim())}</a>`;
+        }).join('')}
+      </div>
+    ` : '';
 
     let html = `
       <nav class="breadcrumbs" aria-label="Breadcrumb">
         <a href="/" data-nav="home">Home</a>
         <span class="breadcrumbs__sep">${icons.chevronRight}</span>
-        <a href="#topic/${targetMod.units[0]?.slug}">Module ${targetMod.number}</a>
+        <a href="/topic/${targetMod.units[0]?.slug}/">Module ${targetMod.number}</a>
         <span class="breadcrumbs__sep">${icons.chevronRight}</span>
-        <span class="breadcrumbs__current">Cheat Sheet</span>
+        <span class="breadcrumbs__current">SQL Patterns &amp; Cheat Sheet</span>
       </nav>
+
+      ${switcherHtml}
 
       <div class="lesson-header">
         <div class="lesson-header__badge">
           <span class="lesson-header__kind lesson-header__kind--lesson">Module ${targetMod.number}</span>
-          <span class="tag">Printable</span>
+          <span class="tag">SQL Patterns &amp; Printable Reference</span>
         </div>
-        <h1 class="lesson-header__title">${targetMod.title} — Cheat Sheet</h1>
-        <p class="hero__subtitle" style="margin-top:0.5rem;">${targetMod.summary}</p>
+        <h1 class="lesson-header__title">${escapeHtml(targetMod.title)} — Cheat Sheet</h1>
+        <p class="hero__subtitle" style="margin-top:0.5rem;">${escapeHtml(targetMod.summary)}</p>
         <div class="lesson-header__actions" style="margin-top:1rem;">
           <button class="btn btn--sm btn--primary" data-action="window-print">
             🖨️ Print / Save as PDF
           </button>
+          <a href="/topic/${targetMod.units[0]?.slug}/" class="btn btn--sm btn--secondary">
+            📖 Open Module ${targetMod.number} Lessons
+          </a>
         </div>
       </div>
 
-      <div style="margin-top:1.5rem; display:flex; flex-direction:column; gap:1.5rem;">
+      <div style="margin-top:1.5rem; display:flex; flex-direction:column; gap:1.25rem;">
     `;
 
     for (const unit of targetMod.units) {
@@ -1938,16 +1958,22 @@ window.Renderer = (() => {
       const takeaways = c?.keyTakeaways || [];
       html += `
         <div style="padding:1.25rem; border:1px solid var(--border); border-radius:8px; background:var(--surface);">
-          <h3 style="font-size:16px; margin:0 0 0.5rem; display:flex; justify-content:space-between;">
-            <span>${unit.title}</span>
-            <a href="/topic/${unit.slug}/" style="font-size:12px; color:var(--link); text-decoration:none;">View Lesson →</a>
-          </h3>
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; margin-bottom:0.65rem;">
+            <div>
+              <h3 style="font-size:16px; margin:0; color:var(--fg);">${escapeHtml(unit.title)}</h3>
+              ${unit.complexity ? `<div style="margin-top:4px;font-size:11.5px;font-family:var(--font-mono);color:var(--info);">⏱ Complexity: ${escapeHtml(unit.complexity)}</div>` : ''}
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <button type="button" class="btn btn--secondary btn--sm" data-open-topic-lab="${escapeHtml(unit.slug)}" data-lab-mode="guided">▶ Launch SQL Lab</button>
+              <a href="/topic/${escapeHtml(unit.slug)}/" class="btn btn--primary btn--sm" style="text-decoration:none;">View Lesson →</a>
+            </div>
+          </div>
           ${takeaways.length ? `
-            <div style="font-size:12px; font-weight:700; color:var(--fg-muted); margin-bottom:0.25rem;">KEY TAKEAWAYS:</div>
-            <ul style="margin:0; padding-left:1.25rem; font-size:13px; color:var(--fg-prose); line-height:1.5;">
+            <div style="font-size:11px; font-weight:700; letter-spacing:0.05em; color:var(--fg-muted); margin-bottom:0.35rem;">KEY SQL INVARIANTS &amp; TAKEAWAYS:</div>
+            <ul style="margin:0; padding-left:1.25rem; font-size:13.5px; color:var(--fg-prose); line-height:1.6;">
               ${takeaways.map(t => `<li style="margin-bottom:0.25rem;">${escapeHtml(t)}</li>`).join('')}
             </ul>
-          ` : '<p style="font-size:12px; color:var(--fg-muted);">Deep unit content available in lesson.</p>'}
+          ` : '<p style="font-size:12px; color:var(--fg-muted); margin:0;">Interactive SQL Lab and clause walkthrough available in lesson.</p>'}
         </div>
       `;
     }

@@ -893,26 +893,29 @@
             var colName = '';
             var colType = 'TEXT';
             var isPk = false;
-            var isFk = false;
+            var fkTarget = '';
             if (typeof colItem === 'string') {
               var parts = colItem.trim().split(/\s+/);
               colName = parts[0] || '';
               colType = parts[1] || 'TEXT';
               isPk = /PRIMARY\s+KEY/i.test(colItem) || (t.pk && t.pk.split(/\s*,\s*/).indexOf(colName) !== -1);
-              isFk = /REFERENCES/i.test(colItem) || (!isPk && /_id$/i.test(colName));
+              if (/REFERENCES/i.test(colItem)) {
+                var refMatch = colItem.match(/REFERENCES\s+([a-zA-Z0-9_.(),]+)/i);
+                fkTarget = refMatch ? refMatch[1] : 'FK';
+              }
             } else if (colItem && typeof colItem === 'object') {
               colName = colItem.name || '';
               colType = colItem.type || 'TEXT';
               isPk = Boolean(colItem.pk);
-              isFk = Boolean(colItem.fk);
+              fkTarget = colItem.fk ? String(colItem.fk) : '';
             }
             return (
-              '<div style="display:flex;justify-content:space-between;align-items:center;padding:2px 6px;font-size:0.73rem;font-family:var(--font-mono);color:var(--fg-muted);">' +
-                '<span>' + escapeHtml(colName) +
+              '<div style="display:flex;justify-content:space-between;align-items:center;gap:4px;padding:2px 6px;font-size:0.73rem;font-family:var(--font-mono);color:var(--fg-muted);">' +
+                '<span><strong style="color:var(--fg);">' + escapeHtml(colName) + '</strong>' +
                   (isPk ? ' <span class="col-badge col-badge--pk" style="font-size:0.62rem;padding:0 4px;">PK</span>' : '') +
-                  (isFk ? ' <span class="col-badge" style="font-size:0.62rem;padding:0 4px;">FK</span>' : '') +
+                  (fkTarget ? ' <span class="col-badge col-badge--fk" style="font-size:0.62rem;padding:0 4px;" title="Foreign Key → ' + escapeHtml(fkTarget) + '">FK→' + escapeHtml(fkTarget) + '</span>' : '') +
                 '</span>' +
-                '<span style="color:var(--fg-faint);">' + escapeHtml(colType) + '</span>' +
+                '<span style="color:var(--fg-faint);font-size:0.68rem;">' + escapeHtml(colType) + '</span>' +
               '</div>'
             );
           }).join('');
