@@ -2492,7 +2492,7 @@ window.App = (() => {
           const isPk = Boolean(c && c.pk);
           const fkRef = c && c.fk ? String(c.fk) : '';
           return `
-            <div class="sql-inline-schema-col">
+            <div class="sql-inline-schema-col sql-studio-col-item sql-studio-col-item--clickable" data-insert-col="${escapeHtml(cName)}" title="Click to insert ${escapeHtml(cName)} into SQL editor" style="cursor:pointer;">
               <span>
                 <strong style="color:var(--fg);">${escapeHtml(cName)}</strong>
                 ${isPk ? ' <span class="col-badge col-badge--pk">PK</span>' : ''}
@@ -2582,16 +2582,26 @@ window.App = (() => {
       };
 
       if (window.SQLEngine && typeof window.SQLEngine.init === 'function') {
-        window.SQLEngine.init().then(() => mountNow()).catch(() => mountNow());
-      } else {
-        mountNow();
+        window.SQLEngine.init().catch(() => {});
       }
+      mountNow();
 
       host.querySelectorAll('[data-lab-preview-table]').forEach(btn => {
         btn.addEventListener('click', () => {
           const tblName = btn.getAttribute('data-lab-preview-table');
           if (tblName) {
             mountNow(`SELECT *\nFROM ${tblName}\nLIMIT 15;`);
+          }
+        });
+      });
+
+      host.querySelectorAll('[data-insert-col]').forEach(colEl => {
+        colEl.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          const colName = colEl.getAttribute('data-insert-col');
+          const ta = mountSlot ? mountSlot.querySelector('textarea') : null;
+          if (colName && ta && window.TableVisualizer && typeof window.TableVisualizer.insertSqlSnippet === 'function') {
+            window.TableVisualizer.insertSqlSnippet(ta, colName);
           }
         });
       });
@@ -2704,6 +2714,27 @@ window.App = (() => {
     const datasets = window.SQL_DATASETS || {};
     const datasetKeys = Object.keys(datasets).length > 0 ? Object.keys(datasets) : ['ecommerce', 'org_hr', 'saas_telemetry', 'fintech_ledger', 'social_graph'];
 
+    function buildQueryPresetOptionsHtml() {
+      const dsObj = datasets[activeDatasetId] || {};
+      const sampleList = Array.isArray(dsObj.sampleQueries) ? dsObj.sampleQueries : (Array.isArray(dsObj.defaultQueries) ? dsObj.defaultQueries : []);
+      let html = `<option value="custom">✎ Custom Query (Current Editor)</option>`;
+      if (steps.length > 0) {
+        steps.forEach((s, idx) => {
+          const sTitle = s.title || `Step ${idx + 1}`;
+          html += `<option value="step-${idx}-starter">Step ${idx + 1} Starter — ${escapeHtml(sTitle)}</option>`;
+          html += `<option value="step-${idx}-solution">★ Step ${idx + 1} Solution — ${escapeHtml(sTitle)}</option>`;
+        });
+      }
+      if ((spec && spec.referenceSql) || opts.referenceSql) {
+        html += `<option value="reference">★ Reference Solution SQL</option>`;
+      }
+      sampleList.forEach((sq, idx) => {
+        const label = typeof sq === 'string' ? `Sample Query ${idx + 1}` : (sq.title || sq.label || `Sample Query ${idx + 1}`);
+        html += `<option value="sample-${idx}">📋 ${escapeHtml(label)}</option>`;
+      });
+      return html;
+    }
+
     overlay.innerHTML = `
       <div class="global-codelab-shell sql-studio-modal-shell" style="display:flex;flex-direction:column;width:96vw;max-width:1560px;height:92vh;margin:4vh auto;background:var(--bg);border:1px solid var(--border-strong);border-radius:14px;overflow:hidden;box-shadow:var(--shadow-xl);">
         <div class="global-codelab-topbar" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;background:var(--surface);border-bottom:1px solid var(--border);">
@@ -2720,6 +2751,12 @@ window.App = (() => {
             </div>
           </div>
           <div class="global-codelab-topbar-right" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <label style="font-size:0.78rem;color:var(--fg-muted);display:flex;align-items:center;gap:6px;">
+              Query / Solution:
+              <select id="sql-studio-modal-query-select" data-role="modal-query-select" aria-label="Load Topic Query / Solution" style="background:var(--bg);color:var(--fg);border:1px solid var(--border-strong);border-radius:6px;padding:4px 8px;font-size:0.8rem;max-width:240px;">
+                ${buildQueryPresetOptionsHtml()}
+              </select>
+            </label>
             <label style="font-size:0.78rem;color:var(--fg-muted);display:flex;align-items:center;gap:6px;">
               Dataset:
               <select id="sql-studio-modal-dataset" data-role="modal-dataset" style="background:var(--bg);color:var(--fg);border:1px solid var(--border-strong);border-radius:6px;padding:4px 8px;font-size:0.8rem;">
@@ -2746,31 +2783,9 @@ window.App = (() => {
           <aside id="sql-studio-modal-schema" style="border-right:1px solid var(--border);background:var(--bg-alt);padding:14px;overflow-y:auto;">
             <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--fg-muted);margin-bottom:10px;">Schema &amp; PK/FK Explorer</div>
             <div id="sql-studio-modal-schema-list" style="font-size:0.82rem;color:var(--fg);"></div>
-            ${steps.length > 0 ? `
-              <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--fg-muted);margin:18px 0 8px;">Guided Lab Steps</div>
-              <div id="sql-studio-modal-steps" style="display:flex;flex-direction:column;gap:6px;">
-                ${steps.map((s, idx) => `
-                  <button type="button" data-modal-step="${idx}" style="text-align:left;padding:8px 10px;border-radius:8px;border:1px solid ${idx === activeStepIdx ? 'var(--info)' : 'var(--border)'};background:${idx === activeStepIdx ? 'var(--info-bg)' : 'var(--surface)'};color:var(--fg);cursor:pointer;font-size:0.8rem;">
-                    <div style="font-weight:700;color:var(--info);">Step ${idx + 1}</div>
-                    <div>${escapeHtml(s.title || `Step ${idx + 1}`)}</div>
-                  </button>
-                `).join('')}
-              </div>
-            ` : ''}
           </aside>
 
           <main style="display:flex;flex-direction:column;min-height:0;overflow-y:auto;padding:16px;gap:14px;">
-            ${steps.length > 0 ? `
-              <div id="sql-studio-modal-step-banner" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;background:var(--info-bg);border:1px solid var(--info-border);border-radius:8px;">
-                <div>
-                  <strong id="sql-studio-modal-step-title" style="color:var(--fg);font-size:0.9rem;">${escapeHtml(steps[activeStepIdx] ? steps[activeStepIdx].title : '')}</strong>
-                  <div id="sql-studio-modal-step-desc" style="color:var(--fg-prose);font-size:0.82rem;margin-top:2px;">${escapeHtml(steps[activeStepIdx] ? (steps[activeStepIdx].instructions || steps[activeStepIdx].concept || '') : '')}</div>
-                </div>
-                <div style="display:flex;gap:8px;flex-shrink:0;">
-                  <button type="button" class="btn btn--secondary btn--sm" id="sql-studio-modal-load-solution">✓ Load Solution SQL</button>
-                </div>
-              </div>
-            ` : ''}
             <div id="sql-studio-modal-visualizer-host" style="flex:1;min-height:420px;"></div>
           </main>
         </div>
@@ -2802,6 +2817,7 @@ window.App = (() => {
 
     const schemaListEl = overlay.querySelector('#sql-studio-modal-schema-list');
     const visHost = overlay.querySelector('#sql-studio-modal-visualizer-host');
+    const querySelect = overlay.querySelector('#sql-studio-modal-query-select');
     const dsSelect = overlay.querySelector('#sql-studio-modal-dataset');
     const engSelect = overlay.querySelector('#sql-studio-modal-engine');
     const runBtn = overlay.querySelector('#sql-studio-modal-run-btn');
@@ -2831,11 +2847,14 @@ window.App = (() => {
               ${Array.isArray(t.columns) ? `
                 <div style="margin-top:6px;display:flex;flex-direction:column;gap:3px;font-size:0.74rem;color:var(--fg-muted);font-family:var(--font-mono,monospace);">
                   ${t.columns.map(c => {
-                    if (typeof c === 'string') return `<div>• ${escapeHtml(c)}</div>`;
+                    if (typeof c === 'string') {
+                      const colToken = c.split(/\s+/)[0] || c;
+                      return `<div class="sql-studio-col-item sql-studio-col-item--clickable" data-insert-col="${escapeHtml(colToken)}" style="cursor:pointer;">• ${escapeHtml(c)}</div>`;
+                    }
                     const isPk = Boolean(c.pk);
                     const fkRef = c.fk ? String(c.fk) : '';
                     return `
-                      <div style="display:flex;align-items:center;justify-content:space-between;gap:4px;">
+                      <div class="sql-studio-col-item sql-studio-col-item--clickable" data-insert-col="${escapeHtml(c.name || '')}" title="Click to insert ${escapeHtml(c.name || '')}" style="display:flex;align-items:center;justify-content:space-between;gap:4px;cursor:pointer;">
                         <span>
                           <strong style="color:var(--fg);">${escapeHtml(c.name || '')}</strong>
                           ${isPk ? ' <span class="col-badge col-badge--pk sql-studio-col-badge sql-studio-col-badge--pk">PK</span>' : ''}
@@ -2856,8 +2875,18 @@ window.App = (() => {
             mountStudioQuery(`SELECT *\nFROM ${tbl}\nLIMIT 15;`);
           });
         });
+        schemaListEl.querySelectorAll('[data-insert-col]').forEach(colEl => {
+          colEl.addEventListener('click', (ev) => {
+            ev.stopPropagation();
+            const colName = colEl.getAttribute('data-insert-col');
+            const ta = visHost ? visHost.querySelector('textarea') : null;
+            if (colName && ta && window.TableVisualizer && typeof window.TableVisualizer.insertSqlSnippet === 'function') {
+              window.TableVisualizer.insertSqlSnippet(ta, colName);
+            }
+          });
+        });
       } else {
-        schemaListEl.innerHTML = `<div style="color:#94a3b8;font-size:0.8rem;">Dataset <code>${escapeHtml(activeDatasetId)}</code> loaded.</div>`;
+        schemaListEl.innerHTML = `<div style="color:var(--fg-muted);font-size:0.8rem;">Dataset <code>${escapeHtml(activeDatasetId)}</code> loaded.</div>`;
       }
     }
 
@@ -2887,19 +2916,59 @@ window.App = (() => {
         }
       };
       if (window.SQLEngine && typeof window.SQLEngine.init === 'function') {
-        window.SQLEngine.init().then(mountFn).catch(mountFn);
-      } else {
-        mountFn();
+        window.SQLEngine.init().catch(() => {});
       }
+      mountFn();
     }
 
     refreshSchemaSidebar();
     mountStudioQuery(initialSql);
 
+    if (querySelect) {
+      querySelect.addEventListener('change', () => {
+        const val = querySelect.value;
+        if (!val || val === 'custom') return;
+        let selectedSql = '';
+        let isSolution = false;
+        const stepMatch = val.match(/^step-(\d+)-(starter|solution)$/);
+        if (stepMatch) {
+          const idx = parseInt(stepMatch[1], 10);
+          const mode = stepMatch[2];
+          const st = steps[idx];
+          if (st) {
+            activeStepIdx = idx;
+            if (mode === 'solution') {
+              selectedSql = st.solutionCode || st.solutionSnippet || st.starterCode || initialSql;
+              isSolution = true;
+            } else {
+              selectedSql = st.starterCode || st.starterSnippet || initialSql;
+            }
+          }
+        } else if (val === 'reference') {
+          selectedSql = (spec && spec.referenceSql) || opts.referenceSql || initialSql;
+          isSolution = true;
+        } else if (val.indexOf('sample-') === 0) {
+          const sIdx = parseInt(val.replace('sample-', ''), 10);
+          const dsObj = datasets[activeDatasetId] || {};
+          const sampleList = Array.isArray(dsObj.sampleQueries) ? dsObj.sampleQueries : (Array.isArray(dsObj.defaultQueries) ? dsObj.defaultQueries : []);
+          const sq = sampleList[sIdx];
+          if (sq) {
+            selectedSql = typeof sq === 'string' ? sq : (sq.sql || sq.query || '');
+          }
+        }
+        if (selectedSql) {
+          mountStudioQuery(selectedSql, { referenceSql: isSolution ? selectedSql : undefined, autoVerify: isSolution });
+        }
+      });
+    }
+
     if (dsSelect) {
       dsSelect.addEventListener('change', () => {
         activeDatasetId = dsSelect.value;
         refreshSchemaSidebar();
+        if (querySelect) {
+          querySelect.innerHTML = buildQueryPresetOptionsHtml();
+        }
         const ta = visHost.querySelector('textarea');
         mountStudioQuery(ta ? ta.value : initialSql);
       });
@@ -2938,33 +3007,6 @@ window.App = (() => {
       });
     }
 
-    overlay.querySelectorAll('[data-modal-step]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const idx = parseInt(btn.getAttribute('data-modal-step'), 10);
-        if (isNaN(idx) || !steps[idx]) return;
-        activeStepIdx = idx;
-        overlay.querySelectorAll('[data-modal-step]').forEach((b, i) => {
-          b.style.borderColor = i === activeStepIdx ? 'var(--info)' : 'var(--border)';
-          b.style.background = i === activeStepIdx ? 'var(--info-bg)' : 'var(--surface)';
-        });
-        const tEl = overlay.querySelector('#sql-studio-modal-step-title');
-        const dEl = overlay.querySelector('#sql-studio-modal-step-desc');
-        if (tEl) tEl.textContent = steps[idx].title || '';
-        if (dEl) dEl.textContent = steps[idx].instructions || steps[idx].concept || '';
-        mountStudioQuery(steps[idx].starterCode || steps[idx].starterSnippet || initialSql);
-      });
-    });
-
-    const solBtn = overlay.querySelector('#sql-studio-modal-load-solution');
-    if (solBtn) {
-      solBtn.addEventListener('click', () => {
-        const step = steps[activeStepIdx];
-        const solSql = (step && (step.solutionCode || step.solutionSnippet || step.starterCode)) || opts.referenceSql || initialSql;
-        mountStudioQuery(solSql, { referenceSql: solSql, autoVerify: true });
-        if (typeof opts.onStepComplete === 'function' && step) opts.onStepComplete(step);
-        if (typeof opts.onLabComplete === 'function') opts.onLabComplete();
-      });
-    }
     return Promise.resolve(overlay);
   }
 

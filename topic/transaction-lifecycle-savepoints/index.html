@@ -33,14 +33,14 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
   <link rel="stylesheet" href="css/variables.css?v=b68ab27ba0">
   <link rel="stylesheet" href="css/layout.css?v=a384f455dc">
-  <link rel="stylesheet" href="css/components.css?v=8fed5d69e3">
+  <link rel="stylesheet" href="css/components.css?v=6a661d5122">
   <link rel="stylesheet" href="css/content.css?v=178f3a2481">
   <link rel="stylesheet" href="css/landing.css?v=14b77b8c3d">
   <link rel="stylesheet" href="css/simulators.css?v=be366fe40d">
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=59c953e95f"></script>
-  <script src="js/manifest.js?v=9a9ff5d494"></script>
+  <script src="js/manifest.js?v=02cf7c8a30"></script>
 
   <script type="application/ld+json">
 {
@@ -1492,9 +1492,9 @@ sequenceDiagram
             <h2 class="build-lab-card__title">Transaction Lifecycle: BEGIN, COMMIT, ROLLBACK, SAVEPOINT &amp; Autocommit Hazards — Interactive Guided SQL Lab</h2>
             <p class="build-lab-card__desc">Managing transaction boundaries, partial rollbacks via nested SAVEPOINTs, and why long-running idle-in-transaction sessions poison database health.</p>
             <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;">
-              <span class="badge">⏱ Target Time: <code>O(N) scan / O(log_B N) indexed</code></span>
-              <span class="badge">💾 Auxiliary Space: <code>O(1) streaming tuple state</code></span>
-              <span class="badge">🧭 Pattern: ACID Transactions, Concurrency Anomalies &amp; Isolation Levels</span>
+              <span class="badge">⏱ Target Time: <code>O(M log M) window partition sort</code></span>
+              <span class="badge">💾 Auxiliary Space: <code>O(W) sliding 3-row frame state</code></span>
+              <span class="badge">🧭 Pattern: ACID Transactions, Concurrency Anomalies &amp; Isolation Levels · savepoint</span>
               <span class="badge">🗄️ Dataset: <code>fintech_ledger</code></span>
             </div>
           </div>
@@ -1520,15 +1520,25 @@ sequenceDiagram
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">01</span>
-                    <span class="build-lab-step-card__target">Phase 1 · Base Relation &amp; SARGable Predicate</span>
+                    <span class="build-lab-step-card__target">Phase 1 · Transaction Lifecycle: BEGIN, COMMIT, ROLLBACK, SAVEPOINT &amp; Autocommit Hazards: Corporate Cards &amp; Daily Limit Controls</span>
                   </div>
-                  <div class="build-lab-step-card__title">Base Relation Scan &amp; SARGable Filter (fintech_ledger)</div>
-                  <div class="build-lab-step-card__invariant">Establish the base relation scan in <code>fintech_ledger</code> for Transaction Lifecycle: BEGIN, COMMIT, ROLLBACK, SAVEPOINT &amp; Autocommit Hazards with a SARGable predicate and explicit Three-Valued Logic NULL handling.</div>
-                  <div class="build-lab-step-card__concept">Run or edit <code>query.sql</code> to inspect the base table tuples, verify SARGable index filtering in the <code>WHERE</code> clause, and step through the live Table Visualizer.</div>
+                  <div class="build-lab-step-card__title">Inspect Issued Cards &amp; Daily Spend Limits (transaction-lifecycle-savepoints)</div>
+                  <div class="build-lab-step-card__invariant">Examine the <code>cards</code> table in <code>fintech_ledger</code> to inspect active vs frozen cards and daily limit thresholds.</div>
+                  <div class="build-lab-step-card__concept">Refine the starter <code>cards</code> query in <code>query.sql</code> to convert <code>daily_limit_cents</code> into <code>daily_limit_usd</code> and join account owners.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>💡 Progressive SQL Hint (Step 1)</summary>
-                      <pre><code>SELECT transfer_id, idempotency_key, from_account_id, to_account_id, ROUND(amount_cents / 100.0, 2) AS amount_usd, status, created_at FROM transfers WHERE status = &#039;posted&#039; AND amount_cents &gt;= 25000 ORDER BY transfer_id ASC LIMIT 10;</code></pre>
+                      <pre><code>-- Step 1 Solution (transaction-lifecycle-savepoints): Issued cards enriched with account owner &amp; USD limit
+SELECT
+  c.card_id,
+  a.owner_name,
+  c.last4,
+  ROUND(c.daily_limit_cents / 100.0, 2) AS daily_limit_usd,
+  c.status AS card_status
+FROM cards AS c
+INNER JOIN accounts AS a
+  ON a.account_id = c.account_id
+ORDER BY c.daily_limit_cents DESC, c.card_id ASC;</code></pre>
                     </details>
                   
                 </div>
@@ -1544,29 +1554,27 @@ sequenceDiagram
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">02</span>
-                    <span class="build-lab-step-card__target">Phase 2 · Relational Join, Aggregation &amp; 3VL Guard</span>
+                    <span class="build-lab-step-card__target">Phase 2 · Transaction Lifecycle: BEGIN, COMMIT, ROLLBACK, SAVEPOINT &amp; Autocommit Hazards: Merchant Transaction Spend vs Card Limit</span>
                   </div>
-                  <div class="build-lab-step-card__title">Relational Join, Grouping &amp; NULL-Safe Aggregation</div>
-                  <div class="build-lab-step-card__invariant">Combine normalized tables via explicit JOIN conditions and fold group buckets or window partitions without losing NULL boundary rows.</div>
-                  <div class="build-lab-step-card__concept">Run or refine the Step 2 relational join and aggregation query in <code>query.sql</code>, then click <strong>🔍 Step Clauses</strong> to inspect each intermediate table.</div>
+                  <div class="build-lab-step-card__title">Aggregate Merchant Spend per Card (Transaction Lifecycle: BEGIN, COMMIT, ROLLBACK, SAVEPOINT &amp; Autocommit Hazards)</div>
+                  <div class="build-lab-step-card__invariant">Join <code>cards</code> with <code>merchant_txns</code> to compare cumulative card spend against <code>daily_limit_cents</code>.</div>
+                  <div class="build-lab-step-card__concept">Complete the grouped card spend query in <code>query.sql</code> to compute <code>txn_count</code> and <code>total_spend_usd</code>.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>💡 Progressive SQL Hint (Step 2)</summary>
-                      <pre><code>-- Dataset: fintech_ledger | Double-Entry Conservation &amp; Account Audit (transaction-lifecycle-savepoints)
+                      <pre><code>-- Step 2 Solution (transaction-lifecycle-savepoints): Aggregated card spend vs daily limit utilization
 SELECT
-  a.account_id,
-  a.owner_name,
-  a.account_type,
-  COUNT(je.entry_id) AS journal_postings,
-  SUM(CASE WHEN je.direction = &#039;credit&#039; THEN je.amount_cents ELSE 0 END) AS credit_cents,
-  SUM(CASE WHEN je.direction = &#039;debit&#039; THEN je.amount_cents ELSE 0 END) AS debit_cents,
-  SUM(CASE WHEN je.direction = &#039;credit&#039; THEN je.amount_cents ELSE -je.amount_cents END) AS computed_balance_cents,
-  a.posted_balance_cents
-FROM accounts AS a
-INNER JOIN journal_entries AS je
-  ON je.account_id = a.account_id
-GROUP BY a.account_id, a.owner_name, a.account_type, a.posted_balance_cents
-ORDER BY a.account_id ASC;</code></pre>
+  c.card_id,
+  c.last4,
+  c.status AS card_status,
+  COUNT(mt.txn_id) AS txn_count,
+  ROUND(SUM(mt.amount_cents) / 100.0, 2) AS total_spend_usd,
+  ROUND(c.daily_limit_cents / 100.0, 2) AS daily_limit_usd
+FROM cards AS c
+INNER JOIN merchant_txns AS mt
+  ON mt.card_id = c.card_id
+GROUP BY c.card_id, c.last4, c.status, c.daily_limit_cents
+ORDER BY total_spend_usd DESC;</code></pre>
                     </details>
                   
                 </div>
@@ -1582,28 +1590,37 @@ ORDER BY a.account_id ASC;</code></pre>
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">03</span>
-                    <span class="build-lab-step-card__target">Phase 3 · Production Query &amp; Plan Verification</span>
+                    <span class="build-lab-step-card__target">Phase 3 · Transaction Lifecycle: BEGIN, COMMIT, ROLLBACK, SAVEPOINT &amp; Autocommit Hazards: Sliding 3-Transaction Velocity Window</span>
                   </div>
-                  <div class="build-lab-step-card__title">Production Query &amp; Execution Plan Verification (Transaction Lifecycle: BEGIN, COMMIT, ROLLBACK, SAVEPOINT &amp; Autocommit Hazards)</div>
-                  <div class="build-lab-step-card__invariant">Verify final column projections, ordering, and physical B+Tree access paths via EXPLAIN QUERY PLAN and automated relational assertions.</div>
-                  <div class="build-lab-step-card__concept">Execute the complete production query in <code>query.sql</code> and click <strong>✓ Check SQL Assertions</strong> to verify schema alignment, row cardinality, and tuple equivalence.</div>
+                  <div class="build-lab-step-card__title">Production Sliding Window Card Velocity Audit (Transaction Lifecycle: BEGIN, COMMIT, ROLLBACK, SAVEPOINT &amp; Autocommit Hazards)</div>
+                  <div class="build-lab-step-card__invariant">Use <code>ROWS BETWEEN 2 PRECEDING AND CURRENT ROW</code> partitioned by <code>card_id</code> to detect rapid consecutive card spend bursts.</div>
+                  <div class="build-lab-step-card__concept">Execute the sliding-window card velocity query in <code>query.sql</code> and inspect the window frame results.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>💡 Progressive SQL Hint (Step 3)</summary>
-                      <pre><code>-- Dataset: fintech_ledger | Double-Entry ACID Invariant &amp; Ledger Conservation Audit
+                      <pre><code>-- Dataset: fintech_ledger | Transaction Lifecycle: BEGIN, COMMIT, ROLLBACK, SAVEPOINT &amp; Autocommit Hazards (transaction-lifecycle-savepoints) — Sliding 3-Txn Card Velocity Window
 SELECT
-  t.transfer_id,
-  t.idempotency_key,
-  t.status,
-  COUNT(je.entry_id) AS journal_legs,
-  SUM(CASE WHEN je.direction = &#039;debit&#039; THEN je.amount_cents ELSE 0 END) AS total_debit_cents,
-  SUM(CASE WHEN je.direction = &#039;credit&#039; THEN je.amount_cents ELSE 0 END) AS total_credit_cents,
-  SUM(CASE WHEN je.direction = &#039;credit&#039; THEN je.amount_cents ELSE -je.amount_cents END) AS net_balance_cents
-FROM transfers AS t
-INNER JOIN journal_entries AS je
-  ON je.transfer_id = t.transfer_id
-GROUP BY t.transfer_id, t.idempotency_key, t.status
-ORDER BY t.transfer_id ASC;</code></pre>
+  txn_id,
+  card_id,
+  merchant,
+  country,
+  ROUND(amount_cents / 100.0, 2) AS amount_usd,
+  txn_ts,
+  COUNT(*) OVER (
+    PARTITION BY card_id
+    ORDER BY txn_ts ASC
+    ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+  ) AS window_txn_count,
+  ROUND(
+    SUM(amount_cents) OVER (
+      PARTITION BY card_id
+      ORDER BY txn_ts ASC
+      ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+    ) / 100.0,
+    2
+  ) AS rolling_3txn_usd
+FROM merchant_txns
+ORDER BY card_id ASC, txn_ts ASC;</code></pre>
                     </details>
                   
                 </div>
@@ -1735,7 +1752,7 @@ ORDER BY t.transfer_id ASC;</code></pre>
   <script type="text/plain" data-defer src="data/srs-cards.js?v=fabc47dd9c"></script>
   <script type="text/plain" data-defer src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
   <script type="text/plain" data-defer src="data/implementations_code.js?v=fce884f8a8"></script>
-  <script type="text/plain" data-defer src="data/topic_guided_labs.js?v=341584ee01"></script>
+  <script type="text/plain" data-defer src="data/topic_guided_labs.js?v=2a57d85494"></script>
   <script type="text/plain" data-defer src="data/projects.js?v=2280ac085f"></script>
   <script type="text/plain" data-defer src="data/glossary.js?v=4f6c79a4e0"></script>
 
@@ -1746,8 +1763,8 @@ ORDER BY t.transfer_id ASC;</code></pre>
   <script type="text/plain" data-defer src="js/search.js?v=e2063e0ccd"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
   <script type="text/plain" data-defer src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>
-  <script type="text/plain" data-defer src="js/sql-engine.js?v=a668c919ba"></script>
-  <script type="text/plain" data-defer src="js/table-visualizer.js?v=ea5db1c17a"></script>
+  <script type="text/plain" data-defer src="js/sql-engine.js?v=60d0c505ad"></script>
+  <script type="text/plain" data-defer src="js/table-visualizer.js?v=1f1a1f2968"></script>
   <script type="text/plain" data-defer src="js/simulators.js?v=68b973e4c8"></script>
   <script type="text/plain" data-defer src="js/simulators-relational.js?v=8e12b97831"></script>
   <script type="text/plain" data-defer src="js/simulators-analytical.js?v=258089d8ac"></script>
@@ -1764,10 +1781,10 @@ ORDER BY t.transfer_id ASC;</code></pre>
   <script type="text/plain" data-defer src="js/roadmap.js?v=cebfb7e32c"></script>
   <script type="text/plain" data-defer src="js/challenges.js?v=fcc5b1b6c5"></script>
   <script type="text/plain" data-defer src="js/dashboard.js?v=d411d5a9bb"></script>
-  <script type="text/plain" data-defer src="js/sandbox.js?v=1f94508aa4"></script>
+  <script type="text/plain" data-defer src="js/sandbox.js?v=5528739eb9"></script>
   <script type="text/plain" data-defer src="js/topic-codelab.js?v=096611d91c"></script>
   
-  <script type="text/plain" data-defer src="js/app.js?v=ab7d42f863"></script>
+  <script type="text/plain" data-defer src="js/app.js?v=79ca5d1666"></script>
 
   <!-- App bootstrap & deferred script loader -->
   <script src="js/bootstrap.js?v=df2bb60aeb"></script>

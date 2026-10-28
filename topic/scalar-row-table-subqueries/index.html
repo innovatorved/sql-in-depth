@@ -33,14 +33,14 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
   <link rel="stylesheet" href="css/variables.css?v=b68ab27ba0">
   <link rel="stylesheet" href="css/layout.css?v=a384f455dc">
-  <link rel="stylesheet" href="css/components.css?v=8fed5d69e3">
+  <link rel="stylesheet" href="css/components.css?v=6a661d5122">
   <link rel="stylesheet" href="css/content.css?v=178f3a2481">
   <link rel="stylesheet" href="css/landing.css?v=14b77b8c3d">
   <link rel="stylesheet" href="css/simulators.css?v=be366fe40d">
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=59c953e95f"></script>
-  <script src="js/manifest.js?v=9a9ff5d494"></script>
+  <script src="js/manifest.js?v=02cf7c8a30"></script>
 
   <script type="application/ld+json">
 {
@@ -1526,9 +1526,9 @@ flowchart LR
             <h2 class="build-lab-card__title">Subquery Taxonomy: Scalar, Row, Array &amp; Derived Table Subqueries — Interactive Guided SQL Lab</h2>
             <p class="build-lab-card__desc">Where subqueries can legally appear across SELECT, FROM, and WHERE, runtime cardinality assertions for scalar subqueries, and inline views.</p>
             <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;">
-              <span class="badge">⏱ Target Time: <code>O(N) scan / O(log_B N) indexed</code></span>
-              <span class="badge">💾 Auxiliary Space: <code>O(1) streaming tuple state</code></span>
-              <span class="badge">🧭 Pattern: Subqueries, Correlated Queries, Lateral Joins &amp; CTEs</span>
+              <span class="badge">⏱ Target Time: <code>O(V + E) recursive BFS + window sort</code></span>
+              <span class="badge">💾 Auxiliary Space: <code>O(V) hierarchy working table</code></span>
+              <span class="badge">🧭 Pattern: Subqueries, Correlated Queries, Lateral Joins &amp; CTEs · subqueries</span>
               <span class="badge">🗄️ Dataset: <code>org_hr</code></span>
             </div>
           </div>
@@ -1554,15 +1554,26 @@ flowchart LR
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">01</span>
-                    <span class="build-lab-step-card__target">Phase 1 · Base Relation &amp; SARGable Predicate</span>
+                    <span class="build-lab-step-card__target">Phase 1 · Subquery Taxonomy: Scalar, Row, Array &amp; Derived Table Subqueries: Project Portfolio &amp; Lead Assignment Scan</span>
                   </div>
-                  <div class="build-lab-step-card__title">Base Relation Scan &amp; SARGable Filter (org_hr)</div>
-                  <div class="build-lab-step-card__invariant">Establish the base relation scan in <code>org_hr</code> for Subquery Taxonomy: Scalar, Row, Array &amp; Derived Table Subqueries with a SARGable predicate and explicit Three-Valued Logic NULL handling.</div>
-                  <div class="build-lab-step-card__concept">Run or edit <code>query.sql</code> to inspect the base table tuples, verify SARGable index filtering in the <code>WHERE</code> clause, and step through the live Table Visualizer.</div>
+                  <div class="build-lab-step-card__title">Inspect Engineering Projects &amp; Allocation Matrix (scalar-row-table-subqueries)</div>
+                  <div class="build-lab-step-card__invariant">Inspect <code>projects</code> and <code>employee_projects</code> to understand capital budgets and percentage allocations across staff.</div>
+                  <div class="build-lab-step-card__concept">Extend the starter <code>projects</code> query in <code>query.sql</code> to join the project lead&#039;s name from <code>employees</code>.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>💡 Progressive SQL Hint (Step 1)</summary>
-                      <pre><code>SELECT emp_id, name, title, dept_id, manager_id, salary_usd, hired_at FROM employees WHERE salary_usd &gt;= 170000 ORDER BY salary_usd DESC LIMIT 10;</code></pre>
+                      <pre><code>-- Step 1 Solution (scalar-row-table-subqueries): Projects enriched with lead engineer identity
+SELECT
+  p.project_id,
+  p.code AS project_code,
+  p.title AS project_title,
+  e.name AS lead_engineer,
+  e.title AS lead_role,
+  p.budget_usd
+FROM projects AS p
+INNER JOIN employees AS e
+  ON e.emp_id = p.lead_emp_id
+ORDER BY p.budget_usd DESC, p.project_id ASC;</code></pre>
                     </details>
                   
                 </div>
@@ -1578,65 +1589,16 @@ flowchart LR
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">02</span>
-                    <span class="build-lab-step-card__target">Phase 2 · Relational Join, Aggregation &amp; 3VL Guard</span>
+                    <span class="build-lab-step-card__target">Phase 2 · Subquery Taxonomy: Scalar, Row, Array &amp; Derived Table Subqueries: Recursive Org Hierarchy CTE</span>
                   </div>
-                  <div class="build-lab-step-card__title">Relational Join, Grouping &amp; NULL-Safe Aggregation</div>
-                  <div class="build-lab-step-card__invariant">Combine normalized tables via explicit JOIN conditions and fold group buckets or window partitions without losing NULL boundary rows.</div>
-                  <div class="build-lab-step-card__concept">Run or refine the Step 2 relational join and aggregation query in <code>query.sql</code>, then click <strong>🔍 Step Clauses</strong> to inspect each intermediate table.</div>
+                  <div class="build-lab-step-card__title">Traverse Reporting Chain with WITH RECURSIVE (Subquery Taxonomy: Scalar, Row, Array &amp; Derived Table Subqueries)</div>
+                  <div class="build-lab-step-card__invariant">Build a recursive CTE anchored at <code>manager_id IS NULL</code> and iteratively join direct reports up to depth 5.</div>
+                  <div class="build-lab-step-card__concept">Complete the <code>WITH RECURSIVE org_tree</code> query in <code>query.sql</code> to compute <code>hierarchy_level</code> and <code>reporting_chain</code>.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>💡 Progressive SQL Hint (Step 2)</summary>
-                      <pre><code>-- Dataset: org_hr | Live Verification &amp; Departmental Window Audit (scalar-row-table-subqueries)
-WITH dept_rollup AS (
-  SELECT
-    d.dept_id,
-    d.name AS dept_name,
-    COUNT(e.emp_id) AS staff_count,
-    ROUND(AVG(e.salary_usd), 0) AS avg_salary_usd,
-    MAX(e.salary_usd) AS top_salary_usd,
-    SUM(e.salary_usd) AS total_payroll_usd,
-    d.annual_budget_usd
-  FROM departments AS d
-  LEFT JOIN employees AS e
-    ON e.dept_id = d.dept_id
-  GROUP BY d.dept_id, d.name, d.annual_budget_usd
-)
-SELECT
-  dept_id,
-  dept_name,
-  staff_count,
-  avg_salary_usd,
-  top_salary_usd,
-  total_payroll_usd,
-  ROUND((total_payroll_usd * 100.0) / annual_budget_usd, 1) AS budget_utilization_pct
-FROM dept_rollup
-WHERE staff_count &gt;= 1
-ORDER BY total_payroll_usd DESC;</code></pre>
-                    </details>
-                  
-                </div>
-                <div class="build-lab-step-card__footer">
-                  <span>Step 2 of 3 · <code>query.sql</code></span>
-                  <button type="button" class="btn btn--sm btn--outline" data-action="open-topic-codelab" data-slug="scalar-row-table-subqueries" data-mode="guided" data-step="1" data-step-index="1">
-                    Load Step 2 SQL →
-                  </button>
-                </div>
-              </div>
-            
-              <div class="build-lab-step-card " data-step="2" data-step-index="2">
-                <div class="build-lab-step-card__body">
-                  <div class="build-lab-step-card__header">
-                    <span class="build-lab-step-card__num">03</span>
-                    <span class="build-lab-step-card__target">Phase 3 · Production Query &amp; Plan Verification</span>
-                  </div>
-                  <div class="build-lab-step-card__title">Production Query &amp; Execution Plan Verification (Subquery Taxonomy: Scalar, Row, Array &amp; Derived Table Subqueries)</div>
-                  <div class="build-lab-step-card__invariant">Verify final column projections, ordering, and physical B+Tree access paths via EXPLAIN QUERY PLAN and automated relational assertions.</div>
-                  <div class="build-lab-step-card__concept">Execute the complete production query in <code>query.sql</code> and click <strong>✓ Check SQL Assertions</strong> to verify schema alignment, row cardinality, and tuple equivalence.</div>
-                  
-                    <details class="quiz-hint-details">
-                      <summary>💡 Progressive SQL Hint (Step 3)</summary>
-                      <pre><code>-- Dataset: org_hr | WITH RECURSIVE Hierarchy Traversal &amp; Chain-of-Command Depth
-WITH RECURSIVE org_hierarchy AS (
+                      <pre><code>-- Step 2 Solution (scalar-row-table-subqueries): Full WITH RECURSIVE chain-of-command traversal
+WITH RECURSIVE org_tree AS (
   SELECT
     emp_id,
     name,
@@ -1656,12 +1618,12 @@ WITH RECURSIVE org_hierarchy AS (
     e.manager_id,
     e.dept_id,
     e.salary_usd,
-    h.hierarchy_level + 1 AS hierarchy_level,
-    h.reporting_chain || &#039; -&gt; &#039; || e.name AS reporting_chain
+    t.hierarchy_level + 1 AS hierarchy_level,
+    t.reporting_chain || &#039; -&gt; &#039; || e.name AS reporting_chain
   FROM employees AS e
-  INNER JOIN org_hierarchy AS h
-    ON e.manager_id = h.emp_id
-  WHERE h.hierarchy_level &lt; 6
+  INNER JOIN org_tree AS t
+    ON e.manager_id = t.emp_id
+  WHERE t.hierarchy_level &lt; 5
 )
 SELECT
   emp_id,
@@ -1670,8 +1632,54 @@ SELECT
   hierarchy_level,
   salary_usd,
   reporting_chain
-FROM org_hierarchy
+FROM org_tree
 ORDER BY hierarchy_level ASC, salary_usd DESC;</code></pre>
+                    </details>
+                  
+                </div>
+                <div class="build-lab-step-card__footer">
+                  <span>Step 2 of 3 · <code>query.sql</code></span>
+                  <button type="button" class="btn btn--sm btn--outline" data-action="open-topic-codelab" data-slug="scalar-row-table-subqueries" data-mode="guided" data-step="1" data-step-index="1">
+                    Load Step 2 SQL →
+                  </button>
+                </div>
+              </div>
+            
+              <div class="build-lab-step-card " data-step="2" data-step-index="2">
+                <div class="build-lab-step-card__body">
+                  <div class="build-lab-step-card__header">
+                    <span class="build-lab-step-card__num">03</span>
+                    <span class="build-lab-step-card__target">Phase 3 · Subquery Taxonomy: Scalar, Row, Array &amp; Derived Table Subqueries: Departmental Window Ranking &amp; Running Payroll</span>
+                  </div>
+                  <div class="build-lab-step-card__title">Production Window Rank, Peer Gap &amp; Cumulative Payroll (Subquery Taxonomy: Scalar, Row, Array &amp; Derived Table Subqueries)</div>
+                  <div class="build-lab-step-card__invariant">Evaluate <code>DENSE_RANK()</code>, <code>LAG()</code>, and <code>SUM() OVER (PARTITION BY e.dept_id ... ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)</code> without collapsing employee rows.</div>
+                  <div class="build-lab-step-card__concept">Complete the production window query in <code>query.sql</code> and step through the Window clause in the Table Visualizer.</div>
+                  
+                    <details class="quiz-hint-details">
+                      <summary>💡 Progressive SQL Hint (Step 3)</summary>
+                      <pre><code>-- Dataset: org_hr | Subquery Taxonomy: Scalar, Row, Array &amp; Derived Table Subqueries (scalar-row-table-subqueries) — Partitioned Window Ranking &amp; Running Payroll
+SELECT
+  d.name AS dept_name,
+  e.name AS employee_name,
+  e.title,
+  e.salary_usd,
+  DENSE_RANK() OVER (
+    PARTITION BY e.dept_id
+    ORDER BY e.salary_usd DESC
+  ) AS dept_salary_rank,
+  LAG(e.salary_usd, 1, e.salary_usd) OVER (
+    PARTITION BY e.dept_id
+    ORDER BY e.salary_usd DESC
+  ) - e.salary_usd AS gap_to_higher_peer_usd,
+  SUM(e.salary_usd) OVER (
+    PARTITION BY e.dept_id
+    ORDER BY e.hired_at ASC, e.emp_id ASC
+    ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+  ) AS cumulative_dept_payroll_usd
+FROM employees AS e
+INNER JOIN departments AS d
+  ON d.dept_id = e.dept_id
+ORDER BY d.name ASC, dept_salary_rank ASC, e.emp_id ASC;</code></pre>
                     </details>
                   
                 </div>
@@ -1803,7 +1811,7 @@ ORDER BY hierarchy_level ASC, salary_usd DESC;</code></pre>
   <script type="text/plain" data-defer src="data/srs-cards.js?v=fabc47dd9c"></script>
   <script type="text/plain" data-defer src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
   <script type="text/plain" data-defer src="data/implementations_code.js?v=fce884f8a8"></script>
-  <script type="text/plain" data-defer src="data/topic_guided_labs.js?v=341584ee01"></script>
+  <script type="text/plain" data-defer src="data/topic_guided_labs.js?v=2a57d85494"></script>
   <script type="text/plain" data-defer src="data/projects.js?v=2280ac085f"></script>
   <script type="text/plain" data-defer src="data/glossary.js?v=4f6c79a4e0"></script>
 
@@ -1814,8 +1822,8 @@ ORDER BY hierarchy_level ASC, salary_usd DESC;</code></pre>
   <script type="text/plain" data-defer src="js/search.js?v=e2063e0ccd"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
   <script type="text/plain" data-defer src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>
-  <script type="text/plain" data-defer src="js/sql-engine.js?v=a668c919ba"></script>
-  <script type="text/plain" data-defer src="js/table-visualizer.js?v=ea5db1c17a"></script>
+  <script type="text/plain" data-defer src="js/sql-engine.js?v=60d0c505ad"></script>
+  <script type="text/plain" data-defer src="js/table-visualizer.js?v=1f1a1f2968"></script>
   <script type="text/plain" data-defer src="js/simulators.js?v=68b973e4c8"></script>
   <script type="text/plain" data-defer src="js/simulators-relational.js?v=8e12b97831"></script>
   <script type="text/plain" data-defer src="js/simulators-analytical.js?v=258089d8ac"></script>
@@ -1832,10 +1840,10 @@ ORDER BY hierarchy_level ASC, salary_usd DESC;</code></pre>
   <script type="text/plain" data-defer src="js/roadmap.js?v=cebfb7e32c"></script>
   <script type="text/plain" data-defer src="js/challenges.js?v=fcc5b1b6c5"></script>
   <script type="text/plain" data-defer src="js/dashboard.js?v=d411d5a9bb"></script>
-  <script type="text/plain" data-defer src="js/sandbox.js?v=1f94508aa4"></script>
+  <script type="text/plain" data-defer src="js/sandbox.js?v=5528739eb9"></script>
   <script type="text/plain" data-defer src="js/topic-codelab.js?v=096611d91c"></script>
   
-  <script type="text/plain" data-defer src="js/app.js?v=ab7d42f863"></script>
+  <script type="text/plain" data-defer src="js/app.js?v=79ca5d1666"></script>
 
   <!-- App bootstrap & deferred script loader -->
   <script src="js/bootstrap.js?v=df2bb60aeb"></script>

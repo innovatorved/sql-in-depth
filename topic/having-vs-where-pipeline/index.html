@@ -33,14 +33,14 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
   <link rel="stylesheet" href="css/variables.css?v=b68ab27ba0">
   <link rel="stylesheet" href="css/layout.css?v=a384f455dc">
-  <link rel="stylesheet" href="css/components.css?v=8fed5d69e3">
+  <link rel="stylesheet" href="css/components.css?v=6a661d5122">
   <link rel="stylesheet" href="css/content.css?v=178f3a2481">
   <link rel="stylesheet" href="css/landing.css?v=14b77b8c3d">
   <link rel="stylesheet" href="css/simulators.css?v=be366fe40d">
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=59c953e95f"></script>
-  <script src="js/manifest.js?v=9a9ff5d494"></script>
+  <script src="js/manifest.js?v=02cf7c8a30"></script>
 
   <script type="application/ld+json">
 {
@@ -1503,9 +1503,9 @@ flowchart LR
             <h2 class="build-lab-card__title">Pre-Filter (WHERE) vs Post-Aggregate Filter (HAVING) Pipeline — Interactive Guided SQL Lab</h2>
             <p class="build-lab-card__desc">Why pushing selective predicates into WHERE prunes rows before hash table allocation, reserving HAVING strictly for group-level aggregates.</p>
             <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;">
-              <span class="badge">⏱ Target Time: <code>O(N) scan / O(log_B N) indexed</code></span>
-              <span class="badge">💾 Auxiliary Space: <code>O(1) streaming tuple state</code></span>
-              <span class="badge">🧭 Pattern: Grouping, Aggregations &amp; Multi-Dimensional Rollups</span>
+              <span class="badge">⏱ Target Time: <code>O(N) index scan + hash join</code></span>
+              <span class="badge">💾 Auxiliary Space: <code>O(C) category lookup state</code></span>
+              <span class="badge">🧭 Pattern: Grouping, Aggregations &amp; Multi-Dimensional Rollups · having</span>
               <span class="badge">🗄️ Dataset: <code>ecommerce</code></span>
             </div>
           </div>
@@ -1531,15 +1531,27 @@ flowchart LR
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">01</span>
-                    <span class="build-lab-step-card__target">Phase 1 · Base Relation &amp; SARGable Predicate</span>
+                    <span class="build-lab-step-card__target">Phase 1 · Pre-Filter (WHERE) vs Post-Aggregate Filter (HAVING) Pipeline: Exact-Cents Catalog Arithmetic</span>
                   </div>
-                  <div class="build-lab-step-card__title">Base Relation Scan &amp; SARGable Filter (ecommerce)</div>
-                  <div class="build-lab-step-card__invariant">Establish the base relation scan in <code>ecommerce</code> for Pre-Filter (WHERE) vs Post-Aggregate Filter (HAVING) Pipeline with a SARGable predicate and explicit Three-Valued Logic NULL handling.</div>
-                  <div class="build-lab-step-card__concept">Run or edit <code>query.sql</code> to inspect the base table tuples, verify SARGable index filtering in the <code>WHERE</code> clause, and step through the live Table Visualizer.</div>
+                  <div class="build-lab-step-card__title">Inspect Active Catalog SKUs &amp; Cents Domain (having-vs-where-pipeline)</div>
+                  <div class="build-lab-step-card__invariant">Verify integer-cents pricing (<code>price_cents</code>) and active inventory flags (<code>is_active = 1</code>) in <code>products</code> without IEEE-754 float drift.</div>
+                  <div class="build-lab-step-card__concept">Refine the starter <code>products</code> query in <code>query.sql</code> to filter <code>is_active = 1</code> and compute <code>price_usd</code> plus <code>stock_value_usd</code>.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>💡 Progressive SQL Hint (Step 1)</summary>
-                      <pre><code>SELECT order_id, customer_id, status, ROUND(total_cents / 100.0, 2) AS total_usd, COALESCE(discount_code, &#039;NONE&#039;) AS promo_code, created_at FROM orders WHERE status = &#039;completed&#039; AND total_cents &gt;= 30000 ORDER BY total_cents DESC LIMIT 10;</code></pre>
+                      <pre><code>-- Step 1 Solution (having-vs-where-pipeline): Active SKUs with exact decimal USD valuation
+SELECT
+  product_id,
+  sku,
+  name AS product_title,
+  category_id,
+  price_cents,
+  ROUND(price_cents / 100.0, 2) AS price_usd,
+  stock_qty,
+  ROUND((price_cents * stock_qty) / 100.0, 2) AS stock_value_usd
+FROM products
+WHERE is_active = 1
+ORDER BY stock_value_usd DESC;</code></pre>
                     </details>
                   
                 </div>
@@ -1555,32 +1567,30 @@ flowchart LR
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">02</span>
-                    <span class="build-lab-step-card__target">Phase 2 · Relational Join, Aggregation &amp; 3VL Guard</span>
+                    <span class="build-lab-step-card__target">Phase 2 · Pre-Filter (WHERE) vs Post-Aggregate Filter (HAVING) Pipeline: Category Hierarchy &amp; Line-Item Join</span>
                   </div>
-                  <div class="build-lab-step-card__title">Relational Join, Grouping &amp; NULL-Safe Aggregation</div>
-                  <div class="build-lab-step-card__invariant">Combine normalized tables via explicit JOIN conditions and fold group buckets or window partitions without losing NULL boundary rows.</div>
-                  <div class="build-lab-step-card__concept">Run or refine the Step 2 relational join and aggregation query in <code>query.sql</code>, then click <strong>🔍 Step Clauses</strong> to inspect each intermediate table.</div>
+                  <div class="build-lab-step-card__title">Join Categories &amp; Order Items for Pre-Filter (WHERE) vs Post-Aggregate Filter (HAVING) Pipeline</div>
+                  <div class="build-lab-step-card__invariant">Enrich active products with <code>categories</code> metadata and aggregate ordered quantities from <code>order_items</code>.</div>
+                  <div class="build-lab-step-card__concept">Expand the category join in <code>query.sql</code> to include a <code>LEFT JOIN</code> on <code>order_items</code> and compute <code>units_sold</code>.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>💡 Progressive SQL Hint (Step 2)</summary>
-                      <pre><code>-- Dataset: ecommerce | Live Verification, 3VL Guard &amp; SARGable Plan Audit (having-vs-where-pipeline)
+                      <pre><code>-- Step 2 Solution (having-vs-where-pipeline): Category-enriched product demand aggregation
 SELECT
-  c.customer_id,
-  c.name AS customer_name,
-  c.tier,
-  c.country,
-  COUNT(o.order_id) AS completed_orders,
-  ROUND(COALESCE(SUM(o.total_cents), 0) / 100.0, 2) AS verified_spend_usd,
-  ROUND(
-    AVG(COALESCE(SUM(o.total_cents), 0)) OVER (PARTITION BY c.tier) / 100.0,
-    2
-  ) AS tier_peer_avg_spend_usd
-FROM customers AS c
-LEFT JOIN orders AS o
-  ON o.customer_id = c.customer_id
-  AND o.status = &#039;completed&#039;
-GROUP BY c.customer_id, c.name, c.tier, c.country
-ORDER BY verified_spend_usd DESC, c.customer_id ASC;</code></pre>
+  p.product_id,
+  p.sku,
+  p.name AS product_title,
+  cat.name AS category_name,
+  ROUND(p.price_cents / 100.0, 2) AS price_usd,
+  COALESCE(SUM(oi.quantity), 0) AS units_sold
+FROM products AS p
+INNER JOIN categories AS cat
+  ON cat.category_id = p.category_id
+LEFT JOIN order_items AS oi
+  ON oi.product_id = p.product_id
+WHERE p.is_active = 1
+GROUP BY p.product_id, p.sku, p.name, cat.name, p.price_cents
+ORDER BY units_sold DESC, price_usd DESC;</code></pre>
                     </details>
                   
                 </div>
@@ -1596,31 +1606,33 @@ ORDER BY verified_spend_usd DESC, c.customer_id ASC;</code></pre>
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">03</span>
-                    <span class="build-lab-step-card__target">Phase 3 · Production Query &amp; Plan Verification</span>
+                    <span class="build-lab-step-card__target">Phase 3 · Pre-Filter (WHERE) vs Post-Aggregate Filter (HAVING) Pipeline: Inventory Valuation &amp; Sell-Through Audit</span>
                   </div>
-                  <div class="build-lab-step-card__title">Production Query &amp; Execution Plan Verification (Pre-Filter (WHERE) vs Post-Aggregate Filter (HAVING) Pipeline)</div>
-                  <div class="build-lab-step-card__invariant">Verify final column projections, ordering, and physical B+Tree access paths via EXPLAIN QUERY PLAN and automated relational assertions.</div>
-                  <div class="build-lab-step-card__concept">Execute the complete production query in <code>query.sql</code> and click <strong>✓ Check SQL Assertions</strong> to verify schema alignment, row cardinality, and tuple equivalence.</div>
+                  <div class="build-lab-step-card__title">Production Catalog Valuation &amp; Revenue Query (Pre-Filter (WHERE) vs Post-Aggregate Filter (HAVING) Pipeline)</div>
+                  <div class="build-lab-step-card__invariant">Combine on-hand inventory valuation with realized line-item revenue to audit catalog performance for Pre-Filter (WHERE) vs Post-Aggregate Filter (HAVING) Pipeline.</div>
+                  <div class="build-lab-step-card__concept">Complete the production query in <code>query.sql</code> by projecting <code>inventory_valuation_usd</code>, <code>realized_revenue_usd</code>, and ordering by total valuation.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>💡 Progressive SQL Hint (Step 3)</summary>
-                      <pre><code>-- Dataset: ecommerce | Conditional Aggregation with FILTER (WHERE ...) &amp; Country Rollups
+                      <pre><code>-- Dataset: ecommerce | Pre-Filter (WHERE) vs Post-Aggregate Filter (HAVING) Pipeline (having-vs-where-pipeline) — Catalog Valuation &amp; Demand Audit
 SELECT
-  c.country,
-  COUNT(DISTINCT c.customer_id) AS total_customers,
-  COUNT(o.order_id) AS total_orders,
-  COUNT(o.order_id) FILTER (WHERE o.status = &#039;completed&#039;) AS completed_orders,
-  COUNT(o.order_id) FILTER (WHERE o.status IN (&#039;cancelled&#039;, &#039;refunded&#039;)) AS reversed_orders,
-  ROUND(
-    COALESCE(SUM(o.total_cents) FILTER (WHERE o.status = &#039;completed&#039;), 0) / 100.0,
-    2
-  ) AS net_settled_revenue_usd
-FROM customers AS c
-LEFT JOIN orders AS o
-  ON o.customer_id = c.customer_id
-GROUP BY c.country
-HAVING COUNT(o.order_id) &gt;= 1
-ORDER BY net_settled_revenue_usd DESC;</code></pre>
+  p.product_id,
+  p.sku,
+  p.name AS product_title,
+  cat.name AS category_name,
+  ROUND(p.price_cents / 100.0, 2) AS price_usd,
+  p.stock_qty,
+  ROUND((p.price_cents * p.stock_qty) / 100.0, 2) AS inventory_valuation_usd,
+  COALESCE(SUM(oi.quantity), 0) AS total_units_sold,
+  ROUND(COALESCE(SUM(oi.quantity * oi.unit_price_cents), 0) / 100.0, 2) AS realized_revenue_usd
+FROM products AS p
+INNER JOIN categories AS cat
+  ON cat.category_id = p.category_id
+LEFT JOIN order_items AS oi
+  ON oi.product_id = p.product_id
+WHERE p.is_active = 1
+GROUP BY p.product_id, p.sku, p.name, cat.name, p.price_cents, p.stock_qty
+ORDER BY inventory_valuation_usd DESC, p.product_id ASC;</code></pre>
                     </details>
                   
                 </div>
@@ -1752,7 +1764,7 @@ ORDER BY net_settled_revenue_usd DESC;</code></pre>
   <script type="text/plain" data-defer src="data/srs-cards.js?v=fabc47dd9c"></script>
   <script type="text/plain" data-defer src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
   <script type="text/plain" data-defer src="data/implementations_code.js?v=fce884f8a8"></script>
-  <script type="text/plain" data-defer src="data/topic_guided_labs.js?v=341584ee01"></script>
+  <script type="text/plain" data-defer src="data/topic_guided_labs.js?v=2a57d85494"></script>
   <script type="text/plain" data-defer src="data/projects.js?v=2280ac085f"></script>
   <script type="text/plain" data-defer src="data/glossary.js?v=4f6c79a4e0"></script>
 
@@ -1763,8 +1775,8 @@ ORDER BY net_settled_revenue_usd DESC;</code></pre>
   <script type="text/plain" data-defer src="js/search.js?v=e2063e0ccd"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
   <script type="text/plain" data-defer src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>
-  <script type="text/plain" data-defer src="js/sql-engine.js?v=a668c919ba"></script>
-  <script type="text/plain" data-defer src="js/table-visualizer.js?v=ea5db1c17a"></script>
+  <script type="text/plain" data-defer src="js/sql-engine.js?v=60d0c505ad"></script>
+  <script type="text/plain" data-defer src="js/table-visualizer.js?v=1f1a1f2968"></script>
   <script type="text/plain" data-defer src="js/simulators.js?v=68b973e4c8"></script>
   <script type="text/plain" data-defer src="js/simulators-relational.js?v=8e12b97831"></script>
   <script type="text/plain" data-defer src="js/simulators-analytical.js?v=258089d8ac"></script>
@@ -1781,10 +1793,10 @@ ORDER BY net_settled_revenue_usd DESC;</code></pre>
   <script type="text/plain" data-defer src="js/roadmap.js?v=cebfb7e32c"></script>
   <script type="text/plain" data-defer src="js/challenges.js?v=fcc5b1b6c5"></script>
   <script type="text/plain" data-defer src="js/dashboard.js?v=d411d5a9bb"></script>
-  <script type="text/plain" data-defer src="js/sandbox.js?v=1f94508aa4"></script>
+  <script type="text/plain" data-defer src="js/sandbox.js?v=5528739eb9"></script>
   <script type="text/plain" data-defer src="js/topic-codelab.js?v=096611d91c"></script>
   
-  <script type="text/plain" data-defer src="js/app.js?v=ab7d42f863"></script>
+  <script type="text/plain" data-defer src="js/app.js?v=79ca5d1666"></script>
 
   <!-- App bootstrap & deferred script loader -->
   <script src="js/bootstrap.js?v=df2bb60aeb"></script>

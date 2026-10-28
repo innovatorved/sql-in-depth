@@ -33,14 +33,14 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
   <link rel="stylesheet" href="css/variables.css?v=b68ab27ba0">
   <link rel="stylesheet" href="css/layout.css?v=a384f455dc">
-  <link rel="stylesheet" href="css/components.css?v=8fed5d69e3">
+  <link rel="stylesheet" href="css/components.css?v=6a661d5122">
   <link rel="stylesheet" href="css/content.css?v=178f3a2481">
   <link rel="stylesheet" href="css/landing.css?v=14b77b8c3d">
   <link rel="stylesheet" href="css/simulators.css?v=be366fe40d">
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=59c953e95f"></script>
-  <script src="js/manifest.js?v=9a9ff5d494"></script>
+  <script src="js/manifest.js?v=02cf7c8a30"></script>
 
   <script type="application/ld+json">
 {
@@ -1537,10 +1537,10 @@ erDiagram
             <h2 class="build-lab-card__title">Strategic Denormalization: Read vs Write Amplification &amp; Cached Counters — Interactive Guided SQL Lab</h2>
             <p class="build-lab-card__desc">Knowing when to break strict normalization in high-read OLTP systems using trigger-maintained summary columns, snapshot fields, and read models.</p>
             <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;">
-              <span class="badge">⏱ Target Time: <code>O(N) scan / O(log_B N) indexed</code></span>
-              <span class="badge">💾 Auxiliary Space: <code>O(1) streaming tuple state</code></span>
-              <span class="badge">🧭 Pattern: Relational Data Modeling &amp; Normalization (1NF to BCNF/5NF)</span>
-              <span class="badge">🗄️ Dataset: <code>ecommerce</code></span>
+              <span class="badge">⏱ Target Time: <code>O(E + D) hash join &amp; group rollup</code></span>
+              <span class="badge">💾 Auxiliary Space: <code>O(D) department state</code></span>
+              <span class="badge">🧭 Pattern: Relational Data Modeling &amp; Normalization (1NF to BCNF/5NF) · denormalization</span>
+              <span class="badge">🗄️ Dataset: <code>org_hr</code></span>
             </div>
           </div>
           <div class="build-lab-card__cta-col">
@@ -1565,15 +1565,26 @@ erDiagram
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">01</span>
-                    <span class="build-lab-step-card__target">Phase 1 · Base Relation &amp; SARGable Predicate</span>
+                    <span class="build-lab-step-card__target">Phase 1 · Strategic Denormalization: Read vs Write Amplification &amp; Cached Counters: Employee Compensation &amp; Tenure Scan</span>
                   </div>
-                  <div class="build-lab-step-card__title">Base Relation Scan &amp; SARGable Filter (ecommerce)</div>
-                  <div class="build-lab-step-card__invariant">Establish the base relation scan in <code>ecommerce</code> for Strategic Denormalization: Read vs Write Amplification &amp; Cached Counters with a SARGable predicate and explicit Three-Valued Logic NULL handling.</div>
-                  <div class="build-lab-step-card__concept">Run or edit <code>query.sql</code> to inspect the base table tuples, verify SARGable index filtering in the <code>WHERE</code> clause, and step through the live Table Visualizer.</div>
+                  <div class="build-lab-step-card__title">Inspect Employee Roster &amp; Compensation Bands (strategic-denormalization-tradeoffs)</div>
+                  <div class="build-lab-step-card__invariant">Query the <code>employees</code> relation in <code>org_hr</code>, handling the root executive&#039;s <code>NULL</code> <code>manager_id</code> explicitly.</div>
+                  <div class="build-lab-step-card__concept">Refine the starter query in <code>query.sql</code> to filter employees with <code>salary_usd &gt;= 150000</code> and label root vs reporting staff.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>💡 Progressive SQL Hint (Step 1)</summary>
-                      <pre><code>SELECT order_id, customer_id, status, ROUND(total_cents / 100.0, 2) AS total_usd, COALESCE(discount_code, &#039;NONE&#039;) AS promo_code, created_at FROM orders WHERE status = &#039;completed&#039; AND total_cents &gt;= 30000 ORDER BY total_cents DESC LIMIT 10;</code></pre>
+                      <pre><code>-- Step 1 Solution (strategic-denormalization-tradeoffs): Compensation filter &amp; root-manager classification
+SELECT
+  emp_id,
+  name AS employee_name,
+  title,
+  dept_id,
+  COALESCE(manager_id, 0) AS reports_to_id,
+  salary_usd,
+  hired_at
+FROM employees
+WHERE salary_usd &gt;= 150000
+ORDER BY salary_usd DESC, emp_id ASC;</code></pre>
                     </details>
                   
                 </div>
@@ -1589,32 +1600,27 @@ erDiagram
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">02</span>
-                    <span class="build-lab-step-card__target">Phase 2 · Relational Join, Aggregation &amp; 3VL Guard</span>
+                    <span class="build-lab-step-card__target">Phase 2 · Strategic Denormalization: Read vs Write Amplification &amp; Cached Counters: Self-Join Employee-to-Manager Pairing</span>
                   </div>
-                  <div class="build-lab-step-card__title">Relational Join, Grouping &amp; NULL-Safe Aggregation</div>
-                  <div class="build-lab-step-card__invariant">Combine normalized tables via explicit JOIN conditions and fold group buckets or window partitions without losing NULL boundary rows.</div>
-                  <div class="build-lab-step-card__concept">Run or refine the Step 2 relational join and aggregation query in <code>query.sql</code>, then click <strong>🔍 Step Clauses</strong> to inspect each intermediate table.</div>
+                  <div class="build-lab-step-card__title">Self-Join Employees with Direct Managers (Strategic Denormalization: Read vs Write Amplification &amp; Cached Counters)</div>
+                  <div class="build-lab-step-card__invariant">Alias <code>employees AS e</code> and <code>employees AS m</code> with <code>LEFT JOIN</code> so the CEO (<code>manager_id IS NULL</code>) is preserved alongside direct reports.</div>
+                  <div class="build-lab-step-card__concept">Complete the self-join in <code>query.sql</code> to compute the compensation ratio between each employee and their manager.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>💡 Progressive SQL Hint (Step 2)</summary>
-                      <pre><code>-- Dataset: ecommerce | Live Verification, 3VL Guard &amp; SARGable Plan Audit (strategic-denormalization-tradeoffs)
+                      <pre><code>-- Step 2 Solution (strategic-denormalization-tradeoffs): Self-join reporting pairs with manager salary comparison
 SELECT
-  c.customer_id,
-  c.name AS customer_name,
-  c.tier,
-  c.country,
-  COUNT(o.order_id) AS completed_orders,
-  ROUND(COALESCE(SUM(o.total_cents), 0) / 100.0, 2) AS verified_spend_usd,
-  ROUND(
-    AVG(COALESCE(SUM(o.total_cents), 0)) OVER (PARTITION BY c.tier) / 100.0,
-    2
-  ) AS tier_peer_avg_spend_usd
-FROM customers AS c
-LEFT JOIN orders AS o
-  ON o.customer_id = c.customer_id
-  AND o.status = &#039;completed&#039;
-GROUP BY c.customer_id, c.name, c.tier, c.country
-ORDER BY verified_spend_usd DESC, c.customer_id ASC;</code></pre>
+  e.emp_id,
+  e.name AS employee_name,
+  e.title AS employee_role,
+  e.salary_usd AS employee_salary,
+  COALESCE(m.name, &#039;BOARD_OF_DIRECTORS&#039;) AS manager_name,
+  COALESCE(m.salary_usd, e.salary_usd) AS manager_salary,
+  (COALESCE(m.salary_usd, e.salary_usd) - e.salary_usd) AS gap_to_manager_usd
+FROM employees AS e
+LEFT JOIN employees AS m
+  ON m.emp_id = e.manager_id
+ORDER BY e.salary_usd DESC, e.emp_id ASC;</code></pre>
                     </details>
                   
                 </div>
@@ -1630,33 +1636,29 @@ ORDER BY verified_spend_usd DESC, c.customer_id ASC;</code></pre>
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">03</span>
-                    <span class="build-lab-step-card__target">Phase 3 · Production Query &amp; Plan Verification</span>
+                    <span class="build-lab-step-card__target">Phase 3 · Strategic Denormalization: Read vs Write Amplification &amp; Cached Counters: Departmental Payroll vs Budget Rollup</span>
                   </div>
-                  <div class="build-lab-step-card__title">Production Query &amp; Execution Plan Verification (Strategic Denormalization: Read vs Write Amplification &amp; Cached Counters)</div>
-                  <div class="build-lab-step-card__invariant">Verify final column projections, ordering, and physical B+Tree access paths via EXPLAIN QUERY PLAN and automated relational assertions.</div>
-                  <div class="build-lab-step-card__concept">Execute the complete production query in <code>query.sql</code> and click <strong>✓ Check SQL Assertions</strong> to verify schema alignment, row cardinality, and tuple equivalence.</div>
+                  <div class="build-lab-step-card__title">Production Department Budget Utilization Audit (Strategic Denormalization: Read vs Write Amplification &amp; Cached Counters)</div>
+                  <div class="build-lab-step-card__invariant">Aggregate departmental headcount and active payroll against <code>departments.annual_budget_usd</code> to measure budget utilization.</div>
+                  <div class="build-lab-step-card__concept">Complete the production departmental rollup in <code>query.sql</code> including <code>budget_used_pct</code> and verify via SQL assertions.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>💡 Progressive SQL Hint (Step 3)</summary>
-                      <pre><code>-- Dataset: ecommerce | Functional Dependency &amp; 3NF/BCNF Normalization Verification
+                      <pre><code>-- Dataset: org_hr | Strategic Denormalization: Read vs Write Amplification &amp; Cached Counters (strategic-denormalization-tradeoffs) — Department Budget Utilization Rollup
 SELECT
-  o.order_id,
-  o.customer_id,
-  c.email AS canonical_customer_email,
-  COUNT(oi.order_item_id) AS distinct_line_items,
-  SUM(oi.quantity * oi.unit_price_cents) AS computed_line_total_cents,
-  o.total_cents AS header_total_cents,
-  CASE
-    WHEN SUM(oi.quantity * oi.unit_price_cents) = o.total_cents THEN &#039;NORMALIZED_CONSISTENT&#039;
-    ELSE &#039;PROMO_OR_ADJUSTMENT_DELTA&#039;
-  END AS normalization_audit
-FROM orders AS o
-INNER JOIN customers AS c
-  ON c.customer_id = o.customer_id
-INNER JOIN order_items AS oi
-  ON oi.order_id = o.order_id
-GROUP BY o.order_id, o.customer_id, c.email, o.total_cents
-ORDER BY o.order_id ASC;</code></pre>
+  d.dept_id,
+  d.name AS department_name,
+  d.cost_center,
+  COUNT(e.emp_id) AS headcount,
+  COALESCE(SUM(e.salary_usd), 0) AS active_payroll_usd,
+  d.annual_budget_usd,
+  ROUND((COALESCE(SUM(e.salary_usd), 0) * 100.0) / d.annual_budget_usd, 1) AS budget_used_pct
+FROM departments AS d
+LEFT JOIN employees AS e
+  ON e.dept_id = d.dept_id
+GROUP BY d.dept_id, d.name, d.cost_center, d.annual_budget_usd
+HAVING COUNT(e.emp_id) &gt;= 1
+ORDER BY active_payroll_usd DESC, d.dept_id ASC;</code></pre>
                     </details>
                   
                 </div>
@@ -1776,7 +1778,7 @@ ORDER BY o.order_id ASC;</code></pre>
   <script type="text/plain" data-defer src="data/srs-cards.js?v=fabc47dd9c"></script>
   <script type="text/plain" data-defer src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
   <script type="text/plain" data-defer src="data/implementations_code.js?v=fce884f8a8"></script>
-  <script type="text/plain" data-defer src="data/topic_guided_labs.js?v=341584ee01"></script>
+  <script type="text/plain" data-defer src="data/topic_guided_labs.js?v=2a57d85494"></script>
   <script type="text/plain" data-defer src="data/projects.js?v=2280ac085f"></script>
   <script type="text/plain" data-defer src="data/glossary.js?v=4f6c79a4e0"></script>
 
@@ -1787,8 +1789,8 @@ ORDER BY o.order_id ASC;</code></pre>
   <script type="text/plain" data-defer src="js/search.js?v=e2063e0ccd"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
   <script type="text/plain" data-defer src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>
-  <script type="text/plain" data-defer src="js/sql-engine.js?v=a668c919ba"></script>
-  <script type="text/plain" data-defer src="js/table-visualizer.js?v=ea5db1c17a"></script>
+  <script type="text/plain" data-defer src="js/sql-engine.js?v=60d0c505ad"></script>
+  <script type="text/plain" data-defer src="js/table-visualizer.js?v=1f1a1f2968"></script>
   <script type="text/plain" data-defer src="js/simulators.js?v=68b973e4c8"></script>
   <script type="text/plain" data-defer src="js/simulators-relational.js?v=8e12b97831"></script>
   <script type="text/plain" data-defer src="js/simulators-analytical.js?v=258089d8ac"></script>
@@ -1805,10 +1807,10 @@ ORDER BY o.order_id ASC;</code></pre>
   <script type="text/plain" data-defer src="js/roadmap.js?v=cebfb7e32c"></script>
   <script type="text/plain" data-defer src="js/challenges.js?v=fcc5b1b6c5"></script>
   <script type="text/plain" data-defer src="js/dashboard.js?v=d411d5a9bb"></script>
-  <script type="text/plain" data-defer src="js/sandbox.js?v=1f94508aa4"></script>
+  <script type="text/plain" data-defer src="js/sandbox.js?v=5528739eb9"></script>
   <script type="text/plain" data-defer src="js/topic-codelab.js?v=096611d91c"></script>
   
-  <script type="text/plain" data-defer src="js/app.js?v=ab7d42f863"></script>
+  <script type="text/plain" data-defer src="js/app.js?v=79ca5d1666"></script>
 
   <!-- App bootstrap & deferred script loader -->
   <script src="js/bootstrap.js?v=df2bb60aeb"></script>

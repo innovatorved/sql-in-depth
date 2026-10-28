@@ -5900,3 +5900,249 @@ body.view-ecosystem .main__content {
   border-color: #34d399;
   color: #047857;
 }
+
+/* ── SQL IDE Shell, Line Numbers & Syntax Highlighting (R2/R3) ── */
+.sql-ide-shell {
+  display: flex;
+  align-items: stretch;
+  position: relative;
+  width: 100%;
+  background: var(--surface, #0f172a);
+  border: 1px solid var(--border-strong, #334155);
+  border-radius: var(--r-md, 6px);
+  overflow: hidden;
+  box-sizing: border-box;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+.sql-ide-shell:focus-within {
+  border-color: var(--accent, #6366f1);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.16);
+}
+
+.sql-ide-gutter {
+  flex-shrink: 0;
+  width: 36px;
+  padding: 10px 6px 10px 4px;
+  background: var(--bg-alt, #1e293b);
+  border-right: 1px solid var(--border, #334155);
+  color: var(--fg-muted, #94a3b8);
+  text-align: right;
+  user-select: none;
+  overflow: hidden;
+  font-family: inherit;
+  font-size: 11.5px;
+  line-height: 1.55;
+  box-sizing: border-box;
+}
+
+.sql-ide-line-num {
+  height: 1.55em;
+  line-height: 1.55;
+  padding-right: 2px;
+}
+
+.sql-ide-stage {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: 104px;
+  overflow: hidden;
+}
+
+.sql-ide-backdrop {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 10px 12px;
+  pointer-events: none;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: inherit;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--fg, #e2e8f0);
+  background: transparent;
+  border: none;
+  box-sizing: border-box;
+  scrollbar-width: none;
+}
+
+.sql-ide-backdrop::-webkit-scrollbar {
+  display: none;
+}
+
+.sql-ide-highlight {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+  background: transparent;
+}
+
+.sql-ide-textarea,
+.sql-ide-shell textarea.sql-ide-textarea {
+  position: relative;
+  display: block;
+  width: 100% !important;
+  min-height: 104px;
+  margin: 0 !important;
+  padding: 10px 12px !important;
+  border: none !important;
+  border-radius: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  caret-color: var(--fg, #e2e8f0) !important;
+  font-family: inherit !important;
+  font-size: 12.5px !important;
+  line-height: 1.55 !important;
+  white-space: pre-wrap !important;
+  word-wrap: break-word !important;
+  resize: vertical;
+  box-sizing: border-box !important;
+  z-index: 2;
+}
+
+.sql-ide-textarea::selection {
+  background: rgba(99, 102, 241, 0.28);
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Syntax Token Colors — Dark Default */
+.sql-tok-kw,
+.sql-tok-keyword {
+  color: #818cf8;
+  font-weight: 700;
+}
+
+.sql-tok-fn,
+.sql-tok-type {
+  color: #38bdf8;
+  font-weight: 600;
+}
+
+.sql-tok-str {
+  color: #34d399;
+}
+
+.sql-tok-num {
+  color: #fbbf24;
+}
+
+.sql-tok-cmt,
+.sql-tok-comment {
+  color: var(--fg-muted, #94a3b8);
+  font-style: italic;
+}
+
+.sql-tok-op {
+  color: #f472b6;
+}
+
+/* Practice Snippet Chips Bar & Saved Panel */
+.sql-practice-bar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.sql-practice-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  font-size: 10.5px;
+  font-family: var(--font-mono, monospace);
+  font-weight: 600;
+  color: var(--fg, #e2e8f0);
+  background: var(--bg-alt, #1e293b);
+  border: 1px solid var(--border, #334155);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.14s ease;
+}
+
+.sql-practice-chip:hover {
+  border-color: var(--accent, #6366f1);
+  color: var(--accent, #818cf8);
+  background: rgba(99, 102, 241, 0.12);
+}
+
+.sql-studio-col-item--clickable:hover {
+  background: rgba(99, 102, 241, 0.12);
+  color: var(--accent, #818cf8);
+}
+
+/* Light-Theme Overrides for SQL IDE & Tokens */
+[data-theme="light"] .sql-ide-shell {
+  background: #ffffff;
+  border-color: #cbd5e1;
+}
+
+[data-theme="light"] .sql-ide-gutter {
+  background: #f1f5f9;
+  border-right-color: #e2e8f0;
+  color: #64748b;
+}
+
+[data-theme="light"] .sql-ide-backdrop {
+  color: #0f172a;
+}
+
+[data-theme="light"] .sql-ide-textarea,
+[data-theme="light"] .sql-ide-shell textarea.sql-ide-textarea {
+  background: transparent !important;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  caret-color: #0f172a !important;
+}
+
+[data-theme="light"] .sql-tok-kw,
+[data-theme="light"] .sql-tok-keyword {
+  color: #4338ca;
+  font-weight: 700;
+}
+
+[data-theme="light"] .sql-tok-fn,
+[data-theme="light"] .sql-tok-type {
+  color: #0369a1;
+  font-weight: 600;
+}
+
+[data-theme="light"] .sql-tok-str {
+  color: #047857;
+}
+
+[data-theme="light"] .sql-tok-num {
+  color: #b45309;
+}
+
+[data-theme="light"] .sql-tok-cmt,
+[data-theme="light"] .sql-tok-comment {
+  color: #64748b;
+  font-style: italic;
+}
+
+[data-theme="light"] .sql-tok-op {
+  color: #be185d;
+}
+
+[data-theme="light"] .sql-practice-chip {
+  background: #f8fafc;
+  color: #1e293b;
+  border-color: #cbd5e1;
+}
+
+[data-theme="light"] .sql-practice-chip:hover {
+  background: #eef2ff;
+  color: #4338ca;
+  border-color: #818cf8;
+}
+

@@ -33,14 +33,14 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
   <link rel="stylesheet" href="css/variables.css?v=b68ab27ba0">
   <link rel="stylesheet" href="css/layout.css?v=a384f455dc">
-  <link rel="stylesheet" href="css/components.css?v=8fed5d69e3">
+  <link rel="stylesheet" href="css/components.css?v=6a661d5122">
   <link rel="stylesheet" href="css/content.css?v=178f3a2481">
   <link rel="stylesheet" href="css/landing.css?v=14b77b8c3d">
   <link rel="stylesheet" href="css/simulators.css?v=be366fe40d">
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=59c953e95f"></script>
-  <script src="js/manifest.js?v=9a9ff5d494"></script>
+  <script src="js/manifest.js?v=02cf7c8a30"></script>
 
   <script type="application/ld+json">
 {
@@ -1497,9 +1497,9 @@ flowchart LR
             <h2 class="build-lab-card__title">Parallel Query Execution: Parallel Seq Scan, Parallel Hash Join &amp; Gather Nodes — Interactive Guided SQL Lab</h2>
             <p class="build-lab-card__desc">Coordinating multiple background worker processes to scan shared heap blocks concurrently and build shared-memory hash tables.</p>
             <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;">
-              <span class="badge">⏱ Target Time: <code>O(N) scan / O(log_B N) indexed</code></span>
-              <span class="badge">💾 Auxiliary Space: <code>O(1) streaming tuple state</code></span>
-              <span class="badge">🧭 Pattern: Physical Join Algorithms &amp; Execution Pipelines</span>
+              <span class="badge">⏱ Target Time: <code>O(N) sequential/index scan</code></span>
+              <span class="badge">💾 Auxiliary Space: <code>O(1) tuple projection state</code></span>
+              <span class="badge">🧭 Pattern: Physical Join Algorithms &amp; Execution Pipelines · parallel-hash-join</span>
               <span class="badge">🗄️ Dataset: <code>ecommerce</code></span>
             </div>
           </div>
@@ -1525,15 +1525,27 @@ flowchart LR
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">01</span>
-                    <span class="build-lab-step-card__target">Phase 1 · Base Relation &amp; SARGable Predicate</span>
+                    <span class="build-lab-step-card__target">Phase 1 · Parallel Query Execution: Parallel Seq Scan, Parallel Hash Join &amp; Gather Nodes: Three-Valued Logic &amp; NULL Inspection</span>
                   </div>
-                  <div class="build-lab-step-card__title">Base Relation Scan &amp; SARGable Filter (ecommerce)</div>
-                  <div class="build-lab-step-card__invariant">Establish the base relation scan in <code>ecommerce</code> for Parallel Query Execution: Parallel Seq Scan, Parallel Hash Join &amp; Gather Nodes with a SARGable predicate and explicit Three-Valued Logic NULL handling.</div>
-                  <div class="build-lab-step-card__concept">Run or edit <code>query.sql</code> to inspect the base table tuples, verify SARGable index filtering in the <code>WHERE</code> clause, and step through the live Table Visualizer.</div>
+                  <div class="build-lab-step-card__title">Inspect Nullable Promo Codes in Orders (parallel-query-execution-workers)</div>
+                  <div class="build-lab-step-card__invariant">Observe how <code>discount_code</code> contains <code>NULL</code> markers where direct equality (<code>=</code> or <code>&lt;&gt;</code>) evaluates to <code>UNKNOWN</code> under SQL Three-Valued Logic.</div>
+                  <div class="build-lab-step-card__concept">Enhance the starter query in <code>query.sql</code> with <code>COALESCE(discount_code, &#039;NO_PROMO&#039;)</code> and an explicit <code>IS NULL</code> / <code>IS NOT NULL</code> classification.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>💡 Progressive SQL Hint (Step 1)</summary>
-                      <pre><code>SELECT order_id, customer_id, status, ROUND(total_cents / 100.0, 2) AS total_usd, COALESCE(discount_code, &#039;NONE&#039;) AS promo_code, created_at FROM orders WHERE status = &#039;completed&#039; AND total_cents &gt;= 30000 ORDER BY total_cents DESC LIMIT 10;</code></pre>
+                      <pre><code>-- Step 1 Solution (parallel-query-execution-workers): Explicit 3VL NULL guard and promo normalization
+SELECT
+  order_id,
+  customer_id,
+  status,
+  COALESCE(discount_code, &#039;NO_PROMO&#039;) AS promo_code,
+  CASE
+    WHEN discount_code IS NULL THEN &#039;ORGANIC_CHECKOUT&#039;
+    ELSE &#039;PROMO_APPLIED&#039;
+  END AS promo_state,
+  ROUND(total_cents / 100.0, 2) AS order_usd
+FROM orders
+ORDER BY total_cents DESC, order_id ASC;</code></pre>
                     </details>
                   
                 </div>
@@ -1549,32 +1561,28 @@ flowchart LR
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">02</span>
-                    <span class="build-lab-step-card__target">Phase 2 · Relational Join, Aggregation &amp; 3VL Guard</span>
+                    <span class="build-lab-step-card__target">Phase 2 · Parallel Query Execution: Parallel Seq Scan, Parallel Hash Join &amp; Gather Nodes: Payment &amp; Shipment Fulfillment Join</span>
                   </div>
-                  <div class="build-lab-step-card__title">Relational Join, Grouping &amp; NULL-Safe Aggregation</div>
-                  <div class="build-lab-step-card__invariant">Combine normalized tables via explicit JOIN conditions and fold group buckets or window partitions without losing NULL boundary rows.</div>
-                  <div class="build-lab-step-card__concept">Run or refine the Step 2 relational join and aggregation query in <code>query.sql</code>, then click <strong>🔍 Step Clauses</strong> to inspect each intermediate table.</div>
+                  <div class="build-lab-step-card__title">Reconcile Orders with Payments &amp; Shipments (Parallel Query Execution: Parallel Seq Scan, Parallel Hash Join &amp; Gather Nodes)</div>
+                  <div class="build-lab-step-card__invariant">Correlate <code>orders</code> against <code>payments</code> and <code>shipments</code> using <code>LEFT JOIN</code> so unpaid or unshipped orders remain visible.</div>
+                  <div class="build-lab-step-card__concept">Add the <code>LEFT JOIN shipments</code> clause and normalize missing payment/carrier attributes with <code>COALESCE</code>.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>💡 Progressive SQL Hint (Step 2)</summary>
-                      <pre><code>-- Dataset: ecommerce | Live Verification, 3VL Guard &amp; SARGable Plan Audit (parallel-query-execution-workers)
+                      <pre><code>-- Step 2 Solution (parallel-query-execution-workers): Full order-to-payment-to-shipment reconciliation
 SELECT
-  c.customer_id,
-  c.name AS customer_name,
-  c.tier,
-  c.country,
-  COUNT(o.order_id) AS completed_orders,
-  ROUND(COALESCE(SUM(o.total_cents), 0) / 100.0, 2) AS verified_spend_usd,
-  ROUND(
-    AVG(COALESCE(SUM(o.total_cents), 0)) OVER (PARTITION BY c.tier) / 100.0,
-    2
-  ) AS tier_peer_avg_spend_usd
-FROM customers AS c
-LEFT JOIN orders AS o
-  ON o.customer_id = c.customer_id
-  AND o.status = &#039;completed&#039;
-GROUP BY c.customer_id, c.name, c.tier, c.country
-ORDER BY verified_spend_usd DESC, c.customer_id ASC;</code></pre>
+  o.order_id,
+  o.status AS order_status,
+  ROUND(o.total_cents / 100.0, 2) AS billed_usd,
+  COALESCE(pay.method, &#039;UNPAID&#039;) AS payment_method,
+  COALESCE(pay.status, &#039;PENDING&#039;) AS payment_status,
+  COALESCE(s.carrier, &#039;NOT_SHIPPED&#039;) AS carrier_status
+FROM orders AS o
+LEFT JOIN payments AS pay
+  ON pay.order_id = o.order_id
+LEFT JOIN shipments AS s
+  ON s.order_id = o.order_id
+ORDER BY o.order_id ASC;</code></pre>
                     </details>
                   
                 </div>
@@ -1590,28 +1598,33 @@ ORDER BY verified_spend_usd DESC, c.customer_id ASC;</code></pre>
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">03</span>
-                    <span class="build-lab-step-card__target">Phase 3 · Production Query &amp; Plan Verification</span>
+                    <span class="build-lab-step-card__target">Phase 3 · Parallel Query Execution: Parallel Seq Scan, Parallel Hash Join &amp; Gather Nodes: End-to-End Order Settlement Audit</span>
                   </div>
-                  <div class="build-lab-step-card__title">Production Query &amp; Execution Plan Verification (Parallel Query Execution: Parallel Seq Scan, Parallel Hash Join &amp; Gather Nodes)</div>
-                  <div class="build-lab-step-card__invariant">Verify final column projections, ordering, and physical B+Tree access paths via EXPLAIN QUERY PLAN and automated relational assertions.</div>
-                  <div class="build-lab-step-card__concept">Execute the complete production query in <code>query.sql</code> and click <strong>✓ Check SQL Assertions</strong> to verify schema alignment, row cardinality, and tuple equivalence.</div>
+                  <div class="build-lab-step-card__title">Production Settlement &amp; Promo Attribution Query (Parallel Query Execution: Parallel Seq Scan, Parallel Hash Join &amp; Gather Nodes)</div>
+                  <div class="build-lab-step-card__invariant">Produce the complete customer, promo, payment, and fulfillment audit relation with strict 3VL NULL guards.</div>
+                  <div class="build-lab-step-card__concept">Run the complete multi-table settlement audit in <code>query.sql</code> and verify each clause in the Table Visualizer.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>💡 Progressive SQL Hint (Step 3)</summary>
-                      <pre><code>-- Dataset: ecommerce | Covering Category-Price Index Scan (idx_products_category_price)
+                      <pre><code>-- Dataset: ecommerce | Parallel Query Execution: Parallel Seq Scan, Parallel Hash Join &amp; Gather Nodes (parallel-query-execution-workers) — End-to-End Settlement &amp; 3VL Audit
 SELECT
-  p.category_id,
-  cat.name AS category_name,
-  p.product_id,
-  p.sku,
-  p.name AS product_name,
-  ROUND(p.price_cents / 100.0, 2) AS price_usd
-FROM products AS p
-INNER JOIN categories AS cat
-  ON cat.category_id = p.category_id
-WHERE p.category_id IN (20, 30, 40)
-  AND p.price_cents &gt;= 10000
-ORDER BY p.category_id ASC, p.price_cents DESC;</code></pre>
+  o.order_id,
+  c.name AS customer_name,
+  c.tier,
+  o.status AS order_status,
+  COALESCE(o.discount_code, &#039;NO_PROMO&#039;) AS promo_code,
+  ROUND(o.total_cents / 100.0, 2) AS billed_usd,
+  COALESCE(pay.method, &#039;UNPAID&#039;) AS payment_method,
+  COALESCE(pay.status, &#039;AWAITING_SETTLEMENT&#039;) AS payment_status,
+  COALESCE(s.carrier, &#039;UNFULFILLED&#039;) AS shipping_carrier
+FROM orders AS o
+INNER JOIN customers AS c
+  ON c.customer_id = o.customer_id
+LEFT JOIN payments AS pay
+  ON pay.order_id = o.order_id
+LEFT JOIN shipments AS s
+  ON s.order_id = o.order_id
+ORDER BY o.total_cents DESC, o.order_id ASC;</code></pre>
                     </details>
                   
                 </div>
@@ -1731,7 +1744,7 @@ ORDER BY p.category_id ASC, p.price_cents DESC;</code></pre>
   <script type="text/plain" data-defer src="data/srs-cards.js?v=fabc47dd9c"></script>
   <script type="text/plain" data-defer src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
   <script type="text/plain" data-defer src="data/implementations_code.js?v=fce884f8a8"></script>
-  <script type="text/plain" data-defer src="data/topic_guided_labs.js?v=341584ee01"></script>
+  <script type="text/plain" data-defer src="data/topic_guided_labs.js?v=2a57d85494"></script>
   <script type="text/plain" data-defer src="data/projects.js?v=2280ac085f"></script>
   <script type="text/plain" data-defer src="data/glossary.js?v=4f6c79a4e0"></script>
 
@@ -1742,8 +1755,8 @@ ORDER BY p.category_id ASC, p.price_cents DESC;</code></pre>
   <script type="text/plain" data-defer src="js/search.js?v=e2063e0ccd"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
   <script type="text/plain" data-defer src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>
-  <script type="text/plain" data-defer src="js/sql-engine.js?v=a668c919ba"></script>
-  <script type="text/plain" data-defer src="js/table-visualizer.js?v=ea5db1c17a"></script>
+  <script type="text/plain" data-defer src="js/sql-engine.js?v=60d0c505ad"></script>
+  <script type="text/plain" data-defer src="js/table-visualizer.js?v=1f1a1f2968"></script>
   <script type="text/plain" data-defer src="js/simulators.js?v=68b973e4c8"></script>
   <script type="text/plain" data-defer src="js/simulators-relational.js?v=8e12b97831"></script>
   <script type="text/plain" data-defer src="js/simulators-analytical.js?v=258089d8ac"></script>
@@ -1760,10 +1773,10 @@ ORDER BY p.category_id ASC, p.price_cents DESC;</code></pre>
   <script type="text/plain" data-defer src="js/roadmap.js?v=cebfb7e32c"></script>
   <script type="text/plain" data-defer src="js/challenges.js?v=fcc5b1b6c5"></script>
   <script type="text/plain" data-defer src="js/dashboard.js?v=d411d5a9bb"></script>
-  <script type="text/plain" data-defer src="js/sandbox.js?v=1f94508aa4"></script>
+  <script type="text/plain" data-defer src="js/sandbox.js?v=5528739eb9"></script>
   <script type="text/plain" data-defer src="js/topic-codelab.js?v=096611d91c"></script>
   
-  <script type="text/plain" data-defer src="js/app.js?v=ab7d42f863"></script>
+  <script type="text/plain" data-defer src="js/app.js?v=79ca5d1666"></script>
 
   <!-- App bootstrap & deferred script loader -->
   <script src="js/bootstrap.js?v=df2bb60aeb"></script>

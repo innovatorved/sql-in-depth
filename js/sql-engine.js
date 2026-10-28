@@ -269,13 +269,8 @@
   }
 
   function init() {
-    if (_engineMode === 'postgres') {
-      return Promise.all([
-        initSqlite(),
-        initPglite().catch(function () {})
-      ]).then(function (res) {
-        return res[0];
-      });
+    if (_engineMode === 'postgres' && !_pgDb) {
+      initPglite().catch(function () {});
     }
     return initSqlite();
   }
@@ -840,14 +835,15 @@
   /**
    * Executes a SQL string and returns structured result sets, columnTypes, dmlDiff, timing, and EXPLAIN plan.
    */
-  function execute(sql, options) {
+  function execute(sql, options, thirdOptions) {
     if (typeof options === 'string') {
-      options = { datasetId: options };
+      options = Object.assign({ datasetId: options }, thirdOptions || {});
     }
     options = options || {};
     var datasetId = options.datasetId || '__unified__';
     var includeExplain = options.explain !== false;
-    var forceEngine = options.engine || _engineMode;
+    var explicitEngine = options.engine || null;
+    var forceEngine = explicitEngine || _engineMode;
 
     function runSqliteFallback() {
       var dbGetter = datasetId === '__unified__'
@@ -941,13 +937,18 @@
       });
     }
 
-    // Always use PostgreSQL 18 when requested, awaiting PGlite initialization in both Browser and Node
-    if (forceEngine === 'postgres') {
+    // Use PostgreSQL 18 when explicitly requested or when PGlite is already warm in postgres mode
+    if (explicitEngine === 'postgres' || (forceEngine === 'postgres' && Boolean(_pgDb))) {
       return initPglite().then(function (pgDb) {
         return executePostgres(pgDb, sql, options);
       }).catch(function () {
         return runSqliteFallback();
       });
+    }
+
+    // If in postgres mode while PGlite is still booting, warm PGlite in background and execute immediately on SQLite
+    if (forceEngine === 'postgres' && !_pgDb) {
+      initPglite().catch(function () {});
     }
 
     // Fallback or explicit SQLite 3 execution
@@ -1092,6 +1093,7 @@
     isPgliteReady: isPgliteReady,
     getEngineLabel: getEngineLabel,
     onEngineChange: onEngineChange,
+    onEngineReady: onEngineChange,
     normalizeDialect: normalizeDialect,
     createDatabaseForDataset: createDatabaseForDataset,
     getUnifiedDatabase: getUnifiedDatabase,

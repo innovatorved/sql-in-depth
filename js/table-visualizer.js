@@ -86,6 +86,639 @@
         return root.SQL_DATASETS || root.SQLDatasets || {};
     }
 
+    var SQL_KEYWORDS_LIST = [
+        'SELECT', 'FROM', 'WHERE', 'JOIN', 'INNER', 'LEFT', 'RIGHT', 'FULL', 'OUTER', 'CROSS', 'NATURAL', 'LATERAL',
+        'ON', 'USING', 'GROUP', 'BY', 'HAVING', 'WINDOW', 'PARTITION', 'ORDER', 'ASC', 'DESC', 'NULLS', 'FIRST', 'LAST',
+        'LIMIT', 'OFFSET', 'FETCH', 'NEXT', 'ROWS', 'ONLY', 'WITH', 'RECURSIVE', 'AS', 'DISTINCT', 'ALL', 'UNION',
+        'INTERSECT', 'EXCEPT', 'CASE', 'WHEN', 'THEN', 'ELSE', 'END', 'AND', 'OR', 'NOT', 'IN', 'EXISTS', 'BETWEEN',
+        'LIKE', 'ILIKE', 'SIMILAR', 'TO', 'IS', 'NULL', 'TRUE', 'FALSE', 'UNKNOWN', 'INSERT', 'INTO', 'VALUES',
+        'UPDATE', 'SET', 'DELETE', 'RETURNING', 'CONFLICT', 'DO', 'NOTHING', 'EXCLUDED', 'MERGE', 'MATCHED',
+        'CREATE', 'ALTER', 'DROP', 'TABLE', 'VIEW', 'INDEX', 'MATERIALIZED', 'UNIQUE', 'PRIMARY', 'KEY', 'FOREIGN',
+        'REFERENCES', 'CHECK', 'DEFAULT', 'CONSTRAINT', 'CASCADE', 'RESTRICT', 'BEGIN', 'COMMIT', 'ROLLBACK',
+        'SAVEPOINT', 'TRANSACTION', 'ISOLATION', 'LEVEL', 'SERIALIZABLE', 'REPEATABLE', 'READ', 'COMMITTED',
+        'UNCOMMITTED', 'FOR', 'SHARE', 'SKIP', 'LOCKED', 'NOWAIT', 'EXPLAIN', 'ANALYZE', 'BUFFERS', 'COSTS',
+        'VERBOSE', 'FORMAT', 'FILTER', 'OVER', 'RANGE', 'UNBOUNDED', 'PRECEDING', 'FOLLOWING', 'CURRENT', 'ROW',
+        'GROUPS', 'EXCLUDE', 'TIES', 'NO', 'OTHERS', 'ROLLUP', 'CUBE', 'GROUPING', 'SETS', 'CAST',
+        'CURRENT_DATE', 'CURRENT_TIMESTAMP', 'CURRENT_TIME', 'PRAGMA'
+    ];
+
+    var SQL_FUNCTIONS_LIST = [
+        'COUNT', 'SUM', 'AVG', 'MIN', 'MAX', 'COALESCE', 'NULLIF', 'GREATEST', 'LEAST', 'ROUND', 'FLOOR', 'CEIL',
+        'CEILING', 'ABS', 'MOD', 'POWER', 'SQRT', 'ROW_NUMBER', 'RANK', 'DENSE_RANK', 'NTILE', 'PERCENT_RANK',
+        'CUME_DIST', 'LAG', 'LEAD', 'FIRST_VALUE', 'LAST_VALUE', 'NTH_VALUE', 'STRING_AGG', 'GROUP_CONCAT',
+        'ARRAY_AGG', 'JSON_OBJECT', 'JSON_BUILD_OBJECT', 'JSONB_BUILD_OBJECT', 'JSON_AGG', 'JSONB_AGG',
+        'JSON_EXTRACT', 'LOWER', 'UPPER', 'TRIM', 'LTRIM', 'RTRIM', 'SUBSTR', 'SUBSTRING', 'LENGTH', 'CHAR_LENGTH',
+        'REPLACE', 'CONCAT', 'SPLIT_PART', 'REGEXP_REPLACE', 'REGEXP_MATCHES', 'INSTR', 'STRPOS', 'PRINTF',
+        'REPEAT', 'DATE_TRUNC', 'EXTRACT', 'AGE', 'NOW', 'TO_CHAR', 'TO_DATE', 'TO_TIMESTAMP', 'GENERATE_SERIES',
+        'RANDOM', 'JULIANDAY', 'STRFTIME', 'DATETIME', 'IIF', 'IFNULL'
+    ];
+
+    var SQL_TYPES_LIST = [
+        'INT', 'INTEGER', 'BIGINT', 'SMALLINT', 'SERIAL', 'BIGSERIAL', 'NUMERIC', 'DECIMAL', 'REAL', 'FLOAT',
+        'DOUBLE', 'PRECISION', 'MONEY', 'TEXT', 'VARCHAR', 'CHAR', 'CHARACTER', 'VARYING', 'BOOLEAN', 'BOOL',
+        'DATE', 'TIME', 'TIMESTAMP', 'TIMESTAMPTZ', 'INTERVAL', 'UUID', 'JSON', 'JSONB', 'BYTEA', 'INET',
+        'CIDR', 'ARRAY', 'VECTOR'
+    ];
+
+    var SQL_KEYWORDS_SET = {};
+    SQL_KEYWORDS_LIST.forEach(function (k) { SQL_KEYWORDS_SET[k] = true; });
+    var SQL_FUNCTIONS_SET = {};
+    SQL_FUNCTIONS_LIST.forEach(function (f) { SQL_FUNCTIONS_SET[f] = true; });
+    var SQL_TYPES_SET = {};
+    SQL_TYPES_LIST.forEach(function (t) { SQL_TYPES_SET[t] = true; });
+
+    /**
+     * Tokenizes a SQL string into syntax-highlighted HTML spans (.sql-tok-*).
+     */
+    function highlightSql(sql) {
+        if (sql === null || sql === undefined) return '';
+        var raw = String(sql);
+        if (!raw) return '';
+        var tokenRe = /(\/\*[\s\S]*?\*\/|--[^\n]*)|('(?:''|[^'])*')|(\b\d+(?:\.\d+)?\b)|(::|->>|->|#>>|#>|@>|<@|<>|!=|<=|>=|\|\||[=<>+\-*/%])|(\b[A-Za-z_][A-Za-z0-9_]*\b)/g;
+        var out = '';
+        var lastIndex = 0;
+        var match;
+        while ((match = tokenRe.exec(raw)) !== null) {
+            if (match.index > lastIndex) {
+                out += escapeHtml(raw.slice(lastIndex, match.index));
+            }
+            var full = match[0];
+            if (match[1] !== undefined) {
+                out += '<span class="sql-tok-cmt sql-tok-comment">' + escapeHtml(full) + '</span>';
+            } else if (match[2] !== undefined) {
+                out += '<span class="sql-tok-str">' + escapeHtml(full) + '</span>';
+            } else if (match[3] !== undefined) {
+                out += '<span class="sql-tok-num">' + escapeHtml(full) + '</span>';
+            } else if (match[4] !== undefined) {
+                out += '<span class="sql-tok-op">' + escapeHtml(full) + '</span>';
+            } else if (match[5] !== undefined) {
+                var upper = full.toUpperCase();
+                var afterSlice = raw.slice(tokenRe.lastIndex, tokenRe.lastIndex + 12);
+                var isFuncCall = /^\s*\(/.test(afterSlice);
+                if (SQL_FUNCTIONS_SET[upper] && isFuncCall) {
+                    out += '<span class="sql-tok-fn">' + escapeHtml(full) + '</span>';
+                } else if (SQL_KEYWORDS_SET[upper]) {
+                    out += '<span class="sql-tok-kw sql-tok-keyword">' + escapeHtml(full) + '</span>';
+                } else if (SQL_FUNCTIONS_SET[upper]) {
+                    out += '<span class="sql-tok-fn">' + escapeHtml(full) + '</span>';
+                } else if (SQL_TYPES_SET[upper]) {
+                    out += '<span class="sql-tok-type">' + escapeHtml(full) + '</span>';
+                } else {
+                    out += escapeHtml(full);
+                }
+            } else {
+                out += escapeHtml(full);
+            }
+            lastIndex = tokenRe.lastIndex;
+        }
+        if (lastIndex < raw.length) {
+            out += escapeHtml(raw.slice(lastIndex));
+        }
+        return out;
+    }
+
+    /**
+     * One-click SQL formatter & keyword uppercaser.
+     * Preserves string literals and comments while uppercasing SQL keywords/functions
+     * and placing major clauses on cleanly indented lines.
+     */
+    function formatSql(sql) {
+        if (sql === null || sql === undefined) return '';
+        var raw = String(sql).trim();
+        if (!raw) return '';
+
+        var placeholders = [];
+        var protectedSql = raw.replace(/(\/\*[\s\S]*?\*\/|--[^\n]*|'(?:''|[^'])*')/g, function (m) {
+            var idx = placeholders.length;
+            placeholders.push(m);
+            return '__SQL_PH_' + idx + '__';
+        });
+
+        // Collapse horizontal whitespace runs while keeping existing newlines reasonable
+        protectedSql = protectedSql.replace(/[ \t]+/g, ' ').replace(/\s*\n\s*/g, '\n');
+
+        // Uppercase SQL keywords and built-in functions outside placeholders
+        protectedSql = protectedSql.replace(/\b([A-Za-z_][A-Za-z0-9_]*)\b/g, function (word, _w, offset, fullStr) {
+            if (/^__SQL_PH_\d+__$/.test(word)) return word;
+            var up = word.toUpperCase();
+            var rest = fullStr.slice(offset + word.length, offset + word.length + 10);
+            if (SQL_KEYWORDS_SET[up]) return up;
+            if (SQL_FUNCTIONS_SET[up] && /^\s*\(/.test(rest)) return up;
+            if (SQL_TYPES_SET[up] && offset >= 2 && fullStr.slice(offset - 2, offset) === '::') return up;
+            return word;
+        });
+
+        // Normalize compound clause spacing
+        protectedSql = protectedSql
+            .replace(/\bGROUP\s+BY\b/g, 'GROUP BY')
+            .replace(/\bORDER\s+BY\b/g, 'ORDER BY')
+            .replace(/\bPARTITION\s+BY\b/g, 'PARTITION BY')
+            .replace(/\bINNER\s+JOIN\b/g, 'INNER JOIN')
+            .replace(/\bLEFT\s+OUTER\s+JOIN\b/g, 'LEFT OUTER JOIN')
+            .replace(/\bLEFT\s+JOIN\b/g, 'LEFT JOIN')
+            .replace(/\bRIGHT\s+OUTER\s+JOIN\b/g, 'RIGHT OUTER JOIN')
+            .replace(/\bRIGHT\s+JOIN\b/g, 'RIGHT JOIN')
+            .replace(/\bFULL\s+OUTER\s+JOIN\b/g, 'FULL OUTER JOIN')
+            .replace(/\bFULL\s+JOIN\b/g, 'FULL JOIN')
+            .replace(/\bCROSS\s+JOIN\b/g, 'CROSS JOIN')
+            .replace(/\bLATERAL\s+JOIN\b/g, 'LATERAL JOIN')
+            .replace(/\bUNION\s+ALL\b/g, 'UNION ALL')
+            .replace(/\bINSERT\s+INTO\b/g, 'INSERT INTO')
+            .replace(/\bDELETE\s+FROM\b/g, 'DELETE FROM')
+            .replace(/\bON\s+CONFLICT\b/g, 'ON CONFLICT');
+
+        // Break major top-level clauses onto new lines (tracking parenthesis depth)
+        var majorClauses = [
+            'WITH RECURSIVE', 'WITH', 'SELECT', 'FROM',
+            'LEFT OUTER JOIN', 'RIGHT OUTER JOIN', 'FULL OUTER JOIN',
+            'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'FULL JOIN', 'CROSS JOIN', 'LATERAL JOIN', 'JOIN',
+            'WHERE', 'GROUP BY', 'HAVING', 'WINDOW', 'ORDER BY', 'LIMIT', 'OFFSET',
+            'UNION ALL', 'UNION', 'INTERSECT', 'EXCEPT',
+            'INSERT INTO', 'VALUES', 'UPDATE', 'SET', 'DELETE FROM', 'ON CONFLICT', 'RETURNING'
+        ];
+
+        // Flatten single-line queries or re-flow top-level clauses cleanly
+        var singleSpaced = protectedSql.replace(/\s+/g, ' ').trim();
+        var depth = 0;
+        var inBetween = false;
+        var formatted = '';
+        var i = 0;
+        while (i < singleSpaced.length) {
+            var ch = singleSpaced[i];
+            if (ch === '(') {
+                depth++;
+                formatted += ch;
+                i++;
+                continue;
+            }
+            if (ch === ')') {
+                depth = Math.max(0, depth - 1);
+                formatted += ch;
+                i++;
+                continue;
+            }
+            if (depth === 0 && (i === 0 || /\s/.test(singleSpaced[i - 1]))) {
+                var rem = singleSpaced.slice(i);
+                if (/^BETWEEN\b/.test(rem)) {
+                    inBetween = true;
+                }
+                var matchedClause = null;
+                for (var cIdx = 0; cIdx < majorClauses.length; cIdx++) {
+                    var cl = majorClauses[cIdx];
+                    var re = new RegExp('^' + cl.replace(/ /g, '\\s+') + '\\b');
+                    var m = rem.match(re);
+                    if (m) {
+                        matchedClause = { text: cl, rawLen: m[0].length };
+                        break;
+                    }
+                }
+                if (matchedClause) {
+                    if (formatted.trim().length > 0 && !formatted.endsWith('\n')) {
+                        formatted = formatted.replace(/[ \t]+$/, '') + '\n';
+                    }
+                    formatted += matchedClause.text;
+                    i += matchedClause.rawLen;
+                    inBetween = false;
+                    continue;
+                }
+                var subMatch = rem.match(/^(AND|OR)\b/);
+                if (subMatch) {
+                    if (subMatch[1] === 'AND' && inBetween) {
+                        inBetween = false;
+                        formatted += 'AND';
+                        i += 3;
+                        continue;
+                    }
+                    if (formatted.trim().length > 0 && !formatted.endsWith('\n')) {
+                        formatted = formatted.replace(/[ \t]+$/, '') + '\n  ';
+                    }
+                    formatted += subMatch[1];
+                    i += subMatch[0].length;
+                    continue;
+                }
+            }
+            formatted += ch;
+            i++;
+        }
+
+        // Restore comments and string literals
+        var restored = formatted.replace(/__SQL_PH_(\d+)__/g, function (_, idxStr) {
+            var p = placeholders[Number(idxStr)];
+            return p !== undefined ? p : '';
+        });
+
+        return restored
+            .split('\n')
+            .map(function (line) { return line.replace(/[ \t]+$/, ''); })
+            .join('\n')
+            .trim();
+    }
+
+    /**
+     * Enhances a <textarea> into a live syntax-highlighted SQL IDE with line numbers,
+     * scroll sync, Tab/Shift+Tab indentation, and Cmd/Ctrl+Enter execution.
+     */
+    function enhanceTextareaToIde(textarea, options) {
+        if (!textarea || typeof document === 'undefined') return null;
+        options = options || {};
+        if (textarea._sqlIdeInstance) {
+            if (options.onRun) textarea._sqlIdeInstance.onRun = options.onRun;
+            textarea._sqlIdeInstance.sync();
+            return textarea._sqlIdeInstance;
+        }
+
+        var shell = document.createElement('div');
+        shell.className = 'sql-ide-shell';
+
+        var gutter = document.createElement('div');
+        gutter.className = 'sql-ide-gutter';
+        gutter.setAttribute('aria-hidden', 'true');
+
+        var stage = document.createElement('div');
+        stage.className = 'sql-ide-stage';
+
+        var backdrop = document.createElement('pre');
+        backdrop.className = 'sql-ide-backdrop';
+        backdrop.setAttribute('aria-hidden', 'true');
+
+        var highlightCode = document.createElement('code');
+        highlightCode.className = 'sql-ide-highlight';
+        backdrop.appendChild(highlightCode);
+
+        var parent = textarea.parentNode;
+        if (parent) {
+            parent.insertBefore(shell, textarea);
+        }
+        textarea.classList.add('sql-ide-textarea');
+        stage.appendChild(backdrop);
+        stage.appendChild(textarea);
+        shell.appendChild(gutter);
+        shell.appendChild(stage);
+
+        var lastLineCount = -1;
+        function sync() {
+            var val = textarea.value || '';
+            var lines = val.split('\n');
+            var count = Math.max(1, lines.length);
+            if (count !== lastLineCount) {
+                var numsHtml = '';
+                for (var ln = 1; ln <= count; ln++) {
+                    numsHtml += '<span class="sql-ide-line-num">' + ln + '</span>';
+                }
+                gutter.innerHTML = numsHtml;
+                lastLineCount = count;
+            }
+            highlightCode.innerHTML = highlightSql(val) + (val.endsWith('\n') ? '\n ' : '');
+            backdrop.scrollTop = textarea.scrollTop;
+            backdrop.scrollLeft = textarea.scrollLeft;
+            gutter.scrollTop = textarea.scrollTop;
+        }
+
+        // Hook .value setter on the textarea instance so programmatic textarea.value = ... auto-syncs
+        try {
+            var proto = typeof HTMLTextAreaElement !== 'undefined' ? HTMLTextAreaElement.prototype : Object.getPrototypeOf(textarea);
+            var desc = proto ? Object.getOwnPropertyDescriptor(proto, 'value') : null;
+            if (desc && desc.get && desc.set) {
+                Object.defineProperty(textarea, 'value', {
+                    configurable: true,
+                    enumerable: true,
+                    get: function () {
+                        return desc.get.call(this);
+                    },
+                    set: function (v) {
+                        desc.set.call(this, v);
+                        sync();
+                    }
+                });
+            }
+        } catch (e) {}
+
+        var instance = {
+            shell: shell,
+            gutter: gutter,
+            backdrop: backdrop,
+            highlightCode: highlightCode,
+            textarea: textarea,
+            onRun: options.onRun || null,
+            sync: sync
+        };
+
+        textarea.addEventListener('input', sync);
+        textarea.addEventListener('change', sync);
+        textarea.addEventListener('scroll', function () {
+            backdrop.scrollTop = textarea.scrollTop;
+            backdrop.scrollLeft = textarea.scrollLeft;
+            gutter.scrollTop = textarea.scrollTop;
+        });
+
+        textarea.addEventListener('keydown', function (ev) {
+            if (ev.key === 'Tab') {
+                ev.preventDefault();
+                var start = textarea.selectionStart || 0;
+                var end = textarea.selectionEnd || 0;
+                var current = textarea.value || '';
+                if (!ev.shiftKey) {
+                    textarea.value = current.slice(0, start) + '  ' + current.slice(end);
+                    textarea.selectionStart = textarea.selectionEnd = start + 2;
+                } else {
+                    var lineStart = current.lastIndexOf('\n', Math.max(0, start - 1)) + 1;
+                    var prefix = current.slice(lineStart, lineStart + 2);
+                    var removeCount = prefix === '  ' ? 2 : (prefix.charAt(0) === ' ' || prefix.charAt(0) === '\t' ? 1 : 0);
+                    if (removeCount > 0) {
+                        textarea.value = current.slice(0, lineStart) + current.slice(lineStart + removeCount);
+                        textarea.selectionStart = Math.max(lineStart, start - removeCount);
+                        textarea.selectionEnd = Math.max(lineStart, end - removeCount);
+                    }
+                }
+                sync();
+                try {
+                    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+                } catch (e) {}
+                return;
+            }
+            if ((ev.metaKey || ev.ctrlKey) && ev.key === 'Enter') {
+                if (typeof instance.onRun === 'function') {
+                    ev.preventDefault();
+                    instance.onRun(textarea.value);
+                }
+            }
+        });
+
+        textarea._sqlIdeInstance = instance;
+        textarea._syncSqlIde = sync;
+        sync();
+        return instance;
+    }
+
+    // --- Saved Queries & Query History Persistence ---
+    var SAVED_QUERIES_KEY = 'sql_in_depth_saved_queries_v1';
+    var QUERY_HISTORY_KEY = 'sql_in_depth_query_history_v1';
+    var _memStore = {};
+
+    function readStorageJson(key, fallback) {
+        try {
+            if (root.localStorage && typeof root.localStorage.getItem === 'function') {
+                var raw = root.localStorage.getItem(key);
+                if (raw) {
+                    var parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed)) return parsed;
+                }
+            }
+        } catch (e) {}
+        return Array.isArray(_memStore[key]) ? _memStore[key].slice() : (fallback || []);
+    }
+
+    function writeStorageJson(key, arr) {
+        var safeArr = Array.isArray(arr) ? arr : [];
+        _memStore[key] = safeArr.slice();
+        try {
+            if (root.localStorage && typeof root.localStorage.setItem === 'function') {
+                root.localStorage.setItem(key, JSON.stringify(safeArr));
+            }
+        } catch (e) {}
+        return safeArr;
+    }
+
+    function getSavedQueries() {
+        return readStorageJson(SAVED_QUERIES_KEY, []);
+    }
+
+    function saveQuery(titleOrObj, sql, datasetId) {
+        var rawTitle = titleOrObj;
+        var rawSql = sql;
+        var rawDs = datasetId;
+        if (titleOrObj && typeof titleOrObj === 'object' && !Array.isArray(titleOrObj)) {
+            rawTitle = titleOrObj.title || titleOrObj.name || '';
+            rawSql = titleOrObj.sql || titleOrObj.query || '';
+            rawDs = titleOrObj.datasetId || titleOrObj.dataset || '';
+        }
+        var cleanSql = String(rawSql || '').trim();
+        var cleanTitle = String(rawTitle || '').trim() || ('Query (' + (rawDs || 'ecommerce') + ')');
+        var cleanDs = String(rawDs || inferDatasetFromSql(cleanSql) || 'ecommerce');
+        var list = getSavedQueries();
+        var entry = {
+            id: 'sq_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+            title: cleanTitle,
+            sql: cleanSql,
+            datasetId: cleanDs,
+            createdAt: new Date().toISOString()
+        };
+        list.unshift(entry);
+        writeStorageJson(SAVED_QUERIES_KEY, list);
+        return entry;
+    }
+
+    function deleteSavedQuery(id) {
+        var list = getSavedQueries().filter(function (item) {
+            return item && item.id !== id;
+        });
+        return writeStorageJson(SAVED_QUERIES_KEY, list);
+    }
+
+    function getQueryHistory() {
+        return readStorageJson(QUERY_HISTORY_KEY, []);
+    }
+
+    function recordQueryHistory(sqlOrObj, datasetId) {
+        var rawSql = sqlOrObj;
+        var rawDs = datasetId;
+        if (sqlOrObj && typeof sqlOrObj === 'object' && !Array.isArray(sqlOrObj)) {
+            rawSql = sqlOrObj.sql || sqlOrObj.query || '';
+            rawDs = sqlOrObj.datasetId || sqlOrObj.dataset || '';
+        }
+        var cleanSql = String(rawSql || '').trim();
+        if (!cleanSql) return getQueryHistory();
+        var cleanDs = String(rawDs || inferDatasetFromSql(cleanSql) || 'ecommerce');
+        var list = getQueryHistory().filter(function (item) {
+            return item && item.sql !== cleanSql;
+        });
+        var entry = {
+            id: 'qh_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+            sql: cleanSql,
+            datasetId: cleanDs,
+            executedAt: new Date().toISOString()
+        };
+        list.unshift(entry);
+        if (list.length > 30) {
+            list = list.slice(0, 30);
+        }
+        writeStorageJson(QUERY_HISTORY_KEY, list);
+        return entry;
+    }
+
+    function clearQueryHistory() {
+        return writeStorageJson(QUERY_HISTORY_KEY, []);
+    }
+
+    // --- Multi-Format Export (.sql, .csv, .json) ---
+    function serializeCsvCell(val) {
+        if (val === null || val === undefined) return '';
+        var str = typeof val === 'object' ? JSON.stringify(val) : String(val);
+        if (/[",\r\n]/.test(str)) {
+            return '"' + str.replace(/"/g, '""') + '"';
+        }
+        return str;
+    }
+
+    function serializeCsv(columns, rows) {
+        var cols = Array.isArray(columns) ? columns : [];
+        var dataRows = Array.isArray(rows) ? rows : [];
+        var lines = [];
+        if (cols.length > 0) {
+            lines.push(cols.map(serializeCsvCell).join(','));
+        }
+        dataRows.forEach(function (row) {
+            if (Array.isArray(row)) {
+                lines.push(row.map(serializeCsvCell).join(','));
+            } else if (row && typeof row === 'object') {
+                lines.push(cols.map(function (c) { return serializeCsvCell(row[c]); }).join(','));
+            }
+        });
+        return lines.join('\n');
+    }
+
+    function serializeJson(columns, rows) {
+        var cols = Array.isArray(columns) ? columns : [];
+        var dataRows = Array.isArray(rows) ? rows : [];
+        var objects = dataRows.map(function (row) {
+            if (row && !Array.isArray(row) && typeof row === 'object') {
+                return row;
+            }
+            var obj = {};
+            cols.forEach(function (colName, idx) {
+                var v = Array.isArray(row) ? row[idx] : undefined;
+                obj[colName] = v === undefined ? null : v;
+            });
+            return obj;
+        });
+        return JSON.stringify(objects, null, 2);
+    }
+
+    function triggerDownload(content, filename, mimeType) {
+        try {
+            if (typeof document !== 'undefined' && typeof Blob !== 'undefined' && typeof URL !== 'undefined' && typeof URL.createObjectURL === 'function') {
+                var blob = new Blob([content], { type: mimeType || 'text/plain;charset=utf-8' });
+                var url = URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = filename || 'export.txt';
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                setTimeout(function () {
+                    try { URL.revokeObjectURL(url); } catch (e) {}
+                }, 250);
+            }
+        } catch (e) {}
+        return content;
+    }
+
+    function exportSql(sql, filename) {
+        var content = String(sql || '');
+        return triggerDownload(content, filename || 'query.sql', 'application/sql;charset=utf-8');
+    }
+
+    function exportCsv(columns, rows, filename) {
+        var content = serializeCsv(columns, rows);
+        return triggerDownload(content, filename || 'results.csv', 'text/csv;charset=utf-8');
+    }
+
+    function exportJson(columns, rows, filename) {
+        var content = serializeJson(columns, rows);
+        return triggerDownload(content, filename || 'results.json', 'application/json;charset=utf-8');
+    }
+
+    function copySqlToClipboard(sql, buttonEl) {
+        var text = String(sql || '');
+        try {
+            if (typeof navigator !== 'undefined' && navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+                navigator.clipboard.writeText(text).catch(function () {});
+            }
+        } catch (e) {}
+        if (buttonEl) {
+            var orig = buttonEl.textContent;
+            buttonEl.textContent = '✓ Copied!';
+            setTimeout(function () {
+                buttonEl.textContent = orig;
+            }, 1200);
+        }
+        return text;
+    }
+
+    // --- Interactive SQL Clause Practice Chips ---
+    var SQL_PRACTICE_CHIPS = [
+        { id: 'select', label: 'SELECT', clause: 'SELECT', snippet: 'SELECT customer_id, full_name, tier\nFROM customers\nLIMIT 10;' },
+        { id: 'where', label: 'WHERE', clause: 'WHERE', snippet: "WHERE status = 'completed'\n  AND total_amount >= 100" },
+        { id: 'inner_join', label: 'INNER JOIN', clause: 'INNER JOIN', snippet: 'INNER JOIN orders o ON o.customer_id = c.customer_id' },
+        { id: 'left_join', label: 'LEFT JOIN', clause: 'LEFT JOIN', snippet: 'LEFT JOIN orders o ON o.customer_id = c.customer_id' },
+        { id: 'group_by', label: 'GROUP BY', clause: 'GROUP BY', snippet: 'GROUP BY 1\nORDER BY 2 DESC' },
+        { id: 'having', label: 'HAVING', clause: 'HAVING', snippet: 'HAVING COUNT(*) > 1' },
+        { id: 'window_over', label: 'WINDOW OVER', clause: 'WINDOW OVER', snippet: 'ROW_NUMBER() OVER (PARTITION BY dept_id ORDER BY salary DESC) AS dept_rank' },
+        { id: 'with_cte', label: 'WITH CTE', clause: 'WITH CTE', snippet: 'WITH summary_cte AS (\n  SELECT customer_id, SUM(total_amount) AS total_spent\n  FROM orders\n  GROUP BY customer_id\n)\nSELECT * FROM summary_cte;' },
+        { id: 'exists', label: 'EXISTS', clause: 'EXISTS', snippet: 'WHERE EXISTS (\n  SELECT 1 FROM orders o WHERE o.customer_id = c.customer_id\n)' },
+        { id: 'case_when', label: 'CASE WHEN', clause: 'CASE WHEN', snippet: "CASE\n  WHEN total_amount >= 200 THEN 'high'\n  WHEN total_amount >= 75 THEN 'medium'\n  ELSE 'low'\nEND AS spend_tier" },
+        { id: 'upsert', label: 'UPSERT', clause: 'UPSERT', snippet: "INSERT INTO categories (category_id, name)\nVALUES (1, 'Electronics')\nON CONFLICT (category_id) DO UPDATE SET name = EXCLUDED.name;" },
+        { id: 'explain', label: 'EXPLAIN', clause: 'EXPLAIN', snippet: 'EXPLAIN SELECT * FROM orders WHERE customer_id = 1;' }
+    ];
+
+    function buildPracticeChipsHtml() {
+        return '<div class="sql-practice-bar" role="toolbar" aria-label="SQL Clause Practice Chips">' +
+            '<span class="sql-practice-label">Clause Snippets:</span>' +
+            SQL_PRACTICE_CHIPS.map(function (chip) {
+                return '<button type="button" class="sql-practice-chip" data-sql-chip="' + escapeHtml(chip.label) + '" title="Insert ' + escapeHtml(chip.label) + ' clause snippet">+ ' + escapeHtml(chip.label) + '</button>';
+            }).join('') +
+        '</div>';
+    }
+
+    function insertSqlSnippet(textarea, snippet) {
+        if (!textarea || snippet === null || snippet === undefined) return '';
+        var text = String(snippet);
+        var current = textarea.value || '';
+        var start = typeof textarea.selectionStart === 'number' ? textarea.selectionStart : current.length;
+        var end = typeof textarea.selectionEnd === 'number' ? textarea.selectionEnd : current.length;
+        var before = current.slice(0, start);
+        var after = current.slice(end);
+        var needLeadingSpace = before.length > 0 && !/[\s(,\n]$/.test(before) && !/^[,);\s]/.test(text);
+        var prefix = needLeadingSpace ? (text.indexOf('\n') !== -1 ? '\n' : ' ') : '';
+        var nextVal = before + prefix + text + after;
+        textarea.value = nextVal;
+        var nextCursor = before.length + prefix.length + text.length;
+        try {
+            textarea.selectionStart = textarea.selectionEnd = nextCursor;
+            textarea.focus();
+        } catch (e) {}
+        if (typeof textarea._syncSqlIde === 'function') {
+            textarea._syncSqlIde();
+        }
+        try {
+            textarea.dispatchEvent(new Event('input', { bubbles: true }));
+        } catch (e) {}
+        return nextVal;
+    }
+
+    function buildSavedAndHistorySelectOptionsHtml() {
+        var saved = getSavedQueries();
+        var history = getQueryHistory();
+        var html = '<option value="">📂 Saved Queries (' + saved.length + ') &amp; History (' + history.length + ')...</option>';
+        if (saved.length > 0) {
+            html += '<optgroup label="★ Saved Queries">';
+            saved.forEach(function (item) {
+                html += '<option value="saved:' + escapeHtml(item.id) + '">★ ' + escapeHtml(item.title) + ' [' + escapeHtml(item.datasetId) + ']</option>';
+            });
+            html += '</optgroup>';
+        }
+        if (history.length > 0) {
+            html += '<optgroup label="🕒 Recent Query History">';
+            history.slice(0, 15).forEach(function (item, idx) {
+                var oneLine = String(item.sql || '').replace(/\s+/g, ' ').slice(0, 56);
+                html += '<option value="history:' + escapeHtml(item.id) + '">' + (idx + 1) + '. ' + escapeHtml(oneLine) + ' [' + escapeHtml(item.datasetId) + ']</option>';
+            });
+            html += '</optgroup>';
+        }
+        return html;
+    }
+
     /**
      * Return table names for a given datasetId, or all 26 table names across all datasets
      * when datasetId === '__unified__' or not a specific single dataset.
@@ -1285,21 +1918,39 @@
             container.innerHTML =
                 '<div class="sql-studio-inline-workbench" style="display:flex;flex-direction:column;gap:10px;padding:12px;background:var(--bg-elevated);">' +
                     '<div class="sql-lab-editor-box" style="display:flex;flex-direction:column;gap:8px;">' +
-                        '<div style="display:flex;align-items:center;justify-content:space-between;font-size:0.76rem;color:var(--fg-muted);padding:0 2px;">' +
-                            '<span style="font-family:var(--font-mono,monospace);color:var(--accent,#38bdf8);font-weight:700;">query.sql · Live SQL Workbench</span>' +
-                            '<span>Shortcut: Cmd/Ctrl + Enter to Run</span>' +
+                        '<div class="sql-ide-header-bar" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:0.76rem;color:var(--fg-muted);padding:0 2px;">' +
+                            '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
+                                '<span style="font-family:var(--font-mono,monospace);color:var(--accent,#38bdf8);font-weight:700;">query.sql · Live SQL IDE</span>' +
+                                '<span>Shortcut: Cmd/Ctrl + Enter to Run · Tab to Indent</span>' +
+                            '</div>' +
+                            '<div class="sql-studio-saved-panel" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">' +
+                                '<select class="sql-studio-saved-select" data-sql-ide-role="saved-history-select" aria-label="Saved Queries and History" style="background:var(--bg-surface);color:var(--fg);border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:0.74rem;max-width:260px;">' +
+                                    buildSavedAndHistorySelectOptionsHtml() +
+                                '</select>' +
+                                '<input type="text" data-sql-ide-role="save-title-input" placeholder="Query name..." aria-label="Saved query title" style="background:var(--bg-surface);color:var(--fg);border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:0.74rem;width:125px;" />' +
+                                '<button type="button" class="sql-exec-btn is-secondary" data-sql-ide-action="save-query" title="Save current SQL query to browser storage">💾 Save Query</button>' +
+                                '<button type="button" class="sql-exec-btn is-secondary" data-sql-ide-action="delete-saved" title="Delete selected saved query">🗑</button>' +
+                            '</div>' +
                         '</div>' +
+                        buildPracticeChipsHtml() +
                         '<textarea class="sql-live-editor sql-inline-textarea" rows="7" spellcheck="false" style="width:100%;font-family:var(--font-mono,monospace);font-size:0.85rem;padding:10px 12px;border-radius:8px;background:var(--bg-surface);color:var(--fg);border:1px solid var(--border-subtle,rgba(148,163,184,0.28));">' + escapeHtml(sql) + '</textarea>' +
                         '<div class="sql-lab-actions" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">' +
-                            '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
+                            '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">' +
                                 '<button type="button" class="sql-exec-btn is-primary" data-inline-viz-action="run">▶ Run &amp; Visualize SQL</button>' +
                                 '<button type="button" class="sql-exec-btn is-secondary" data-inline-viz-action="step">🔍 Step Clauses (Step 0 → 8)</button>' +
                                 '<button type="button" class="sql-exec-btn is-verify" data-inline-viz-action="verify" style="background:rgba(16,185,129,0.16);color:#10b981;border:1px solid rgba(16,185,129,0.4);">✓ Check SQL Assertions</button>' +
                                 '<button type="button" class="sql-exec-btn is-secondary" data-inline-viz-action="explain">📊 EXPLAIN QUERY PLAN</button>' +
+                                '<button type="button" class="sql-exec-btn is-secondary" data-sql-ide-action="format" title="Format SQL &amp; Uppercase Keywords">✨ Format SQL</button>' +
+                                '<button type="button" class="sql-exec-btn is-secondary" data-sql-ide-action="copy" title="Copy SQL to Clipboard">📋 Copy SQL</button>' +
                             '</div>' +
-                            (!isInsideModal
-                                ? '<button type="button" class="sql-exec-btn is-studio" data-inline-viz-action="studio" data-action="open-sql-studio" data-lang="sql">⤢ Open in Full-Screen SQL Studio</button>'
-                                : '') +
+                            '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">' +
+                                '<button type="button" class="sql-exec-btn is-secondary" data-sql-ide-action="export-sql" title="Download query as .sql file">⬇ .sql</button>' +
+                                '<button type="button" class="sql-exec-btn is-secondary" data-sql-ide-action="export-csv" title="Download result table as .csv file">⬇ .csv</button>' +
+                                '<button type="button" class="sql-exec-btn is-secondary" data-sql-ide-action="export-json" title="Download result table as .json file">⬇ .json</button>' +
+                                (!isInsideModal
+                                    ? '<button type="button" class="sql-exec-btn is-studio" data-inline-viz-action="studio" data-action="open-sql-studio" data-lang="sql">⤢ Open in Full-Screen SQL Studio</button>'
+                                    : '') +
+                            '</div>' +
                         '</div>' +
                     '</div>' +
                     '<div class="sql-inline-verify-banner" style="display:none;padding:12px 14px;border-radius:8px;font-size:0.83rem;"></div>' +
@@ -1313,6 +1964,122 @@
             var verifyBtn = container.querySelector('[data-inline-viz-action="verify"]');
             var explainBtn = container.querySelector('[data-inline-viz-action="explain"]');
             var studioBtn = container.querySelector('[data-inline-viz-action="studio"]');
+            var formatBtn = container.querySelector('[data-sql-ide-action="format"]');
+            var copyBtn = container.querySelector('[data-sql-ide-action="copy"]');
+            var saveBtn = container.querySelector('[data-sql-ide-action="save-query"]');
+            var deleteSavedBtn = container.querySelector('[data-sql-ide-action="delete-saved"]');
+            var saveTitleInput = container.querySelector('[data-sql-ide-role="save-title-input"]');
+            var savedHistorySelect = container.querySelector('[data-sql-ide-role="saved-history-select"]');
+            var exportSqlBtn = container.querySelector('[data-sql-ide-action="export-sql"]');
+            var exportCsvBtn = container.querySelector('[data-sql-ide-action="export-csv"]');
+            var exportJsonBtn = container.querySelector('[data-sql-ide-action="export-json"]');
+
+            function refreshSavedDropdown() {
+                if (savedHistorySelect) {
+                    savedHistorySelect.innerHTML = buildSavedAndHistorySelectOptionsHtml();
+                }
+            }
+
+            function executeCurrentEditorSql(runOpts) {
+                if (verifyBanner) verifyBanner.style.display = 'none';
+                var currentSql = ed ? ed.value : sql;
+                return mountClauseVisualizer(stage, currentSql, datasetId, Object.assign({}, editorOpts, runOpts || { startAtFinal: true })).then(function (res) {
+                    refreshSavedDropdown();
+                    return res;
+                });
+            }
+
+            if (ed) {
+                enhanceTextareaToIde(ed, {
+                    onRun: function () {
+                        executeCurrentEditorSql({ startAtFinal: true });
+                    }
+                });
+            }
+
+            container.querySelectorAll('[data-sql-chip]').forEach(function (chipBtn) {
+                chipBtn.addEventListener('click', function () {
+                    var label = chipBtn.getAttribute('data-sql-chip');
+                    var found = null;
+                    for (var i = 0; i < SQL_PRACTICE_CHIPS.length; i++) {
+                        if (SQL_PRACTICE_CHIPS[i].label === label || SQL_PRACTICE_CHIPS[i].id === label) {
+                            found = SQL_PRACTICE_CHIPS[i];
+                            break;
+                        }
+                    }
+                    if (found && ed) {
+                        insertSqlSnippet(ed, found.snippet);
+                    }
+                });
+            });
+
+            if (formatBtn && ed) {
+                formatBtn.addEventListener('click', function () {
+                    ed.value = formatSql(ed.value);
+                    if (typeof ed._syncSqlIde === 'function') ed._syncSqlIde();
+                });
+            }
+            if (copyBtn && ed) {
+                copyBtn.addEventListener('click', function () {
+                    copySqlToClipboard(ed.value, copyBtn);
+                });
+            }
+            if (saveBtn && ed) {
+                saveBtn.addEventListener('click', function () {
+                    var titleVal = (saveTitleInput && saveTitleInput.value.trim()) || (options.title ? String(options.title).slice(0, 40) : 'Saved Query');
+                    var savedEntry = saveQuery(titleVal, ed.value, datasetId);
+                    if (saveTitleInput) saveTitleInput.value = '';
+                    refreshSavedDropdown();
+                    if (savedHistorySelect && savedEntry) {
+                        savedHistorySelect.value = 'saved:' + savedEntry.id;
+                    }
+                });
+            }
+            if (deleteSavedBtn && savedHistorySelect) {
+                deleteSavedBtn.addEventListener('click', function () {
+                    var val = savedHistorySelect.value || '';
+                    if (val.indexOf('saved:') === 0) {
+                        deleteSavedQuery(val.slice(6));
+                        refreshSavedDropdown();
+                    }
+                });
+            }
+            if (savedHistorySelect && ed) {
+                savedHistorySelect.addEventListener('change', function () {
+                    var val = savedHistorySelect.value || '';
+                    if (!val) return;
+                    var targetItem = null;
+                    if (val.indexOf('saved:') === 0) {
+                        var sid = val.slice(6);
+                        targetItem = getSavedQueries().find(function (q) { return q.id === sid; });
+                    } else if (val.indexOf('history:') === 0) {
+                        var hid = val.slice(8);
+                        targetItem = getQueryHistory().find(function (q) { return q.id === hid; });
+                    }
+                    if (targetItem && targetItem.sql) {
+                        ed.value = targetItem.sql;
+                        if (typeof ed._syncSqlIde === 'function') ed._syncSqlIde();
+                        executeCurrentEditorSql({ startAtFinal: true });
+                    }
+                });
+            }
+            if (exportSqlBtn) {
+                exportSqlBtn.addEventListener('click', function () {
+                    exportSql(ed ? ed.value : sql, (datasetId || 'query') + '.sql');
+                });
+            }
+            if (exportCsvBtn) {
+                exportCsvBtn.addEventListener('click', function () {
+                    var last = (stage && stage._lastExecutionResult) || { columns: [], rows: [] };
+                    exportCsv(last.columns, last.rows, (datasetId || 'results') + '.csv');
+                });
+            }
+            if (exportJsonBtn) {
+                exportJsonBtn.addEventListener('click', function () {
+                    var last = (stage && stage._lastExecutionResult) || { columns: [], rows: [] };
+                    exportJson(last.columns, last.rows, (datasetId || 'results') + '.json');
+                });
+            }
 
             async function runVerification() {
                 if (!verifyBanner) return;
@@ -1348,14 +2115,12 @@
 
             if (runBtn) {
                 runBtn.addEventListener('click', function () {
-                    if (verifyBanner) verifyBanner.style.display = 'none';
-                    mountClauseVisualizer(stage, ed ? ed.value : sql, datasetId, Object.assign({}, editorOpts, { startAtFinal: true }));
+                    executeCurrentEditorSql({ startAtFinal: true });
                 });
             }
             if (stepBtn) {
                 stepBtn.addEventListener('click', function () {
-                    if (verifyBanner) verifyBanner.style.display = 'none';
-                    mountClauseVisualizer(stage, ed ? ed.value : sql, datasetId, Object.assign({}, editorOpts, { startAtFinal: false, initialStepIndex: 0 }));
+                    executeCurrentEditorSql({ startAtFinal: false, initialStepIndex: 0 });
                 });
             }
             if (verifyBtn) {
@@ -1365,8 +2130,7 @@
             }
             if (explainBtn) {
                 explainBtn.addEventListener('click', async function () {
-                    if (verifyBanner) verifyBanner.style.display = 'none';
-                    await mountClauseVisualizer(stage, ed ? ed.value : sql, datasetId, Object.assign({}, editorOpts, { startAtFinal: true }));
+                    await executeCurrentEditorSql({ startAtFinal: true });
                     var stepBtns = stage.querySelectorAll('.sql-pipeline-step');
                     if (stepBtns.length > 0) {
                         stepBtns[stepBtns.length - 1].click();
@@ -1391,15 +2155,7 @@
                     });
                 });
             }
-            if (ed) {
-                ed.addEventListener('keydown', function (ev) {
-                    if ((ev.metaKey || ev.ctrlKey) && ev.key === 'Enter') {
-                        ev.preventDefault();
-                        mountClauseVisualizer(stage, ed.value, datasetId, Object.assign({}, editorOpts, { startAtFinal: true }));
-                    }
-                });
-            }
-            var initProm = mountClauseVisualizer(stage, sql, datasetId, editorOpts);
+            var initProm = executeCurrentEditorSql(editorOpts);
             if (options.autoVerify) {
                 initProm.then(function () { runVerification(); });
             }
@@ -1431,6 +2187,8 @@
                 return;
             }
 
+            recordQueryHistory(sql, pipeline.datasetId);
+
             var activeIdx = steps.length > 0 ? steps.length - 1 : 0;
             // Default to final data step (before Step 8 Explain Plan) so the user immediately sees the output table
             if (steps.length > 1 && steps[activeIdx].isExplainStep && !options.focusExplain) {
@@ -1457,8 +2215,17 @@
                     rowStates: []
                 };
 
+                var exportCols = (currentStep.columns && currentStep.columns.length > 0) ? currentStep.columns : (finalRes.columns || []);
+                var exportRows = (currentStep.rows && currentStep.rows.length > 0) ? currentStep.rows : (finalRes.rows || []);
+                container._lastExecutionResult = {
+                    sql: sql,
+                    datasetId: pipeline.datasetId,
+                    columns: exportCols,
+                    rows: exportRows
+                };
+
                 var html = '<div class="sql-viz-panel sql-tviz">';
-                // Header bar with Engine Toggle + Reset DB button
+                // Header bar with Engine Toggle + Export + Reset DB button
                 html += '<div class="sql-viz-header">' +
                     '<div class="sql-viz-title-wrap">' +
                         '<span class="sql-viz-badge is-ok">✓ Executed (' + escapeHtml(finalRes.durationMs) + ' ms)</span>' +
@@ -1466,6 +2233,9 @@
                     '</div>' +
                     '<div class="sql-viz-meta-right">' +
                         buildEngineSwitchHtml() +
+                        '<button type="button" class="sql-viz-reset-btn" data-sql-ide-action="export-sql" title="Download SQL (.sql)">⬇ .sql</button>' +
+                        '<button type="button" class="sql-viz-reset-btn" data-sql-ide-action="export-csv" title="Download CSV (.csv)">⬇ .csv</button>' +
+                        '<button type="button" class="sql-viz-reset-btn" data-sql-ide-action="export-json" title="Download JSON (.json)">⬇ .json</button>' +
                         '<button type="button" class="sql-viz-reset-btn" data-action="reset-dataset" title="Reset dataset tables to initial seed state">↺ Reset DB</button>' +
                     '</div>' +
                 '</div>';
@@ -1493,7 +2263,7 @@
                         '<strong>' + escapeHtml(currentStep.clause) + ':</strong> ' +
                         '<span>' + escapeHtml(currentStep.description) + '</span>' +
                     '</div>' +
-                    '<code class="sql-step-code-pill">' + escapeHtml(currentStep.code) + '</code>' +
+                    '<code class="sql-step-code-pill">' + highlightSql(currentStep.code) + '</code>' +
                 '</div>';
 
                 // Active Step Table Output
@@ -1517,6 +2287,25 @@
                         }
                     });
                 });
+
+                var stageExportSql = container.querySelector('[data-sql-ide-action="export-sql"]');
+                if (stageExportSql) {
+                    stageExportSql.addEventListener('click', function () {
+                        exportSql(sql, (pipeline.datasetId || 'query') + '.sql');
+                    });
+                }
+                var stageExportCsv = container.querySelector('[data-sql-ide-action="export-csv"]');
+                if (stageExportCsv) {
+                    stageExportCsv.addEventListener('click', function () {
+                        exportCsv(exportCols, exportRows, (pipeline.datasetId || 'results') + '.csv');
+                    });
+                }
+                var stageExportJson = container.querySelector('[data-sql-ide-action="export-json"]');
+                if (stageExportJson) {
+                    stageExportJson.addEventListener('click', function () {
+                        exportJson(exportCols, exportRows, (pipeline.datasetId || 'results') + '.json');
+                    });
+                }
 
                 var resetBtn = container.querySelector('[data-action="reset-dataset"]');
                 if (resetBtn) {
@@ -1661,6 +2450,7 @@
             if (!/\b(SELECT|WITH|INSERT|UPDATE|DELETE|CREATE|EXPLAIN)\b/.test(upper)) return;
 
             pre.setAttribute('data-sql-enhanced', '1');
+            codeEl.innerHTML = highlightSql(rawSql);
             var dsId = inferDatasetFromSql(rawSql);
             var dsInfo = getDatasets()[dsId] || { title: dsId };
 
@@ -1691,10 +2481,13 @@
                     '<span>Press <kbd>⌘↵</kbd> / <kbd>Ctrl+Enter</kbd> to Execute</span>' +
                 '</div>' +
                 '<textarea class="sql-inline-textarea" rows="' + Math.min(14, Math.max(5, rawSql.split('\n').length + 1)) + '" spellcheck="false">' + escapeHtml(rawSql) + '</textarea>' +
+                buildPracticeChipsHtml() +
                 '<div class="sql-inline-editor-actions">' +
                     '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
                         '<button type="button" class="sql-exec-btn is-primary" data-action="exec-edited-sql">▶ Execute Edited Query (⌘↵)</button>' +
                         '<button type="button" class="sql-exec-btn is-secondary" data-action="step-edited-sql">🔍 Step Clauses (Step 0 → Final)</button>' +
+                        '<button type="button" class="sql-exec-btn is-secondary" data-sql-ide-action="format">✨ Format SQL</button>' +
+                        '<button type="button" class="sql-exec-btn is-secondary" data-sql-ide-action="copy">📋 Copy SQL</button>' +
                         '<button type="button" class="sql-exec-btn is-secondary" data-action="reset-edited-sql">↺ Reset to Original SQL</button>' +
                     '</div>' +
                     '<button type="button" class="sql-exec-btn is-studio" data-action="open-sql-studio" data-lang="sql">⤢ Open in Full-Screen SQL Studio</button>' +
@@ -1720,11 +2513,20 @@
             var execEditedBtn = editorWrap.querySelector('[data-action="exec-edited-sql"]');
             var stepEditedBtn = editorWrap.querySelector('[data-action="step-edited-sql"]');
             var resetEditedBtn = editorWrap.querySelector('[data-action="reset-edited-sql"]');
+            var formatInlineBtn = editorWrap.querySelector('[data-sql-ide-action="format"]');
+            var copyInlineBtn = editorWrap.querySelector('[data-sql-ide-action="copy"]');
             var outputStage = outputWrap.querySelector('.sql-inline-output-stage');
+
+            var inlineIdeCtrl = textarea ? enhanceTextareaToIde(textarea, {
+                onRun: function () {
+                    runCurrentBlock({ startAtFinal: true });
+                }
+            }) : null;
 
             function setEditorVisible(visible, focusEditor) {
                 editorWrap.hidden = !visible;
                 editBtn.textContent = visible ? '✕ Hide SQL Editor' : '✎ Edit & Try SQL';
+                if (visible && inlineIdeCtrl) inlineIdeCtrl.sync();
                 if (visible && focusEditor && textarea) {
                     textarea.focus();
                 }
@@ -1759,19 +2561,34 @@
                 });
             }
 
-            if (resetEditedBtn) {
-                resetEditedBtn.addEventListener('click', function () {
-                    if (textarea) textarea.value = rawSql;
-                    runCurrentBlock({ startAtFinal: true });
+            if (formatInlineBtn && textarea) {
+                formatInlineBtn.addEventListener('click', function () {
+                    textarea.value = formatSql(textarea.value);
+                    if (inlineIdeCtrl) inlineIdeCtrl.sync();
                 });
             }
 
-            if (textarea) {
-                textarea.addEventListener('keydown', function (ev) {
-                    if ((ev.metaKey || ev.ctrlKey) && ev.key === 'Enter') {
-                        ev.preventDefault();
-                        runCurrentBlock({ startAtFinal: true });
+            if (copyInlineBtn && textarea) {
+                copyInlineBtn.addEventListener('click', function () {
+                    copySqlToClipboard(textarea.value, copyInlineBtn);
+                });
+            }
+
+            editorWrap.querySelectorAll('.sql-practice-chip[data-sql-chip]').forEach(function (chipBtn) {
+                chipBtn.addEventListener('click', function () {
+                    var chipId = chipBtn.getAttribute('data-sql-chip');
+                    var chipObj = SQL_PRACTICE_CHIPS.find(function (c) { return c.id === chipId; });
+                    if (chipObj && textarea) {
+                        insertSqlSnippet(textarea, chipObj.snippet);
                     }
+                });
+            });
+
+            if (resetEditedBtn) {
+                resetEditedBtn.addEventListener('click', function () {
+                    if (textarea) textarea.value = rawSql;
+                    if (inlineIdeCtrl) inlineIdeCtrl.sync();
+                    runCurrentBlock({ startAtFinal: true });
                 });
             }
 
@@ -1962,11 +2779,14 @@
                         '</div>' +
                         '<div class="sql-lab-editor-box">' +
                             '<textarea class="sql-live-editor sql-inline-textarea" rows="6" spellcheck="false">' + escapeHtml(currentSql) + '</textarea>' +
+                            buildPracticeChipsHtml() +
                             '<div class="sql-lab-actions">' +
                                 '<button type="button" class="sql-exec-btn is-primary" data-lab-action="run">▶ Run & Visualize SQL</button>' +
                                 '<button type="button" class="sql-exec-btn is-secondary" data-lab-action="step">🔍 Step-by-Step Clauses</button>' +
                                 '<button type="button" class="sql-exec-btn is-verify" data-lab-action="verify">✓ Verify SQL Output</button>' +
                                 '<button type="button" class="sql-exec-btn is-secondary" data-lab-action="solution">★ Load Step Solution</button>' +
+                                '<button type="button" class="sql-exec-btn is-secondary" data-sql-ide-action="format">✨ Format SQL</button>' +
+                                '<button type="button" class="sql-exec-btn is-secondary" data-sql-ide-action="copy">📋 Copy SQL</button>' +
                                 '<button type="button" class="sql-exec-btn is-studio" data-lab-action="studio" data-action="open-sql-studio" data-lang="sql">⤢ Open in Full-Screen SQL Studio</button>' +
                             '</div>' +
                         '</div>' +
@@ -1979,10 +2799,44 @@
             var verifyBanner = container.querySelector('.sql-lab-verify-banner');
             var vizMount = container.querySelector('.sql-lab-visualizer-mount');
 
+            var labIdeCtrl = editor ? enhanceTextareaToIde(editor, {
+                onRun: function () {
+                    verifyBanner.hidden = true;
+                    mountClauseVisualizer(vizMount, editor.value, datasetId);
+                }
+            }) : null;
+
             editor.addEventListener('input', function () {
                 if (!isRefTab) {
                     draftSqlByStep[activeStepIdx] = editor.value;
                 }
+            });
+
+            var labFormatBtn = container.querySelector('.sql-lab-editor-box [data-sql-ide-action="format"]');
+            if (labFormatBtn && editor) {
+                labFormatBtn.addEventListener('click', function () {
+                    editor.value = formatSql(editor.value);
+                    if (!isRefTab) draftSqlByStep[activeStepIdx] = editor.value;
+                    if (labIdeCtrl) labIdeCtrl.sync();
+                });
+            }
+
+            var labCopyBtn = container.querySelector('.sql-lab-editor-box [data-sql-ide-action="copy"]');
+            if (labCopyBtn && editor) {
+                labCopyBtn.addEventListener('click', function () {
+                    copySqlToClipboard(editor.value, labCopyBtn);
+                });
+            }
+
+            container.querySelectorAll('.sql-lab-editor-box .sql-practice-chip[data-sql-chip]').forEach(function (chipBtn) {
+                chipBtn.addEventListener('click', function () {
+                    var chipId = chipBtn.getAttribute('data-sql-chip');
+                    var chipObj = SQL_PRACTICE_CHIPS.find(function (c) { return c.id === chipId; });
+                    if (chipObj && editor) {
+                        insertSqlSnippet(editor, chipObj.snippet);
+                        if (!isRefTab) draftSqlByStep[activeStepIdx] = editor.value;
+                    }
+                });
             });
 
             container.querySelectorAll('.sql-lab-step-tab').forEach(function (tabBtn) {
@@ -2007,6 +2861,7 @@
                 if (sol) {
                     editor.value = sol;
                     if (!isRefTab) draftSqlByStep[activeStepIdx] = sol;
+                    if (labIdeCtrl) labIdeCtrl.sync();
                     mountClauseVisualizer(vizMount, sol, datasetId);
                 }
             });
@@ -2146,6 +3001,22 @@
         enhanceSqlCodeBlocks: enhanceSqlCodeBlocks,
         mountGuidedSqlLab: mountGuidedSqlLab,
         openFullScreenSqlStudio: openFullScreenSqlStudio,
+        highlightSql: highlightSql,
+        formatSql: formatSql,
+        enhanceTextareaToIde: enhanceTextareaToIde,
+        saveQuery: saveQuery,
+        getSavedQueries: getSavedQueries,
+        deleteSavedQuery: deleteSavedQuery,
+        recordQueryHistory: recordQueryHistory,
+        getQueryHistory: getQueryHistory,
+        clearQueryHistory: clearQueryHistory,
+        serializeCsv: serializeCsv,
+        serializeJson: serializeJson,
+        exportSql: exportSql,
+        exportCsv: exportCsv,
+        exportJson: exportJson,
+        SQL_PRACTICE_CHIPS: SQL_PRACTICE_CHIPS,
+        insertSqlSnippet: insertSqlSnippet,
         SCHEMA_META: SCHEMA_META
     };
 })(typeof globalThis !== 'undefined' ? globalThis : (typeof window !== 'undefined' ? window : this));

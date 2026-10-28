@@ -33,14 +33,14 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
   <link rel="stylesheet" href="css/variables.css?v=b68ab27ba0">
   <link rel="stylesheet" href="css/layout.css?v=a384f455dc">
-  <link rel="stylesheet" href="css/components.css?v=8fed5d69e3">
+  <link rel="stylesheet" href="css/components.css?v=6a661d5122">
   <link rel="stylesheet" href="css/content.css?v=178f3a2481">
   <link rel="stylesheet" href="css/landing.css?v=14b77b8c3d">
   <link rel="stylesheet" href="css/simulators.css?v=be366fe40d">
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=59c953e95f"></script>
-  <script src="js/manifest.js?v=9a9ff5d494"></script>
+  <script src="js/manifest.js?v=02cf7c8a30"></script>
 
   <script type="application/ld+json">
 {
@@ -1476,9 +1476,9 @@ sequenceDiagram
             <h2 class="build-lab-card__title">LSM-Trees (RocksDB / Cassandra): MemTable, Immutable SSTables, Bloom Filters &amp; Compaction — Interactive Guided SQL Lab</h2>
             <p class="build-lab-card__desc">Turning random writes into sequential appends via an in-memory skip-list MemTable, immutable sorted SSTable runs, Bloom filters, and leveled/tiered compaction.</p>
             <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;">
-              <span class="badge">⏱ Target Time: <code>O(N) scan / O(log_B N) indexed</code></span>
-              <span class="badge">💾 Auxiliary Space: <code>O(1) streaming tuple state</code></span>
-              <span class="badge">🧭 Pattern: Storage Engine Internals: Pages, Buffer Pool, WAL &amp; LSM-Trees</span>
+              <span class="badge">⏱ Target Time: <code>O(T + J) indexed join + group check</code></span>
+              <span class="badge">💾 Auxiliary Space: <code>O(T) transfer accumulator</code></span>
+              <span class="badge">🧭 Pattern: Storage Engine Internals: Pages, Buffer Pool, WAL &amp; LSM-Trees · lsm-tree</span>
               <span class="badge">🗄️ Dataset: <code>fintech_ledger</code></span>
             </div>
           </div>
@@ -1504,15 +1504,25 @@ sequenceDiagram
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">01</span>
-                    <span class="build-lab-step-card__target">Phase 1 · Base Relation &amp; SARGable Predicate</span>
+                    <span class="build-lab-step-card__target">Phase 1 · LSM-Trees (RocksDB / Cassandra): MemTable, Immutable SSTables, Bloom Filters &amp; Compaction: Ledger Account &amp; Optimistic Version Scan</span>
                   </div>
-                  <div class="build-lab-step-card__title">Base Relation Scan &amp; SARGable Filter (fintech_ledger)</div>
-                  <div class="build-lab-step-card__invariant">Establish the base relation scan in <code>fintech_ledger</code> for LSM-Trees (RocksDB / Cassandra): MemTable, Immutable SSTables, Bloom Filters &amp; Compaction with a SARGable predicate and explicit Three-Valued Logic NULL handling.</div>
-                  <div class="build-lab-step-card__concept">Run or edit <code>query.sql</code> to inspect the base table tuples, verify SARGable index filtering in the <code>WHERE</code> clause, and step through the live Table Visualizer.</div>
+                  <div class="build-lab-step-card__title">Inspect Accounts &amp; Optimistic Lock Versions (lsm-trees-memtable-sstable-compaction)</div>
+                  <div class="build-lab-step-card__invariant">Inspect <code>accounts</code> in <code>fintech_ledger</code> to verify <code>posted_balance_cents</code> and MVCC/optimistic concurrency <code>version</code> counters.</div>
+                  <div class="build-lab-step-card__concept">Refine the starter <code>accounts</code> query in <code>query.sql</code> to compute <code>posted_balance_usd</code> and classify account types.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>💡 Progressive SQL Hint (Step 1)</summary>
-                      <pre><code>SELECT transfer_id, idempotency_key, from_account_id, to_account_id, ROUND(amount_cents / 100.0, 2) AS amount_usd, status, created_at FROM transfers WHERE status = &#039;posted&#039; AND amount_cents &gt;= 25000 ORDER BY transfer_id ASC LIMIT 10;</code></pre>
+                      <pre><code>-- Step 1 Solution (lsm-trees-memtable-sstable-compaction): Account balances in USD with optimistic version metadata
+SELECT
+  account_id,
+  owner_name,
+  account_type,
+  currency,
+  posted_balance_cents,
+  ROUND(posted_balance_cents / 100.0, 2) AS posted_balance_usd,
+  version AS optimistic_lock_version
+FROM accounts
+ORDER BY posted_balance_cents DESC, account_id ASC;</code></pre>
                     </details>
                   
                 </div>
@@ -1528,29 +1538,29 @@ sequenceDiagram
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">02</span>
-                    <span class="build-lab-step-card__target">Phase 2 · Relational Join, Aggregation &amp; 3VL Guard</span>
+                    <span class="build-lab-step-card__target">Phase 2 · LSM-Trees (RocksDB / Cassandra): MemTable, Immutable SSTables, Bloom Filters &amp; Compaction: Idempotent Transfers &amp; Account Endpoints</span>
                   </div>
-                  <div class="build-lab-step-card__title">Relational Join, Grouping &amp; NULL-Safe Aggregation</div>
-                  <div class="build-lab-step-card__invariant">Combine normalized tables via explicit JOIN conditions and fold group buckets or window partitions without losing NULL boundary rows.</div>
-                  <div class="build-lab-step-card__concept">Run or refine the Step 2 relational join and aggregation query in <code>query.sql</code>, then click <strong>🔍 Step Clauses</strong> to inspect each intermediate table.</div>
+                  <div class="build-lab-step-card__title">Join Transfers with Sender &amp; Receiver Accounts (LSM-Trees (RocksDB / Cassandra): MemTable, Immutable SSTables, Bloom Filters &amp; Compaction)</div>
+                  <div class="build-lab-step-card__invariant">Resolve both foreign keys (<code>from_account_id</code> and <code>to_account_id</code>) on <code>transfers</code> while verifying unique <code>idempotency_key</code> values.</div>
+                  <div class="build-lab-step-card__concept">Complete the dual-account join in <code>query.sql</code> to display both sender and receiver names for each transfer.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>💡 Progressive SQL Hint (Step 2)</summary>
-                      <pre><code>-- Dataset: fintech_ledger | Double-Entry Conservation &amp; Account Audit (lsm-trees-memtable-sstable-compaction)
+                      <pre><code>-- Step 2 Solution (lsm-trees-memtable-sstable-compaction): Dual-endpoint transfer audit with USD conversion
 SELECT
-  a.account_id,
-  a.owner_name,
-  a.account_type,
-  COUNT(je.entry_id) AS journal_postings,
-  SUM(CASE WHEN je.direction = &#039;credit&#039; THEN je.amount_cents ELSE 0 END) AS credit_cents,
-  SUM(CASE WHEN je.direction = &#039;debit&#039; THEN je.amount_cents ELSE 0 END) AS debit_cents,
-  SUM(CASE WHEN je.direction = &#039;credit&#039; THEN je.amount_cents ELSE -je.amount_cents END) AS computed_balance_cents,
-  a.posted_balance_cents
-FROM accounts AS a
-INNER JOIN journal_entries AS je
-  ON je.account_id = a.account_id
-GROUP BY a.account_id, a.owner_name, a.account_type, a.posted_balance_cents
-ORDER BY a.account_id ASC;</code></pre>
+  t.transfer_id,
+  t.idempotency_key,
+  fa.owner_name AS sender_account,
+  ta.owner_name AS receiver_account,
+  ROUND(t.amount_cents / 100.0, 2) AS transfer_usd,
+  t.status,
+  t.created_at
+FROM transfers AS t
+INNER JOIN accounts AS fa
+  ON fa.account_id = t.from_account_id
+INNER JOIN accounts AS ta
+  ON ta.account_id = t.to_account_id
+ORDER BY t.transfer_id ASC;</code></pre>
                     </details>
                   
                 </div>
@@ -1566,15 +1576,15 @@ ORDER BY a.account_id ASC;</code></pre>
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">03</span>
-                    <span class="build-lab-step-card__target">Phase 3 · Production Query &amp; Plan Verification</span>
+                    <span class="build-lab-step-card__target">Phase 3 · LSM-Trees (RocksDB / Cassandra): MemTable, Immutable SSTables, Bloom Filters &amp; Compaction: Double-Entry Conservation Invariant</span>
                   </div>
-                  <div class="build-lab-step-card__title">Production Query &amp; Execution Plan Verification (LSM-Trees (RocksDB / Cassandra): MemTable, Immutable SSTables, Bloom Filters &amp; Compaction)</div>
-                  <div class="build-lab-step-card__invariant">Verify final column projections, ordering, and physical B+Tree access paths via EXPLAIN QUERY PLAN and automated relational assertions.</div>
-                  <div class="build-lab-step-card__concept">Execute the complete production query in <code>query.sql</code> and click <strong>✓ Check SQL Assertions</strong> to verify schema alignment, row cardinality, and tuple equivalence.</div>
+                  <div class="build-lab-step-card__title">Production Double-Entry Zero-Sum Audit (LSM-Trees (RocksDB / Cassandra): MemTable, Immutable SSTables, Bloom Filters &amp; Compaction)</div>
+                  <div class="build-lab-step-card__invariant">Verify the fundamental ACID ledger invariant: every posted transfer has matching debit and credit legs in <code>journal_entries</code> summing to zero net drift.</div>
+                  <div class="build-lab-step-card__concept">Execute the double-entry conservation audit in <code>query.sql</code> and confirm <code>net_balance_cents = 0</code> across all transfers.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>💡 Progressive SQL Hint (Step 3)</summary>
-                      <pre><code>-- Dataset: fintech_ledger | Double-Entry ACID Invariant &amp; Ledger Conservation Audit
+                      <pre><code>-- Dataset: fintech_ledger | LSM-Trees (RocksDB / Cassandra): MemTable, Immutable SSTables, Bloom Filters &amp; Compaction (lsm-trees-memtable-sstable-compaction) — Double-Entry Conservation Audit
 SELECT
   t.transfer_id,
   t.idempotency_key,
@@ -1707,7 +1717,7 @@ ORDER BY t.transfer_id ASC;</code></pre>
   <script type="text/plain" data-defer src="data/srs-cards.js?v=fabc47dd9c"></script>
   <script type="text/plain" data-defer src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
   <script type="text/plain" data-defer src="data/implementations_code.js?v=fce884f8a8"></script>
-  <script type="text/plain" data-defer src="data/topic_guided_labs.js?v=341584ee01"></script>
+  <script type="text/plain" data-defer src="data/topic_guided_labs.js?v=2a57d85494"></script>
   <script type="text/plain" data-defer src="data/projects.js?v=2280ac085f"></script>
   <script type="text/plain" data-defer src="data/glossary.js?v=4f6c79a4e0"></script>
 
@@ -1718,8 +1728,8 @@ ORDER BY t.transfer_id ASC;</code></pre>
   <script type="text/plain" data-defer src="js/search.js?v=e2063e0ccd"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
   <script type="text/plain" data-defer src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>
-  <script type="text/plain" data-defer src="js/sql-engine.js?v=a668c919ba"></script>
-  <script type="text/plain" data-defer src="js/table-visualizer.js?v=ea5db1c17a"></script>
+  <script type="text/plain" data-defer src="js/sql-engine.js?v=60d0c505ad"></script>
+  <script type="text/plain" data-defer src="js/table-visualizer.js?v=1f1a1f2968"></script>
   <script type="text/plain" data-defer src="js/simulators.js?v=68b973e4c8"></script>
   <script type="text/plain" data-defer src="js/simulators-relational.js?v=8e12b97831"></script>
   <script type="text/plain" data-defer src="js/simulators-analytical.js?v=258089d8ac"></script>
@@ -1736,10 +1746,10 @@ ORDER BY t.transfer_id ASC;</code></pre>
   <script type="text/plain" data-defer src="js/roadmap.js?v=cebfb7e32c"></script>
   <script type="text/plain" data-defer src="js/challenges.js?v=fcc5b1b6c5"></script>
   <script type="text/plain" data-defer src="js/dashboard.js?v=d411d5a9bb"></script>
-  <script type="text/plain" data-defer src="js/sandbox.js?v=1f94508aa4"></script>
+  <script type="text/plain" data-defer src="js/sandbox.js?v=5528739eb9"></script>
   <script type="text/plain" data-defer src="js/topic-codelab.js?v=096611d91c"></script>
   
-  <script type="text/plain" data-defer src="js/app.js?v=ab7d42f863"></script>
+  <script type="text/plain" data-defer src="js/app.js?v=79ca5d1666"></script>
 
   <!-- App bootstrap & deferred script loader -->
   <script src="js/bootstrap.js?v=df2bb60aeb"></script>

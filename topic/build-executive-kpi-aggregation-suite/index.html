@@ -33,14 +33,14 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
   <link rel="stylesheet" href="css/variables.css?v=b68ab27ba0">
   <link rel="stylesheet" href="css/layout.css?v=a384f455dc">
-  <link rel="stylesheet" href="css/components.css?v=8fed5d69e3">
+  <link rel="stylesheet" href="css/components.css?v=6a661d5122">
   <link rel="stylesheet" href="css/content.css?v=178f3a2481">
   <link rel="stylesheet" href="css/landing.css?v=14b77b8c3d">
   <link rel="stylesheet" href="css/simulators.css?v=be366fe40d">
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=59c953e95f"></script>
-  <script src="js/manifest.js?v=9a9ff5d494"></script>
+  <script src="js/manifest.js?v=02cf7c8a30"></script>
 
   <script type="application/ld+json">
 {
@@ -1509,10 +1509,10 @@ flowchart LR
             <h2 class="build-lab-card__title">Hands-On Build: Multi-Dimensional Revenue, Cohort &amp; Funnel Aggregation Suite — Interactive Guided SQL Lab</h2>
             <p class="build-lab-card__desc">Construct a fanout-safe executive KPI query suite combining conditional aggregation, pre-aggregated CTEs, and multi-dimensional rollups.</p>
             <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;">
-              <span class="badge">⏱ Target Time: <code>O(N) scan / O(log_B N) indexed</code></span>
-              <span class="badge">💾 Auxiliary Space: <code>O(1) streaming tuple state</code></span>
-              <span class="badge">🧭 Pattern: Grouping, Aggregations &amp; Multi-Dimensional Rollups</span>
-              <span class="badge">🗄️ Dataset: <code>org_hr</code></span>
+              <span class="badge">⏱ Target Time: <code>O(N) index scan + hash join</code></span>
+              <span class="badge">💾 Auxiliary Space: <code>O(C) category lookup state</code></span>
+              <span class="badge">🧭 Pattern: Grouping, Aggregations &amp; Multi-Dimensional Rollups · build</span>
+              <span class="badge">🗄️ Dataset: <code>ecommerce</code></span>
             </div>
           </div>
           <div class="build-lab-card__cta-col">
@@ -1537,15 +1537,27 @@ flowchart LR
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">01</span>
-                    <span class="build-lab-step-card__target">Phase 1 · Base Relation &amp; SARGable Predicate</span>
+                    <span class="build-lab-step-card__target">Phase 1 · Hands-On Build: Multi-Dimensional Revenue, Cohort &amp; Funnel Aggregation Suite: Exact-Cents Catalog Arithmetic</span>
                   </div>
-                  <div class="build-lab-step-card__title">Base Relation Scan &amp; SARGable Filter (org_hr)</div>
-                  <div class="build-lab-step-card__invariant">Establish the base relation scan in <code>org_hr</code> for Hands-On Build: Multi-Dimensional Revenue, Cohort &amp; Funnel Aggregation Suite with a SARGable predicate and explicit Three-Valued Logic NULL handling.</div>
-                  <div class="build-lab-step-card__concept">Run or edit <code>query.sql</code> to inspect the base table tuples, verify SARGable index filtering in the <code>WHERE</code> clause, and step through the live Table Visualizer.</div>
+                  <div class="build-lab-step-card__title">Inspect Active Catalog SKUs &amp; Cents Domain (build-executive-kpi-aggregation-suite)</div>
+                  <div class="build-lab-step-card__invariant">Verify integer-cents pricing (<code>price_cents</code>) and active inventory flags (<code>is_active = 1</code>) in <code>products</code> without IEEE-754 float drift.</div>
+                  <div class="build-lab-step-card__concept">Refine the starter <code>products</code> query in <code>query.sql</code> to filter <code>is_active = 1</code> and compute <code>price_usd</code> plus <code>stock_value_usd</code>.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>💡 Progressive SQL Hint (Step 1)</summary>
-                      <pre><code>SELECT emp_id, name, title, dept_id, manager_id, salary_usd, hired_at FROM employees WHERE salary_usd &gt;= 170000 ORDER BY salary_usd DESC LIMIT 10;</code></pre>
+                      <pre><code>-- Step 1 Solution (build-executive-kpi-aggregation-suite): Active SKUs with exact decimal USD valuation
+SELECT
+  product_id,
+  sku,
+  name AS product_title,
+  category_id,
+  price_cents,
+  ROUND(price_cents / 100.0, 2) AS price_usd,
+  stock_qty,
+  ROUND((price_cents * stock_qty) / 100.0, 2) AS stock_value_usd
+FROM products
+WHERE is_active = 1
+ORDER BY stock_value_usd DESC;</code></pre>
                     </details>
                   
                 </div>
@@ -1561,40 +1573,30 @@ flowchart LR
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">02</span>
-                    <span class="build-lab-step-card__target">Phase 2 · Relational Join, Aggregation &amp; 3VL Guard</span>
+                    <span class="build-lab-step-card__target">Phase 2 · Hands-On Build: Multi-Dimensional Revenue, Cohort &amp; Funnel Aggregation Suite: Category Hierarchy &amp; Line-Item Join</span>
                   </div>
-                  <div class="build-lab-step-card__title">Relational Join, Grouping &amp; NULL-Safe Aggregation</div>
-                  <div class="build-lab-step-card__invariant">Combine normalized tables via explicit JOIN conditions and fold group buckets or window partitions without losing NULL boundary rows.</div>
-                  <div class="build-lab-step-card__concept">Run or refine the Step 2 relational join and aggregation query in <code>query.sql</code>, then click <strong>🔍 Step Clauses</strong> to inspect each intermediate table.</div>
+                  <div class="build-lab-step-card__title">Join Categories &amp; Order Items for Hands-On Build: Multi-Dimensional Revenue, Cohort &amp; Funnel Aggregation Suite</div>
+                  <div class="build-lab-step-card__invariant">Enrich active products with <code>categories</code> metadata and aggregate ordered quantities from <code>order_items</code>.</div>
+                  <div class="build-lab-step-card__concept">Expand the category join in <code>query.sql</code> to include a <code>LEFT JOIN</code> on <code>order_items</code> and compute <code>units_sold</code>.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>💡 Progressive SQL Hint (Step 2)</summary>
-                      <pre><code>-- Dataset: org_hr | Live Verification &amp; Departmental Window Audit (build-executive-kpi-aggregation-suite)
-WITH dept_rollup AS (
-  SELECT
-    d.dept_id,
-    d.name AS dept_name,
-    COUNT(e.emp_id) AS staff_count,
-    ROUND(AVG(e.salary_usd), 0) AS avg_salary_usd,
-    MAX(e.salary_usd) AS top_salary_usd,
-    SUM(e.salary_usd) AS total_payroll_usd,
-    d.annual_budget_usd
-  FROM departments AS d
-  LEFT JOIN employees AS e
-    ON e.dept_id = d.dept_id
-  GROUP BY d.dept_id, d.name, d.annual_budget_usd
-)
+                      <pre><code>-- Step 2 Solution (build-executive-kpi-aggregation-suite): Category-enriched product demand aggregation
 SELECT
-  dept_id,
-  dept_name,
-  staff_count,
-  avg_salary_usd,
-  top_salary_usd,
-  total_payroll_usd,
-  ROUND((total_payroll_usd * 100.0) / annual_budget_usd, 1) AS budget_utilization_pct
-FROM dept_rollup
-WHERE staff_count &gt;= 1
-ORDER BY total_payroll_usd DESC;</code></pre>
+  p.product_id,
+  p.sku,
+  p.name AS product_title,
+  cat.name AS category_name,
+  ROUND(p.price_cents / 100.0, 2) AS price_usd,
+  COALESCE(SUM(oi.quantity), 0) AS units_sold
+FROM products AS p
+INNER JOIN categories AS cat
+  ON cat.category_id = p.category_id
+LEFT JOIN order_items AS oi
+  ON oi.product_id = p.product_id
+WHERE p.is_active = 1
+GROUP BY p.product_id, p.sku, p.name, cat.name, p.price_cents
+ORDER BY units_sold DESC, price_usd DESC;</code></pre>
                     </details>
                   
                 </div>
@@ -1610,29 +1612,33 @@ ORDER BY total_payroll_usd DESC;</code></pre>
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">03</span>
-                    <span class="build-lab-step-card__target">Phase 3 · Production Query &amp; Plan Verification</span>
+                    <span class="build-lab-step-card__target">Phase 3 · Hands-On Build: Multi-Dimensional Revenue, Cohort &amp; Funnel Aggregation Suite: Inventory Valuation &amp; Sell-Through Audit</span>
                   </div>
-                  <div class="build-lab-step-card__title">Production Query &amp; Execution Plan Verification (Hands-On Build: Multi-Dimensional Revenue, Cohort &amp; Funnel Aggregation Suite)</div>
-                  <div class="build-lab-step-card__invariant">Verify final column projections, ordering, and physical B+Tree access paths via EXPLAIN QUERY PLAN and automated relational assertions.</div>
-                  <div class="build-lab-step-card__concept">Execute the complete production query in <code>query.sql</code> and click <strong>✓ Check SQL Assertions</strong> to verify schema alignment, row cardinality, and tuple equivalence.</div>
+                  <div class="build-lab-step-card__title">Production Catalog Valuation &amp; Revenue Query (Hands-On Build: Multi-Dimensional Revenue, Cohort &amp; Funnel Aggregation Suite)</div>
+                  <div class="build-lab-step-card__invariant">Combine on-hand inventory valuation with realized line-item revenue to audit catalog performance for Hands-On Build: Multi-Dimensional Revenue, Cohort &amp; Funnel Aggregation Suite.</div>
+                  <div class="build-lab-step-card__concept">Complete the production query in <code>query.sql</code> by projecting <code>inventory_valuation_usd</code>, <code>realized_revenue_usd</code>, and ordering by total valuation.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>💡 Progressive SQL Hint (Step 3)</summary>
-                      <pre><code>-- Dataset: org_hr | Department Budget Utilization &amp; Headcount Aggregation
+                      <pre><code>-- Dataset: ecommerce | Hands-On Build: Multi-Dimensional Revenue, Cohort &amp; Funnel Aggregation Suite (build-executive-kpi-aggregation-suite) — Catalog Valuation &amp; Demand Audit
 SELECT
-  d.dept_id,
-  d.name AS department_name,
-  d.cost_center,
-  COUNT(e.emp_id) AS headcount,
-  SUM(e.salary_usd) AS active_payroll_usd,
-  d.annual_budget_usd,
-  ROUND((SUM(e.salary_usd) * 100.0) / d.annual_budget_usd, 1) AS budget_used_pct
-FROM departments AS d
-LEFT JOIN employees AS e
-  ON e.dept_id = d.dept_id
-GROUP BY d.dept_id, d.name, d.cost_center, d.annual_budget_usd
-HAVING COUNT(e.emp_id) &gt;= 1
-ORDER BY active_payroll_usd DESC;</code></pre>
+  p.product_id,
+  p.sku,
+  p.name AS product_title,
+  cat.name AS category_name,
+  ROUND(p.price_cents / 100.0, 2) AS price_usd,
+  p.stock_qty,
+  ROUND((p.price_cents * p.stock_qty) / 100.0, 2) AS inventory_valuation_usd,
+  COALESCE(SUM(oi.quantity), 0) AS total_units_sold,
+  ROUND(COALESCE(SUM(oi.quantity * oi.unit_price_cents), 0) / 100.0, 2) AS realized_revenue_usd
+FROM products AS p
+INNER JOIN categories AS cat
+  ON cat.category_id = p.category_id
+LEFT JOIN order_items AS oi
+  ON oi.product_id = p.product_id
+WHERE p.is_active = 1
+GROUP BY p.product_id, p.sku, p.name, cat.name, p.price_cents, p.stock_qty
+ORDER BY inventory_valuation_usd DESC, p.product_id ASC;</code></pre>
                     </details>
                   
                 </div>
@@ -1764,7 +1770,7 @@ ORDER BY active_payroll_usd DESC;</code></pre>
   <script type="text/plain" data-defer src="data/srs-cards.js?v=fabc47dd9c"></script>
   <script type="text/plain" data-defer src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
   <script type="text/plain" data-defer src="data/implementations_code.js?v=fce884f8a8"></script>
-  <script type="text/plain" data-defer src="data/topic_guided_labs.js?v=341584ee01"></script>
+  <script type="text/plain" data-defer src="data/topic_guided_labs.js?v=2a57d85494"></script>
   <script type="text/plain" data-defer src="data/projects.js?v=2280ac085f"></script>
   <script type="text/plain" data-defer src="data/glossary.js?v=4f6c79a4e0"></script>
 
@@ -1775,8 +1781,8 @@ ORDER BY active_payroll_usd DESC;</code></pre>
   <script type="text/plain" data-defer src="js/search.js?v=e2063e0ccd"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
   <script type="text/plain" data-defer src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>
-  <script type="text/plain" data-defer src="js/sql-engine.js?v=a668c919ba"></script>
-  <script type="text/plain" data-defer src="js/table-visualizer.js?v=ea5db1c17a"></script>
+  <script type="text/plain" data-defer src="js/sql-engine.js?v=60d0c505ad"></script>
+  <script type="text/plain" data-defer src="js/table-visualizer.js?v=1f1a1f2968"></script>
   <script type="text/plain" data-defer src="js/simulators.js?v=68b973e4c8"></script>
   <script type="text/plain" data-defer src="js/simulators-relational.js?v=8e12b97831"></script>
   <script type="text/plain" data-defer src="js/simulators-analytical.js?v=258089d8ac"></script>
@@ -1793,10 +1799,10 @@ ORDER BY active_payroll_usd DESC;</code></pre>
   <script type="text/plain" data-defer src="js/roadmap.js?v=cebfb7e32c"></script>
   <script type="text/plain" data-defer src="js/challenges.js?v=fcc5b1b6c5"></script>
   <script type="text/plain" data-defer src="js/dashboard.js?v=d411d5a9bb"></script>
-  <script type="text/plain" data-defer src="js/sandbox.js?v=1f94508aa4"></script>
+  <script type="text/plain" data-defer src="js/sandbox.js?v=5528739eb9"></script>
   <script type="text/plain" data-defer src="js/topic-codelab.js?v=096611d91c"></script>
   
-  <script type="text/plain" data-defer src="js/app.js?v=ab7d42f863"></script>
+  <script type="text/plain" data-defer src="js/app.js?v=79ca5d1666"></script>
 
   <!-- App bootstrap & deferred script loader -->
   <script src="js/bootstrap.js?v=df2bb60aeb"></script>

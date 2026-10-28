@@ -1223,55 +1223,948 @@ function generateUnitQuestions(mod, unit, globalIdx, uIdx) {
   ];
 }
 
-function generateGuidedLabEntry(mod, unit, uIdx) {
+function buildProgressiveLabSteps(mod, unit, uIdx) {
+  const modNum = parseInt(mod.id.replace('m', ''), 10);
   const slug = unit.slug;
   const title = unit.title;
-  const excerpt = unit.archive?.excerpt || title;
-  const referenceSql = buildUnitSqlSnippet(mod.id, uIdx || 0, slug, title);
-  const verificationSql = buildUnitVerificationSqlSnippet(mod.id, uIdx || 0, slug, title);
-  const dsMatch = referenceSql.match(/Dataset:\s*([a-z_]+)/i);
-  const datasetId = dsMatch ? dsMatch[1] : 'ecommerce';
+  const tags = unit.archive?.tags || ['sql', 'relational', 'execution'];
+  const tag0 = tags[0] || 'relational';
+  const tag1 = tags[1] || 'predicate';
+  const limitN = 6 + (uIdx % 5);
 
-  let step1Solution = '';
-  let step1Starter = '';
-  let step1Hint = '';
-  if (datasetId === 'org_hr') {
-    step1Solution = `-- Step 1 (${slug}): Base Relation & SARGable Predicate Selection on employees
+  const blueprints = [
+    // 0: ecommerce — Customer Lifetime Value & Tier Cohort Progression
+    {
+      datasetId: 'ecommerce',
+      complexity: { time: 'O(N log N) hash aggregate + sort', space: 'O(G) customer group table', pattern: `${mod.title} · ${tag0}` },
+      step1: {
+        phase: `Phase 1 · ${title}: Customer Relation Projection`,
+        title: `Step 1: Project Customer Domain Attributes (${slug})`,
+        concept: `Inspect the \`customers\` relation for ${title} and isolate target regional cohorts with explicit \`COALESCE\` referral defaults.`,
+        instructions: `Start from the baseline \`customers\` projection in \`query.sql\`, then filter to core markets (\`'US'\`, \`'IN'\`, \`'GB'\`, \`'DE'\`) and normalize \`referred_by\` with \`COALESCE\`.`,
+        starter: `-- Step 1 Starter (${slug}): Baseline customer catalog scan
+SELECT
+  customer_id,
+  name AS customer_name,
+  tier,
+  country
+FROM customers
+ORDER BY customer_id ASC
+LIMIT ${limitN};`,
+        solution: `-- Step 1 Solution (${slug}): Regional cohort filter & NULL-safe referral attribute
+SELECT
+  customer_id,
+  name AS customer_name,
+  tier,
+  country,
+  COALESCE(referred_by, 0) AS referrer_id,
+  created_at
+FROM customers
+WHERE country IN ('US', 'IN', 'GB', 'DE')
+ORDER BY customer_id ASC
+LIMIT ${limitN};`
+      },
+      step2: {
+        phase: `Phase 2 · ${title}: Outer Join & Order Fold`,
+        title: `Step 2: Left Join Completed Orders for ${title}`,
+        concept: `Preserve zero-order customers via \`LEFT JOIN\` with the \`o.status = 'completed'\` predicate inside the \`ON\` clause rather than \`WHERE\`.`,
+        instructions: `Extend the join scaffold in \`query.sql\` to aggregate \`COUNT(o.order_id)\` and \`COALESCE(SUM(o.total_cents), 0)\` per customer.`,
+        starter: `-- Step 2 Starter (${slug}): Left join customers with completed orders
+SELECT
+  c.customer_id,
+  c.name AS customer_name,
+  c.tier,
+  o.order_id,
+  o.total_cents
+FROM customers AS c
+LEFT JOIN orders AS o
+  ON o.customer_id = c.customer_id
+  AND o.status = 'completed'
+ORDER BY c.customer_id ASC;`,
+        solution: `-- Step 2 Solution (${slug}): Customer-level completed order count & spend rollup
+SELECT
+  c.customer_id,
+  c.name AS customer_name,
+  c.tier,
+  c.country,
+  COUNT(o.order_id) AS completed_orders,
+  ROUND(COALESCE(SUM(o.total_cents), 0) / 100.0, 2) AS settled_spend_usd
+FROM customers AS c
+LEFT JOIN orders AS o
+  ON o.customer_id = c.customer_id
+  AND o.status = 'completed'
+GROUP BY c.customer_id, c.name, c.tier, c.country
+ORDER BY settled_spend_usd DESC, c.customer_id ASC;`
+      },
+      step3: {
+        phase: `Phase 3 · ${title}: Tier Benchmark & Plan Verification`,
+        title: `Step 3: Production LTV & Tier Window Benchmark (${title})`,
+        concept: `Combine grouped customer LTV with a partitioned window average \`AVG(...) OVER (PARTITION BY c.tier)\` to benchmark each customer against their tier cohort.`,
+        instructions: `Complete the production query in \`query.sql\` by adding the \`tier_avg_usd\` window column and deterministic ordering.`,
+        starter: `-- Step 3 Starter (${slug}): Pre-window customer LTV aggregation
+SELECT
+  c.customer_id,
+  c.name AS customer_name,
+  c.tier,
+  c.country,
+  COUNT(o.order_id) AS completed_orders,
+  ROUND(COALESCE(SUM(o.total_cents), 0) / 100.0, 2) AS lifetime_value_usd
+FROM customers AS c
+LEFT JOIN orders AS o
+  ON o.customer_id = c.customer_id
+  AND o.status = 'completed'
+WHERE c.country IN ('US', 'IN', 'GB', 'DE')
+GROUP BY c.customer_id, c.name, c.tier, c.country
+ORDER BY lifetime_value_usd DESC;`,
+        solution: `-- Dataset: ecommerce | ${title} (${slug}) — Production LTV & Tier Benchmark
+SELECT
+  c.customer_id,
+  c.name AS customer_name,
+  c.tier,
+  c.country,
+  COUNT(o.order_id) AS completed_orders,
+  ROUND(COALESCE(SUM(o.total_cents), 0) / 100.0, 2) AS lifetime_value_usd,
+  ROUND(AVG(COALESCE(SUM(o.total_cents), 0)) OVER (PARTITION BY c.tier) / 100.0, 2) AS tier_avg_usd
+FROM customers AS c
+LEFT JOIN orders AS o
+  ON o.customer_id = c.customer_id
+  AND o.status = 'completed'
+WHERE c.country IN ('US', 'IN', 'GB', 'DE')
+GROUP BY c.customer_id, c.name, c.tier, c.country
+ORDER BY lifetime_value_usd DESC, c.customer_id ASC
+LIMIT ${limitN};`
+      }
+    },
+    // 1: ecommerce — Product Catalog Valuation & Category Margin Analysis
+    {
+      datasetId: 'ecommerce',
+      complexity: { time: 'O(N) index scan + hash join', space: 'O(C) category lookup state', pattern: `${mod.title} · ${tag0}` },
+      step1: {
+        phase: `Phase 1 · ${title}: Exact-Cents Catalog Arithmetic`,
+        title: `Step 1: Inspect Active Catalog SKUs & Cents Domain (${slug})`,
+        concept: `Verify integer-cents pricing (\`price_cents\`) and active inventory flags (\`is_active = 1\`) in \`products\` without IEEE-754 float drift.`,
+        instructions: `Refine the starter \`products\` query in \`query.sql\` to filter \`is_active = 1\` and compute \`price_usd\` plus \`stock_value_usd\`.`,
+        starter: `-- Step 1 Starter (${slug}): Raw products table inspection
+SELECT
+  product_id,
+  sku,
+  name AS product_title,
+  price_cents,
+  stock_qty,
+  is_active
+FROM products
+ORDER BY product_id ASC;`,
+        solution: `-- Step 1 Solution (${slug}): Active SKUs with exact decimal USD valuation
+SELECT
+  product_id,
+  sku,
+  name AS product_title,
+  category_id,
+  price_cents,
+  ROUND(price_cents / 100.0, 2) AS price_usd,
+  stock_qty,
+  ROUND((price_cents * stock_qty) / 100.0, 2) AS stock_value_usd
+FROM products
+WHERE is_active = 1
+ORDER BY stock_value_usd DESC;`
+      },
+      step2: {
+        phase: `Phase 2 · ${title}: Category Hierarchy & Line-Item Join`,
+        title: `Step 2: Join Categories & Order Items for ${title}`,
+        concept: `Enrich active products with \`categories\` metadata and aggregate ordered quantities from \`order_items\`.`,
+        instructions: `Expand the category join in \`query.sql\` to include a \`LEFT JOIN\` on \`order_items\` and compute \`units_sold\`.`,
+        starter: `-- Step 2 Starter (${slug}): Join products with categories
+SELECT
+  p.product_id,
+  p.sku,
+  p.name AS product_title,
+  cat.name AS category_name,
+  ROUND(p.price_cents / 100.0, 2) AS price_usd
+FROM products AS p
+INNER JOIN categories AS cat
+  ON cat.category_id = p.category_id
+WHERE p.is_active = 1
+ORDER BY p.price_cents DESC;`,
+        solution: `-- Step 2 Solution (${slug}): Category-enriched product demand aggregation
+SELECT
+  p.product_id,
+  p.sku,
+  p.name AS product_title,
+  cat.name AS category_name,
+  ROUND(p.price_cents / 100.0, 2) AS price_usd,
+  COALESCE(SUM(oi.quantity), 0) AS units_sold
+FROM products AS p
+INNER JOIN categories AS cat
+  ON cat.category_id = p.category_id
+LEFT JOIN order_items AS oi
+  ON oi.product_id = p.product_id
+WHERE p.is_active = 1
+GROUP BY p.product_id, p.sku, p.name, cat.name, p.price_cents
+ORDER BY units_sold DESC, price_usd DESC;`
+      },
+      step3: {
+        phase: `Phase 3 · ${title}: Inventory Valuation & Sell-Through Audit`,
+        title: `Step 3: Production Catalog Valuation & Revenue Query (${title})`,
+        concept: `Combine on-hand inventory valuation with realized line-item revenue to audit catalog performance for ${title}.`,
+        instructions: `Complete the production query in \`query.sql\` by projecting \`inventory_valuation_usd\`, \`realized_revenue_usd\`, and ordering by total valuation.`,
+        starter: `-- Step 3 Starter (${slug}): Category & product valuation baseline
+SELECT
+  p.product_id,
+  p.sku,
+  p.name AS product_title,
+  cat.name AS category_name,
+  p.price_cents,
+  p.stock_qty
+FROM products AS p
+INNER JOIN categories AS cat
+  ON cat.category_id = p.category_id
+WHERE p.is_active = 1
+ORDER BY p.price_cents DESC;`,
+        solution: `-- Dataset: ecommerce | ${title} (${slug}) — Catalog Valuation & Demand Audit
+SELECT
+  p.product_id,
+  p.sku,
+  p.name AS product_title,
+  cat.name AS category_name,
+  ROUND(p.price_cents / 100.0, 2) AS price_usd,
+  p.stock_qty,
+  ROUND((p.price_cents * p.stock_qty) / 100.0, 2) AS inventory_valuation_usd,
+  COALESCE(SUM(oi.quantity), 0) AS total_units_sold,
+  ROUND(COALESCE(SUM(oi.quantity * oi.unit_price_cents), 0) / 100.0, 2) AS realized_revenue_usd
+FROM products AS p
+INNER JOIN categories AS cat
+  ON cat.category_id = p.category_id
+LEFT JOIN order_items AS oi
+  ON oi.product_id = p.product_id
+WHERE p.is_active = 1
+GROUP BY p.product_id, p.sku, p.name, cat.name, p.price_cents, p.stock_qty
+ORDER BY inventory_valuation_usd DESC, p.product_id ASC;`
+      }
+    },
+    // 2: ecommerce — Three-Valued Logic (3VL), Promo Codes & Settlement Reconciliation
+    {
+      datasetId: 'ecommerce',
+      complexity: { time: 'O(N) sequential/index scan', space: 'O(1) tuple projection state', pattern: `${mod.title} · ${tag1}` },
+      step1: {
+        phase: `Phase 1 · ${title}: Three-Valued Logic & NULL Inspection`,
+        title: `Step 1: Inspect Nullable Promo Codes in Orders (${slug})`,
+        concept: `Observe how \`discount_code\` contains \`NULL\` markers where direct equality (\`=\` or \`<>\`) evaluates to \`UNKNOWN\` under SQL Three-Valued Logic.`,
+        instructions: `Enhance the starter query in \`query.sql\` with \`COALESCE(discount_code, 'NO_PROMO')\` and an explicit \`IS NULL\` / \`IS NOT NULL\` classification.`,
+        starter: `-- Step 1 Starter (${slug}): Inspect raw orders and nullable discount_code
+SELECT
+  order_id,
+  customer_id,
+  status,
+  discount_code,
+  total_cents
+FROM orders
+ORDER BY order_id ASC;`,
+        solution: `-- Step 1 Solution (${slug}): Explicit 3VL NULL guard and promo normalization
+SELECT
+  order_id,
+  customer_id,
+  status,
+  COALESCE(discount_code, 'NO_PROMO') AS promo_code,
+  CASE
+    WHEN discount_code IS NULL THEN 'ORGANIC_CHECKOUT'
+    ELSE 'PROMO_APPLIED'
+  END AS promo_state,
+  ROUND(total_cents / 100.0, 2) AS order_usd
+FROM orders
+ORDER BY total_cents DESC, order_id ASC;`
+      },
+      step2: {
+        phase: `Phase 2 · ${title}: Payment & Shipment Fulfillment Join`,
+        title: `Step 2: Reconcile Orders with Payments & Shipments (${title})`,
+        concept: `Correlate \`orders\` against \`payments\` and \`shipments\` using \`LEFT JOIN\` so unpaid or unshipped orders remain visible.`,
+        instructions: `Add the \`LEFT JOIN shipments\` clause and normalize missing payment/carrier attributes with \`COALESCE\`.`,
+        starter: `-- Step 2 Starter (${slug}): Join orders with payments
+SELECT
+  o.order_id,
+  o.status AS order_status,
+  ROUND(o.total_cents / 100.0, 2) AS billed_usd,
+  pay.method AS payment_method,
+  pay.status AS payment_status
+FROM orders AS o
+LEFT JOIN payments AS pay
+  ON pay.order_id = o.order_id
+ORDER BY o.order_id ASC;`,
+        solution: `-- Step 2 Solution (${slug}): Full order-to-payment-to-shipment reconciliation
+SELECT
+  o.order_id,
+  o.status AS order_status,
+  ROUND(o.total_cents / 100.0, 2) AS billed_usd,
+  COALESCE(pay.method, 'UNPAID') AS payment_method,
+  COALESCE(pay.status, 'PENDING') AS payment_status,
+  COALESCE(s.carrier, 'NOT_SHIPPED') AS carrier_status
+FROM orders AS o
+LEFT JOIN payments AS pay
+  ON pay.order_id = o.order_id
+LEFT JOIN shipments AS s
+  ON s.order_id = o.order_id
+ORDER BY o.order_id ASC;`
+      },
+      step3: {
+        phase: `Phase 3 · ${title}: End-to-End Order Settlement Audit`,
+        title: `Step 3: Production Settlement & Promo Attribution Query (${title})`,
+        concept: `Produce the complete customer, promo, payment, and fulfillment audit relation with strict 3VL NULL guards.`,
+        instructions: `Run the complete multi-table settlement audit in \`query.sql\` and verify each clause in the Table Visualizer.`,
+        starter: `-- Step 3 Starter (${slug}): Customer & order settlement scaffold
+SELECT
+  o.order_id,
+  c.name AS customer_name,
+  o.status AS order_status,
+  ROUND(o.total_cents / 100.0, 2) AS billed_usd,
+  COALESCE(o.discount_code, 'NO_PROMO') AS promo_code
+FROM orders AS o
+INNER JOIN customers AS c
+  ON c.customer_id = o.customer_id
+ORDER BY o.total_cents DESC;`,
+        solution: `-- Dataset: ecommerce | ${title} (${slug}) — End-to-End Settlement & 3VL Audit
+SELECT
+  o.order_id,
+  c.name AS customer_name,
+  c.tier,
+  o.status AS order_status,
+  COALESCE(o.discount_code, 'NO_PROMO') AS promo_code,
+  ROUND(o.total_cents / 100.0, 2) AS billed_usd,
+  COALESCE(pay.method, 'UNPAID') AS payment_method,
+  COALESCE(pay.status, 'AWAITING_SETTLEMENT') AS payment_status,
+  COALESCE(s.carrier, 'UNFULFILLED') AS shipping_carrier
+FROM orders AS o
+INNER JOIN customers AS c
+  ON c.customer_id = o.customer_id
+LEFT JOIN payments AS pay
+  ON pay.order_id = o.order_id
+LEFT JOIN shipments AS s
+  ON s.order_id = o.order_id
+ORDER BY o.total_cents DESC, o.order_id ASC;`
+      }
+    },
+    // 3: ecommerce — Line-Item Normalization, Review Sentiment & Anti-Join Checks
+    {
+      datasetId: 'ecommerce',
+      complexity: { time: 'O(N + M) hash join & group fold', space: 'O(P) product accumulator', pattern: `${mod.title} · ${tag0}` },
+      step1: {
+        phase: `Phase 1 · ${title}: Product Review & Rating Domain Scan`,
+        title: `Step 1: Inspect Verified Customer Product Reviews (${slug})`,
+        concept: `Examine the \`product_reviews\` relation to evaluate rating distribution and nullable review comments.`,
+        instructions: `Refine the starter query on \`product_reviews\` to classify ratings >= 4 as \`'POSITIVE'\` and replace \`NULL\` comments via \`COALESCE\`.`,
+        starter: `-- Step 1 Starter (${slug}): Base product_reviews scan
+SELECT
+  review_id,
+  product_id,
+  customer_id,
+  rating,
+  comment
+FROM product_reviews
+ORDER BY review_id ASC;`,
+        solution: `-- Step 1 Solution (${slug}): Normalized review sentiment & NULL-safe comment
+SELECT
+  review_id,
+  product_id,
+  customer_id,
+  rating,
+  CASE
+    WHEN rating >= 4 THEN 'POSITIVE'
+    WHEN rating = 3 THEN 'NEUTRAL'
+    ELSE 'CRITICAL'
+  END AS sentiment_band,
+  COALESCE(comment, 'No written comment') AS review_text,
+  created_at
+FROM product_reviews
+ORDER BY rating DESC, review_id ASC;`
+      },
+      step2: {
+        phase: `Phase 2 · ${title}: Order Line-Item vs Header Reconciliation`,
+        title: `Step 2: Reconcile Order Items Against Order Headers (${title})`,
+        concept: `Verify 3NF/BCNF functional dependency integrity by comparing \`SUM(quantity * unit_price_cents)\` in \`order_items\` against \`orders.total_cents\`.`,
+        instructions: `Complete the grouped reconciliation query in \`query.sql\` to flag promo adjustments where line-item sums differ from header totals.`,
+        starter: `-- Step 2 Starter (${slug}): Inspect order_items joined with orders
+SELECT
+  o.order_id,
+  o.total_cents AS header_total_cents,
+  oi.product_id,
+  oi.quantity,
+  oi.unit_price_cents
+FROM orders AS o
+INNER JOIN order_items AS oi
+  ON oi.order_id = o.order_id
+ORDER BY o.order_id ASC;`,
+        solution: `-- Step 2 Solution (${slug}): Line-item subtotal vs order header audit
+SELECT
+  o.order_id,
+  o.customer_id,
+  COUNT(oi.order_item_id) AS line_item_count,
+  SUM(oi.quantity * oi.unit_price_cents) AS line_subtotal_cents,
+  o.total_cents AS header_total_cents,
+  (o.total_cents - SUM(oi.quantity * oi.unit_price_cents)) AS adjustment_delta_cents
+FROM orders AS o
+INNER JOIN order_items AS oi
+  ON oi.order_id = o.order_id
+GROUP BY o.order_id, o.customer_id, o.total_cents
+ORDER BY o.order_id ASC;`
+      },
+      step3: {
+        phase: `Phase 3 · ${title}: Catalog Demand & Review Rating Synthesis`,
+        title: `Step 3: Production Product Demand & Review Quality Audit (${title})`,
+        concept: `Synthesize catalog pricing, ordered unit volume, and average customer review ratings across normalized tables.`,
+        instructions: `Execute the production synthesis query in \`query.sql\` and inspect the multi-join pipeline in the Table Visualizer.`,
+        starter: `-- Step 3 Starter (${slug}): Product and review join scaffold
+SELECT
+  p.product_id,
+  p.sku,
+  p.name AS product_name,
+  ROUND(p.price_cents / 100.0, 2) AS price_usd,
+  COUNT(r.review_id) AS review_count
+FROM products AS p
+LEFT JOIN product_reviews AS r
+  ON r.product_id = p.product_id
+GROUP BY p.product_id, p.sku, p.name, p.price_cents
+ORDER BY review_count DESC;`,
+        solution: `-- Dataset: ecommerce | ${title} (${slug}) — Product Demand & Review Quality Audit
+SELECT
+  p.product_id,
+  p.sku,
+  p.name AS product_name,
+  ROUND(p.price_cents / 100.0, 2) AS price_usd,
+  COUNT(DISTINCT oi.order_item_id) AS order_appearances,
+  COUNT(DISTINCT r.review_id) AS review_count,
+  ROUND(COALESCE(AVG(r.rating), 0), 2) AS avg_rating
+FROM products AS p
+LEFT JOIN order_items AS oi
+  ON oi.product_id = p.product_id
+LEFT JOIN product_reviews AS r
+  ON r.product_id = p.product_id
+GROUP BY p.product_id, p.sku, p.name, p.price_cents
+ORDER BY avg_rating DESC, order_appearances DESC, p.product_id ASC;`
+      }
+    },
+    // 4: org_hr — Self-Join Reporting Hierarchy & Departmental Budget Utilization
+    {
+      datasetId: 'org_hr',
+      complexity: { time: 'O(E + D) hash join & group rollup', space: 'O(D) department state', pattern: `${mod.title} · ${tag0}` },
+      step1: {
+        phase: `Phase 1 · ${title}: Employee Compensation & Tenure Scan`,
+        title: `Step 1: Inspect Employee Roster & Compensation Bands (${slug})`,
+        concept: `Query the \`employees\` relation in \`org_hr\`, handling the root executive's \`NULL\` \`manager_id\` explicitly.`,
+        instructions: `Refine the starter query in \`query.sql\` to filter employees with \`salary_usd >= 150000\` and label root vs reporting staff.`,
+        starter: `-- Step 1 Starter (${slug}): Baseline employees roster scan
+SELECT
+  emp_id,
+  name AS employee_name,
+  title,
+  dept_id,
+  manager_id,
+  salary_usd
+FROM employees
+ORDER BY emp_id ASC;`,
+        solution: `-- Step 1 Solution (${slug}): Compensation filter & root-manager classification
+SELECT
+  emp_id,
+  name AS employee_name,
+  title,
+  dept_id,
+  COALESCE(manager_id, 0) AS reports_to_id,
+  salary_usd,
+  hired_at
+FROM employees
+WHERE salary_usd >= 150000
+ORDER BY salary_usd DESC, emp_id ASC;`
+      },
+      step2: {
+        phase: `Phase 2 · ${title}: Self-Join Employee-to-Manager Pairing`,
+        title: `Step 2: Self-Join Employees with Direct Managers (${title})`,
+        concept: `Alias \`employees AS e\` and \`employees AS m\` with \`LEFT JOIN\` so the CEO (\`manager_id IS NULL\`) is preserved alongside direct reports.`,
+        instructions: `Complete the self-join in \`query.sql\` to compute the compensation ratio between each employee and their manager.`,
+        starter: `-- Step 2 Starter (${slug}): Self-join employees with manager alias
+SELECT
+  e.emp_id,
+  e.name AS employee_name,
+  e.salary_usd AS employee_salary,
+  m.name AS manager_name
+FROM employees AS e
+LEFT JOIN employees AS m
+  ON m.emp_id = e.manager_id
+ORDER BY e.salary_usd DESC;`,
+        solution: `-- Step 2 Solution (${slug}): Self-join reporting pairs with manager salary comparison
+SELECT
+  e.emp_id,
+  e.name AS employee_name,
+  e.title AS employee_role,
+  e.salary_usd AS employee_salary,
+  COALESCE(m.name, 'BOARD_OF_DIRECTORS') AS manager_name,
+  COALESCE(m.salary_usd, e.salary_usd) AS manager_salary,
+  (COALESCE(m.salary_usd, e.salary_usd) - e.salary_usd) AS gap_to_manager_usd
+FROM employees AS e
+LEFT JOIN employees AS m
+  ON m.emp_id = e.manager_id
+ORDER BY e.salary_usd DESC, e.emp_id ASC;`
+      },
+      step3: {
+        phase: `Phase 3 · ${title}: Departmental Payroll vs Budget Rollup`,
+        title: `Step 3: Production Department Budget Utilization Audit (${title})`,
+        concept: `Aggregate departmental headcount and active payroll against \`departments.annual_budget_usd\` to measure budget utilization.`,
+        instructions: `Complete the production departmental rollup in \`query.sql\` including \`budget_used_pct\` and verify via SQL assertions.`,
+        starter: `-- Step 3 Starter (${slug}): Department to employee join scaffold
+SELECT
+  d.dept_id,
+  d.name AS department_name,
+  d.cost_center,
+  d.annual_budget_usd,
+  COUNT(e.emp_id) AS headcount
+FROM departments AS d
+LEFT JOIN employees AS e
+  ON e.dept_id = d.dept_id
+GROUP BY d.dept_id, d.name, d.cost_center, d.annual_budget_usd
+ORDER BY headcount DESC;`,
+        solution: `-- Dataset: org_hr | ${title} (${slug}) — Department Budget Utilization Rollup
+SELECT
+  d.dept_id,
+  d.name AS department_name,
+  d.cost_center,
+  COUNT(e.emp_id) AS headcount,
+  COALESCE(SUM(e.salary_usd), 0) AS active_payroll_usd,
+  d.annual_budget_usd,
+  ROUND((COALESCE(SUM(e.salary_usd), 0) * 100.0) / d.annual_budget_usd, 1) AS budget_used_pct
+FROM departments AS d
+LEFT JOIN employees AS e
+  ON e.dept_id = d.dept_id
+GROUP BY d.dept_id, d.name, d.cost_center, d.annual_budget_usd
+HAVING COUNT(e.emp_id) >= 1
+ORDER BY active_payroll_usd DESC, d.dept_id ASC;`
+      }
+    },
+    // 5: org_hr — Recursive CTE Org Hierarchy, Project Allocation & Window Ranking
+    {
+      datasetId: 'org_hr',
+      complexity: { time: 'O(V + E) recursive BFS + window sort', space: 'O(V) hierarchy working table', pattern: `${mod.title} · ${tag0}` },
+      step1: {
+        phase: `Phase 1 · ${title}: Project Portfolio & Lead Assignment Scan`,
+        title: `Step 1: Inspect Engineering Projects & Allocation Matrix (${slug})`,
+        concept: `Inspect \`projects\` and \`employee_projects\` to understand capital budgets and percentage allocations across staff.`,
+        instructions: `Extend the starter \`projects\` query in \`query.sql\` to join the project lead's name from \`employees\`.`,
+        starter: `-- Step 1 Starter (${slug}): Base projects table scan
+SELECT
+  project_id,
+  code AS project_code,
+  title AS project_title,
+  lead_emp_id,
+  budget_usd
+FROM projects
+ORDER BY budget_usd DESC;`,
+        solution: `-- Step 1 Solution (${slug}): Projects enriched with lead engineer identity
+SELECT
+  p.project_id,
+  p.code AS project_code,
+  p.title AS project_title,
+  e.name AS lead_engineer,
+  e.title AS lead_role,
+  p.budget_usd
+FROM projects AS p
+INNER JOIN employees AS e
+  ON e.emp_id = p.lead_emp_id
+ORDER BY p.budget_usd DESC, p.project_id ASC;`
+      },
+      step2: {
+        phase: `Phase 2 · ${title}: Recursive Org Hierarchy CTE`,
+        title: `Step 2: Traverse Reporting Chain with WITH RECURSIVE (${title})`,
+        concept: `Build a recursive CTE anchored at \`manager_id IS NULL\` and iteratively join direct reports up to depth 5.`,
+        instructions: `Complete the \`WITH RECURSIVE org_tree\` query in \`query.sql\` to compute \`hierarchy_level\` and \`reporting_chain\`.`,
+        starter: `-- Step 2 Starter (${slug}): Anchor member of organizational hierarchy
 SELECT
   emp_id,
   name,
   title,
   dept_id,
-  manager_id,
-  salary_usd,
-  hired_at
+  0 AS hierarchy_level
 FROM employees
-WHERE salary_usd >= 170000
-ORDER BY salary_usd DESC
-LIMIT 10;`;
-    step1Starter = `-- TODO (Step 1): Filter employees with a SARGable predicate (salary_usd >= 170000) and order by salary_usd DESC
-${step1Solution}`;
-    step1Hint = `SELECT emp_id, name, title, dept_id, manager_id, salary_usd, hired_at FROM employees WHERE salary_usd >= 170000 ORDER BY salary_usd DESC LIMIT 10;`;
-  } else if (datasetId === 'fintech_ledger') {
-    step1Solution = `-- Step 1 (${slug}): Base Relation & SARGable Predicate Selection on accounts & transfers
+WHERE manager_id IS NULL;`,
+        solution: `-- Step 2 Solution (${slug}): Full WITH RECURSIVE chain-of-command traversal
+WITH RECURSIVE org_tree AS (
+  SELECT
+    emp_id,
+    name,
+    title,
+    manager_id,
+    dept_id,
+    salary_usd,
+    0 AS hierarchy_level,
+    name AS reporting_chain
+  FROM employees
+  WHERE manager_id IS NULL
+  UNION ALL
+  SELECT
+    e.emp_id,
+    e.name,
+    e.title,
+    e.manager_id,
+    e.dept_id,
+    e.salary_usd,
+    t.hierarchy_level + 1 AS hierarchy_level,
+    t.reporting_chain || ' -> ' || e.name AS reporting_chain
+  FROM employees AS e
+  INNER JOIN org_tree AS t
+    ON e.manager_id = t.emp_id
+  WHERE t.hierarchy_level < 5
+)
 SELECT
-  transfer_id,
-  idempotency_key,
-  from_account_id,
-  to_account_id,
+  emp_id,
+  name,
+  title,
+  hierarchy_level,
+  salary_usd,
+  reporting_chain
+FROM org_tree
+ORDER BY hierarchy_level ASC, salary_usd DESC;`
+      },
+      step3: {
+        phase: `Phase 3 · ${title}: Departmental Window Ranking & Running Payroll`,
+        title: `Step 3: Production Window Rank, Peer Gap & Cumulative Payroll (${title})`,
+        concept: `Evaluate \`DENSE_RANK()\`, \`LAG()\`, and \`SUM() OVER (PARTITION BY e.dept_id ... ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)\` without collapsing employee rows.`,
+        instructions: `Complete the production window query in \`query.sql\` and step through the Window clause in the Table Visualizer.`,
+        starter: `-- Step 3 Starter (${slug}): Departmental employee join before window frame
+SELECT
+  d.name AS dept_name,
+  e.name AS employee_name,
+  e.title,
+  e.salary_usd,
+  e.hired_at
+FROM employees AS e
+INNER JOIN departments AS d
+  ON d.dept_id = e.dept_id
+ORDER BY d.name ASC, e.salary_usd DESC;`,
+        solution: `-- Dataset: org_hr | ${title} (${slug}) — Partitioned Window Ranking & Running Payroll
+SELECT
+  d.name AS dept_name,
+  e.name AS employee_name,
+  e.title,
+  e.salary_usd,
+  DENSE_RANK() OVER (
+    PARTITION BY e.dept_id
+    ORDER BY e.salary_usd DESC
+  ) AS dept_salary_rank,
+  LAG(e.salary_usd, 1, e.salary_usd) OVER (
+    PARTITION BY e.dept_id
+    ORDER BY e.salary_usd DESC
+  ) - e.salary_usd AS gap_to_higher_peer_usd,
+  SUM(e.salary_usd) OVER (
+    PARTITION BY e.dept_id
+    ORDER BY e.hired_at ASC, e.emp_id ASC
+    ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+  ) AS cumulative_dept_payroll_usd
+FROM employees AS e
+INNER JOIN departments AS d
+  ON d.dept_id = e.dept_id
+ORDER BY d.name ASC, dept_salary_rank ASC, e.emp_id ASC;`
+      }
+    },
+    // 6: org_hr — SCD Type 2 Salary History & Project Allocation Rollup
+    {
+      datasetId: 'org_hr',
+      complexity: { time: 'O(H log H) temporal sort + join', space: 'O(E) employee state', pattern: `${mod.title} · ${tag1}` },
+      step1: {
+        phase: `Phase 1 · ${title}: Historical Compensation Change Scan`,
+        title: `Step 1: Inspect Salary History Audit Records (${slug})`,
+        concept: `Examine \`salary_history\` to compute absolute raise deltas (\`new_salary_usd - old_salary_usd\`) and effective dates.`,
+        instructions: `Update the starter query in \`query.sql\` to compute \`raise_delta_usd\` and \`raise_pct\` ordered chronologically.`,
+        starter: `-- Step 1 Starter (${slug}): Raw salary_history table scan
+SELECT
+  history_id,
+  emp_id,
+  old_salary_usd,
+  new_salary_usd,
+  effective_date
+FROM salary_history
+ORDER BY history_id ASC;`,
+        solution: `-- Step 1 Solution (${slug}): Computed raise delta and percentage growth
+SELECT
+  history_id,
+  emp_id,
+  old_salary_usd,
+  new_salary_usd,
+  (new_salary_usd - old_salary_usd) AS raise_delta_usd,
+  ROUND(((new_salary_usd - old_salary_usd) * 100.0) / old_salary_usd, 1) AS raise_pct,
+  effective_date
+FROM salary_history
+ORDER BY effective_date ASC, raise_delta_usd DESC;`
+      },
+      step2: {
+        phase: `Phase 2 · ${title}: Cross-Project Allocation Aggregation`,
+        title: `Step 2: Aggregate Employee Project Allocations (${title})`,
+        concept: `Join \`employees\`, \`employee_projects\`, and \`projects\` to calculate total allocation percentage per engineer.`,
+        instructions: `Complete the multi-table join in \`query.sql\` to aggregate \`assigned_projects\` and \`total_allocation_pct\`.`,
+        starter: `-- Step 2 Starter (${slug}): Join employee_projects with projects
+SELECT
+  ep.emp_id,
+  p.code AS project_code,
+  p.title AS project_title,
+  ep.allocation_pct
+FROM employee_projects AS ep
+INNER JOIN projects AS p
+  ON p.project_id = ep.project_id
+ORDER BY ep.emp_id ASC;`,
+        solution: `-- Step 2 Solution (${slug}): Engineer workload & project allocation rollup
+SELECT
+  e.emp_id,
+  e.name AS employee_name,
+  e.title,
+  COUNT(ep.project_id) AS assigned_projects,
+  COALESCE(SUM(ep.allocation_pct), 0) AS total_allocation_pct
+FROM employees AS e
+LEFT JOIN employee_projects AS ep
+  ON ep.emp_id = e.emp_id
+GROUP BY e.emp_id, e.name, e.title
+ORDER BY total_allocation_pct DESC, e.emp_id ASC;`
+      },
+      step3: {
+        phase: `Phase 3 · ${title}: SCD Type 2 Compensation & Department Audit`,
+        title: `Step 3: Production SCD2 Compensation Progression Query (${title})`,
+        concept: `Join \`salary_history\`, \`employees\`, and \`departments\` to audit historical compensation changes alongside current salary.`,
+        instructions: `Run the production compensation history query in \`query.sql\` and verify the output schema and ordering.`,
+        starter: `-- Step 3 Starter (${slug}): Join salary_history with employees
+SELECT
+  e.name AS employee_name,
+  e.title,
+  sh.old_salary_usd,
+  sh.new_salary_usd,
+  sh.effective_date
+FROM salary_history AS sh
+INNER JOIN employees AS e
+  ON e.emp_id = sh.emp_id
+ORDER BY sh.effective_date ASC;`,
+        solution: `-- Dataset: org_hr | ${title} (${slug}) — SCD Type 2 Compensation History Audit
+SELECT
+  e.name AS employee_name,
+  d.name AS department_name,
+  e.title,
+  sh.old_salary_usd,
+  sh.new_salary_usd,
+  (sh.new_salary_usd - sh.old_salary_usd) AS raise_delta_usd,
+  ROUND(((sh.new_salary_usd - sh.old_salary_usd) * 100.0) / sh.old_salary_usd, 1) AS raise_pct,
+  sh.effective_date
+FROM salary_history AS sh
+INNER JOIN employees AS e
+  ON e.emp_id = sh.emp_id
+INNER JOIN departments AS d
+  ON d.dept_id = e.dept_id
+ORDER BY sh.effective_date ASC, raise_delta_usd DESC;`
+      }
+    },
+    // 7: fintech_ledger — Double-Entry ACID Conservation & Optimistic Version Control
+    {
+      datasetId: 'fintech_ledger',
+      complexity: { time: 'O(T + J) indexed join + group check', space: 'O(T) transfer accumulator', pattern: `${mod.title} · ${tag0}` },
+      step1: {
+        phase: `Phase 1 · ${title}: Ledger Account & Optimistic Version Scan`,
+        title: `Step 1: Inspect Accounts & Optimistic Lock Versions (${slug})`,
+        concept: `Inspect \`accounts\` in \`fintech_ledger\` to verify \`posted_balance_cents\` and MVCC/optimistic concurrency \`version\` counters.`,
+        instructions: `Refine the starter \`accounts\` query in \`query.sql\` to compute \`posted_balance_usd\` and classify account types.`,
+        starter: `-- Step 1 Starter (${slug}): Base accounts relation scan
+SELECT
+  account_id,
+  owner_name,
+  account_type,
+  posted_balance_cents,
+  version
+FROM accounts
+ORDER BY account_id ASC;`,
+        solution: `-- Step 1 Solution (${slug}): Account balances in USD with optimistic version metadata
+SELECT
+  account_id,
+  owner_name,
+  account_type,
+  currency,
+  posted_balance_cents,
+  ROUND(posted_balance_cents / 100.0, 2) AS posted_balance_usd,
+  version AS optimistic_lock_version
+FROM accounts
+ORDER BY posted_balance_cents DESC, account_id ASC;`
+      },
+      step2: {
+        phase: `Phase 2 · ${title}: Idempotent Transfers & Account Endpoints`,
+        title: `Step 2: Join Transfers with Sender & Receiver Accounts (${title})`,
+        concept: `Resolve both foreign keys (\`from_account_id\` and \`to_account_id\`) on \`transfers\` while verifying unique \`idempotency_key\` values.`,
+        instructions: `Complete the dual-account join in \`query.sql\` to display both sender and receiver names for each transfer.`,
+        starter: `-- Step 2 Starter (${slug}): Transfers joined with sender account
+SELECT
+  t.transfer_id,
+  t.idempotency_key,
+  fa.owner_name AS sender_account,
+  t.to_account_id,
+  t.amount_cents,
+  t.status
+FROM transfers AS t
+INNER JOIN accounts AS fa
+  ON fa.account_id = t.from_account_id
+ORDER BY t.transfer_id ASC;`,
+        solution: `-- Step 2 Solution (${slug}): Dual-endpoint transfer audit with USD conversion
+SELECT
+  t.transfer_id,
+  t.idempotency_key,
+  fa.owner_name AS sender_account,
+  ta.owner_name AS receiver_account,
+  ROUND(t.amount_cents / 100.0, 2) AS transfer_usd,
+  t.status,
+  t.created_at
+FROM transfers AS t
+INNER JOIN accounts AS fa
+  ON fa.account_id = t.from_account_id
+INNER JOIN accounts AS ta
+  ON ta.account_id = t.to_account_id
+ORDER BY t.transfer_id ASC;`
+      },
+      step3: {
+        phase: `Phase 3 · ${title}: Double-Entry Conservation Invariant`,
+        title: `Step 3: Production Double-Entry Zero-Sum Audit (${title})`,
+        concept: `Verify the fundamental ACID ledger invariant: every posted transfer has matching debit and credit legs in \`journal_entries\` summing to zero net drift.`,
+        instructions: `Execute the double-entry conservation audit in \`query.sql\` and confirm \`net_balance_cents = 0\` across all transfers.`,
+        starter: `-- Step 3 Starter (${slug}): Join transfers with journal_entries legs
+SELECT
+  t.transfer_id,
+  t.idempotency_key,
+  t.status,
+  je.direction,
+  je.amount_cents
+FROM transfers AS t
+INNER JOIN journal_entries AS je
+  ON je.transfer_id = t.transfer_id
+ORDER BY t.transfer_id ASC, je.entry_id ASC;`,
+        solution: `-- Dataset: fintech_ledger | ${title} (${slug}) — Double-Entry Conservation Audit
+SELECT
+  t.transfer_id,
+  t.idempotency_key,
+  t.status,
+  COUNT(je.entry_id) AS journal_legs,
+  SUM(CASE WHEN je.direction = 'debit' THEN je.amount_cents ELSE 0 END) AS total_debit_cents,
+  SUM(CASE WHEN je.direction = 'credit' THEN je.amount_cents ELSE 0 END) AS total_credit_cents,
+  SUM(CASE WHEN je.direction = 'credit' THEN je.amount_cents ELSE -je.amount_cents END) AS net_balance_cents
+FROM transfers AS t
+INNER JOIN journal_entries AS je
+  ON je.transfer_id = t.transfer_id
+GROUP BY t.transfer_id, t.idempotency_key, t.status
+ORDER BY t.transfer_id ASC;`
+      }
+    },
+    // 8: fintech_ledger — Card Velocity Window Frames & Account Balance Reconciliation
+    {
+      datasetId: 'fintech_ledger',
+      complexity: { time: 'O(M log M) window partition sort', space: 'O(W) sliding 3-row frame state', pattern: `${mod.title} · ${tag1}` },
+      step1: {
+        phase: `Phase 1 · ${title}: Corporate Cards & Daily Limit Controls`,
+        title: `Step 1: Inspect Issued Cards & Daily Spend Limits (${slug})`,
+        concept: `Examine the \`cards\` table in \`fintech_ledger\` to inspect active vs frozen cards and daily limit thresholds.`,
+        instructions: `Refine the starter \`cards\` query in \`query.sql\` to convert \`daily_limit_cents\` into \`daily_limit_usd\` and join account owners.`,
+        starter: `-- Step 1 Starter (${slug}): Raw cards table inspection
+SELECT
+  card_id,
+  account_id,
+  last4,
+  daily_limit_cents,
+  status
+FROM cards
+ORDER BY card_id ASC;`,
+        solution: `-- Step 1 Solution (${slug}): Issued cards enriched with account owner & USD limit
+SELECT
+  c.card_id,
+  a.owner_name,
+  c.last4,
+  ROUND(c.daily_limit_cents / 100.0, 2) AS daily_limit_usd,
+  c.status AS card_status
+FROM cards AS c
+INNER JOIN accounts AS a
+  ON a.account_id = c.account_id
+ORDER BY c.daily_limit_cents DESC, c.card_id ASC;`
+      },
+      step2: {
+        phase: `Phase 2 · ${title}: Merchant Transaction Spend vs Card Limit`,
+        title: `Step 2: Aggregate Merchant Spend per Card (${title})`,
+        concept: `Join \`cards\` with \`merchant_txns\` to compare cumulative card spend against \`daily_limit_cents\`.`,
+        instructions: `Complete the grouped card spend query in \`query.sql\` to compute \`txn_count\` and \`total_spend_usd\`.`,
+        starter: `-- Step 2 Starter (${slug}): Join cards and merchant_txns
+SELECT
+  c.card_id,
+  c.last4,
+  mt.merchant,
+  mt.amount_cents,
+  mt.txn_ts
+FROM cards AS c
+INNER JOIN merchant_txns AS mt
+  ON mt.card_id = c.card_id
+ORDER BY mt.txn_ts ASC;`,
+        solution: `-- Step 2 Solution (${slug}): Aggregated card spend vs daily limit utilization
+SELECT
+  c.card_id,
+  c.last4,
+  c.status AS card_status,
+  COUNT(mt.txn_id) AS txn_count,
+  ROUND(SUM(mt.amount_cents) / 100.0, 2) AS total_spend_usd,
+  ROUND(c.daily_limit_cents / 100.0, 2) AS daily_limit_usd
+FROM cards AS c
+INNER JOIN merchant_txns AS mt
+  ON mt.card_id = c.card_id
+GROUP BY c.card_id, c.last4, c.status, c.daily_limit_cents
+ORDER BY total_spend_usd DESC;`
+      },
+      step3: {
+        phase: `Phase 3 · ${title}: Sliding 3-Transaction Velocity Window`,
+        title: `Step 3: Production Sliding Window Card Velocity Audit (${title})`,
+        concept: `Use \`ROWS BETWEEN 2 PRECEDING AND CURRENT ROW\` partitioned by \`card_id\` to detect rapid consecutive card spend bursts.`,
+        instructions: `Execute the sliding-window card velocity query in \`query.sql\` and inspect the window frame results.`,
+        starter: `-- Step 3 Starter (${slug}): Ordered merchant transactions per card
+SELECT
+  txn_id,
+  card_id,
+  merchant,
+  country,
   ROUND(amount_cents / 100.0, 2) AS amount_usd,
-  status,
-  created_at
-FROM transfers
-WHERE status = 'posted'
-  AND amount_cents >= 25000
-ORDER BY transfer_id ASC
-LIMIT 10;`;
-    step1Starter = `-- TODO (Step 1): Select posted transfers with amount_cents >= 25000 ordered by transfer_id ASC
-${step1Solution}`;
-    step1Hint = `SELECT transfer_id, idempotency_key, from_account_id, to_account_id, ROUND(amount_cents / 100.0, 2) AS amount_usd, status, created_at FROM transfers WHERE status = 'posted' AND amount_cents >= 25000 ORDER BY transfer_id ASC LIMIT 10;`;
-  } else if (datasetId === 'saas_telemetry') {
-    step1Solution = `-- Step 1 (${slug}): Base Relation & SARGable Predicate Selection on user_events
+  txn_ts
+FROM merchant_txns
+ORDER BY card_id ASC, txn_ts ASC;`,
+        solution: `-- Dataset: fintech_ledger | ${title} (${slug}) — Sliding 3-Txn Card Velocity Window
+SELECT
+  txn_id,
+  card_id,
+  merchant,
+  country,
+  ROUND(amount_cents / 100.0, 2) AS amount_usd,
+  txn_ts,
+  COUNT(*) OVER (
+    PARTITION BY card_id
+    ORDER BY txn_ts ASC
+    ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+  ) AS window_txn_count,
+  ROUND(
+    SUM(amount_cents) OVER (
+      PARTITION BY card_id
+      ORDER BY txn_ts ASC
+      ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+    ) / 100.0,
+    2
+  ) AS rolling_3txn_usd
+FROM merchant_txns
+ORDER BY card_id ASC, txn_ts ASC;`
+      }
+    },
+    // 9: saas_telemetry — Multi-Step Conversion Funnel & Telemetry Latency Profile
+    {
+      datasetId: 'saas_telemetry',
+      complexity: { time: 'O(E) single-pass conditional pivot', space: 'O(U) user funnel state', pattern: `${mod.title} · ${tag0}` },
+      step1: {
+        phase: `Phase 1 · ${title}: Telemetry Event Stream & Null Latency Guard`,
+        title: `Step 1: Filter Non-Null Telemetry Latency Events (${slug})`,
+        concept: `Inspect \`user_events\` in \`saas_telemetry\` and apply an explicit \`latency_ms IS NOT NULL\` guard before computing latency statistics.`,
+        instructions: `Update the starter query in \`query.sql\` to filter out \`NULL\` latency rows and order by \`latency_ms DESC\`.`,
+        starter: `-- Step 1 Starter (${slug}): Raw user_events stream inspection
+SELECT
+  event_id,
+  user_id,
+  event_type,
+  latency_ms,
+  event_ts
+FROM user_events
+ORDER BY event_id ASC;`,
+        solution: `-- Step 1 Solution (${slug}): NULL-safe telemetry event latency filter
 SELECT
   event_id,
   user_id,
@@ -1280,37 +2173,202 @@ SELECT
   event_ts
 FROM user_events
 WHERE latency_ms IS NOT NULL
-  AND event_ts >= '2025-01-01'
-ORDER BY event_ts ASC
-LIMIT 10;`;
-    step1Starter = `-- TODO (Step 1): Query user_events with NULL-safe latency filter and SARGable timestamp predicate
-${step1Solution}`;
-    step1Hint = `SELECT event_id, user_id, event_type, latency_ms, event_ts FROM user_events WHERE latency_ms IS NOT NULL AND event_ts >= '2025-01-01' ORDER BY event_ts ASC LIMIT 10;`;
-  } else {
-    step1Solution = `-- Step 1 (${slug}): Base Relation & SARGable Predicate Selection on orders
+ORDER BY latency_ms DESC, event_id ASC;`
+      },
+      step2: {
+        phase: `Phase 2 · ${title}: Subscription MRR & Invoice Settlement Join`,
+        title: `Step 2: Correlate SaaS Tenants with Subscriptions & Invoices (${title})`,
+        concept: `Join \`saas_users\`, \`subscriptions\`, and \`invoices\` to compare contracted MRR against paid vs unpaid billing invoices.`,
+        instructions: `Complete the tenant revenue rollup in \`query.sql\` to aggregate \`paid_invoices_usd\` and \`unpaid_invoices_usd\`.`,
+        starter: `-- Step 2 Starter (${slug}): Join saas_users and subscriptions
 SELECT
-  order_id,
-  customer_id,
-  status,
-  ROUND(total_cents / 100.0, 2) AS total_usd,
-  COALESCE(discount_code, 'NONE') AS promo_code,
-  created_at
-FROM orders
-WHERE status = 'completed'
-  AND total_cents >= 30000
-ORDER BY total_cents DESC
-LIMIT 10;`;
-    step1Starter = `-- TODO (Step 1): Select completed orders with total_cents >= 30000 using NULL-safe COALESCE for discount_code
-${step1Solution}`;
-    step1Hint = `SELECT order_id, customer_id, status, ROUND(total_cents / 100.0, 2) AS total_usd, COALESCE(discount_code, 'NONE') AS promo_code, created_at FROM orders WHERE status = 'completed' AND total_cents >= 30000 ORDER BY total_cents DESC LIMIT 10;`;
+  u.user_id,
+  u.org_name,
+  u.plan_tier,
+  s.sub_id,
+  s.mrr_usd,
+  s.status
+FROM saas_users AS u
+INNER JOIN subscriptions AS s
+  ON s.user_id = u.user_id
+ORDER BY s.mrr_usd DESC;`,
+        solution: `-- Step 2 Solution (${slug}): Tenant MRR and invoice collection reconciliation
+SELECT
+  u.user_id,
+  u.org_name,
+  u.plan_tier,
+  s.mrr_usd,
+  COUNT(i.invoice_id) AS invoice_count,
+  COALESCE(SUM(CASE WHEN i.paid = 1 THEN i.amount_usd ELSE 0 END), 0) AS collected_usd,
+  COALESCE(SUM(CASE WHEN i.paid = 0 THEN i.amount_usd ELSE 0 END), 0) AS overdue_usd
+FROM saas_users AS u
+INNER JOIN subscriptions AS s
+  ON s.user_id = u.user_id
+LEFT JOIN invoices AS i
+  ON i.sub_id = s.sub_id
+GROUP BY u.user_id, u.org_name, u.plan_tier, s.mrr_usd
+ORDER BY s.mrr_usd DESC, u.user_id ASC;`
+      },
+      step3: {
+        phase: `Phase 3 · ${title}: Cohort Funnel & Telemetry Latency Profile`,
+        title: `Step 3: Production SaaS Telemetry Latency & Plan Profile (${title})`,
+        concept: `Aggregate event volume, average latency, and peak latency across \`plan_tier\` and \`event_type\` to verify SLA compliance.`,
+        instructions: `Execute the production telemetry aggregation in \`query.sql\` and inspect the grouped buckets in the Table Visualizer.`,
+        starter: `-- Step 3 Starter (${slug}): Join user_events with saas_users
+SELECT
+  u.plan_tier,
+  e.event_type,
+  e.latency_ms
+FROM user_events AS e
+INNER JOIN saas_users AS u
+  ON u.user_id = e.user_id
+WHERE e.latency_ms IS NOT NULL
+ORDER BY e.latency_ms DESC;`,
+        solution: `-- Dataset: saas_telemetry | ${title} (${slug}) — Telemetry Latency Profile by Tier
+SELECT
+  u.plan_tier,
+  e.event_type,
+  COUNT(*) AS event_count,
+  ROUND(AVG(e.latency_ms), 2) AS avg_latency_ms,
+  MAX(e.latency_ms) AS max_latency_ms,
+  MIN(e.latency_ms) AS min_latency_ms
+FROM user_events AS e
+INNER JOIN saas_users AS u
+  ON u.user_id = e.user_id
+GROUP BY u.plan_tier, e.event_type
+ORDER BY event_count DESC, avg_latency_ms DESC;`
+      }
+    },
+    // 10: social_graph — Graph Follower Reachability, Post Engagement & Shard Co-Location
+    {
+      datasetId: 'social_graph',
+      complexity: { time: 'O(V + E) graph adjacency join', space: 'O(V) profile state', pattern: `${mod.title} · ${tag0}` },
+      step1: {
+        phase: `Phase 1 · ${title}: Creator Profile & Reputation Scan`,
+        title: `Step 1: Inspect Creator Profiles & Reputation Scores (${slug})`,
+        concept: `Query \`profiles\` in \`social_graph\` to rank database engineering creators by reputation score.`,
+        instructions: `Refine the starter \`profiles\` query in \`query.sql\` to classify creators with \`reputation >= 500\` as \`'CORE_MAINTAINER'\`.`,
+        starter: `-- Step 1 Starter (${slug}): Raw social_graph profiles scan
+SELECT
+  user_id,
+  handle,
+  reputation
+FROM profiles
+ORDER BY user_id ASC;`,
+        solution: `-- Step 1 Solution (${slug}): Creator reputation ranking & tier classification
+SELECT
+  user_id,
+  handle,
+  reputation,
+  CASE
+    WHEN reputation >= 500 THEN 'CORE_MAINTAINER'
+    ELSE 'COMMUNITY_AUTHOR'
+  END AS contributor_tier
+FROM profiles
+ORDER BY reputation DESC, user_id ASC;`
+      },
+      step2: {
+        phase: `Phase 2 · ${title}: Directed Follow Graph & Follower Fan-In`,
+        title: `Step 2: Aggregate Follower Graph Fan-In & Fan-Out (${title})`,
+        concept: `Join \`profiles\` with \`follows\` to compute incoming followers per user while preserving users with zero followers.`,
+        instructions: `Complete the \`LEFT JOIN follows\` aggregation in \`query.sql\` to count \`follower_count\` per handle.`,
+        starter: `-- Step 2 Starter (${slug}): Inspect directed follows edges
+SELECT
+  p.user_id,
+  p.handle,
+  f.follower_id,
+  f.followed_at
+FROM profiles AS p
+LEFT JOIN follows AS f
+  ON f.followee_id = p.user_id
+ORDER BY p.user_id ASC;`,
+        solution: `-- Step 2 Solution (${slug}): Follower fan-in count per creator profile
+SELECT
+  p.user_id,
+  p.handle,
+  p.reputation,
+  COUNT(f.follower_id) AS follower_count
+FROM profiles AS p
+LEFT JOIN follows AS f
+  ON f.followee_id = p.user_id
+GROUP BY p.user_id, p.handle, p.reputation
+ORDER BY follower_count DESC, p.reputation DESC;`
+      },
+      step3: {
+        phase: `Phase 3 · ${title}: Topic Post Engagement & Like Attribution`,
+        title: `Step 3: Production Post Engagement & Author Reputation Query (${title})`,
+        concept: `Join \`posts\`, author \`profiles\`, and \`post_likes\` to rank technical posts by engagement and author reputation.`,
+        instructions: `Run the complete post engagement query in \`query.sql\` and step through the multi-join pipeline.`,
+        starter: `-- Step 3 Starter (${slug}): Join posts with author profiles
+SELECT
+  po.post_id,
+  pr.handle AS author_handle,
+  po.topic_tag,
+  po.published_at
+FROM posts AS po
+INNER JOIN profiles AS pr
+  ON pr.user_id = po.author_id
+ORDER BY po.published_at DESC;`,
+        solution: `-- Dataset: social_graph | ${title} (${slug}) — Post Engagement & Author Reputation
+SELECT
+  po.post_id,
+  pr.handle AS author_handle,
+  pr.reputation AS author_reputation,
+  po.topic_tag,
+  COUNT(pl.user_id) AS like_count,
+  po.published_at
+FROM posts AS po
+INNER JOIN profiles AS pr
+  ON pr.user_id = po.author_id
+LEFT JOIN post_likes AS pl
+  ON pl.post_id = po.post_id
+GROUP BY po.post_id, pr.handle, pr.reputation, po.topic_tag, po.published_at
+ORDER BY like_count DESC, pr.reputation DESC, po.post_id ASC;`
+      }
+    }
+  ];
+
+  let bpIndex = 0;
+  if (modNum === 1) {
+    bpIndex = uIdx % 4;
+  } else if (modNum === 2) {
+    bpIndex = [1, 2, 7, 3, 0, 2, 7, 1, 3, 8][uIdx % 10];
+  } else if (modNum === 3) {
+    bpIndex = [0, 2, 3, 4, 10, 1, 4, 10, 2, 0][uIdx % 10];
+  } else if (modNum === 4) {
+    bpIndex = [0, 4, 1, 7, 9, 3, 4, 0, 8, 1][uIdx % 10];
+  } else if (modNum === 5) {
+    bpIndex = [5, 10, 4, 1, 6, 5, 10, 3, 4, 5][uIdx % 10];
+  } else if (modNum === 6) {
+    bpIndex = [5, 8, 6, 0, 8, 5, 6, 8, 4, 5][uIdx % 10];
+  } else if (modNum === 7) {
+    bpIndex = [3, 1, 7, 10, 2, 3, 4, 7, 10, 3][uIdx % 10];
+  } else if (modNum === 8) {
+    bpIndex = [6, 1, 9, 4, 0, 6, 9, 1, 4, 6][uIdx % 10];
+  } else if (modNum === 9) {
+    bpIndex = [9, 8, 10, 6, 2, 9, 8, 10, 7, 9][uIdx % 10];
+  } else if (modNum === 10 || modNum === 11 || modNum === 12) {
+    bpIndex = [2, 1, 8, 9, 4, 0, 7, 3, 5, 2][(uIdx + modNum) % 10];
+  } else if (modNum === 13 || modNum === 14 || modNum === 15) {
+    bpIndex = [7, 8, 2, 7, 8, 9, 7, 8, 3, 7][uIdx % 10];
+  } else if (modNum === 16) {
+    bpIndex = [9, 1, 0, 9, 3, 8, 9, 1, 4, 9][uIdx % 10];
+  } else if (modNum === 17) {
+    bpIndex = [10, 7, 9, 10, 8, 0, 10, 7, 9, 10][uIdx % 10];
+  } else {
+    bpIndex = [2, 7, 9, 8, 5, 1, 4, 10, 3, 0][uIdx % 10];
   }
 
-  const step2Solution = verificationSql;
-  const step2Starter = `-- TODO (Step 2): Compose relational JOIN, GROUP BY aggregation, and Three-Valued Logic NULL guards for ${title}
-${verificationSql}`;
-  const step3Solution = referenceSql;
-  const step3Starter = `-- TODO (Step 3): Execute and verify the production SQL query & EXPLAIN QUERY PLAN for ${title} (${slug})
-${referenceSql}`;
+  return blueprints[bpIndex];
+}
+
+function generateGuidedLabEntry(mod, unit, uIdx) {
+  const slug = unit.slug;
+  const title = unit.title;
+  const excerpt = unit.archive?.excerpt || title;
+  const bp = buildProgressiveLabSteps(mod, unit, uIdx || 0);
+  const datasetId = bp.datasetId;
+  const referenceSql = bp.step3.solution;
 
   return {
     title: `${title} — Interactive Guided SQL Lab`,
@@ -1319,58 +2377,57 @@ ${referenceSql}`;
     activeFile: 'query.sql',
     datasetId,
     referenceSql,
-    complexity: {
-      time: 'O(N) scan / O(log_B N) indexed',
-      space: 'O(1) streaming tuple state',
-      pattern: mod.title
-    },
+    complexity: bp.complexity,
     steps: [
       {
         id: 'step-1',
-        phase: 'Phase 1 · Base Relation & SARGable Predicate',
-        title: `Step 1: Base Relation Scan & SARGable Filter (${datasetId})`,
-        concept: `Establish the base relation scan in \`${datasetId}\` for ${title} with a SARGable predicate and explicit Three-Valued Logic NULL handling.`,
-        instructions: `Run or edit \`query.sql\` to inspect the base table tuples, verify SARGable index filtering in the \`WHERE\` clause, and step through the live Table Visualizer.`,
-        hint: step1Hint,
+        phase: bp.step1.phase,
+        title: bp.step1.title,
+        concept: bp.step1.concept,
+        instructions: bp.step1.instructions,
+        hint: bp.step1.solution,
         file: 'query.sql',
         targetFile: 'query.sql',
-        starterCode: step1Starter,
-        solutionCode: step1Solution
+        starterCode: bp.step1.starter,
+        solutionCode: bp.step1.solution
       },
       {
         id: 'step-2',
-        phase: 'Phase 2 · Relational Join, Aggregation & 3VL Guard',
-        title: 'Step 2: Relational Join, Grouping & NULL-Safe Aggregation',
-        concept: 'Combine normalized tables via explicit JOIN conditions and fold group buckets or window partitions without losing NULL boundary rows.',
-        instructions: `Run or refine the Step 2 relational join and aggregation query in \`query.sql\`, then click **🔍 Step Clauses** to inspect each intermediate table.`,
-        hint: step2Solution,
+        phase: bp.step2.phase,
+        title: bp.step2.title,
+        concept: bp.step2.concept,
+        instructions: bp.step2.instructions,
+        hint: bp.step2.solution,
         file: 'query.sql',
         targetFile: 'query.sql',
-        starterCode: step2Starter,
-        solutionCode: step2Solution
+        starterCode: bp.step2.starter,
+        solutionCode: bp.step2.solution
       },
       {
         id: 'step-3',
-        phase: 'Phase 3 · Production Query & Plan Verification',
-        title: `Step 3: Production Query & Execution Plan Verification (${title})`,
-        concept: 'Verify final column projections, ordering, and physical B+Tree access paths via EXPLAIN QUERY PLAN and automated relational assertions.',
-        instructions: `Execute the complete production query in \`query.sql\` and click **✓ Check SQL Assertions** to verify schema alignment, row cardinality, and tuple equivalence.`,
-        hint: step3Solution,
+        phase: bp.step3.phase,
+        title: bp.step3.title,
+        concept: bp.step3.concept,
+        instructions: bp.step3.instructions,
+        hint: bp.step3.solution,
         file: 'query.sql',
         targetFile: 'query.sql',
-        starterCode: step3Starter,
-        solutionCode: step3Solution
+        starterCode: bp.step3.starter,
+        solutionCode: bp.step3.solution
       }
     ],
-    starterCode: step1Starter,
+    starterCode: bp.step1.starter,
     solutionCode: referenceSql
   };
 }
 
 const contentDir = path.join(__dirname, '..', 'data', 'content');
 const questionsDir = path.join(__dirname, '..', 'data', 'questions');
-fs.mkdirSync(contentDir, { recursive: true });
-fs.mkdirSync(questionsDir, { recursive: true });
+const writeAllFiles = process.argv.includes('--all');
+if (writeAllFiles) {
+  fs.mkdirSync(contentDir, { recursive: true });
+  fs.mkdirSync(questionsDir, { recursive: true });
+}
 
 const allGuidedLabs = {};
 let globalUnitIdx = 0;
@@ -1386,24 +2443,28 @@ for (const part of curriculum.parts) {
     const modQuestionsObj = {};
 
     mod.units.forEach((unit, uIdx) => {
-      modContentObj[unit.slug] = generateUnitContent(mod, unit, globalUnitIdx, uIdx);
-      const qs = generateUnitQuestions(mod, unit, globalUnitIdx, uIdx);
-      modQuestionsObj[unit.slug] = qs;
-      totalQuestionsCount += qs.length;
+      if (writeAllFiles) {
+        modContentObj[unit.slug] = generateUnitContent(mod, unit, globalUnitIdx, uIdx);
+        const qs = generateUnitQuestions(mod, unit, globalUnitIdx, uIdx);
+        modQuestionsObj[unit.slug] = qs;
+        totalQuestionsCount += qs.length;
+      }
       allGuidedLabs[unit.slug] = generateGuidedLabEntry(mod, unit, uIdx);
       globalUnitIdx++;
     });
 
-    const contentFilePath = path.join(contentDir, `m${numStr}-${modSlug}.js`);
-    const contentJs = `// SQL In Depth — Module ${modId.toUpperCase()}: ${mod.title}\nwindow.MODULE_CONTENT = window.MODULE_CONTENT || {};\nwindow.MODULE_CONTENT[${JSON.stringify(modId)}] = ${JSON.stringify(modContentObj, null, 2)};\n`;
-    fs.writeFileSync(contentFilePath, contentJs, 'utf8');
+    if (writeAllFiles) {
+      const contentFilePath = path.join(contentDir, `m${numStr}-${modSlug}.js`);
+      const contentJs = `// SQL In Depth — Module ${modId.toUpperCase()}: ${mod.title}\nwindow.MODULE_CONTENT = window.MODULE_CONTENT || {};\nwindow.MODULE_CONTENT[${JSON.stringify(modId)}] = ${JSON.stringify(modContentObj, null, 2)};\n`;
+      fs.writeFileSync(contentFilePath, contentJs, 'utf8');
 
-    const questionsFilePath = path.join(questionsDir, `q${numStr}-${modSlug}.js`);
-    let qLines = `// SQL In Depth — Question Bank ${modId.toUpperCase()}: ${mod.title}\nwindow.QUESTION_BANK = window.QUESTION_BANK || {};\n`;
-    for (const [uSlug, qs] of Object.entries(modQuestionsObj)) {
-      qLines += `window.QUESTION_BANK[${JSON.stringify(uSlug)}] = ${JSON.stringify(qs, null, 2)};\n`;
+      const questionsFilePath = path.join(questionsDir, `q${numStr}-${modSlug}.js`);
+      let qLines = `// SQL In Depth — Question Bank ${modId.toUpperCase()}: ${mod.title}\nwindow.QUESTION_BANK = window.QUESTION_BANK || {};\n`;
+      for (const [uSlug, qs] of Object.entries(modQuestionsObj)) {
+        qLines += `window.QUESTION_BANK[${JSON.stringify(uSlug)}] = ${JSON.stringify(qs, null, 2)};\n`;
+      }
+      fs.writeFileSync(questionsFilePath, qLines, 'utf8');
     }
-    fs.writeFileSync(questionsFilePath, qLines, 'utf8');
   }
 }
 
@@ -1417,58 +2478,62 @@ const guidedLabsJs = `// Interactive Guided SQL & Engine Topic Labs — SQL In D
 
   function buildFallbackSqlLab(slug, title, fallbackSql) {
     var safeTitle = title || slug || 'Interactive SQL Lab';
+    var step1Starter = "SELECT customer_id, name, tier, country FROM customers ORDER BY customer_id ASC LIMIT 8;";
+    var step1Solution = "SELECT customer_id, name, tier, country, COALESCE(referred_by, 0) AS referrer_id FROM customers WHERE country IN ('US', 'IN', 'GB', 'DE') ORDER BY customer_id ASC LIMIT 8;";
+    var step2Starter = "SELECT c.customer_id, c.name, o.order_id, o.total_cents FROM customers c LEFT JOIN orders o ON o.customer_id = c.customer_id AND o.status = 'completed' ORDER BY c.customer_id ASC;";
     var refSql = fallbackSql || "SELECT c.customer_id, c.name, c.tier, COUNT(o.order_id) AS completed_orders, ROUND(COALESCE(SUM(o.total_cents), 0) / 100.0, 2) AS spend_usd FROM customers c LEFT JOIN orders o ON o.customer_id = c.customer_id AND o.status = 'completed' GROUP BY c.customer_id, c.name, c.tier ORDER BY spend_usd DESC;";
+    var step3Starter = "SELECT c.customer_id, c.name, COUNT(o.order_id) AS completed_orders FROM customers c LEFT JOIN orders o ON o.customer_id = c.customer_id AND o.status = 'completed' GROUP BY c.customer_id, c.name ORDER BY completed_orders DESC;";
     return {
       title: safeTitle + ' — Interactive Guided SQL Lab',
-      summary: 'Step-by-step relational query construction, clause-by-clause table visualization, and execution plan verification.',
+      summary: 'Progressive relational query construction, clause-by-clause table visualization, and execution plan verification.',
       language: 'sql',
       activeFile: 'query.sql',
       datasetId: 'ecommerce',
       referenceSql: refSql,
       complexity: {
         time: 'O(N) scan / O(log_B N) indexed',
-        space: 'O(1) streaming tuple state',
+        space: 'O(G) grouped tuple state',
         pattern: 'Relational SQL Execution'
       },
       steps: [
         {
           id: 'step-1',
-          phase: 'Phase 1 · Base Relation & SARGable Predicate',
-          title: 'Step 1: Base Relation Scan & SARGable Filter',
-          concept: 'Inspect base tuples and apply a SARGable WHERE predicate.',
-          instructions: 'Run or edit query.sql to inspect the base table tuples and step through the live Table Visualizer.',
-          hint: "SELECT order_id, customer_id, status, total_cents FROM orders WHERE status = 'completed' ORDER BY total_cents DESC LIMIT 10;",
+          phase: 'Phase 1 · Domain Projection & Cohort Filtering',
+          title: 'Step 1: Inspect Customer Cohort Attributes (' + safeTitle + ')',
+          concept: 'Project core domain columns and apply NULL-safe attribute defaults.',
+          instructions: 'Run or edit query.sql to filter the customer cohort and step through the live Table Visualizer.',
+          hint: step1Solution,
           file: 'query.sql',
           targetFile: 'query.sql',
-          starterCode: "-- TODO (Step 1): Select completed orders ordered by total_cents DESC\\nSELECT order_id, customer_id, status, total_cents FROM orders WHERE status = 'completed' ORDER BY total_cents DESC LIMIT 10;",
-          solutionCode: "SELECT order_id, customer_id, status, total_cents FROM orders WHERE status = 'completed' ORDER BY total_cents DESC LIMIT 10;"
+          starterCode: step1Starter,
+          solutionCode: step1Solution
         },
         {
           id: 'step-2',
-          phase: 'Phase 2 · Relational Join, Aggregation & 3VL Guard',
-          title: 'Step 2: Relational Join & NULL-Safe Aggregation',
-          concept: 'Combine normalized tables and fold group buckets without losing NULL boundary rows.',
-          instructions: 'Run the Step 2 JOIN and GROUP BY query and click Step Clauses to inspect each intermediate table.',
+          phase: 'Phase 2 · Outer Join & Customer Order Fold',
+          title: 'Step 2: Left Join Completed Orders (' + safeTitle + ')',
+          concept: 'Combine customer and order relations without dropping zero-order accounts.',
+          instructions: 'Complete the LEFT JOIN and GROUP BY rollup in query.sql and inspect each intermediate clause.',
           hint: refSql,
           file: 'query.sql',
           targetFile: 'query.sql',
-          starterCode: '-- TODO (Step 2): Join customers and orders with NULL-safe aggregation\\n' + refSql,
+          starterCode: step2Starter,
           solutionCode: refSql
         },
         {
           id: 'step-3',
           phase: 'Phase 3 · Production Query & Plan Verification',
-          title: 'Step 3: Production Query & Execution Plan Verification',
+          title: 'Step 3: Production Query & Execution Plan Verification (' + safeTitle + ')',
           concept: 'Verify final column projections, ordering, and physical B+Tree access paths.',
           instructions: 'Execute the complete production query in query.sql and run automated SQL assertions.',
           hint: refSql,
           file: 'query.sql',
           targetFile: 'query.sql',
-          starterCode: '-- TODO (Step 3): Verify full production SQL query & EXPLAIN QUERY PLAN\\n' + refSql,
+          starterCode: step3Starter,
           solutionCode: refSql
         }
       ],
-      starterCode: '-- TODO (Step 1): Run and verify SQL query\\n' + refSql,
+      starterCode: step1Starter,
       solutionCode: refSql
     };
   }
@@ -1489,4 +2554,5 @@ const guidedLabsJs = `// Interactive Guided SQL & Engine Topic Labs — SQL In D
 `;
 fs.writeFileSync(guidedLabsFilePath, guidedLabsJs, 'utf8');
 
-console.log(`✓ Generated 18 module content files (${globalUnitIdx} units), 18 question bank files (${totalQuestionsCount} questions), and data/topic_guided_labs.js.`);
+console.log(`✓ Generated data/topic_guided_labs.js for ${globalUnitIdx} units${writeAllFiles ? ` plus 18 module content files and 18 question bank files (${totalQuestionsCount} questions)` : ''}.`);
+

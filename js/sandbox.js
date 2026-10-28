@@ -910,7 +910,7 @@
               fkTarget = colItem.fk ? String(colItem.fk) : '';
             }
             return (
-              '<div style="display:flex;justify-content:space-between;align-items:center;gap:4px;padding:2px 6px;font-size:0.73rem;font-family:var(--font-mono);color:var(--fg-muted);">' +
+              '<div class="sql-studio-col-item sql-studio-col-item--clickable" data-insert-col="' + escapeHtml(colName) + '" title="Click to insert ' + escapeHtml(colName) + ' into SQL editor" style="display:flex;justify-content:space-between;align-items:center;gap:4px;padding:2px 6px;font-size:0.73rem;font-family:var(--font-mono);color:var(--fg-muted);cursor:pointer;">' +
                 '<span><strong style="color:var(--fg);">' + escapeHtml(colName) + '</strong>' +
                   (isPk ? ' <span class="col-badge col-badge--pk wb-col-badge wb-col-badge--pk" style="font-size:0.62rem;padding:0 4px;">PK</span>' : '') +
                   (fkTarget ? ' <span class="col-badge col-badge--fk wb-col-badge wb-col-badge--fk" style="font-size:0.62rem;padding:0 4px;" title="Foreign Key → ' + escapeHtml(fkTarget) + '">FK→' + escapeHtml(fkTarget) + '</span>' : '') +
@@ -943,6 +943,29 @@
       }).join('');
     },
 
+    _buildSavedHistoryOptionsHtml: function() {
+      if (!root.TableVisualizer) return '<option value="">📚 Saved Queries &amp; History (0)</option>';
+      var saved = typeof root.TableVisualizer.getSavedQueries === 'function' ? root.TableVisualizer.getSavedQueries() : [];
+      var history = typeof root.TableVisualizer.getQueryHistory === 'function' ? root.TableVisualizer.getQueryHistory() : [];
+      var html = '<option value="">📚 Saved Queries (' + saved.length + ') &amp; History (' + history.length + ')...</option>';
+      if (saved.length > 0) {
+        html += '<optgroup label="★ Saved Queries">';
+        saved.forEach(function(item) {
+          html += '<option value="saved:' + escapeHtml(item.id) + '">★ ' + escapeHtml(item.title) + ' (' + escapeHtml(item.datasetId || 'ecommerce') + ')</option>';
+        });
+        html += '</optgroup>';
+      }
+      if (history.length > 0) {
+        html += '<optgroup label="🕒 Recent Executed Queries">';
+        history.forEach(function(item) {
+          var snippet = String(item.sql || '').replace(/\s+/g, ' ').trim().slice(0, 56);
+          html += '<option value="history:' + escapeHtml(item.id) + '">🕒 ' + escapeHtml(snippet) + ' (' + (item.rowCount || 0) + ' rows)</option>';
+        });
+        html += '</optgroup>';
+      }
+      return html;
+    },
+
     _mountSqlStudioVisualizer: function(opts) {
       if (!this._container || this._activeWorkbenchMode !== 'sql-studio') return;
       opts = opts || {};
@@ -955,6 +978,7 @@
       if (this._sqlStudioVizHandle && typeof this._sqlStudioVizHandle.stop === 'function') {
         this._sqlStudioVizHandle.stop();
       }
+      var self = this;
       this._sqlStudioVizHandle = root.TableVisualizer.mountClauseVisualizer(slot, sql, {
         datasetId: this._sqlStudioDatasetId || '__unified__',
         referenceSql: sql,
@@ -962,6 +986,10 @@
         focusExplain: Boolean(opts.focusExplain),
         runTests: Boolean(opts.runTests)
       });
+      Promise.resolve(this._sqlStudioVizHandle).then(function() {
+        var sel = self._container ? self._container.querySelector('#wb-sql-saved-history-select') : null;
+        if (sel) sel.innerHTML = self._buildSavedHistoryOptionsHtml();
+      }).catch(function() {});
     },
 
     _triggerDownload: function(content, filename, mime) {
@@ -1128,6 +1156,14 @@
           }).join('');
 
         var schemaExplorerHtml = this._renderSqlStudioSchemaExplorer();
+        var practiceChipsHtml = (root.TableVisualizer && Array.isArray(root.TableVisualizer.SQL_PRACTICE_CHIPS))
+          ? '<div class="sql-practice-bar" id="wb-sql-practice-bar">' +
+              '<span class="sql-practice-bar__label">⚡ Practice Clauses:</span>' +
+              root.TableVisualizer.SQL_PRACTICE_CHIPS.map(function(c) {
+                return '<button type="button" class="sql-practice-chip" data-wb-sql-chip="' + escapeHtml(c.id) + '" data-sql-chip="' + escapeHtml(c.id) + '" title="Insert ' + escapeHtml(c.label) + ' clause">' + escapeHtml(c.label) + '</button>';
+              }).join('') +
+            '</div>'
+          : '';
 
         this._container.innerHTML =
           '<div class="view-canvas sandbox-view">' +
@@ -1185,7 +1221,7 @@
                 '<aside class="sandbox-palette" style="max-height:780px;overflow-y:auto;padding:12px;">' +
                   '<div class="sandbox-palette__header" style="margin-bottom:10px;">' +
                     '<h3 class="inspector-subtitle">Schema &amp; Table Explorer</h3>' +
-                    '<span class="sandbox-palette__hint">Click any table to preview rows</span>' +
+                    '<span class="sandbox-palette__hint">Click table to preview · Click column to insert</span>' +
                   '</div>' +
                   '<div id="wb-sql-schema-sidebar">' + schemaExplorerHtml + '</div>' +
                 '</aside>' +
@@ -1195,14 +1231,39 @@
                       '<span class="eco-pill eco-pill--accent">query.sql</span>' +
                       '<span style="font-size:0.76rem;color:var(--fg-muted);">Write any SELECT, CTE, Window Function, JOIN, or DDL/DML statement</span>' +
                     '</div>' +
-                    '<span style="font-size:0.74rem;color:var(--fg-faint);font-family:var(--font-mono);">Shortcut: Cmd/Ctrl + Enter to Run</span>' +
+                    '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">' +
+                      '<button type="button" class="eco-btn eco-btn--sm" data-wb-ide-action="format" data-sql-ide-action="format">✨ Format SQL</button>' +
+                      '<button type="button" class="eco-btn eco-btn--sm" data-wb-ide-action="copy" data-sql-ide-action="copy">📋 Copy SQL</button>' +
+                      '<button type="button" class="eco-btn eco-btn--sm" data-wb-ide-action="export-sql" data-sql-ide-action="export-sql">⬇ .sql</button>' +
+                      '<button type="button" class="eco-btn eco-btn--sm" data-wb-ide-action="export-csv" data-sql-ide-action="export-csv">⬇ .csv</button>' +
+                      '<button type="button" class="eco-btn eco-btn--sm" data-wb-ide-action="export-json" data-sql-ide-action="export-json">⬇ .json</button>' +
+                    '</div>' +
+                  '</div>' +
+                  '<div class="sql-studio-saved-panel" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:6px 10px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;">' +
+                    '<input type="text" id="wb-sql-save-title-input" data-sql-ide-role="save-title-input" placeholder="Query title (optional)..." aria-label="Query title" style="background:var(--bg-surface);color:var(--fg);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:0.75rem;min-width:150px;" />' +
+                    '<button type="button" class="eco-btn eco-btn--sm" data-wb-ide-action="save-query" data-sql-ide-action="save-query">💾 Save Query</button>' +
+                    '<select id="wb-sql-saved-history-select" data-sql-ide-role="saved-history-select" aria-label="Saved Queries and Query History" style="background:var(--bg-surface);color:var(--fg);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:0.75rem;max-width:280px;">' +
+                      this._buildSavedHistoryOptionsHtml() +
+                    '</select>' +
+                    '<button type="button" class="eco-btn eco-btn--sm" data-wb-ide-action="delete-saved" data-sql-ide-action="delete-saved">🗑 Delete Saved</button>' +
                   '</div>' +
                   '<textarea class="sql-studio-editor sql-inline-workbench__editor" id="wb-sql-studio-editor" spellcheck="false" rows="9" style="width:100%;min-height:175px;font-family:var(--font-mono);font-size:0.84rem;line-height:1.55;padding:12px;border-radius:8px;border:1px solid var(--border-strong);background:var(--bg);color:var(--fg);resize:vertical;">' + escapeHtml(this._sqlStudioQuery) + '</textarea>' +
+                  practiceChipsHtml +
                   '<div id="wb-sql-studio-visualizer-slot"></div>' +
                 '</section>' +
               '</div>' +
             '</main>' +
           '</div>';
+
+        var topEditor = this._container.querySelector('#wb-sql-studio-editor');
+        if (topEditor && root.TableVisualizer && typeof root.TableVisualizer.enhanceTextareaToIde === 'function') {
+          this._wbIdeCtrl = root.TableVisualizer.enhanceTextareaToIde(topEditor, {
+            onRun: function() {
+              self._sqlStudioQuery = topEditor.value.trim();
+              self._mountSqlStudioVisualizer({ startAtFinal: true });
+            }
+          });
+        }
 
         this._mountSqlStudioVisualizer({ startAtFinal: true });
         return;
@@ -1794,6 +1855,26 @@
           return;
         }
 
+        // Schema Explorer column click -> insert column name at cursor
+        var insertColEl = e.target.closest('[data-insert-col]');
+        if (insertColEl) {
+          var colName = insertColEl.getAttribute('data-insert-col');
+          var editorTa = container.querySelector('#wb-sql-studio-editor');
+          if (colName && editorTa) {
+            if (root.TableVisualizer && typeof root.TableVisualizer.insertSqlSnippet === 'function') {
+              root.TableVisualizer.insertSqlSnippet(editorTa, colName);
+            } else {
+              var s = editorTa.selectionStart || 0;
+              var endPos = editorTa.selectionEnd || 0;
+              editorTa.value = editorTa.value.slice(0, s) + colName + editorTa.value.slice(endPos);
+              editorTa.selectionStart = editorTa.selectionEnd = s + colName.length;
+              editorTa.focus();
+            }
+            self._sqlStudioQuery = editorTa.value;
+          }
+          return;
+        }
+
         // Schema Explorer table click -> preview SELECT * FROM <table> LIMIT 15;
         var previewTblBtn = e.target.closest('[data-sql-preview-table]');
         if (previewTblBtn) {
@@ -1809,8 +1890,79 @@
           if (tblName) {
             self._sqlStudioQuery = 'SELECT * FROM ' + tblName + ' LIMIT 15;';
             var edEl = container.querySelector('#wb-sql-studio-editor');
-            if (edEl) edEl.value = self._sqlStudioQuery;
+            if (edEl) {
+              edEl.value = self._sqlStudioQuery;
+              edEl.dispatchEvent(new Event('input', { bubbles: true }));
+            }
             self._mountSqlStudioVisualizer({ startAtFinal: true });
+          }
+          return;
+        }
+
+        // SQL Studio IDE & Saved/Export toolbar actions
+        var wbIdeBtn = e.target.closest('[data-wb-ide-action]');
+        if (wbIdeBtn) {
+          var ideAct = wbIdeBtn.getAttribute('data-wb-ide-action');
+          var wbEd = container.querySelector('#wb-sql-studio-editor');
+          var curSql = wbEd ? wbEd.value : (self._sqlStudioQuery || '');
+          if (ideAct === 'format-sql' && wbEd && root.TableVisualizer && typeof root.TableVisualizer.formatSql === 'function') {
+            wbEd.value = root.TableVisualizer.formatSql(wbEd.value);
+            self._sqlStudioQuery = wbEd.value;
+            wbEd.dispatchEvent(new Event('input', { bubbles: true }));
+          } else if (ideAct === 'copy-sql') {
+            if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(curSql).catch(function() {});
+            }
+            var origLabel = wbIdeBtn.textContent;
+            wbIdeBtn.textContent = '✓ Copied';
+            setTimeout(function() { wbIdeBtn.textContent = origLabel; }, 1200);
+          } else if (ideAct === 'save-query' && root.TableVisualizer && typeof root.TableVisualizer.saveQuery === 'function') {
+            var qTitle = (typeof window !== 'undefined' && typeof window.prompt === 'function')
+              ? window.prompt('Save SQL query as:', 'My Saved Query')
+              : 'Saved Query';
+            if (qTitle) {
+              root.TableVisualizer.saveQuery({
+                title: qTitle,
+                sql: curSql,
+                datasetId: self._sqlStudioDatasetId || '__unified__'
+              });
+              var shSel = container.querySelector('#wb-sql-saved-history-select');
+              if (shSel) shSel.innerHTML = self._buildSavedHistoryOptionsHtml();
+            }
+          } else if (ideAct === 'clear-history' && root.TableVisualizer && typeof root.TableVisualizer.clearQueryHistory === 'function') {
+            root.TableVisualizer.clearQueryHistory();
+            var shSel2 = container.querySelector('#wb-sql-saved-history-select');
+            if (shSel2) shSel2.innerHTML = self._buildSavedHistoryOptionsHtml();
+          } else if (ideAct === 'export-sql' && root.TableVisualizer && typeof root.TableVisualizer.exportSql === 'function') {
+            root.TableVisualizer.exportSql(curSql, 'studio-query.sql');
+          } else if ((ideAct === 'export-csv' || ideAct === 'export-json') && root.SQLEngine && typeof root.SQLEngine.execute === 'function') {
+            Promise.resolve(root.SQLEngine.execute(curSql, self._sqlStudioDatasetId || '__unified__', { forceEngine: self._sqlStudioEngine })).then(function(res) {
+              if (res && !res.error && root.TableVisualizer) {
+                if (ideAct === 'export-csv' && typeof root.TableVisualizer.exportCsv === 'function') {
+                  root.TableVisualizer.exportCsv(res.columns || [], res.rows || [], 'studio-results.csv');
+                } else if (ideAct === 'export-json' && typeof root.TableVisualizer.exportJson === 'function') {
+                  root.TableVisualizer.exportJson(res.columns || [], res.rows || [], 'studio-results.json');
+                }
+              }
+            });
+          }
+          return;
+        }
+
+        // SQL Studio practice snippet chips
+        var wbChipBtn = e.target.closest('[data-wb-sql-chip]');
+        if (wbChipBtn) {
+          var chipIdx = parseInt(wbChipBtn.getAttribute('data-wb-sql-chip'), 10);
+          var chips = (root.TableVisualizer && Array.isArray(root.TableVisualizer.SQL_PRACTICE_CHIPS)) ? root.TableVisualizer.SQL_PRACTICE_CHIPS : [];
+          var chip = chips[chipIdx];
+          var chipTa = container.querySelector('#wb-sql-studio-editor');
+          if (chip && chipTa) {
+            if (root.TableVisualizer && typeof root.TableVisualizer.insertSqlSnippet === 'function') {
+              root.TableVisualizer.insertSqlSnippet(chipTa, chip.snippet);
+            } else {
+              chipTa.value = (chipTa.value ? chipTa.value + '\n' : '') + chip.snippet;
+            }
+            self._sqlStudioQuery = chipTa.value;
           }
           return;
         }
@@ -2148,9 +2300,38 @@
               if (dsSel) dsSel.value = '__unified__';
             }
             var ed = container.querySelector('#wb-sql-studio-editor');
-            if (ed) ed.value = foundTpl.sql;
+            if (ed) {
+              ed.value = foundTpl.sql;
+              ed.dispatchEvent(new Event('input', { bubbles: true }));
+            }
             self._mountSqlStudioVisualizer({ startAtFinal: true });
           }
+          return;
+        }
+        if (e.target.id === 'wb-sql-saved-history-select') {
+          var selVal = e.target.value;
+          if (!selVal) return;
+          var pickedSql = '';
+          if (selVal.indexOf('saved:') === 0 && root.TableVisualizer && typeof root.TableVisualizer.getSavedQueries === 'function') {
+            var sId = selVal.slice(6);
+            var sList = root.TableVisualizer.getSavedQueries();
+            var foundS = sList.find(function(s) { return s.id === sId; });
+            if (foundS) pickedSql = foundS.sql;
+          } else if (selVal.indexOf('hist:') === 0 && root.TableVisualizer && typeof root.TableVisualizer.getQueryHistory === 'function') {
+            var hIdx = parseInt(selVal.slice(5), 10);
+            var hList = root.TableVisualizer.getQueryHistory();
+            if (hList[hIdx]) pickedSql = hList[hIdx].sql;
+          }
+          if (pickedSql) {
+            self._sqlStudioQuery = pickedSql;
+            var ed2 = container.querySelector('#wb-sql-studio-editor');
+            if (ed2) {
+              ed2.value = pickedSql;
+              ed2.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+            self._mountSqlStudioVisualizer({ startAtFinal: true });
+          }
+          e.target.value = '';
           return;
         }
       }, sig);

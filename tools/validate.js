@@ -426,13 +426,98 @@ if (fs.existsSync(questionsDir)) {
   }
 }
 
-// Asset stamps
-try {
-  require('child_process').execFileSync(process.execPath, [path.join(__dirname, 'stamp-assets.js'), '--check'], { stdio: 'pipe' });
-  reportSuccess('Asset stamps: all ?v= hashes up to date');
-} catch (e) {
-  reportError('Asset stamps are stale — run `node tools/stamp-assets.js`');
+// Topic Guided SQL Labs Validation (R4: 180 topics, 540 progressive steps, 0 generic boilerplate)
+const topicGuidedLabsFile = path.join(dataDir, 'topic_guided_labs.js');
+if (!fs.existsSync(topicGuidedLabsFile)) {
+  reportError(`Topic Guided Labs file not found: ${topicGuidedLabsFile}`);
+} else {
+  let topicGuidedLabsSrc = '';
+  try {
+    topicGuidedLabsSrc = fs.readFileSync(topicGuidedLabsFile, 'utf8');
+    eval(topicGuidedLabsSrc);
+  } catch (e) {
+    reportError(`Failed to load topic_guided_labs.js: ${e.message}`);
+  }
+
+  const topicLabs = global.window.TOPIC_GUIDED_LABS || {};
+  let labErrors = 0;
+
+  if (topicGuidedLabsSrc.includes('Base Relation Scan & SARGable Filter')) {
+    reportError('data/topic_guided_labs.js contains legacy generic boilerplate "Base Relation Scan & SARGable Filter"');
+    labErrors++;
+  }
+  if (topicGuidedLabsSrc.includes('Relational Join, Grouping & NULL-Safe Aggregation')) {
+    reportError('data/topic_guided_labs.js contains legacy generic boilerplate "Relational Join, Grouping & NULL-Safe Aggregation"');
+    labErrors++;
+  }
+
+  const stripSqlCommentLines = (sql) =>
+    String(sql || '')
+      .split('\n')
+      .filter((line) => !line.trim().startsWith('--'))
+      .join('\n')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+  for (const slug of allSlugs) {
+    const lab = topicLabs[slug];
+    if (!lab) {
+      reportError(`topic_guided_labs.js: missing lab entry for curriculum slug "${slug}"`);
+      labErrors++;
+      continue;
+    }
+    if (!Array.isArray(lab.steps) || lab.steps.length !== 3) {
+      reportError(`topic_guided_labs.js (${slug}): expected steps.length === 3, found ${Array.isArray(lab.steps) ? lab.steps.length : 'non-array'}`);
+      labErrors++;
+      continue;
+    }
+    lab.steps.forEach((step, idx) => {
+      const stepLabel = `topic_guided_labs.js (${slug} step-${idx + 1})`;
+      const textFields = [step.title, step.phase, step.concept, step.instructions, step.description].map((v) => String(v || '')).join(' | ');
+      if (textFields.includes('Base Relation Scan & SARGable Filter') || textFields.includes('Relational Join, Grouping & NULL-Safe Aggregation')) {
+        reportError(`${stepLabel}: contains forbidden generic boilerplate in title/phase/concept/instructions`);
+        labErrors++;
+      }
+      const starterTrim = String(step.starterCode || '').trim();
+      const solutionTrim = String(step.solutionCode || '').trim();
+      if (!starterTrim || !solutionTrim) {
+        reportError(`${stepLabel}: starterCode and solutionCode must be non-empty strings`);
+        labErrors++;
+      } else {
+        if (starterTrim === solutionTrim) {
+          reportError(`${stepLabel}: starterCode is identical to solutionCode`);
+          labErrors++;
+        } else {
+          const starterBody = stripSqlCommentLines(starterTrim);
+          const solutionBody = stripSqlCommentLines(solutionTrim);
+          if (!starterBody) {
+            reportError(`${stepLabel}: starterCode contains only SQL comments (must be runnable SQL)`);
+            labErrors++;
+          } else if (starterBody === solutionBody) {
+            reportError(`${stepLabel}: starterCode equals solutionCode after stripping SQL comments`);
+            labErrors++;
+          }
+        }
+      }
+    });
+  }
+
+  if (labErrors === 0) {
+    reportSuccess(`Topic Guided SQL Labs: all ${allSlugs.size} units have 3 topic-specific steps (${allSlugs.size * 3} steps) with distinct starter/solution SQL and 0 generic boilerplate`);
+  }
 }
+
+// Asset stamps
+if (!process.argv.includes('--skip-stamp-check')) {
+  try {
+    require('child_process').execFileSync(process.execPath, [path.join(__dirname, 'stamp-assets.js'), '--check'], { stdio: 'pipe' });
+    reportSuccess('Asset stamps: all ?v= hashes up to date');
+  } catch (e) {
+    reportError('Asset stamps are stale — run `node tools/stamp-assets.js`');
+  }
+}
+
 
 // 3. Static Pages & SEO Validation
 const topicBaseDir = path.join(__dirname, '..', 'topic');

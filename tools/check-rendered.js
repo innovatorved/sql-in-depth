@@ -73,6 +73,24 @@ function checkAudioDuration(file, html) {
   }
 }
 
+function checkLegacyBoilerplate(file, html) {
+  if (
+    html.includes('Base Relation Scan & SARGable Filter') ||
+    html.includes('Base Relation Scan &amp; SARGable Filter')
+  ) {
+    reportError(file, 'Legacy boilerplate string "Base Relation Scan & SARGable Filter" detected in pre-rendered HTML');
+  }
+  if (
+    html.includes('Relational Join, Grouping & NULL-Safe Aggregation') ||
+    html.includes('Relational Join, Grouping &amp; NULL-Safe Aggregation')
+  ) {
+    reportError(file, 'Legacy boilerplate string "Relational Join, Grouping & NULL-Safe Aggregation" detected in pre-rendered HTML');
+  }
+  if (html.includes('id="sql-studio-modal-step-banner"')) {
+    reportError(file, 'Legacy #sql-studio-modal-step-banner element detected in pre-rendered HTML');
+  }
+}
+
 // 1. Check Homepage (index.html)
 console.log('Checking homepage index.html...');
 const indexPath = path.join(ROOT, 'index.html');
@@ -101,6 +119,7 @@ if (!fs.existsSync(indexPath)) {
   }
 
   checkDuplicateParagraphs('index.html', html);
+  checkLegacyBoilerplate('index.html', html);
 }
 
 // 2. Check Topic Pages (topic/*/index.html)
@@ -133,6 +152,7 @@ if (fs.existsSync(topicDir)) {
     checkMarkdownLeaks(`topic/${slug}`, html);
     checkTagSpacing(`topic/${slug}`, html);
     checkAudioDuration(`topic/${slug}`, html);
+    checkLegacyBoilerplate(`topic/${slug}`, html);
   }
 }
 
@@ -163,6 +183,7 @@ if (fs.existsSync(buildDir)) {
     }
 
     checkDuplicateParagraphs(`build/${buildId}`, html);
+    checkLegacyBoilerplate(`build/${buildId}`, html);
   }
 }
 
@@ -180,6 +201,7 @@ if (errors.length > 0) {
   console.log('  ✓ 0 raw Markdown leaks in .intuition__body');
   console.log('  ✓ Tag chips properly separated with whitespace');
   console.log('  ✓ Precomputed audio narration durations present');
+  console.log('  ✓ 0 legacy step-banner boilerplate strings or #sql-studio-modal-step-banner');
   console.log('  ✓ Full crawler accessibility on homepage (180 topic links & populated sidebar)');
   console.log('  ✓ Strict canonical tags & word counts >= 300');
   process.exit(0);

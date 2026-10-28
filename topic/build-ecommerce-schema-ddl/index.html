@@ -33,14 +33,14 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
   <link rel="stylesheet" href="css/variables.css?v=b68ab27ba0">
   <link rel="stylesheet" href="css/layout.css?v=a384f455dc">
-  <link rel="stylesheet" href="css/components.css?v=8fed5d69e3">
+  <link rel="stylesheet" href="css/components.css?v=6a661d5122">
   <link rel="stylesheet" href="css/content.css?v=178f3a2481">
   <link rel="stylesheet" href="css/landing.css?v=14b77b8c3d">
   <link rel="stylesheet" href="css/simulators.css?v=be366fe40d">
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=59c953e95f"></script>
-  <script src="js/manifest.js?v=9a9ff5d494"></script>
+  <script src="js/manifest.js?v=02cf7c8a30"></script>
 
   <script type="application/ld+json">
 {
@@ -1536,10 +1536,10 @@ erDiagram
             <h2 class="build-lab-card__title">Hands-On Build: E-Commerce Schema with Referential Integrity &amp; Upsert Pipeline — Interactive Guided SQL Lab</h2>
             <p class="build-lab-card__desc">Design and verify a normalized e-commerce relational schema enforcing foreign keys, CHECK constraints, and idempotent inventory upserts.</p>
             <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;">
-              <span class="badge">⏱ Target Time: <code>O(N) scan / O(log_B N) indexed</code></span>
-              <span class="badge">💾 Auxiliary Space: <code>O(1) streaming tuple state</code></span>
-              <span class="badge">🧭 Pattern: DDL, Schema Constraints &amp; DML Mutations</span>
-              <span class="badge">🗄️ Dataset: <code>ecommerce</code></span>
+              <span class="badge">⏱ Target Time: <code>O(M log M) window partition sort</code></span>
+              <span class="badge">💾 Auxiliary Space: <code>O(W) sliding 3-row frame state</code></span>
+              <span class="badge">🧭 Pattern: DDL, Schema Constraints &amp; DML Mutations · ddl</span>
+              <span class="badge">🗄️ Dataset: <code>fintech_ledger</code></span>
             </div>
           </div>
           <div class="build-lab-card__cta-col">
@@ -1564,15 +1564,25 @@ erDiagram
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">01</span>
-                    <span class="build-lab-step-card__target">Phase 1 · Base Relation &amp; SARGable Predicate</span>
+                    <span class="build-lab-step-card__target">Phase 1 · Hands-On Build: E-Commerce Schema with Referential Integrity &amp; Upsert Pipeline: Corporate Cards &amp; Daily Limit Controls</span>
                   </div>
-                  <div class="build-lab-step-card__title">Base Relation Scan &amp; SARGable Filter (ecommerce)</div>
-                  <div class="build-lab-step-card__invariant">Establish the base relation scan in <code>ecommerce</code> for Hands-On Build: E-Commerce Schema with Referential Integrity &amp; Upsert Pipeline with a SARGable predicate and explicit Three-Valued Logic NULL handling.</div>
-                  <div class="build-lab-step-card__concept">Run or edit <code>query.sql</code> to inspect the base table tuples, verify SARGable index filtering in the <code>WHERE</code> clause, and step through the live Table Visualizer.</div>
+                  <div class="build-lab-step-card__title">Inspect Issued Cards &amp; Daily Spend Limits (build-ecommerce-schema-ddl)</div>
+                  <div class="build-lab-step-card__invariant">Examine the <code>cards</code> table in <code>fintech_ledger</code> to inspect active vs frozen cards and daily limit thresholds.</div>
+                  <div class="build-lab-step-card__concept">Refine the starter <code>cards</code> query in <code>query.sql</code> to convert <code>daily_limit_cents</code> into <code>daily_limit_usd</code> and join account owners.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>💡 Progressive SQL Hint (Step 1)</summary>
-                      <pre><code>SELECT order_id, customer_id, status, ROUND(total_cents / 100.0, 2) AS total_usd, COALESCE(discount_code, &#039;NONE&#039;) AS promo_code, created_at FROM orders WHERE status = &#039;completed&#039; AND total_cents &gt;= 30000 ORDER BY total_cents DESC LIMIT 10;</code></pre>
+                      <pre><code>-- Step 1 Solution (build-ecommerce-schema-ddl): Issued cards enriched with account owner &amp; USD limit
+SELECT
+  c.card_id,
+  a.owner_name,
+  c.last4,
+  ROUND(c.daily_limit_cents / 100.0, 2) AS daily_limit_usd,
+  c.status AS card_status
+FROM cards AS c
+INNER JOIN accounts AS a
+  ON a.account_id = c.account_id
+ORDER BY c.daily_limit_cents DESC, c.card_id ASC;</code></pre>
                     </details>
                   
                 </div>
@@ -1588,32 +1598,27 @@ erDiagram
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">02</span>
-                    <span class="build-lab-step-card__target">Phase 2 · Relational Join, Aggregation &amp; 3VL Guard</span>
+                    <span class="build-lab-step-card__target">Phase 2 · Hands-On Build: E-Commerce Schema with Referential Integrity &amp; Upsert Pipeline: Merchant Transaction Spend vs Card Limit</span>
                   </div>
-                  <div class="build-lab-step-card__title">Relational Join, Grouping &amp; NULL-Safe Aggregation</div>
-                  <div class="build-lab-step-card__invariant">Combine normalized tables via explicit JOIN conditions and fold group buckets or window partitions without losing NULL boundary rows.</div>
-                  <div class="build-lab-step-card__concept">Run or refine the Step 2 relational join and aggregation query in <code>query.sql</code>, then click <strong>🔍 Step Clauses</strong> to inspect each intermediate table.</div>
+                  <div class="build-lab-step-card__title">Aggregate Merchant Spend per Card (Hands-On Build: E-Commerce Schema with Referential Integrity &amp; Upsert Pipeline)</div>
+                  <div class="build-lab-step-card__invariant">Join <code>cards</code> with <code>merchant_txns</code> to compare cumulative card spend against <code>daily_limit_cents</code>.</div>
+                  <div class="build-lab-step-card__concept">Complete the grouped card spend query in <code>query.sql</code> to compute <code>txn_count</code> and <code>total_spend_usd</code>.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>💡 Progressive SQL Hint (Step 2)</summary>
-                      <pre><code>-- Dataset: ecommerce | Live Verification, 3VL Guard &amp; SARGable Plan Audit (build-ecommerce-schema-ddl)
+                      <pre><code>-- Step 2 Solution (build-ecommerce-schema-ddl): Aggregated card spend vs daily limit utilization
 SELECT
-  c.customer_id,
-  c.name AS customer_name,
-  c.tier,
-  c.country,
-  COUNT(o.order_id) AS completed_orders,
-  ROUND(COALESCE(SUM(o.total_cents), 0) / 100.0, 2) AS verified_spend_usd,
-  ROUND(
-    AVG(COALESCE(SUM(o.total_cents), 0)) OVER (PARTITION BY c.tier) / 100.0,
-    2
-  ) AS tier_peer_avg_spend_usd
-FROM customers AS c
-LEFT JOIN orders AS o
-  ON o.customer_id = c.customer_id
-  AND o.status = &#039;completed&#039;
-GROUP BY c.customer_id, c.name, c.tier, c.country
-ORDER BY verified_spend_usd DESC, c.customer_id ASC;</code></pre>
+  c.card_id,
+  c.last4,
+  c.status AS card_status,
+  COUNT(mt.txn_id) AS txn_count,
+  ROUND(SUM(mt.amount_cents) / 100.0, 2) AS total_spend_usd,
+  ROUND(c.daily_limit_cents / 100.0, 2) AS daily_limit_usd
+FROM cards AS c
+INNER JOIN merchant_txns AS mt
+  ON mt.card_id = c.card_id
+GROUP BY c.card_id, c.last4, c.status, c.daily_limit_cents
+ORDER BY total_spend_usd DESC;</code></pre>
                     </details>
                   
                 </div>
@@ -1629,32 +1634,37 @@ ORDER BY verified_spend_usd DESC, c.customer_id ASC;</code></pre>
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">03</span>
-                    <span class="build-lab-step-card__target">Phase 3 · Production Query &amp; Plan Verification</span>
+                    <span class="build-lab-step-card__target">Phase 3 · Hands-On Build: E-Commerce Schema with Referential Integrity &amp; Upsert Pipeline: Sliding 3-Transaction Velocity Window</span>
                   </div>
-                  <div class="build-lab-step-card__title">Production Query &amp; Execution Plan Verification (Hands-On Build: E-Commerce Schema with Referential Integrity &amp; Upsert Pipeline)</div>
-                  <div class="build-lab-step-card__invariant">Verify final column projections, ordering, and physical B+Tree access paths via EXPLAIN QUERY PLAN and automated relational assertions.</div>
-                  <div class="build-lab-step-card__concept">Execute the complete production query in <code>query.sql</code> and click <strong>✓ Check SQL Assertions</strong> to verify schema alignment, row cardinality, and tuple equivalence.</div>
+                  <div class="build-lab-step-card__title">Production Sliding Window Card Velocity Audit (Hands-On Build: E-Commerce Schema with Referential Integrity &amp; Upsert Pipeline)</div>
+                  <div class="build-lab-step-card__invariant">Use <code>ROWS BETWEEN 2 PRECEDING AND CURRENT ROW</code> partitioned by <code>card_id</code> to detect rapid consecutive card spend bursts.</div>
+                  <div class="build-lab-step-card__concept">Execute the sliding-window card velocity query in <code>query.sql</code> and inspect the window frame results.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>💡 Progressive SQL Hint (Step 3)</summary>
-                      <pre><code>-- Dataset: ecommerce | DDL Referential Integrity &amp; Domain Constraint Verification
+                      <pre><code>-- Dataset: fintech_ledger | Hands-On Build: E-Commerce Schema with Referential Integrity &amp; Upsert Pipeline (build-ecommerce-schema-ddl) — Sliding 3-Txn Card Velocity Window
 SELECT
-  p.product_id,
-  p.sku,
-  p.name AS product_name,
-  p.price_cents,
-  p.stock_qty,
-  COUNT(oi.order_item_id) AS line_item_references,
-  COALESCE(SUM(oi.quantity), 0) AS total_units_ordered,
-  CASE
-    WHEN p.price_cents &gt;= 0 AND p.stock_qty &gt;= 0 THEN &#039;CHECK_VALID&#039;
-    ELSE &#039;CONSTRAINT_VIOLATION&#039;
-  END AS domain_constraint_status
-FROM products AS p
-LEFT JOIN order_items AS oi
-  ON oi.product_id = p.product_id
-GROUP BY p.product_id, p.sku, p.name, p.price_cents, p.stock_qty
-ORDER BY total_units_ordered DESC;</code></pre>
+  txn_id,
+  card_id,
+  merchant,
+  country,
+  ROUND(amount_cents / 100.0, 2) AS amount_usd,
+  txn_ts,
+  COUNT(*) OVER (
+    PARTITION BY card_id
+    ORDER BY txn_ts ASC
+    ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+  ) AS window_txn_count,
+  ROUND(
+    SUM(amount_cents) OVER (
+      PARTITION BY card_id
+      ORDER BY txn_ts ASC
+      ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+    ) / 100.0,
+    2
+  ) AS rolling_3txn_usd
+FROM merchant_txns
+ORDER BY card_id ASC, txn_ts ASC;</code></pre>
                     </details>
                   
                 </div>
@@ -1786,7 +1796,7 @@ ORDER BY total_units_ordered DESC;</code></pre>
   <script type="text/plain" data-defer src="data/srs-cards.js?v=fabc47dd9c"></script>
   <script type="text/plain" data-defer src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
   <script type="text/plain" data-defer src="data/implementations_code.js?v=fce884f8a8"></script>
-  <script type="text/plain" data-defer src="data/topic_guided_labs.js?v=341584ee01"></script>
+  <script type="text/plain" data-defer src="data/topic_guided_labs.js?v=2a57d85494"></script>
   <script type="text/plain" data-defer src="data/projects.js?v=2280ac085f"></script>
   <script type="text/plain" data-defer src="data/glossary.js?v=4f6c79a4e0"></script>
 
@@ -1797,8 +1807,8 @@ ORDER BY total_units_ordered DESC;</code></pre>
   <script type="text/plain" data-defer src="js/search.js?v=e2063e0ccd"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
   <script type="text/plain" data-defer src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>
-  <script type="text/plain" data-defer src="js/sql-engine.js?v=a668c919ba"></script>
-  <script type="text/plain" data-defer src="js/table-visualizer.js?v=ea5db1c17a"></script>
+  <script type="text/plain" data-defer src="js/sql-engine.js?v=60d0c505ad"></script>
+  <script type="text/plain" data-defer src="js/table-visualizer.js?v=1f1a1f2968"></script>
   <script type="text/plain" data-defer src="js/simulators.js?v=68b973e4c8"></script>
   <script type="text/plain" data-defer src="js/simulators-relational.js?v=8e12b97831"></script>
   <script type="text/plain" data-defer src="js/simulators-analytical.js?v=258089d8ac"></script>
@@ -1815,10 +1825,10 @@ ORDER BY total_units_ordered DESC;</code></pre>
   <script type="text/plain" data-defer src="js/roadmap.js?v=cebfb7e32c"></script>
   <script type="text/plain" data-defer src="js/challenges.js?v=fcc5b1b6c5"></script>
   <script type="text/plain" data-defer src="js/dashboard.js?v=d411d5a9bb"></script>
-  <script type="text/plain" data-defer src="js/sandbox.js?v=1f94508aa4"></script>
+  <script type="text/plain" data-defer src="js/sandbox.js?v=5528739eb9"></script>
   <script type="text/plain" data-defer src="js/topic-codelab.js?v=096611d91c"></script>
   
-  <script type="text/plain" data-defer src="js/app.js?v=ab7d42f863"></script>
+  <script type="text/plain" data-defer src="js/app.js?v=79ca5d1666"></script>
 
   <!-- App bootstrap & deferred script loader -->
   <script src="js/bootstrap.js?v=df2bb60aeb"></script>

@@ -33,14 +33,14 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
   <link rel="stylesheet" href="css/variables.css?v=b68ab27ba0">
   <link rel="stylesheet" href="css/layout.css?v=a384f455dc">
-  <link rel="stylesheet" href="css/components.css?v=8fed5d69e3">
+  <link rel="stylesheet" href="css/components.css?v=6a661d5122">
   <link rel="stylesheet" href="css/content.css?v=178f3a2481">
   <link rel="stylesheet" href="css/landing.css?v=14b77b8c3d">
   <link rel="stylesheet" href="css/simulators.css?v=be366fe40d">
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=59c953e95f"></script>
-  <script src="js/manifest.js?v=9a9ff5d494"></script>
+  <script src="js/manifest.js?v=02cf7c8a30"></script>
 
   <script type="application/ld+json">
 {
@@ -1514,10 +1514,10 @@ flowchart LR
             <h2 class="build-lab-card__title">Recursive CTEs (WITH RECURSIVE): Anchor, Recursive Member &amp; Fixpoint — Interactive Guided SQL Lab</h2>
             <p class="build-lab-card__desc">Executing iterative fixpoint worktable algorithms in pure SQL to traverse organizational charts, category trees, and parent-child hierarchies.</p>
             <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;">
-              <span class="badge">⏱ Target Time: <code>O(N) scan / O(log_B N) indexed</code></span>
-              <span class="badge">💾 Auxiliary Space: <code>O(1) streaming tuple state</code></span>
-              <span class="badge">🧭 Pattern: Subqueries, Correlated Queries, Lateral Joins &amp; CTEs</span>
-              <span class="badge">🗄️ Dataset: <code>org_hr</code></span>
+              <span class="badge">⏱ Target Time: <code>O(V + E) graph adjacency join</code></span>
+              <span class="badge">💾 Auxiliary Space: <code>O(V) profile state</code></span>
+              <span class="badge">🧭 Pattern: Subqueries, Correlated Queries, Lateral Joins &amp; CTEs · recursive-cte</span>
+              <span class="badge">🗄️ Dataset: <code>social_graph</code></span>
             </div>
           </div>
           <div class="build-lab-card__cta-col">
@@ -1542,15 +1542,25 @@ flowchart LR
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">01</span>
-                    <span class="build-lab-step-card__target">Phase 1 · Base Relation &amp; SARGable Predicate</span>
+                    <span class="build-lab-step-card__target">Phase 1 · Recursive CTEs (WITH RECURSIVE): Anchor, Recursive Member &amp; Fixpoint: Creator Profile &amp; Reputation Scan</span>
                   </div>
-                  <div class="build-lab-step-card__title">Base Relation Scan &amp; SARGable Filter (org_hr)</div>
-                  <div class="build-lab-step-card__invariant">Establish the base relation scan in <code>org_hr</code> for Recursive CTEs (WITH RECURSIVE): Anchor, Recursive Member &amp; Fixpoint with a SARGable predicate and explicit Three-Valued Logic NULL handling.</div>
-                  <div class="build-lab-step-card__concept">Run or edit <code>query.sql</code> to inspect the base table tuples, verify SARGable index filtering in the <code>WHERE</code> clause, and step through the live Table Visualizer.</div>
+                  <div class="build-lab-step-card__title">Inspect Creator Profiles &amp; Reputation Scores (recursive-ctes-hierarchies)</div>
+                  <div class="build-lab-step-card__invariant">Query <code>profiles</code> in <code>social_graph</code> to rank database engineering creators by reputation score.</div>
+                  <div class="build-lab-step-card__concept">Refine the starter <code>profiles</code> query in <code>query.sql</code> to classify creators with <code>reputation &gt;= 500</code> as <code>&#039;CORE_MAINTAINER&#039;</code>.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>💡 Progressive SQL Hint (Step 1)</summary>
-                      <pre><code>SELECT emp_id, name, title, dept_id, manager_id, salary_usd, hired_at FROM employees WHERE salary_usd &gt;= 170000 ORDER BY salary_usd DESC LIMIT 10;</code></pre>
+                      <pre><code>-- Step 1 Solution (recursive-ctes-hierarchies): Creator reputation ranking &amp; tier classification
+SELECT
+  user_id,
+  handle,
+  reputation,
+  CASE
+    WHEN reputation &gt;= 500 THEN &#039;CORE_MAINTAINER&#039;
+    ELSE &#039;COMMUNITY_AUTHOR&#039;
+  END AS contributor_tier
+FROM profiles
+ORDER BY reputation DESC, user_id ASC;</code></pre>
                     </details>
                   
                 </div>
@@ -1566,40 +1576,25 @@ flowchart LR
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">02</span>
-                    <span class="build-lab-step-card__target">Phase 2 · Relational Join, Aggregation &amp; 3VL Guard</span>
+                    <span class="build-lab-step-card__target">Phase 2 · Recursive CTEs (WITH RECURSIVE): Anchor, Recursive Member &amp; Fixpoint: Directed Follow Graph &amp; Follower Fan-In</span>
                   </div>
-                  <div class="build-lab-step-card__title">Relational Join, Grouping &amp; NULL-Safe Aggregation</div>
-                  <div class="build-lab-step-card__invariant">Combine normalized tables via explicit JOIN conditions and fold group buckets or window partitions without losing NULL boundary rows.</div>
-                  <div class="build-lab-step-card__concept">Run or refine the Step 2 relational join and aggregation query in <code>query.sql</code>, then click <strong>🔍 Step Clauses</strong> to inspect each intermediate table.</div>
+                  <div class="build-lab-step-card__title">Aggregate Follower Graph Fan-In &amp; Fan-Out (Recursive CTEs (WITH RECURSIVE): Anchor, Recursive Member &amp; Fixpoint)</div>
+                  <div class="build-lab-step-card__invariant">Join <code>profiles</code> with <code>follows</code> to compute incoming followers per user while preserving users with zero followers.</div>
+                  <div class="build-lab-step-card__concept">Complete the <code>LEFT JOIN follows</code> aggregation in <code>query.sql</code> to count <code>follower_count</code> per handle.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>💡 Progressive SQL Hint (Step 2)</summary>
-                      <pre><code>-- Dataset: org_hr | Live Verification &amp; Departmental Window Audit (recursive-ctes-hierarchies)
-WITH dept_rollup AS (
-  SELECT
-    d.dept_id,
-    d.name AS dept_name,
-    COUNT(e.emp_id) AS staff_count,
-    ROUND(AVG(e.salary_usd), 0) AS avg_salary_usd,
-    MAX(e.salary_usd) AS top_salary_usd,
-    SUM(e.salary_usd) AS total_payroll_usd,
-    d.annual_budget_usd
-  FROM departments AS d
-  LEFT JOIN employees AS e
-    ON e.dept_id = d.dept_id
-  GROUP BY d.dept_id, d.name, d.annual_budget_usd
-)
+                      <pre><code>-- Step 2 Solution (recursive-ctes-hierarchies): Follower fan-in count per creator profile
 SELECT
-  dept_id,
-  dept_name,
-  staff_count,
-  avg_salary_usd,
-  top_salary_usd,
-  total_payroll_usd,
-  ROUND((total_payroll_usd * 100.0) / annual_budget_usd, 1) AS budget_utilization_pct
-FROM dept_rollup
-WHERE staff_count &gt;= 1
-ORDER BY total_payroll_usd DESC;</code></pre>
+  p.user_id,
+  p.handle,
+  p.reputation,
+  COUNT(f.follower_id) AS follower_count
+FROM profiles AS p
+LEFT JOIN follows AS f
+  ON f.followee_id = p.user_id
+GROUP BY p.user_id, p.handle, p.reputation
+ORDER BY follower_count DESC, p.reputation DESC;</code></pre>
                     </details>
                   
                 </div>
@@ -1615,51 +1610,29 @@ ORDER BY total_payroll_usd DESC;</code></pre>
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">03</span>
-                    <span class="build-lab-step-card__target">Phase 3 · Production Query &amp; Plan Verification</span>
+                    <span class="build-lab-step-card__target">Phase 3 · Recursive CTEs (WITH RECURSIVE): Anchor, Recursive Member &amp; Fixpoint: Topic Post Engagement &amp; Like Attribution</span>
                   </div>
-                  <div class="build-lab-step-card__title">Production Query &amp; Execution Plan Verification (Recursive CTEs (WITH RECURSIVE): Anchor, Recursive Member &amp; Fixpoint)</div>
-                  <div class="build-lab-step-card__invariant">Verify final column projections, ordering, and physical B+Tree access paths via EXPLAIN QUERY PLAN and automated relational assertions.</div>
-                  <div class="build-lab-step-card__concept">Execute the complete production query in <code>query.sql</code> and click <strong>✓ Check SQL Assertions</strong> to verify schema alignment, row cardinality, and tuple equivalence.</div>
+                  <div class="build-lab-step-card__title">Production Post Engagement &amp; Author Reputation Query (Recursive CTEs (WITH RECURSIVE): Anchor, Recursive Member &amp; Fixpoint)</div>
+                  <div class="build-lab-step-card__invariant">Join <code>posts</code>, author <code>profiles</code>, and <code>post_likes</code> to rank technical posts by engagement and author reputation.</div>
+                  <div class="build-lab-step-card__concept">Run the complete post engagement query in <code>query.sql</code> and step through the multi-join pipeline.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>💡 Progressive SQL Hint (Step 3)</summary>
-                      <pre><code>-- Dataset: org_hr | WITH RECURSIVE Hierarchy Traversal &amp; Chain-of-Command Depth
-WITH RECURSIVE org_hierarchy AS (
-  SELECT
-    emp_id,
-    name,
-    title,
-    manager_id,
-    dept_id,
-    salary_usd,
-    0 AS hierarchy_level,
-    name AS reporting_chain
-  FROM employees
-  WHERE manager_id IS NULL
-  UNION ALL
-  SELECT
-    e.emp_id,
-    e.name,
-    e.title,
-    e.manager_id,
-    e.dept_id,
-    e.salary_usd,
-    h.hierarchy_level + 1 AS hierarchy_level,
-    h.reporting_chain || &#039; -&gt; &#039; || e.name AS reporting_chain
-  FROM employees AS e
-  INNER JOIN org_hierarchy AS h
-    ON e.manager_id = h.emp_id
-  WHERE h.hierarchy_level &lt; 6
-)
+                      <pre><code>-- Dataset: social_graph | Recursive CTEs (WITH RECURSIVE): Anchor, Recursive Member &amp; Fixpoint (recursive-ctes-hierarchies) — Post Engagement &amp; Author Reputation
 SELECT
-  emp_id,
-  name,
-  title,
-  hierarchy_level,
-  salary_usd,
-  reporting_chain
-FROM org_hierarchy
-ORDER BY hierarchy_level ASC, salary_usd DESC;</code></pre>
+  po.post_id,
+  pr.handle AS author_handle,
+  pr.reputation AS author_reputation,
+  po.topic_tag,
+  COUNT(pl.user_id) AS like_count,
+  po.published_at
+FROM posts AS po
+INNER JOIN profiles AS pr
+  ON pr.user_id = po.author_id
+LEFT JOIN post_likes AS pl
+  ON pl.post_id = po.post_id
+GROUP BY po.post_id, pr.handle, pr.reputation, po.topic_tag, po.published_at
+ORDER BY like_count DESC, pr.reputation DESC, po.post_id ASC;</code></pre>
                     </details>
                   
                 </div>
@@ -1803,7 +1776,7 @@ ORDER BY hierarchy_level ASC, salary_usd DESC;</code></pre>
   <script type="text/plain" data-defer src="data/srs-cards.js?v=fabc47dd9c"></script>
   <script type="text/plain" data-defer src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
   <script type="text/plain" data-defer src="data/implementations_code.js?v=fce884f8a8"></script>
-  <script type="text/plain" data-defer src="data/topic_guided_labs.js?v=341584ee01"></script>
+  <script type="text/plain" data-defer src="data/topic_guided_labs.js?v=2a57d85494"></script>
   <script type="text/plain" data-defer src="data/projects.js?v=2280ac085f"></script>
   <script type="text/plain" data-defer src="data/glossary.js?v=4f6c79a4e0"></script>
 
@@ -1814,8 +1787,8 @@ ORDER BY hierarchy_level ASC, salary_usd DESC;</code></pre>
   <script type="text/plain" data-defer src="js/search.js?v=e2063e0ccd"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
   <script type="text/plain" data-defer src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>
-  <script type="text/plain" data-defer src="js/sql-engine.js?v=a668c919ba"></script>
-  <script type="text/plain" data-defer src="js/table-visualizer.js?v=ea5db1c17a"></script>
+  <script type="text/plain" data-defer src="js/sql-engine.js?v=60d0c505ad"></script>
+  <script type="text/plain" data-defer src="js/table-visualizer.js?v=1f1a1f2968"></script>
   <script type="text/plain" data-defer src="js/simulators.js?v=68b973e4c8"></script>
   <script type="text/plain" data-defer src="js/simulators-relational.js?v=8e12b97831"></script>
   <script type="text/plain" data-defer src="js/simulators-analytical.js?v=258089d8ac"></script>
@@ -1832,10 +1805,10 @@ ORDER BY hierarchy_level ASC, salary_usd DESC;</code></pre>
   <script type="text/plain" data-defer src="js/roadmap.js?v=cebfb7e32c"></script>
   <script type="text/plain" data-defer src="js/challenges.js?v=fcc5b1b6c5"></script>
   <script type="text/plain" data-defer src="js/dashboard.js?v=d411d5a9bb"></script>
-  <script type="text/plain" data-defer src="js/sandbox.js?v=1f94508aa4"></script>
+  <script type="text/plain" data-defer src="js/sandbox.js?v=5528739eb9"></script>
   <script type="text/plain" data-defer src="js/topic-codelab.js?v=096611d91c"></script>
   
-  <script type="text/plain" data-defer src="js/app.js?v=ab7d42f863"></script>
+  <script type="text/plain" data-defer src="js/app.js?v=79ca5d1666"></script>
 
   <!-- App bootstrap & deferred script loader -->
   <script src="js/bootstrap.js?v=df2bb60aeb"></script>
