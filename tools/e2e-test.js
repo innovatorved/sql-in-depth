@@ -792,6 +792,16 @@ async function runSuite() {
   const hasAllStaticFiles = topicDirs.length === 180 && buildDirs.length === 18 && rootIndexHtml.includes('id="sidebar-content"');
   assertCheck(4, 'T4-J10', 'Static HTML & SEO Readiness Journey: All 201 HTML entrypoints and pre-rendered navigation structures are intact', hasAllStaticFiles);
 
+  // Journey 11: "⤢ Open in Full-Screen SQL Studio" Direct & Delegated Click Wiring Journey
+  const hasDirectStudioWiring =
+    typeof TableVisualizer.openFullScreenSqlStudio === 'function' &&
+    tableVisSrc.includes("wrapper.querySelectorAll('[data-action=\"open-sql-studio\"]')") &&
+    tableVisSrc.includes("blockController.openStudio()") &&
+    tableVisSrc.includes('data-inline-viz-action="studio"') &&
+    appSrc.includes('rawTarget.nodeType === 3') &&
+    appSrc.includes('z-index:9999');
+  assertCheck(4, 'T4-J11', 'Full-Screen SQL Studio Button Journey: "⤢ Open in Full-Screen SQL Studio" buttons have direct click listeners + modal visibility styles', hasDirectStudioWiring);
+
   // =========================================================================
   // SUMMARY REPORT
   // =========================================================================

@@ -1281,6 +1281,7 @@
         if (options.showEditor) {
             var editorOpts = Object.assign({}, options, { showEditor: false });
             var refSql = options.referenceSql || options.solutionSql || sql;
+            var isInsideModal = Boolean(container && typeof container.closest === 'function' && container.closest('#global-codelab-overlay'));
             container.innerHTML =
                 '<div class="sql-studio-inline-workbench" style="display:flex;flex-direction:column;gap:10px;padding:12px;background:var(--bg-elevated);">' +
                     '<div class="sql-lab-editor-box" style="display:flex;flex-direction:column;gap:8px;">' +
@@ -1289,11 +1290,16 @@
                             '<span>Shortcut: Cmd/Ctrl + Enter to Run</span>' +
                         '</div>' +
                         '<textarea class="sql-live-editor sql-inline-textarea" rows="7" spellcheck="false" style="width:100%;font-family:var(--font-mono,monospace);font-size:0.85rem;padding:10px 12px;border-radius:8px;background:var(--bg-surface);color:var(--fg);border:1px solid var(--border-subtle,rgba(148,163,184,0.28));">' + escapeHtml(sql) + '</textarea>' +
-                        '<div class="sql-lab-actions" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
-                            '<button type="button" class="sql-exec-btn is-primary" data-inline-viz-action="run">▶ Run &amp; Visualize SQL</button>' +
-                            '<button type="button" class="sql-exec-btn is-secondary" data-inline-viz-action="step">🔍 Step Clauses (Step 0 → 8)</button>' +
-                            '<button type="button" class="sql-exec-btn is-verify" data-inline-viz-action="verify" style="background:rgba(16,185,129,0.16);color:#10b981;border:1px solid rgba(16,185,129,0.4);">✓ Check SQL Assertions</button>' +
-                            '<button type="button" class="sql-exec-btn is-secondary" data-inline-viz-action="explain">📊 EXPLAIN QUERY PLAN</button>' +
+                        '<div class="sql-lab-actions" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">' +
+                            '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
+                                '<button type="button" class="sql-exec-btn is-primary" data-inline-viz-action="run">▶ Run &amp; Visualize SQL</button>' +
+                                '<button type="button" class="sql-exec-btn is-secondary" data-inline-viz-action="step">🔍 Step Clauses (Step 0 → 8)</button>' +
+                                '<button type="button" class="sql-exec-btn is-verify" data-inline-viz-action="verify" style="background:rgba(16,185,129,0.16);color:#10b981;border:1px solid rgba(16,185,129,0.4);">✓ Check SQL Assertions</button>' +
+                                '<button type="button" class="sql-exec-btn is-secondary" data-inline-viz-action="explain">📊 EXPLAIN QUERY PLAN</button>' +
+                            '</div>' +
+                            (!isInsideModal
+                                ? '<button type="button" class="sql-exec-btn is-studio" data-inline-viz-action="studio" data-action="open-sql-studio" data-lang="sql">⤢ Open in Full-Screen SQL Studio</button>'
+                                : '') +
                         '</div>' +
                     '</div>' +
                     '<div class="sql-inline-verify-banner" style="display:none;padding:12px 14px;border-radius:8px;font-size:0.83rem;"></div>' +
@@ -1306,6 +1312,7 @@
             var stepBtn = container.querySelector('[data-inline-viz-action="step"]');
             var verifyBtn = container.querySelector('[data-inline-viz-action="verify"]');
             var explainBtn = container.querySelector('[data-inline-viz-action="explain"]');
+            var studioBtn = container.querySelector('[data-inline-viz-action="studio"]');
 
             async function runVerification() {
                 if (!verifyBanner) return;
@@ -1368,6 +1375,20 @@
                     if (expBox) {
                         expBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                     }
+                });
+            }
+            if (studioBtn) {
+                studioBtn.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    var currentSql = ed && ed.value.trim() ? ed.value : sql;
+                    var currentDs = inferDatasetFromSql(currentSql) || datasetId || 'ecommerce';
+                    openFullScreenSqlStudio({
+                        sql: currentSql,
+                        referenceSql: refSql || currentSql,
+                        datasetId: currentDs,
+                        title: options.title || 'Interactive SQL & Table Studio'
+                    });
                 });
             }
             if (ed) {
@@ -1544,6 +1565,89 @@
      */
     var _autoRunQueue = Promise.resolve();
 
+    function openFullScreenSqlStudio(opts) {
+        opts = opts || {};
+        var sqlText = (opts.sql || '').trim() || 'SELECT * FROM customers LIMIT 10;';
+        var dsId = opts.datasetId || inferDatasetFromSql(sqlText) || 'ecommerce';
+        var titleEl = typeof document !== 'undefined' ? document.querySelector('.lesson-header__title, .lesson__title, h1') : null;
+        var titleText = opts.title || (titleEl ? (titleEl.textContent.trim() + ' — SQL Studio') : 'Interactive SQL & Table Studio (PostgreSQL 18 / SQLite WASM)');
+        var modalPayload = {
+            slug: opts.slug || (root.App && typeof root.App.getCurrentSlug === 'function' ? root.App.getCurrentSlug() : ''),
+            title: titleText,
+            summary: opts.summary || 'Execute, edit, and step through this SQL query clause-by-clause in the full-screen SQL Studio.',
+            datasetId: dsId,
+            sql: sqlText,
+            referenceSql: opts.referenceSql || sqlText,
+            steps: Array.isArray(opts.steps) ? opts.steps : []
+        };
+
+        if (root.App && typeof root.App.openSqlStudioModal === 'function') {
+            var res = root.App.openSqlStudioModal(modalPayload);
+            var existingOverlay = typeof document !== 'undefined' ? document.getElementById('global-codelab-overlay') : null;
+            if (existingOverlay) {
+                existingOverlay.classList.add('open', 'is-open');
+                existingOverlay.setAttribute('aria-hidden', 'false');
+                existingOverlay.style.cssText = 'position:fixed;inset:0;z-index:9999;width:100vw;height:100vh;background:rgba(0,0,0,0.82);backdrop-filter:blur(4px);display:flex;flex-direction:column;opacity:1;visibility:visible;pointer-events:auto;transform:none;';
+            }
+            return res;
+        }
+
+        if (typeof document === 'undefined') return Promise.resolve(null);
+        var overlay = document.getElementById('global-codelab-overlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = 'global-codelab-overlay';
+            overlay.className = 'global-codelab-overlay build-lab-overlay';
+            document.body.appendChild(overlay);
+        }
+        var datasets = getDatasets();
+        var dsInfo = datasets[dsId] || { title: dsId };
+        overlay.innerHTML =
+            '<div class="global-codelab-shell sql-studio-modal-shell" style="display:flex;flex-direction:column;width:96vw;max-width:1560px;height:92vh;margin:4vh auto;background:var(--bg);border:1px solid var(--border-strong);border-radius:14px;overflow:hidden;box-shadow:var(--shadow-xl);">' +
+                '<div class="global-codelab-topbar" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;background:var(--surface);border-bottom:1px solid var(--border);">' +
+                    '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">' +
+                        '<button type="button" class="btn btn--secondary btn--sm" id="global-codelab-close-btn">← Back to Lesson</button>' +
+                        '<div>' +
+                            '<div style="display:flex;align-items:center;gap:8px;">' +
+                                '<span style="background:var(--info-muted);color:var(--info);padding:2px 8px;border-radius:999px;font-size:0.72rem;font-weight:700;">SQL STUDIO</span>' +
+                                '<strong style="font-size:0.98rem;color:var(--fg);">' + escapeHtml(titleText) + '</strong>' +
+                            '</div>' +
+                            '<div style="font-size:0.78rem;color:var(--fg-muted);margin-top:2px;">Dataset: ' + escapeHtml(dsInfo.title || dsId) + '</div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div id="sql-studio-modal-visualizer-host" style="flex:1;min-height:0;overflow-y:auto;padding:16px;"></div>' +
+            '</div>';
+        overlay.classList.add('open', 'is-open');
+        overlay.setAttribute('aria-hidden', 'false');
+        overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;width:100vw;height:100vh;background:rgba(0,0,0,0.82);backdrop-filter:blur(4px);display:flex;flex-direction:column;opacity:1;visibility:visible;pointer-events:auto;transform:none;';
+        document.body.style.overflow = 'hidden';
+
+        var closeModal = function () {
+            overlay.classList.remove('open', 'is-open');
+            overlay.setAttribute('aria-hidden', 'true');
+            overlay.style.cssText = 'display:none;opacity:0;visibility:hidden;pointer-events:none;';
+            overlay.innerHTML = '';
+            document.body.style.overflow = '';
+        };
+        var closeBtn = overlay.querySelector('#global-codelab-close-btn');
+        if (closeBtn) closeBtn.addEventListener('click', closeModal);
+        overlay.addEventListener('click', function (ev) {
+            if (ev.target === overlay) closeModal();
+        });
+        var visHost = overlay.querySelector('#sql-studio-modal-visualizer-host');
+        if (visHost) {
+            mountClauseVisualizer(visHost, {
+                datasetId: dsId,
+                sql: sqlText,
+                referenceSql: opts.referenceSql || sqlText,
+                showEditor: true,
+                title: titleText
+            });
+        }
+        return Promise.resolve(overlay);
+    }
+
     function enhanceSqlCodeBlocks(rootEl) {
         if (!rootEl) return;
         var codeNodes = rootEl.querySelectorAll('pre code.language-sql');
@@ -1680,6 +1784,15 @@
                     runCurrentBlock({ startAtFinal: true });
                     outputWrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 },
+                openStudio: function () {
+                    var currentSql = (textarea && textarea.value.trim()) ? textarea.value : rawSql;
+                    var currentDs = inferDatasetFromSql(currentSql) || dsId;
+                    return openFullScreenSqlStudio({
+                        sql: currentSql,
+                        referenceSql: rawSql,
+                        datasetId: currentDs
+                    });
+                },
                 getCurrentSql: function () {
                     return (textarea && textarea.value.trim()) ? textarea.value : rawSql;
                 },
@@ -1689,6 +1802,15 @@
                 }
             };
             wrapper._sqlBlockController = blockController;
+
+            var studioBtns = wrapper.querySelectorAll('[data-action="open-sql-studio"]');
+            studioBtns.forEach(function (stBtn) {
+                stBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    blockController.openStudio();
+                });
+            });
 
             var parentCodeBlock = wrapper.closest('.code-block');
             if (parentCodeBlock) {
@@ -1707,6 +1829,15 @@
                         e.preventDefault();
                         e.stopPropagation();
                         blockController.runAndOpen(true, true);
+                    });
+                });
+                var extStudioBtns = parentCodeBlock.querySelectorAll('[data-action="open-sql-studio"]');
+                extStudioBtns.forEach(function (extBtn) {
+                    if (wrapper.contains(extBtn)) return;
+                    extBtn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        blockController.openStudio();
                     });
                 });
             }
@@ -1836,6 +1967,7 @@
                                 '<button type="button" class="sql-exec-btn is-secondary" data-lab-action="step">🔍 Step-by-Step Clauses</button>' +
                                 '<button type="button" class="sql-exec-btn is-verify" data-lab-action="verify">✓ Verify SQL Output</button>' +
                                 '<button type="button" class="sql-exec-btn is-secondary" data-lab-action="solution">★ Load Step Solution</button>' +
+                                '<button type="button" class="sql-exec-btn is-studio" data-lab-action="studio" data-action="open-sql-studio" data-lang="sql">⤢ Open in Full-Screen SQL Studio</button>' +
                             '</div>' +
                         '</div>' +
                         '<div class="sql-lab-verify-banner" hidden></div>' +
@@ -1878,6 +2010,20 @@
                     mountClauseVisualizer(vizMount, sol, datasetId);
                 }
             });
+
+            var labStudioBtn = container.querySelector('[data-lab-action="studio"]');
+            if (labStudioBtn) {
+                labStudioBtn.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    openFullScreenSqlStudio({
+                        sql: editor.value || currentSql,
+                        referenceSql: currentStep.solutionSql || labConfig.solutionSql || editor.value,
+                        datasetId: datasetId,
+                        title: labConfig.title || currentStep.title || 'Guided SQL Lab Studio'
+                    });
+                });
+            }
 
             container.querySelector('[data-lab-action="verify"]').addEventListener('click', async function () {
                 var userSql = editor.value;
@@ -1999,6 +2145,7 @@
         mountClauseVisualizer: mountClauseVisualizer,
         enhanceSqlCodeBlocks: enhanceSqlCodeBlocks,
         mountGuidedSqlLab: mountGuidedSqlLab,
+        openFullScreenSqlStudio: openFullScreenSqlStudio,
         SCHEMA_META: SCHEMA_META
     };
 })(typeof globalThis !== 'undefined' ? globalThis : (typeof window !== 'undefined' ? window : this));

@@ -1790,8 +1790,9 @@ window.App = (() => {
 
     // Delegated click listener for interactive actions and navigation (CSP-compliant, no inline onclick)
     document.addEventListener('click', (e) => {
-      const target = e.target;
-      if (!target) return;
+      const rawTarget = e.target;
+      const target = (rawTarget && rawTarget.nodeType === 3) ? rawTarget.parentElement : rawTarget;
+      if (!target || typeof target.closest !== 'function') return;
 
       // 1. Navigation links with [data-nav]
       const navEl = target.closest('[data-nav]');
@@ -1988,18 +1989,26 @@ window.App = (() => {
         return;
       }
 
-      const openSqlStudioBtn = target.closest('[data-action="open-sql-studio"], [data-action="run-snippet-codelab"]');
+      const openSqlStudioBtn = target.closest('[data-action="open-sql-studio"], [data-action="run-snippet-codelab"], [data-inline-viz-action="studio"], [data-lab-action="studio"]');
       if (openSqlStudioBtn) {
         e.preventDefault();
-        const block = openSqlStudioBtn.closest('.code-block') || openSqlStudioBtn.closest('.sql-executable-block');
+        const block = openSqlStudioBtn.closest('.code-block')
+          || openSqlStudioBtn.closest('.sql-executable-block')
+          || openSqlStudioBtn.closest('.sql-studio-inline-workbench')
+          || openSqlStudioBtn.closest('.sql-guided-lab-host')
+          || openSqlStudioBtn.closest('.build-lab-card');
         const ctrl = (block && block._sqlBlockController) || (block?.querySelector('.sql-executable-block')?._sqlBlockController);
-        const textareaEl = block?.querySelector('.sql-inline-textarea');
+        if (ctrl && typeof ctrl.openStudio === 'function') {
+          ctrl.openStudio();
+          return;
+        }
+        const textareaEl = block?.querySelector('.sql-inline-textarea, .sql-live-editor, textarea');
         const codeEl = block?.querySelector('code');
         const code = (ctrl && typeof ctrl.getCurrentSql === 'function')
           ? ctrl.getCurrentSql()
           : ((textareaEl && textareaEl.value.trim()) ? textareaEl.value : (codeEl ? codeEl.textContent : ''));
         const lang = openSqlStudioBtn.getAttribute('data-lang') || 'sql';
-        const titleEl = document.querySelector('.lesson__title, h1');
+        const titleEl = document.querySelector('.lesson-header__title, .lesson__title, h1');
         const title = titleEl ? `${titleEl.textContent.trim()} — SQL Studio` : 'Interactive SQL Studio';
         openSnippetInCodeLab(code, lang, title);
         return;
@@ -2659,6 +2668,7 @@ window.App = (() => {
       overlay.classList.remove('open');
       overlay.classList.remove('is-open');
       overlay.setAttribute('aria-hidden', 'true');
+      overlay.style.cssText = 'display:none;opacity:0;visibility:hidden;pointer-events:none;';
       overlay.innerHTML = '';
     }
     document.body.style.overflow = '';
@@ -2770,12 +2780,20 @@ window.App = (() => {
     overlay.classList.add('open');
     overlay.classList.add('is-open');
     overlay.setAttribute('aria-hidden', 'false');
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;width:100vw;height:100vh;background:rgba(0,0,0,0.82);backdrop-filter:blur(4px);display:flex;flex-direction:column;opacity:1;visibility:visible;pointer-events:auto;transform:none;';
     document.body.style.overflow = 'hidden';
 
     const handleCloseModal = () => {
+      document.removeEventListener('keydown', handleEscModal);
       closeGlobalCodeLab();
       if (typeof opts.onClose === 'function') opts.onClose();
     };
+    const handleEscModal = (ev) => {
+      if (ev.key === 'Escape') {
+        handleCloseModal();
+      }
+    };
+    document.addEventListener('keydown', handleEscModal);
     const closeBtn = overlay.querySelector('#global-codelab-close-btn');
     if (closeBtn) closeBtn.addEventListener('click', handleCloseModal);
     overlay.addEventListener('click', (e) => {
