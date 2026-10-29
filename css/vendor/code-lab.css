@@ -810,7 +810,7 @@ code-lab,
 }
 
 .codelab-guide-prose {
-  max-width: 65ch;
+  max-width: 100%;
   font-family: var(--cl-font-sans);
   color: var(--cl-fg-muted);
   font-size: 13px;
@@ -1595,7 +1595,7 @@ code-lab,
 }
 
 .codelab-md-preview > * {
-  max-width: 860px;
+  max-width: 100%;
   margin-left: auto;
   margin-right: auto;
 }

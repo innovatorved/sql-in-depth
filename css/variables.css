@@ -85,7 +85,7 @@
   --sidebar-w: 280px;
   --content-max: 1140px;
   --reading-max: 1140px;
-  --prose-line-max: 74ch;
+  --prose-line-max: 100%;
 
   /* ── Transitions ─────────────────────────────────────────── */
   --dur-fast: 120ms;

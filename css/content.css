@@ -130,7 +130,7 @@
 .prose > ol {
   color: var(--fg-prose);
   line-height: 1.7;
-  max-width: var(--prose-line-max, 76ch);
+  max-width: var(--prose-line-max, 100%);
 }
 
 /* Links */
@@ -236,8 +236,7 @@
   border-collapse: collapse;
   font-size: var(--text-sm);
   margin: var(--space-4) 0;
-  overflow-x: auto;
-  display: block;
+  display: table;
 }
 
 .prose thead {
@@ -345,7 +344,7 @@
   font-size: 15px;
   color: var(--fg-muted);
   line-height: var(--leading-relaxed);
-  max-width: 680px;
+  max-width: 100%;
   margin: 0 0 var(--space-6) 0;
 }
 
