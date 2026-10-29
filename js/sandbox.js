@@ -988,7 +988,13 @@
       });
       Promise.resolve(this._sqlStudioVizHandle).then(function() {
         var sel = self._container ? self._container.querySelector('#wb-sql-saved-history-select') : null;
-        if (sel) sel.innerHTML = self._buildSavedHistoryOptionsHtml();
+        if (sel) {
+          var prevVal = sel.value;
+          sel.innerHTML = self._buildSavedHistoryOptionsHtml();
+          if (prevVal && prevVal.indexOf('saved:') === 0) {
+            sel.value = prevVal;
+          }
+        }
       }).catch(function() {});
     },
 
@@ -1905,11 +1911,11 @@
           var ideAct = wbIdeBtn.getAttribute('data-wb-ide-action');
           var wbEd = container.querySelector('#wb-sql-studio-editor');
           var curSql = wbEd ? wbEd.value : (self._sqlStudioQuery || '');
-          if (ideAct === 'format-sql' && wbEd && root.TableVisualizer && typeof root.TableVisualizer.formatSql === 'function') {
+          if ((ideAct === 'format-sql' || ideAct === 'format') && wbEd && root.TableVisualizer && typeof root.TableVisualizer.formatSql === 'function') {
             wbEd.value = root.TableVisualizer.formatSql(wbEd.value);
             self._sqlStudioQuery = wbEd.value;
             wbEd.dispatchEvent(new Event('input', { bubbles: true }));
-          } else if (ideAct === 'copy-sql') {
+          } else if (ideAct === 'copy-sql' || ideAct === 'copy') {
             if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
               navigator.clipboard.writeText(curSql).catch(function() {});
             }
@@ -1917,17 +1923,47 @@
             wbIdeBtn.textContent = '✓ Copied';
             setTimeout(function() { wbIdeBtn.textContent = origLabel; }, 1200);
           } else if (ideAct === 'save-query' && root.TableVisualizer && typeof root.TableVisualizer.saveQuery === 'function') {
-            var qTitle = (typeof window !== 'undefined' && typeof window.prompt === 'function')
-              ? window.prompt('Save SQL query as:', 'My Saved Query')
-              : 'Saved Query';
+            var titleInput = container.querySelector('#wb-sql-save-title-input');
+            var qTitle = (titleInput && titleInput.value && titleInput.value.trim())
+              ? titleInput.value.trim()
+              : ((typeof window !== 'undefined' && typeof window.prompt === 'function')
+                ? window.prompt('Save SQL query as:', 'My Saved Query')
+                : 'Saved Query');
             if (qTitle) {
-              root.TableVisualizer.saveQuery({
+              var savedEntry = root.TableVisualizer.saveQuery({
                 title: qTitle,
                 sql: curSql,
                 datasetId: self._sqlStudioDatasetId || '__unified__'
               });
+              if (titleInput) titleInput.value = '';
               var shSel = container.querySelector('#wb-sql-saved-history-select');
-              if (shSel) shSel.innerHTML = self._buildSavedHistoryOptionsHtml();
+              if (shSel) {
+                shSel.innerHTML = self._buildSavedHistoryOptionsHtml();
+                if (savedEntry && savedEntry.id) {
+                  shSel.value = 'saved:' + savedEntry.id;
+                  self._lastSelectedSavedId = savedEntry.id;
+                }
+              }
+            }
+          } else if (ideAct === 'delete-saved' && root.TableVisualizer && typeof root.TableVisualizer.deleteSavedQuery === 'function') {
+            var shSelDel = container.querySelector('#wb-sql-saved-history-select');
+            var selValDel = shSelDel ? shSelDel.value : '';
+            var delId = '';
+            if (selValDel && selValDel.indexOf('saved:') === 0) {
+              delId = selValDel.slice(6);
+            } else if (self._lastSelectedSavedId) {
+              delId = self._lastSelectedSavedId;
+            } else if (typeof root.TableVisualizer.getSavedQueries === 'function') {
+              var curSaved = root.TableVisualizer.getSavedQueries();
+              if (curSaved && curSaved.length > 0) delId = curSaved[0].id;
+            }
+            if (delId) {
+              root.TableVisualizer.deleteSavedQuery(delId);
+              if (self._lastSelectedSavedId === delId) self._lastSelectedSavedId = null;
+              if (shSelDel) {
+                shSelDel.innerHTML = self._buildSavedHistoryOptionsHtml();
+                shSelDel.value = '';
+              }
             }
           } else if (ideAct === 'clear-history' && root.TableVisualizer && typeof root.TableVisualizer.clearQueryHistory === 'function') {
             root.TableVisualizer.clearQueryHistory();
@@ -1952,15 +1988,16 @@
         // SQL Studio practice snippet chips
         var wbChipBtn = e.target.closest('[data-wb-sql-chip]');
         if (wbChipBtn) {
-          var chipIdx = parseInt(wbChipBtn.getAttribute('data-wb-sql-chip'), 10);
+          var chipAttr = wbChipBtn.getAttribute('data-wb-sql-chip');
           var chips = (root.TableVisualizer && Array.isArray(root.TableVisualizer.SQL_PRACTICE_CHIPS)) ? root.TableVisualizer.SQL_PRACTICE_CHIPS : [];
-          var chip = chips[chipIdx];
+          var chip = chips.find(function(c) { return c.id === chipAttr || c.label === chipAttr; }) || chips[parseInt(chipAttr, 10)];
           var chipTa = container.querySelector('#wb-sql-studio-editor');
           if (chip && chipTa) {
             if (root.TableVisualizer && typeof root.TableVisualizer.insertSqlSnippet === 'function') {
               root.TableVisualizer.insertSqlSnippet(chipTa, chip.snippet);
             } else {
               chipTa.value = (chipTa.value ? chipTa.value + '\n' : '') + chip.snippet;
+              chipTa.dispatchEvent(new Event('input', { bubbles: true }));
             }
             self._sqlStudioQuery = chipTa.value;
           }
@@ -2314,13 +2351,19 @@
           var pickedSql = '';
           if (selVal.indexOf('saved:') === 0 && root.TableVisualizer && typeof root.TableVisualizer.getSavedQueries === 'function') {
             var sId = selVal.slice(6);
+            self._lastSelectedSavedId = sId;
             var sList = root.TableVisualizer.getSavedQueries();
-            var foundS = sList.find(function(s) { return s.id === sId; });
+            var foundS = sList.find(function(s) { return String(s.id) === String(sId); });
             if (foundS) pickedSql = foundS.sql;
-          } else if (selVal.indexOf('hist:') === 0 && root.TableVisualizer && typeof root.TableVisualizer.getQueryHistory === 'function') {
-            var hIdx = parseInt(selVal.slice(5), 10);
+          } else if ((selVal.indexOf('history:') === 0 || selVal.indexOf('hist:') === 0) && root.TableVisualizer && typeof root.TableVisualizer.getQueryHistory === 'function') {
+            var hKey = selVal.indexOf('history:') === 0 ? selVal.slice(8) : selVal.slice(5);
             var hList = root.TableVisualizer.getQueryHistory();
-            if (hList[hIdx]) pickedSql = hList[hIdx].sql;
+            var foundH = hList.find(function(h) { return String(h.id) === String(hKey); });
+            if (!foundH) {
+              var hIdx = parseInt(hKey, 10);
+              if (!isNaN(hIdx) && hList[hIdx]) foundH = hList[hIdx];
+            }
+            if (foundH) pickedSql = foundH.sql;
           }
           if (pickedSql) {
             self._sqlStudioQuery = pickedSql;
@@ -2331,7 +2374,9 @@
             }
             self._mountSqlStudioVisualizer({ startAtFinal: true });
           }
-          e.target.value = '';
+          if (selVal.indexOf('saved:') !== 0) {
+            e.target.value = '';
+          }
           return;
         }
       }, sig);

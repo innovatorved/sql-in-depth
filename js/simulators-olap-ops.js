@@ -400,10 +400,65 @@ window.SIMULATORS = window.SIMULATORS || {};
   }
 ];
 
+  function resolvePresetRows(spec, preset) {
+    const isAlt = Boolean(preset && spec.presets && spec.presets[0] && preset.id !== spec.presets[0].id);
+    if (!isAlt) return spec.baseRows.map(r => r.slice());
+
+    if (spec.id === 'sim-columnar-rle-dict-zonemap') {
+      return [
+        ['Dict Header', '4 Distinct Codes', '0:"paid", 1:"pending"', '2:"refunded", 3:"void"', 'Bit-Packed 2-bit Codes', 'Evaluate code == 0 in Register ✓'],
+        ['RLE Run #1', '14,200 rows', 'code = 0 ("paid")', 'run_length = 14,200', 'RLE Single Pair (8B)', 'SIMD Match Entire Run ✓'],
+        ['RLE Run #2', '8,500 rows', 'code = 2 ("refunded")', 'run_length = 8,500', 'RLE Single Pair (8B)', 'PRUNED Run in 1 Cycle'],
+        ['Late Materialize', '14,200 hits', 'Fetch total_cents only', 'Skip 18 unreferenced cols', 'Selection Vector Gather', '92% I/O Bandwidth Saved ✓']
+      ];
+    }
+    if (spec.id === 'sim-duckdb-clickhouse-iceberg') {
+      return [
+        ['Granule #0', 'Rows [0..8191]', 'First Key: (tenant=1, 09:00)', 'Primary Index Binary Search', 'PRUNED (max < target)', '0 KB'],
+        ['Granule #14', 'Rows [114688..122879]', 'First Key: (tenant=42, 10:00)', 'Sparse Index Mark Hit ✓', 'Seek to .bin + .mrk2 offset', '64 KB ✓'],
+        ['Granule #15', 'Rows [122880..131071]', 'First Key: (tenant=42, 10:15)', 'Contiguous Granule Stream ✓', 'SIMD Vector Decompress', '64 KB ✓'],
+        ['Granule #16', 'Rows [131072..139263]', 'First Key: (tenant=43, 08:00)', 'Primary Index Bound > 42', 'PRUNED (Stop Scan)', '0 KB']
+      ];
+    }
+    if (spec.id === 'sim-replication-failover-fencing') {
+      return [
+        ['Old Leader (Partitioned)', 'Epoch Token #7', 'LSN 9,415', 'Send Storage Write (Epoch #7)', 'QUEUED in Network Partition'],
+        ['Consensus Promotion', 'Epoch Token #8', 'LSN 9,420', 'New Leader Elected (Epoch #8)', 'Storage max_epoch ← 8 ✓'],
+        ['New Leader Write', 'Epoch Token #8', 'LSN 9,425', 'Write Commit (Epoch #8 >= 8)', 'ACCEPTED by Storage ✓'],
+        ['Zombie Packet Arrives', 'Epoch Token #7', 'LSN 9,416', 'Late Write with Stale Epoch #7', 'BREACH BLOCKED: 7 < 8 Fenced!']
+      ];
+    }
+    if (spec.id === 'sim-partitioning-sharding-2pc') {
+      return [
+        ['Step 1: Order Service', 'Local TX #1', 'INSERT order (PENDING)', 'Committed Locally', 'Saga Forward Step #1 ✓'],
+        ['Step 2: Payment Shard', 'Local TX #2', 'Charge Card $240', 'Committed Locally', 'Saga Forward Step #2 ✓'],
+        ['Step 3: Inventory Shard', 'Local TX #3', 'stock_qty = 0 (Out of Stock!)', 'BREACH: Step #3 Aborted!', 'Trigger Compensating Saga!'],
+        ['Step 4: Compensate', 'Undo TX #2 & #1', 'Refund $240 + Cancel Order', 'Eventual Consistency Restored', 'No Distributed Lock Held ✓']
+      ];
+    }
+    if (spec.id === 'sim-keyset-pagination-nplus1-fts') {
+      return [
+        ['Job #901', 'status = queued', 'Worker A: FOR UPDATE SKIP LOCKED', 'Row Lock Acquired', 'CLAIMED by Worker A ✓'],
+        ['Job #901 (Locked)', 'status = queued', 'Worker B: FOR UPDATE SKIP LOCKED', 'WAITING Skipped Immediately!', 'PRUNED (Non-Blocking Skip)'],
+        ['Job #902', 'status = queued', 'Worker B: Next Unlocked Tuple', 'Row Lock Acquired', 'CLAIMED by Worker B ✓'],
+        ['Job #903', 'status = queued', 'Worker C: Next Unlocked Tuple', 'Row Lock Acquired', 'CLAIMED by Worker C ✓']
+      ];
+    }
+    if (spec.id === 'sim-production-triage-zero-downtime-ddl') {
+      return [
+        ['1. Base Backup', 'pg_basebackup Tarball', 'LSN 40/10000000', 'Restore Physical Cluster Dir', 'Checkpoint Seed Loaded ✓'],
+        ['2. WAL Segment #1', '000000010000004000000010', 'Replay LSN ..10 → ..1F', 'Redo 14,200 Committed Ops', 'Consistent State Advancing ✓'],
+        ['3. Target Timestamp', 'recovery_target_time = 14:29:59', 'Stop Before Accidental DROP TABLE', 'Halt Replay @ LSN 40/1F88A0', 'PRUNED Destructive TX @ 14:30:00!'],
+        ['4. Promote Timeline', 'pg_wal_replay_resume()', 'Timeline ID 1 → 2', 'Cluster Accepting Writes', 'Zero Data Loss PITR Complete ✓']
+      ];
+    }
+    return spec.baseRows.map(r => r.slice());
+  }
+
   function buildInteractiveFrames(spec, preset) {
     const frames = [];
     const cols = spec.columns;
-    const baseRows = spec.baseRows;
+    const baseRows = resolvePresetRows(spec, preset);
     const customNums = Array.isArray(preset.arr) && preset.arr.length >= 2 ? preset.arr : null;
 
     // Frame 0: Initial Table & Schema State
@@ -471,7 +526,7 @@ window.SIMULATORS = window.SIMULATORS || {};
             warn: warnRows,
             tags: { [i]: isWarn ? 'WARN/FILTER' : 'EVAL ✓' }
           }),
-        invariant: `Evaluating tuple [${i}] (${cols[0]}=${row[0]}): ${row.slice(1).map((v, cIdx) => cols[cIdx + 1] + '=' + (v === null ? 'NULL' : v)).join(', ')}.`,
+        invariant: `Evaluating tuple [${i}] (${cols[0]}=${row[0]}) under preset "${preset.label}": ${row.slice(1).map((v, cIdx) => cols[cIdx + 1] + '=' + (v === null ? 'NULL' : v)).join(', ')}.`,
         metrics: [
           { label: 'Cursor Tuple', value: `${i + 1} / ${baseRows.length}` },
           { label: 'Key', value: String(row[0]) },
@@ -510,7 +565,7 @@ window.SIMULATORS = window.SIMULATORS || {};
           warn: finalWarn,
           tags: { [baseRows.length - 1]: 'COMPLETE ✓' }
         }),
-      invariant: `Execution complete: ${finalMatch.length} tuple(s) emitted/verified, ${finalWarn.length} tuple(s) filtered/guarded under ${spec.badge}.`,
+      invariant: `Execution complete (${preset.label}): ${finalMatch.length} tuple(s) emitted/verified, ${finalWarn.length} tuple(s) filtered/guarded under ${spec.badge}.`,
       metrics: [
         { label: 'Total Scanned', value: String(baseRows.length) },
         { label: 'Emitted / Valid', value: String(finalMatch.length) },
@@ -538,6 +593,7 @@ window.SIMULATORS = window.SIMULATORS || {};
       blurb: spec.blurb,
       slugs: spec.slugs,
       presets: spec.presets,
+      customInput: false,
       buildFrames(preset) {
         return buildInteractiveFrames(spec, preset || spec.presets[0]);
       }

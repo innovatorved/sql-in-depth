@@ -402,10 +402,63 @@ window.SIMULATORS = window.SIMULATORS || {};
   }
 ];
 
+  function resolvePresetRows(spec, preset) {
+    const isAlt = Boolean(preset && spec.presets && spec.presets[0] && preset.id !== spec.presets[0].id);
+    if (!isAlt) return spec.baseRows.map(r => r.slice());
+
+    if (spec.id === 'sim-isolation-concurrency-anomalies') {
+      return [
+        ['t = 1', 'SELECT bal FROM acct WHERE id=1 FOR UPDATE', 'SELECT bal FROM acct WHERE id=1 FOR UPDATE', 'T1 acquires X-Lock on id=1', 'Pessimistic Row Lock ✓'],
+        ['t = 2', 'UPDATE acct SET bal = bal - 80', 'WAITING on X-Lock (id=1)', 'T2 blocked until T1 commits', 'Prevents Lost Update'],
+        ['t = 3', 'COMMIT (bal = 20) ✓', 'Unblocked → Re-reads bal = 20', 'Read Committed re-evaluates row', 'SAFE: Sees latest committed state ✓'],
+        ['t = 4', '—', 'Check 20 >= 80 → FALSE (Abort)', 'Final balance = $20 (No Overdraft)', 'Double-Spend Prevented ✓']
+      ];
+    }
+    if (spec.id === 'sim-mvcc-tuple-visibility') {
+      return [
+        ['(0, 1)', 480, 501, '$1,000', 'DEAD TUPLE (xmax 501 < OldestXmin 510) → Reclaimed ✓'],
+        ['(0, 2)', 501, 502, '$1,250', 'DEAD TUPLE (xmax 502 < OldestXmin 510) → Reclaimed ✓'],
+        ['(0, 3)', 502, 0, '$1,600', 'LIVE TUPLE (Frozen xmin → FrozenTransactionId) ✓'],
+        ['(0, 4)', '2.1B Age', 0, 'Wraparound Risk', 'WAITING: Autovacuum FREEZE Required']
+      ];
+    }
+    if (spec.id === 'sim-locks-deadlock-wait-graph') {
+      return [
+        ['1. Range Scan', 'T1 (RR)', '—', 'Next-Key Lock (-∞, 10], (10, 25]', 'Gap + Record Locked ✓'],
+        ['2. Phantom Insert', 'T1 holds Gap (10, 25]', 'T2 INSERT id=18', 'Gap (10, 25]', 'WAITING: Blocked by Next-Key Lock!'],
+        ['3. T1 Re-Read', 'T1 SELECT BETWEEN 10 AND 25', 'T2 Queued', '0 Phantoms Observed', 'SAFE: Repeatable Read Guaranteed ✓'],
+        ['4. T1 Commit', 'T1 Releases Locks', 'T2 Proceeds', 'Row id=18 Inserted', 'Serialized Safely ✓']
+      ];
+    }
+    if (spec.id === 'sim-slotted-page-buffer-pool') {
+      return [
+        ['Buf #1 (Page 12)', 'pin_count=1, usage=3', '8 KB Frame', 'Pinned by Active Scan', 'WAITING: Cannot Evict Pinned Page'],
+        ['Buf #2 (Page 44)', 'pin_count=0, usage=2 → 1', '8 KB Frame', 'Clock Hand Decrements usage', 'Survived Sweep Pass #1 ✓'],
+        ['Buf #3 (Page 89)', 'pin_count=0, usage=0', '8 KB Frame', 'dirty=false → Victim Chosen!', 'EVICTED for New Read ✓']
+      ];
+    }
+    if (spec.id === 'sim-wal-aries-crash-recovery') {
+      return [
+        ['LSN 210', 'HEAP UPDATE Page #7', 'T9', 'pageLSN = 210', 'Dirty Buffer in RAM'],
+        ['LSN 205', 'BgWriter Flush Check', '—', 'flushedLSN = 205 < 210', 'WAITING: WAL-Before-Data Blocks Page Write!'],
+        ['LSN 210', 'XLogFlush(210) → fsync', 'T9', 'flushedLSN = 210', 'WAL Durable on NVMe ✓'],
+        ['LSN 210', 'Flush Page #7 to Heap', '—', 'pageLSN(210) <= flushedLSN(210)', 'SAFE: Data Page Written ✓']
+      ];
+    }
+    if (spec.id === 'sim-lsm-compaction-amplification') {
+      return [
+        ['Point Lookup', 'B+Tree: O(log_B N) 3 pages', 'LSM: L0 + L1..Lk + Bloom', 'Read Amp: B+Tree Wins', 'SAFE (Predictable Latency) ✓'],
+        ['Random Write', 'B+Tree: In-Place 8KB Rewrite', 'LSM: Sequential WAL + MemTable', 'Write Amp: LSM Wins (3× vs 15×)', 'Sequential I/O ✓'],
+        ['Disk Space', 'B+Tree: 30% Fragmentation', 'LSM: ZSTD Compressed SSTables', 'Space Amp: LSM Wins ✓', 'Zero Random Page Splits ✓']
+      ];
+    }
+    return spec.baseRows.map(r => r.slice());
+  }
+
   function buildInteractiveFrames(spec, preset) {
     const frames = [];
     const cols = spec.columns;
-    const baseRows = spec.baseRows;
+    const baseRows = resolvePresetRows(spec, preset);
     const customNums = Array.isArray(preset.arr) && preset.arr.length >= 2 ? preset.arr : null;
 
     // Frame 0: Initial Table & Schema State
@@ -473,7 +526,7 @@ window.SIMULATORS = window.SIMULATORS || {};
             warn: warnRows,
             tags: { [i]: isWarn ? 'WARN/FILTER' : 'EVAL ✓' }
           }),
-        invariant: `Evaluating tuple [${i}] (${cols[0]}=${row[0]}): ${row.slice(1).map((v, cIdx) => cols[cIdx + 1] + '=' + (v === null ? 'NULL' : v)).join(', ')}.`,
+        invariant: `Evaluating tuple [${i}] (${cols[0]}=${row[0]}) under preset "${preset.label}": ${row.slice(1).map((v, cIdx) => cols[cIdx + 1] + '=' + (v === null ? 'NULL' : v)).join(', ')}.`,
         metrics: [
           { label: 'Cursor Tuple', value: `${i + 1} / ${baseRows.length}` },
           { label: 'Key', value: String(row[0]) },
@@ -512,7 +565,7 @@ window.SIMULATORS = window.SIMULATORS || {};
           warn: finalWarn,
           tags: { [baseRows.length - 1]: 'COMPLETE ✓' }
         }),
-      invariant: `Execution complete: ${finalMatch.length} tuple(s) emitted/verified, ${finalWarn.length} tuple(s) filtered/guarded under ${spec.badge}.`,
+      invariant: `Execution complete (${preset.label}): ${finalMatch.length} tuple(s) emitted/verified, ${finalWarn.length} tuple(s) filtered/guarded under ${spec.badge}.`,
       metrics: [
         { label: 'Total Scanned', value: String(baseRows.length) },
         { label: 'Emitted / Valid', value: String(finalMatch.length) },
@@ -540,6 +593,7 @@ window.SIMULATORS = window.SIMULATORS || {};
       blurb: spec.blurb,
       slugs: spec.slugs,
       presets: spec.presets,
+      customInput: false,
       buildFrames(preset) {
         return buildInteractiveFrames(spec, preset || spec.presets[0]);
       }

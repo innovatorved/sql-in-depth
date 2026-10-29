@@ -3,11 +3,12 @@
  */
 document.addEventListener('DOMContentLoaded', () => {
   const syncThemeIcons = (theme) => {
+    const isDark = theme === 'dark';
     const sun = document.querySelector('#theme-toggle .icon-sun');
     const moon = document.querySelector('#theme-toggle .icon-moon');
     if (sun && moon) {
-      sun.style.display = theme === 'dark' ? 'block' : 'none';
-      moon.style.display = theme === 'dark' ? 'none' : 'block';
+      sun.style.display = isDark ? '' : 'none';
+      moon.style.display = isDark ? 'none' : '';
     }
   };
 

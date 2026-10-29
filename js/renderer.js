@@ -298,7 +298,7 @@ window.Renderer = (() => {
           <div><div class="hero__stat-value" style="color: ${streak > 0 ? '#f97316' : 'inherit'};">${streak} 🔥</div><div class="hero__stat-label">Day Streak</div></div>
         </div>
         <div style="margin-top: 1.25rem; display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
-          <a href="#/glossary" class="btn btn--sm btn--primary">📖 Glossary</a>
+          <a href="/glossary/" class="btn btn--sm btn--primary">📖 Glossary</a>
         </div>
       </div>`;
 
@@ -1056,7 +1056,11 @@ window.Renderer = (() => {
     if (!impls || !impls[buildId]) return '<p>Build not found.</p>';
 
     const build = impls[buildId];
-    const guided = (window.TopicGuidedLabs && typeof window.TopicGuidedLabs.getLab === 'function' && window.TopicGuidedLabs.getLab(buildId)) || window.TOPIC_GUIDED_LABS?.[buildId] || window.GUIDED_LABS_DATA?.[buildId] || null;
+    const primarySlug = build.primarySlug || (Array.isArray(build.relatedSlugs) && build.relatedSlugs[0]) || buildId;
+    const guided = (window.TOPIC_GUIDED_LABS && (window.TOPIC_GUIDED_LABS[buildId] || window.TOPIC_GUIDED_LABS[primarySlug]))
+      || (window.TopicGuidedLabs && typeof window.TopicGuidedLabs.getLab === 'function' ? window.TopicGuidedLabs.getLab(primarySlug, build.title) : null)
+      || (window.GUIDED_LABS_DATA && window.GUIDED_LABS_DATA[buildId])
+      || null;
     const steps = Array.isArray(guided?.steps) ? guided.steps : [];
     const files = orderedBuildFiles(build.files);
     const lessons = [build.primarySlug, ...(build.relatedSlugs || [])].filter(Boolean)
@@ -1614,42 +1618,191 @@ window.Renderer = (() => {
     }
   };
 
-  // Global helpers for audio player
-  window.toggleAudio = function(slug) {
-    const audio = document.getElementById('audio-' + slug);
+  // Global helpers for audio player (with Web Speech API narration fallback when static MP3 is absent)
+  const _audioSynthState = {};
+
+  function _formatAudioTime(secs) {
+    if (isNaN(secs) || !isFinite(secs) || secs < 0) return '0:00';
+    const m = Math.floor(secs / 60);
+    const s = Math.floor(secs % 60);
+    return m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  function _parseDurationSecs(slug) {
+    const timeEl = document.getElementById('audio-time-' + slug);
+    const txt = timeEl ? timeEl.textContent : '';
+    const m = txt.match(/\/\s*(\d+):(\d+)/);
+    if (m) return parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
+    return 180;
+  }
+
+  function _extractLessonSpeechText(slug) {
+    const article = document.querySelector('.lesson-content, article.prose, #main-content');
+    if (article && article.textContent && article.textContent.trim().length > 40) {
+      return article.textContent.replace(/\s+/g, ' ').trim().slice(0, 6000);
+    }
+    return 'SQL In Depth lesson narration for ' + String(slug || '').replace(/-/g, ' ');
+  }
+
+  function _syncAudioPlayerUI(slug, isPlaying) {
+    const player = document.getElementById('audio-player-' + slug);
+    const btn = document.getElementById('audio-btn-' + slug);
     const playIcon = document.getElementById('audio-play-icon-' + slug);
     const pauseIcon = document.getElementById('audio-pause-icon-' + slug);
+    if (player) player.classList.toggle('is-playing', Boolean(isPlaying));
+    if (btn) {
+      btn.setAttribute('aria-label', isPlaying ? 'Pause audio' : 'Play audio');
+      btn.setAttribute('title', isPlaying ? 'Pause audio' : 'Play audio');
+    }
+    if (playIcon) playIcon.style.display = isPlaying ? 'none' : 'block';
+    if (pauseIcon) pauseIcon.style.display = isPlaying ? 'block' : 'none';
+  }
+
+  function _stopSynthAudio(slug, resetProgress) {
+    const st = _audioSynthState[slug];
+    if (!st) return;
+    if (st.timer) {
+      clearInterval(st.timer);
+      st.timer = null;
+    }
+    st.playing = false;
+    try {
+      if (typeof window.speechSynthesis !== 'undefined') {
+        window.speechSynthesis.cancel();
+      }
+    } catch (_) {}
+    if (resetProgress) {
+      st.currentTime = 0;
+      const bar = document.getElementById('audio-bar-' + slug);
+      const timeDisplay = document.getElementById('audio-time-' + slug);
+      if (bar) bar.style.width = '0%';
+      if (timeDisplay) timeDisplay.textContent = '0:00 / ' + _formatAudioTime(st.duration);
+    }
+    _syncAudioPlayerUI(slug, false);
+  }
+
+  function _startSynthFallback(slug) {
+    Object.keys(_audioSynthState).forEach(other => {
+      if (other !== slug && _audioSynthState[other]?.playing) {
+        _stopSynthAudio(other, false);
+      }
+    });
+    let st = _audioSynthState[slug];
+    if (!st) {
+      st = _audioSynthState[slug] = {
+        mode: 'synth',
+        playing: false,
+        currentTime: 0,
+        duration: _parseDurationSecs(slug),
+        playbackRate: 1,
+        timer: null,
+        text: _extractLessonSpeechText(slug)
+      };
+    }
+    st.mode = 'synth';
+    st.playing = true;
+    _syncAudioPlayerUI(slug, true);
+
+    const bar = document.getElementById('audio-bar-' + slug);
+    const timeDisplay = document.getElementById('audio-time-' + slug);
+    if (timeDisplay) {
+      timeDisplay.textContent = _formatAudioTime(st.currentTime) + ' / ' + _formatAudioTime(st.duration);
+    }
+
+    try {
+      if (typeof window.speechSynthesis !== 'undefined' && typeof window.SpeechSynthesisUtterance === 'function') {
+        window.speechSynthesis.cancel();
+        const utter = new window.SpeechSynthesisUtterance(st.text);
+        utter.rate = st.playbackRate || 1;
+        utter.onend = () => {
+          if (_audioSynthState[slug]?.playing) {
+            _stopSynthAudio(slug, true);
+          }
+        };
+        window.speechSynthesis.speak(utter);
+      }
+    } catch (_) {}
+
+    if (st.timer) clearInterval(st.timer);
+    st.timer = setInterval(() => {
+      if (!st.playing) return;
+      st.currentTime = Math.min(st.duration, st.currentTime + 0.25 * (st.playbackRate || 1));
+      const pct = st.duration > 0 ? Math.min(100, (st.currentTime / st.duration) * 100) : 0;
+      if (bar) bar.style.width = pct + '%';
+      if (timeDisplay) {
+        timeDisplay.textContent = _formatAudioTime(st.currentTime) + ' / ' + _formatAudioTime(st.duration);
+      }
+      if (st.currentTime >= st.duration) {
+        _stopSynthAudio(slug, true);
+      }
+    }, 250);
+  }
+
+  window.toggleAudio = function(slug) {
+    const audio = document.getElementById('audio-' + slug);
     if (!audio) return;
 
+    const st = _audioSynthState[slug];
+    if (st && st.mode === 'synth') {
+      if (st.playing) {
+        if (st.timer) { clearInterval(st.timer); st.timer = null; }
+        st.playing = false;
+        try {
+          if (typeof window.speechSynthesis !== 'undefined') window.speechSynthesis.pause();
+        } catch (_) {}
+        _syncAudioPlayerUI(slug, false);
+        if (window.Analytics?.trackAudioPause) {
+          window.Analytics.trackAudioPause(slug, st.currentTime, st.duration);
+        }
+      } else {
+        _startSynthFallback(slug);
+        if (window.Analytics?.trackAudioPlay) {
+          window.Analytics.trackAudioPlay(slug, st.currentTime);
+        }
+      }
+      return;
+    }
+
     if (audio.paused) {
-      // Pause all other audio players
+      // Pause all other audio players & synth states
+      Object.keys(_audioSynthState).forEach(other => {
+        if (other !== slug && _audioSynthState[other]?.playing) {
+          _stopSynthAudio(other, false);
+        }
+      });
       document.querySelectorAll('audio').forEach(a => {
         if (a !== audio && !a.paused) {
           a.pause();
           const otherSlug = a.id.replace('audio-', '');
-          const otherPlay = document.getElementById('audio-play-icon-' + otherSlug);
-          const otherPause = document.getElementById('audio-pause-icon-' + otherSlug);
-          if (otherPlay) otherPlay.style.display = 'block';
-          if (otherPause) otherPause.style.display = 'none';
+          _syncAudioPlayerUI(otherSlug, false);
         }
       });
       window.setupAudioListeners(slug);
       if (!audio.getAttribute('src') && audio.dataset && audio.dataset.src) {
         audio.src = audio.dataset.src;
       }
-      audio.play().then(() => {
-        if (playIcon) playIcon.style.display = 'none';
-        if (pauseIcon) pauseIcon.style.display = 'block';
-        if (window.Analytics?.trackAudioPlay) {
-          window.Analytics.trackAudioPlay(slug, audio.currentTime);
-        }
-      }).catch(err => {
-        console.warn('Audio playback error:', err);
-      });
+      let playPromise;
+      try {
+        playPromise = audio.play();
+      } catch (err) {
+        _startSynthFallback(slug);
+        return;
+      }
+      if (playPromise && typeof playPromise.then === 'function') {
+        playPromise.then(() => {
+          _syncAudioPlayerUI(slug, true);
+          if (window.Analytics?.trackAudioPlay) {
+            window.Analytics.trackAudioPlay(slug, audio.currentTime);
+          }
+        }).catch(() => {
+          _startSynthFallback(slug);
+        });
+      } else {
+        _startSynthFallback(slug);
+      }
     } else {
       audio.pause();
-      if (playIcon) playIcon.style.display = 'block';
-      if (pauseIcon) pauseIcon.style.display = 'none';
+      _syncAudioPlayerUI(slug, false);
       if (window.Analytics?.trackAudioPause) {
         window.Analytics.trackAudioPause(slug, audio.currentTime, audio.duration);
       }
@@ -1659,11 +1812,24 @@ window.Renderer = (() => {
   window.seekAudio = function(slug, event) {
     const audio = document.getElementById('audio-' + slug);
     const track = document.getElementById('audio-track-' + slug);
-    if (!audio || !track || !audio.duration) return;
+    if (!track) return;
 
     const rect = track.getBoundingClientRect();
-    const clickX = Math.max(0, Math.min(event.clientX - rect.left, rect.width));
-    const percent = clickX / rect.width;
+    const width = rect.width || 100;
+    const clickX = Math.max(0, Math.min((event?.clientX ?? 0) - rect.left, width));
+    const percent = clickX / width;
+
+    const st = _audioSynthState[slug];
+    if (st && st.mode === 'synth') {
+      st.currentTime = percent * st.duration;
+      const bar = document.getElementById('audio-bar-' + slug);
+      const timeDisplay = document.getElementById('audio-time-' + slug);
+      if (bar) bar.style.width = (percent * 100) + '%';
+      if (timeDisplay) timeDisplay.textContent = _formatAudioTime(st.currentTime) + ' / ' + _formatAudioTime(st.duration);
+      return;
+    }
+
+    if (!audio || !audio.duration) return;
     audio.currentTime = percent * audio.duration;
     if (window.Analytics?.trackAudioSeek) {
       window.Analytics.trackAudioSeek(slug, audio.currentTime);
@@ -1676,11 +1842,13 @@ window.Renderer = (() => {
     if (!audio || !btn) return;
 
     const speeds = [1, 1.25, 1.5, 1.75, 2, 0.75];
-    const currentSpeed = audio.playbackRate || 1;
+    const st = _audioSynthState[slug];
+    const currentSpeed = (st && st.mode === 'synth') ? (st.playbackRate || 1) : (audio.playbackRate || 1);
     const nextIndex = (speeds.indexOf(currentSpeed) + 1) % speeds.length;
     const newSpeed = speeds[nextIndex];
 
     audio.playbackRate = newSpeed;
+    if (st) st.playbackRate = newSpeed;
     btn.textContent = newSpeed + 'x';
     if (window.Analytics?.trackAudioSpeedChange) {
       window.Analytics.trackAudioSpeedChange(slug, newSpeed);
@@ -1694,23 +1862,14 @@ window.Renderer = (() => {
 
     const bar = document.getElementById('audio-bar-' + slug);
     const timeDisplay = document.getElementById('audio-time-' + slug);
-    const playIcon = document.getElementById('audio-play-icon-' + slug);
-    const pauseIcon = document.getElementById('audio-pause-icon-' + slug);
-
-    function formatTime(secs) {
-      if (isNaN(secs) || !isFinite(secs)) return '0:00';
-      const m = Math.floor(secs / 60);
-      const s = Math.floor(secs % 60);
-      return m + ':' + (s < 10 ? '0' : '') + s;
-    }
 
     if (audio.duration && isFinite(audio.duration) && timeDisplay) {
-      timeDisplay.textContent = formatTime(audio.currentTime) + ' / ' + formatTime(audio.duration);
+      timeDisplay.textContent = _formatAudioTime(audio.currentTime) + ' / ' + _formatAudioTime(audio.duration);
     }
 
     audio.addEventListener('loadedmetadata', () => {
       if (timeDisplay && audio.duration && isFinite(audio.duration)) {
-        timeDisplay.textContent = formatTime(audio.currentTime) + ' / ' + formatTime(audio.duration);
+        timeDisplay.textContent = _formatAudioTime(audio.currentTime) + ' / ' + _formatAudioTime(audio.duration);
       }
     });
 
@@ -1719,16 +1878,21 @@ window.Renderer = (() => {
       const pct = (audio.currentTime / audio.duration) * 100;
       if (bar) bar.style.width = pct + '%';
       if (timeDisplay) {
-        timeDisplay.textContent = formatTime(audio.currentTime) + ' / ' + formatTime(audio.duration);
+        timeDisplay.textContent = _formatAudioTime(audio.currentTime) + ' / ' + _formatAudioTime(audio.duration);
+      }
+    });
+
+    audio.addEventListener('error', () => {
+      if (!_audioSynthState[slug]?.playing) {
+        _startSynthFallback(slug);
       }
     });
 
     audio.addEventListener('ended', () => {
-      if (playIcon) playIcon.style.display = 'block';
-      if (pauseIcon) pauseIcon.style.display = 'none';
+      _syncAudioPlayerUI(slug, false);
       if (bar) bar.style.width = '0%';
       if (timeDisplay) {
-        timeDisplay.textContent = '0:00 / ' + formatTime(audio.duration);
+        timeDisplay.textContent = '0:00 / ' + _formatAudioTime(audio.duration);
       }
       if (window.Analytics?.trackAudioComplete) {
         window.Analytics.trackAudioComplete(slug, audio.duration);
@@ -1889,7 +2053,7 @@ window.Renderer = (() => {
             <strong style="font-size:15px; color:var(--fg);">${escapeHtml(item.term)}${compText}</strong>
             <span class="badge badge--secondary" style="font-size:11px;">${escapeHtml(catText)}</span>
           </div>
-          <p style="margin:0.25rem 0 0; font-size:13px; color:var(--fg-muted); line-height:1.5;">${escapeHtml(defText)}</p>
+          <p style="margin:0.25rem 0 0; font-size:13px; color:var(--fg-muted); line-height:1.5;">${renderMathInHtml(formatInlineCode(defText))}</p>
         </div>
       `;
     }

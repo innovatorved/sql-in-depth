@@ -284,6 +284,7 @@ window.Simulators = (() => {
   function lifecycle() {
     const offs = [];
     const timers = new Set();
+    const timeouts = new Set();
     return {
       on(el, ev, fn) {
         if (!el) return;
@@ -295,14 +296,33 @@ window.Simulators = (() => {
         timers.add(t);
         return t;
       },
+      after(ms, fn) {
+        const t = setTimeout(() => {
+          timeouts.delete(t);
+          fn();
+        }, ms);
+        timeouts.add(t);
+        return t;
+      },
       stop(t) {
-        clearInterval(t);
-        timers.delete(t);
+        if (t !== undefined) {
+          clearInterval(t);
+          clearTimeout(t);
+          timers.delete(t);
+          timeouts.delete(t);
+        } else {
+          timers.forEach(id => clearInterval(id));
+          timers.clear();
+          timeouts.forEach(id => clearTimeout(id));
+          timeouts.clear();
+        }
       },
       dispose() {
         offs.splice(0).forEach(f => f());
         timers.forEach(t => clearInterval(t));
         timers.clear();
+        timeouts.forEach(t => clearTimeout(t));
+        timeouts.clear();
         sound.stopSpeech();
       }
     };
@@ -1232,7 +1252,7 @@ window.Simulators = (() => {
               </span>
             </div>
 
-            <div class="dsa-sim__custom-bar">
+            ${config.customInput === false ? '' : `<div class="dsa-sim__custom-bar">
               <span class="dsa-sim__custom-label">Custom Input:</span>
               <input
                 type="text"
@@ -1248,7 +1268,7 @@ window.Simulators = (() => {
               <button type="button" class="btn btn--secondary btn--sm" data-role="randomize" title="Generate random input values and run">
                 🎲 Randomize
               </button>
-            </div>
+            </div>`}
 
             <div class="dsa-sim__scrubber-row">
               <span style="font-size:11px;font-family:var(--font-mono,monospace);color:var(--fg-muted);">Timeline</span>

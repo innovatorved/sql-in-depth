@@ -31,7 +31,7 @@
 
   <!-- Stylesheets -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
-  <link rel="stylesheet" href="css/variables.css?v=b68ab27ba0">
+  <link rel="stylesheet" href="css/variables.css?v=fbe5a4fed0">
   <link rel="stylesheet" href="css/layout.css?v=a384f455dc">
   <link rel="stylesheet" href="css/components.css?v=6a661d5122">
   <link rel="stylesheet" href="css/content.css?v=178f3a2481">
@@ -40,7 +40,7 @@
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=59c953e95f"></script>
-  <script src="js/manifest.js?v=02cf7c8a30"></script>
+  <script src="js/manifest.js?v=f1c3a4b804"></script>
 
   <script type="application/ld+json">
 {
@@ -118,6 +118,8 @@
   <aside class="sidebar" id="sidebar" aria-label="Course navigation">
     <nav class="sidebar__tabs" role="tablist">
       <button class="sidebar__tab active" data-tab="curriculum" role="tab" aria-selected="true">Curriculum</button>
+      <button type="button" id="sidebar-collapse-modules-btn" title="Collapse all modules" aria-label="Collapse all modules" style="margin-left:auto;padding:6px 8px;font-size:11px;font-weight:500;color:var(--fg-muted);background:none;border:none;cursor:pointer;"><span id="sidebar-collapse-modules-label">Collapse</span></button>
+      <button type="button" id="sidebar-collapse-btn" title="Collapse sidebar" aria-label="Collapse sidebar" aria-expanded="true" style="padding:6px 6px;font-size:11px;color:var(--fg-muted);background:none;border:none;cursor:pointer;">⟨</button>
     </nav>
     <div class="sidebar__content" id="sidebar-content">
 <div style="padding:4px 16px 4px;font-size:11px;font-weight:600;color:var(--fg-faint);text-transform:uppercase;letter-spacing:0.05em;">Relational Foundations &amp; Core Querying</div><div class="module-group" data-module="m01">
@@ -1071,23 +1073,7 @@ flowchart LR
               </span>
             </div>
 
-            <div class="dsa-sim__custom-bar">
-              <span class="dsa-sim__custom-label">Custom Input:</span>
-              <input
-                type="text"
-                class="simulator-card__input dsa-sim__custom-input"
-                data-role="custom-input"
-                value="38, 27, 43, 3, 9, 82, 10, 19"
-                placeholder="e.g. 38, 27, 43, 3, 9, 82, 10 or target=42 | 10, 20, 42, 50"
-                aria-label="Custom simulator input values"
-              />
-              <button type="button" class="btn btn--primary btn--sm" data-role="apply-custom" title="Run simulator with your custom values">
-                ▶ Run Custom
-              </button>
-              <button type="button" class="btn btn--secondary btn--sm" data-role="randomize" title="Generate random input values and run">
-                🎲 Randomize
-              </button>
-            </div>
+            
 
             <div class="dsa-sim__scrubber-row">
               <span style="font-size:11px;font-family:var(--font-mono,monospace);color:var(--fg-muted);">Timeline</span>
@@ -1767,11 +1753,11 @@ ORDER BY d.name ASC, dept_salary_rank ASC, e.emp_id ASC;</code></pre>
   <script type="text/plain" data-defer src="data/curriculum.js?v=4f53b5646e"></script>
   <script type="text/plain" data-defer src="data/datasets.js?v=259e5934af"></script>
   <script type="text/plain" data-defer src="data/roadmap.js?v=584992226a"></script>
-  <script type="text/plain" data-defer src="data/challenges.js?v=afec18fcf4"></script>
+  <script type="text/plain" data-defer src="data/challenges.js?v=784587e93a"></script>
   <script type="text/plain" data-defer src="data/srs-cards.js?v=fabc47dd9c"></script>
   <script type="text/plain" data-defer src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
   <script type="text/plain" data-defer src="data/implementations_code.js?v=fce884f8a8"></script>
-  <script type="text/plain" data-defer src="data/topic_guided_labs.js?v=2a57d85494"></script>
+  <script type="text/plain" data-defer src="data/topic_guided_labs.js?v=53e3e65695"></script>
   <script type="text/plain" data-defer src="data/projects.js?v=2280ac085f"></script>
   <script type="text/plain" data-defer src="data/glossary.js?v=4f6c79a4e0"></script>
 
@@ -1779,31 +1765,31 @@ ORDER BY d.name ASC, dept_salary_rank ASC, e.emp_id ASC;</code></pre>
   <script type="text/plain" data-defer src="js/lazy.js?v=7275ff46e4"></script>
   <script type="text/plain" data-defer src="js/analytics.js?v=4bfe019329"></script>
   <script type="text/plain" data-defer src="js/progress.js?v=20e4822556"></script>
-  <script type="text/plain" data-defer src="js/search.js?v=e2063e0ccd"></script>
+  <script type="text/plain" data-defer src="js/search.js?v=e12e67ca89"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
   <script type="text/plain" data-defer src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>
   <script type="text/plain" data-defer src="js/sql-engine.js?v=60d0c505ad"></script>
-  <script type="text/plain" data-defer src="js/table-visualizer.js?v=1f1a1f2968"></script>
-  <script type="text/plain" data-defer src="js/simulators.js?v=68b973e4c8"></script>
-  <script type="text/plain" data-defer src="js/simulators-relational.js?v=8e12b97831"></script>
-  <script type="text/plain" data-defer src="js/simulators-analytical.js?v=258089d8ac"></script>
-  <script type="text/plain" data-defer src="js/simulators-modeling.js?v=879389be96"></script>
-  <script type="text/plain" data-defer src="js/simulators-indexing.js?v=53c97b0c73"></script>
-  <script type="text/plain" data-defer src="js/simulators-transactions.js?v=677d3befc9"></script>
-  <script type="text/plain" data-defer src="js/simulators-olap-ops.js?v=c793d19e01"></script>
-  <script type="text/plain" data-defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-  <script type="text/plain" data-defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
-  <script type="text/plain" data-defer src="js/renderer.js?v=4a1d611d31"></script>
-  <script type="text/plain" data-defer src="js/landing.js?v=e3f781ab53"></script>
+  <script type="text/plain" data-defer src="js/table-visualizer.js?v=45f8d4021a"></script>
+  <script type="text/plain" data-defer src="js/simulators.js?v=2b7aaefb27"></script>
+  <script type="text/plain" data-defer src="js/simulators-relational.js?v=32c1358d02"></script>
+  <script type="text/plain" data-defer src="js/simulators-analytical.js?v=50d950f3b6"></script>
+  <script type="text/plain" data-defer src="js/simulators-modeling.js?v=1962947dcb"></script>
+  <script type="text/plain" data-defer src="js/simulators-indexing.js?v=ad1fbfd866"></script>
+  <script type="text/plain" data-defer src="js/simulators-transactions.js?v=b7f1c4e891"></script>
+  <script type="text/plain" data-defer src="js/simulators-olap-ops.js?v=11bb8afed3"></script>
+  <script type="text/plain" data-defer src="js/vendor/katex/katex.min.js?v=6d481709e3"></script>
+  <script type="text/plain" data-defer src="js/vendor/katex/auto-render.min.js?v=82dca94048"></script>
+  <script type="text/plain" data-defer src="js/renderer.js?v=7baaf716cc"></script>
+  <script type="text/plain" data-defer src="js/landing.js?v=8b7ad0bc41"></script>
   
   <script type="text/plain" data-defer src="js/quiz.js?v=5b300d9b3d"></script>
   <script type="text/plain" data-defer src="js/roadmap.js?v=cebfb7e32c"></script>
-  <script type="text/plain" data-defer src="js/challenges.js?v=fcc5b1b6c5"></script>
+  <script type="text/plain" data-defer src="js/challenges.js?v=b7d29d3d83"></script>
   <script type="text/plain" data-defer src="js/dashboard.js?v=d411d5a9bb"></script>
-  <script type="text/plain" data-defer src="js/sandbox.js?v=5528739eb9"></script>
-  <script type="text/plain" data-defer src="js/topic-codelab.js?v=096611d91c"></script>
+  <script type="text/plain" data-defer src="js/sandbox.js?v=e1c9a53b11"></script>
+  <script type="text/plain" data-defer src="js/topic-codelab.js?v=49fccccd99"></script>
   
-  <script type="text/plain" data-defer src="js/app.js?v=79ca5d1666"></script>
+  <script type="text/plain" data-defer src="js/app.js?v=efff1f861a"></script>
 
   <!-- App bootstrap & deferred script loader -->
   <script src="js/bootstrap.js?v=df2bb60aeb"></script>

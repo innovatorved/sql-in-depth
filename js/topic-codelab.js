@@ -1,5 +1,5 @@
 /**
- * Topic Guided CodeLab Controller — DSA In Depth
+ * Topic Guided CodeLab Controller — SQL In Depth
  * Connects topic guided lab cards to @innovatorved/code-lab@0.3.1 workbench.
  */
 (function () {

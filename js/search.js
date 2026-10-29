@@ -247,7 +247,7 @@ window.Search = (() => {
     });
   }
 
-  function open() {
+  function open(initialQuery) {
     const modal = document.getElementById('search-modal');
     const input = document.getElementById('search-input');
     if (!modal || !input) return;
@@ -255,9 +255,10 @@ window.Search = (() => {
     isOpen = true;
     focusedIdx = -1;
     modal.classList.add('open');
-    input.value = '';
+    const queryStr = (typeof initialQuery === 'string' && initialQuery.trim()) ? initialQuery.trim() : '';
+    input.value = queryStr;
     input.focus();
-    renderResults(search(''), '');
+    renderResults(search(queryStr), queryStr);
 
     if (window.loadScript) {
       const lazyData = [];
@@ -346,7 +347,7 @@ window.Search = (() => {
 
     // Search trigger
     const trigger = document.getElementById('search-trigger');
-    if (trigger) trigger.addEventListener('click', open);
+    if (trigger) trigger.addEventListener('click', () => open());
 
     // Backdrop close
     const backdrop = document.getElementById('search-backdrop');
@@ -385,6 +386,14 @@ window.Search = (() => {
       }
       handleKeyDown(e);
     });
+
+    // Auto-open search modal when navigated with ?q=<query> (e.g. from 404.html search box)
+    try {
+      const qParam = new URLSearchParams(window.location.search).get('q');
+      if (qParam && qParam.trim()) {
+        open(qParam.trim());
+      }
+    } catch {}
   }
 
   function isInputFocused() {
@@ -392,5 +401,5 @@ window.Search = (() => {
     return el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable);
   }
 
-  return { init, open, close, search, buildIndex };
+  return { init, open, openWithQuery: open, close, search, buildIndex };
 })();

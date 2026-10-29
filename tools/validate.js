@@ -632,7 +632,7 @@ if (fs.existsSync(buildBaseDir)) {
 if (fs.existsSync(sitemapFile)) {
   const sitemapContent = fs.readFileSync(sitemapFile, 'utf8');
   let missingSitemapUrls = 0;
-  const hubPaths = ['/roadmap/', '/challenges/', '/sandbox/', '/dashboard/', '/projects/'];
+  const hubPaths = ['/roadmap/', '/challenges/', '/sandbox/', '/dashboard/', '/projects/', '/glossary/'];
   for (const hub of hubPaths) {
     const expectedLoc = `<loc>https://sql-in-depth.vedgupta.in${hub}</loc>`;
     if (!sitemapContent.includes(expectedLoc)) {

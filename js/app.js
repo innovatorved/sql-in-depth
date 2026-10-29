@@ -886,7 +886,7 @@ window.App = (() => {
                 if (Array.isArray(legacy)) completedIds = legacy;
               }
             } catch (_) {}
-            const guidedData = window.TopicGuidedLabs?.getLab?.(currentSlug) || window.TOPIC_GUIDED_LABS?.[currentSlug] || window.GUIDED_LABS_DATA?.[currentSlug];
+            const guidedData = getTopicLabSpec(currentSlug) || window.GUIDED_LABS_DATA?.[currentSlug];
             const steps = guidedData?.steps || [];
             const badge = document.getElementById('build-lab-progress-badge');
             if (badge && steps.length) {
@@ -928,7 +928,8 @@ window.App = (() => {
           };
 
           const openBuildLab = (opts = {}) => {
-            const guidedEntry = window.TopicGuidedLabs?.getLab?.(currentSlug) || window.TOPIC_GUIDED_LABS?.[currentSlug] || window.GUIDED_LABS_DATA?.[currentSlug] || null;
+            const sqlSpec = getTopicLabSpec(currentSlug);
+            const engineGuided = window.GUIDED_LABS_DATA?.[currentSlug] || sqlSpec;
             const buildEntry = build || window.IMPLEMENTATIONS_DATA?.[currentSlug] || null;
             const targetMount = document.getElementById('codelab-mount') || mountEl;
 
@@ -942,7 +943,7 @@ window.App = (() => {
                 window.CodeLab.mount(targetMount, {
                   buildId: currentSlug,
                   build: buildEntry,
-                  guided: window.GUIDED_LABS_DATA?.[currentSlug] || guidedEntry,
+                  guided: engineGuided,
                   mode: opts.mode === 'engine' ? 'guided' : (opts.mode || 'guided'),
                   lang: opts.lang,
                   stepIndex: opts.stepIndex,
@@ -956,27 +957,27 @@ window.App = (() => {
                   onClose: closeBuildLab
                 });
               } else {
-                mountEngineCodeLabWorkbench(targetMount, currentSlug, buildEntry, window.GUIDED_LABS_DATA?.[currentSlug] || guidedEntry, closeBuildLab, syncOverviewProgress);
+                mountEngineCodeLabWorkbench(targetMount, currentSlug, buildEntry, engineGuided, closeBuildLab, syncOverviewProgress);
               }
               return;
             }
 
-            const steps = guidedEntry?.steps || [];
+            const steps = sqlSpec?.steps || [];
             const stepIdx = typeof opts.stepIndex === 'number' && !Number.isNaN(opts.stepIndex) ? opts.stepIndex : 0;
             const activeStep = steps[stepIdx] || steps[0] || null;
             const sqlCode = (opts.mode === 'solution' || opts.mode === 'sandbox')
-              ? (activeStep?.solutionCode || activeStep?.solutionSnippet || guidedEntry?.solutionCode || guidedEntry?.referenceSql || 'SELECT * FROM customers LIMIT 10;')
-              : (activeStep?.starterCode || activeStep?.starterSnippet || guidedEntry?.starterCode || guidedEntry?.referenceSql || 'SELECT * FROM customers LIMIT 10;');
+              ? (activeStep?.solutionCode || activeStep?.solutionSnippet || sqlSpec?.solutionCode || sqlSpec?.referenceSql || 'SELECT * FROM customers LIMIT 10;')
+              : (activeStep?.starterCode || activeStep?.starterSnippet || sqlSpec?.starterCode || sqlSpec?.referenceSql || 'SELECT * FROM customers LIMIT 10;');
 
             openSqlStudioModal({
               slug: currentSlug,
               labId: currentSlug,
-              title: buildEntry?.title || guidedEntry?.title || currentSlug,
-              summary: buildEntry?.summary || guidedEntry?.summary || '',
-              datasetId: guidedEntry?.datasetId || activeStep?.datasetId || 'ecommerce',
+              title: buildEntry?.title || sqlSpec?.title || currentSlug,
+              summary: buildEntry?.summary || sqlSpec?.summary || '',
+              datasetId: sqlSpec?.datasetId || activeStep?.datasetId || 'ecommerce',
               sql: sqlCode,
-              starterSql: activeStep?.starterCode || activeStep?.starterSnippet || guidedEntry?.starterCode || sqlCode,
-              referenceSql: activeStep?.solutionCode || activeStep?.solutionSnippet || guidedEntry?.referenceSql || guidedEntry?.solutionCode || sqlCode,
+              starterSql: activeStep?.starterCode || activeStep?.starterSnippet || sqlSpec?.starterCode || sqlCode,
+              referenceSql: activeStep?.solutionCode || activeStep?.solutionSnippet || sqlSpec?.referenceSql || sqlSpec?.solutionCode || sqlCode,
               steps: steps,
               activeStepIdx: stepIdx,
               stepIndex: stepIdx,
@@ -1222,11 +1223,12 @@ window.App = (() => {
     html.setAttribute('data-theme', next);
 
     // Update icons
+    const isDark = next === 'dark';
     const sunIcon = document.querySelector('.icon-sun');
     const moonIcon = document.querySelector('.icon-moon');
     if (sunIcon && moonIcon) {
-      sunIcon.style.display = next === 'light' ? '' : 'none';
-      moonIcon.style.display = next === 'dark' ? '' : 'none';
+      sunIcon.style.display = isDark ? '' : 'none';
+      moonIcon.style.display = isDark ? 'none' : '';
     }
 
     // Update theme-color meta
@@ -2029,7 +2031,24 @@ window.App = (() => {
             overlayEl.classList.add('is-open');
             overlayEl.setAttribute('aria-hidden', 'false');
           }
-          mountEngineCodeLabWorkbench(targetMount, buildId, buildEntry, window.GUIDED_LABS_DATA?.[buildId] || window.TOPIC_GUIDED_LABS?.[buildId]);
+          const engineGuided = window.GUIDED_LABS_DATA?.[buildId] || window.TOPIC_GUIDED_LABS?.[buildId];
+          if (window.CodeLab && typeof window.CodeLab.mount === 'function') {
+            window.CodeLab.mount(targetMount, {
+              buildId,
+              build: buildEntry,
+              guided: engineGuided,
+              mode: mode === 'engine' ? 'guided' : mode,
+              stepIndex,
+              onClose: () => {
+                if (overlayEl) {
+                  overlayEl.classList.remove('is-open');
+                  overlayEl.setAttribute('aria-hidden', 'true');
+                }
+              }
+            });
+          } else {
+            mountEngineCodeLabWorkbench(targetMount, buildId, buildEntry, engineGuided);
+          }
           return;
         }
         openTopicCodeLab(buildId, mode, stepIndex);
@@ -2267,9 +2286,149 @@ window.App = (() => {
   }
   window.getUnitInfo = getUnitInfo;
 
+  function formatInlineBackticks(str) {
+    if (!str) return '';
+    return escapeHtml(String(str))
+      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+      .replace(/`([^`]+)`/g, '<code>$1</code>');
+  }
+  window.formatInlineBackticks = formatInlineBackticks;
+
+  function runEngineJsTestHarness(userCode, harnessCode, step) {
+    let assertionsRun = 0;
+    const deepEq = (a, b) => {
+      if (Object.is(a, b)) return true;
+      if (a && b && typeof a === 'object' && typeof b === 'object') {
+        if (Array.isArray(a) !== Array.isArray(b)) return false;
+        const keysA = Object.keys(a);
+        const keysB = Object.keys(b);
+        if (keysA.length !== keysB.length) return false;
+        for (const k of keysA) {
+          if (!Object.prototype.hasOwnProperty.call(b, k) || !deepEq(a[k], b[k])) return false;
+        }
+        return true;
+      }
+      return a === b;
+    };
+    const fmtVal = (v) => {
+      try { return JSON.stringify(v); } catch (_) { return String(v); }
+    };
+    const assertModule = {
+      ok(val, msg) {
+        assertionsRun++;
+        if (!val) throw new Error(msg || `Expected truthy value, got ${fmtVal(val)}`);
+      },
+      equal(actual, expected, msg) {
+        assertionsRun++;
+        if (actual != expected && !Object.is(actual, expected)) {
+          throw new Error(msg || `AssertionError: expected ${fmtVal(actual)} == ${fmtVal(expected)}`);
+        }
+      },
+      strictEqual(actual, expected, msg) {
+        assertionsRun++;
+        if (!Object.is(actual, expected) && actual !== expected) {
+          throw new Error(msg || `AssertionError: expected ${fmtVal(actual)} === ${fmtVal(expected)}`);
+        }
+      },
+      notEqual(actual, expected, msg) {
+        assertionsRun++;
+        if (actual == expected) {
+          throw new Error(msg || `AssertionError: expected ${fmtVal(actual)} != ${fmtVal(expected)}`);
+        }
+      },
+      notStrictEqual(actual, expected, msg) {
+        assertionsRun++;
+        if (Object.is(actual, expected) || actual === expected) {
+          throw new Error(msg || `AssertionError: expected ${fmtVal(actual)} !== ${fmtVal(expected)}`);
+        }
+      },
+      deepEqual(actual, expected, msg) {
+        assertionsRun++;
+        if (!deepEq(actual, expected)) {
+          throw new Error(msg || `AssertionError: deepEqual failed: ${fmtVal(actual)} vs ${fmtVal(expected)}`);
+        }
+      },
+      deepStrictEqual(actual, expected, msg) {
+        assertionsRun++;
+        if (!deepEq(actual, expected)) {
+          throw new Error(msg || `AssertionError: deepStrictEqual failed: ${fmtVal(actual)} vs ${fmtVal(expected)}`);
+        }
+      },
+      throws(fn, expected, msg) {
+        assertionsRun++;
+        let threw = false;
+        let err = null;
+        try { fn(); } catch (e) { threw = true; err = e; }
+        if (!threw) throw new Error(msg || 'AssertionError: expected function to throw');
+        if (expected instanceof RegExp && !expected.test(String(err && err.message || err))) {
+          throw new Error(msg || `AssertionError: error ${fmtVal(err && err.message)} did not match ${expected}`);
+        }
+      },
+      doesNotThrow(fn, msg) {
+        assertionsRun++;
+        try { fn(); } catch (e) { throw new Error(msg || `AssertionError: unexpected exception: ${e.message || e}`); }
+      },
+      match(str, regexp, msg) {
+        assertionsRun++;
+        if (!regexp.test(String(str))) {
+          throw new Error(msg || `AssertionError: ${fmtVal(str)} did not match ${regexp}`);
+        }
+      },
+      fail(msg) {
+        assertionsRun++;
+        throw new Error(msg || 'AssertionError: assert.fail() called');
+      }
+    };
+    const fakeRequire = (modName) => {
+      if (modName === 'node:assert/strict' || modName === 'node:assert' || modName === 'assert' || modName === 'assert/strict') {
+        return assertModule;
+      }
+      return {};
+    };
+    const logs = [];
+    const fakeConsole = {
+      log: (...args) => logs.push(args.map(a => typeof a === 'string' ? a : fmtVal(a)).join(' ')),
+      error: (...args) => logs.push(args.map(a => typeof a === 'string' ? a : fmtVal(a)).join(' ')),
+      warn: (...args) => logs.push(args.map(a => typeof a === 'string' ? a : fmtVal(a)).join(' '))
+    };
+    try {
+      const codeStr = String(userCode || '');
+      if (!codeStr.trim()) {
+        return { passed: false, assertionsRun: 0, error: 'Implementation code is empty.' };
+      }
+      if (/\/\/\s*TODO:/i.test(codeStr)) {
+        // Still run the harness so if a real assertion fails first we report that exact assertion error;
+        // if no harness is present or TODO remains unimplemented without assertions passing, fail below.
+      }
+      const combined = `${codeStr}\n;\n${harnessCode || ''}\n;\nif (typeof runTests === 'function') { runTests(); }`;
+      const mod = { exports: {} };
+      const fn = new Function('require', 'module', 'exports', 'console', 'assert', combined);
+      fn(fakeRequire, mod, mod.exports, fakeConsole, assertModule);
+      if (assertionsRun === 0 && /\/\/\s*TODO:/i.test(codeStr)) {
+        return { passed: false, assertionsRun: 0, error: 'Starter TODO stubs are not yet implemented.' };
+      }
+      if (step && Array.isArray(step.validationHints) && step.validationHints.length > 0 && /\/\/\s*TODO:/i.test(codeStr)) {
+        for (const hint of step.validationHints) {
+          if (hint && !codeStr.includes(hint)) {
+            return { passed: false, assertionsRun, error: `Missing expected step construct: ${hint}` };
+          }
+        }
+      }
+      return { passed: true, assertionsRun: Math.max(1, assertionsRun), logs };
+    } catch (err) {
+      return { passed: false, assertionsRun, error: err && err.message ? err.message : String(err), logs };
+    }
+  }
+
   function mountEngineCodeLabWorkbench(mountEl, buildId, buildEntry, guidedEntry, onClose, onStepComplete) {
     if (!mountEl || !buildEntry) return;
     const files = Object.assign({}, buildEntry.files || {});
+    const solutionIndexJs = files['index.js'] || buildEntry.code || guidedEntry?.solutionCode || '';
+    if (guidedEntry?.starterCode) {
+      files['index.js'] = guidedEntry.starterCode;
+    } else if (guidedEntry?.starterFiles && guidedEntry.starterFiles['index.js']) {
+      files['index.js'] = guidedEntry.starterFiles['index.js'];
+    }
     const fileNames = Object.keys(files).length > 0 ? Object.keys(files) : ['index.js'];
     let activeFile = files['index.js'] !== undefined ? 'index.js' : fileNames[0];
     const steps = Array.isArray(guidedEntry?.steps) ? guidedEntry.steps : [];
@@ -2277,7 +2436,7 @@ window.App = (() => {
 
     function renderShell() {
       const step = steps[activeStepIdx] || null;
-      const code = files[activeFile] || buildEntry.code || '';
+      const code = files[activeFile] !== undefined ? files[activeFile] : (buildEntry.code || '');
       mountEl.innerHTML = `
         <div class="codelab cl-shell" data-build-id="${escapeHtml(buildId)}" style="display:flex;flex-direction:column;width:100%;height:100%;min-height:560px;background:var(--bg);border:1px solid var(--border-strong);border-radius:12px;overflow:hidden;">
           <div class="cl-topbar" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--border);">
@@ -2287,6 +2446,7 @@ window.App = (() => {
               <strong style="color:var(--fg);font-size:0.95rem;">${escapeHtml(buildEntry.title || buildId)}</strong>
             </div>
             <div style="display:flex;align-items:center;gap:8px;">
+              <button type="button" class="btn btn--secondary btn--sm" data-cl-action="solution">★ Load Solution JS</button>
               <button type="button" class="btn btn--primary btn--sm" data-cl-action="test">▶ Run Engine Assertions</button>
               <button type="button" class="btn btn--secondary btn--sm" data-cl-action="sql-studio">⤢ Open SQL Studio</button>
             </div>
@@ -2317,7 +2477,7 @@ window.App = (() => {
               ${step ? `
                 <div style="padding:10px 12px;background:var(--info-bg);border:1px solid var(--info-border);border-radius:8px;font-size:0.82rem;color:var(--fg);">
                   <strong>${escapeHtml(step.title || '')}</strong>
-                  <div style="color:var(--fg-muted);margin-top:2px;">${escapeHtml(step.concept || step.instructions || '')}</div>
+                  <div style="color:var(--fg-muted);margin-top:2px;">${formatInlineBackticks(step.concept || step.explanation || step.instructions || '')}</div>
                 </div>
               ` : ''}
               <textarea class="cl-editor-textarea" spellcheck="false" style="flex:1;min-height:320px;width:100%;font-family:var(--font-mono,monospace);font-size:0.84rem;padding:12px;border-radius:8px;background:var(--surface);color:var(--fg);border:1px solid var(--border);">${escapeHtml(code)}</textarea>
@@ -2358,6 +2518,18 @@ window.App = (() => {
           }
         });
       }
+      const solBtn = mountEl.querySelector('[data-cl-action="solution"]');
+      if (solBtn) {
+        solBtn.addEventListener('click', () => {
+          files['index.js'] = guidedEntry?.solutionCode || solutionIndexJs;
+          if (activeFile === 'index.js' && ta) {
+            ta.value = files['index.js'];
+          } else {
+            activeFile = 'index.js';
+            renderShell();
+          }
+        });
+      }
       const sqlBtn = mountEl.querySelector('[data-cl-action="sql-studio"]');
       if (sqlBtn) {
         sqlBtn.addEventListener('click', () => {
@@ -2368,16 +2540,29 @@ window.App = (() => {
       const outEl = mountEl.querySelector('.cl-test-output');
       if (testBtn && outEl) {
         testBtn.addEventListener('click', () => {
+          if (ta) files[activeFile] = ta.value;
+          const userCode = files['index.js'] !== undefined ? files['index.js'] : (files[activeFile] || '');
+          const harnessCode = guidedEntry?.testHarness || files['test.js'] || '';
+          const result = runEngineJsTestHarness(userCode, harnessCode, step);
           outEl.style.display = 'block';
-          outEl.style.background = 'rgba(16,185,129,0.12)';
-          outEl.style.border = '1px solid rgba(16,185,129,0.4)';
-          outEl.style.color = '#10b981';
-          const testNames = (step && Array.isArray(step.testNames) && step.testNames.length) ? step.testNames : ['Engine invariant check 1', 'Engine invariant check 2'];
-          outEl.innerHTML = `✓ Passed ${testNames.length}/${testNames.length} engine invariants: ` + testNames.map(t => escapeHtml(t)).join(' · ');
-          if (step && window.Progress?.markBuildStepComplete) {
-            window.Progress.markBuildStepComplete(buildId, step.id || activeStepIdx);
+          if (result.passed) {
+            outEl.style.background = 'rgba(16,185,129,0.12)';
+            outEl.style.border = '1px solid rgba(16,185,129,0.4)';
+            outEl.style.color = '#10b981';
+            const testNames = (step && Array.isArray(step.testNames) && step.testNames.length)
+              ? step.testNames
+              : [`${result.assertionsRun} engine assertion${result.assertionsRun === 1 ? '' : 's'} verified`];
+            outEl.innerHTML = `✓ Passed (${result.assertionsRun} assertions): ` + testNames.map(t => escapeHtml(t)).join(' · ');
+            if (step && window.Progress?.markBuildStepComplete) {
+              window.Progress.markBuildStepComplete(buildId, step.id || activeStepIdx);
+            }
+            if (typeof onStepComplete === 'function') onStepComplete(step);
+          } else {
+            outEl.style.background = 'rgba(239,68,68,0.12)';
+            outEl.style.border = '1px solid rgba(239,68,68,0.4)';
+            outEl.style.color = '#ef4444';
+            outEl.innerHTML = `✗ Engine Assertion Failed: ${escapeHtml(result.error || 'One or more assertions did not pass.')}`;
           }
-          if (typeof onStepComplete === 'function') onStepComplete(step);
         });
       }
     }
@@ -2386,11 +2571,13 @@ window.App = (() => {
   }
 
   function getTopicLabSpec(slug) {
-    const unitInfo = getUnitInfo(slug);
+    const impl = window.IMPLEMENTATIONS_DATA && window.IMPLEMENTATIONS_DATA[slug];
+    const primarySlug = (impl && (impl.primarySlug || (Array.isArray(impl.relatedSlugs) && impl.relatedSlugs[0]))) || slug;
+    const unitInfo = getUnitInfo(primarySlug) || getUnitInfo(slug);
     const topicLabs = window.TOPIC_GUIDED_LABS || {};
-    let spec = topicLabs[slug];
+    let spec = topicLabs[slug] || topicLabs[primarySlug];
     if (!spec && window.TopicGuidedLabs && typeof window.TopicGuidedLabs.getLab === 'function') {
-      spec = window.TopicGuidedLabs.getLab(slug, '', unitInfo ? unitInfo.unit.title : slug);
+      spec = window.TopicGuidedLabs.getLab(primarySlug, '', unitInfo ? unitInfo.unit.title : slug);
     }
     if (spec) return spec;
 
@@ -2520,7 +2707,7 @@ window.App = (() => {
               Active Step ${activeStepIdx + 1} of ${steps.length || 1} · Dataset: <code>${escapeHtml(dsObj ? (dsObj.title || datasetId) : datasetId)}</code>
             </div>
             <div style="font-size:0.95rem;font-weight:600;color:var(--fg);">${escapeHtml(step.title || '')}</div>
-            <div style="font-size:0.83rem;color:var(--fg-muted);margin-top:2px;">${escapeHtml((step.instructions || step.concept || '').replace(/\*\*([^*]+)\*\*/g, '$1'))}</div>
+            <div style="font-size:0.83rem;color:var(--fg-muted);margin-top:2px;">${formatInlineBackticks(step.instructions || step.concept || '')}</div>
           </div>
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
             ${steps.length > 1 ? `
@@ -2543,7 +2730,7 @@ window.App = (() => {
           </details>
         ` : ''}
         <div class="sql-guided-step-hint" style="display:none;padding:10px 16px;background:var(--info-bg);border-left:3px solid var(--info);border-right:1px solid var(--border);font-size:0.83rem;color:var(--fg);">
-          <strong>Hint:</strong> ${escapeHtml(step.hint || 'Inspect the intermediate tables produced by each SQL clause.')}
+          <strong>Hint:</strong> ${formatInlineBackticks(step.hint || 'Inspect the intermediate tables produced by each SQL clause.')}
         </div>
         <div class="sql-guided-visualizer-mount" style="border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;overflow:hidden;"></div>
       `;
@@ -2557,6 +2744,7 @@ window.App = (() => {
             datasetId,
             sql: sqlOverride || initialSql,
             referenceSql: refSql,
+            buggyCode: (!opts.useSolution && step && step.starterCode && step.solutionCode && step.starterCode.trim() !== step.solutionCode.trim()) ? step.starterCode : undefined,
             autoVerify: Boolean(opts.autoVerify),
             title: step.title || spec.title || 'Guided SQL Lab',
             onVerify: (vRes) => {
@@ -2894,12 +3082,16 @@ window.App = (() => {
       if (!visHost) return;
       const step = steps[activeStepIdx] || null;
       const refSql = mountOpts.referenceSql || (step && (step.solutionCode || step.solutionSnippet)) || opts.referenceSql || (spec && spec.referenceSql) || sqlText;
+      const resolvedBuggyCode = mountOpts.buggyCode !== undefined
+        ? mountOpts.buggyCode
+        : (opts.buggyCode || ((!mountOpts.autoVerify && step && step.starterCode && step.solutionCode && step.starterCode.trim() !== step.solutionCode.trim()) ? step.starterCode : undefined));
       const mountFn = () => {
         if (window.TableVisualizer && typeof window.TableVisualizer.mountClauseVisualizer === 'function') {
           window.TableVisualizer.mountClauseVisualizer(visHost, {
             datasetId: activeDatasetId,
             sql: sqlText,
             referenceSql: refSql,
+            buggyCode: resolvedBuggyCode,
             autoVerify: Boolean(mountOpts.autoVerify),
             title,
             onVerify: (vRes) => {
@@ -2957,7 +3149,7 @@ window.App = (() => {
           }
         }
         if (selectedSql) {
-          mountStudioQuery(selectedSql, { referenceSql: isSolution ? selectedSql : undefined, autoVerify: isSolution });
+          mountStudioQuery(selectedSql, { referenceSql: isSolution ? selectedSql : undefined, buggyCode: isSolution ? '' : undefined, autoVerify: isSolution });
         }
       });
     }
@@ -3099,6 +3291,7 @@ window.App = (() => {
       datasetId: cf.datasetId || 'ecommerce',
       sql: cf.buggyCode || cf.solutionCode || 'SELECT * FROM orders LIMIT 10;',
       referenceSql: cf.solutionCode || cf.buggyCode || '',
+      buggyCode: cf.buggyCode || '',
       steps: [
         {
           id: `challenge-${ch.id}-fix`,

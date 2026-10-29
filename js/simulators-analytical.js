@@ -456,10 +456,68 @@ window.SIMULATORS = window.SIMULATORS || {};
   }
 ];
 
+  function resolvePresetRows(spec, preset) {
+    const isAlt = Boolean(preset && spec.presets && spec.presets[0] && preset.id !== spec.presets[0].id);
+    if (!isAlt) return spec.baseRows.map(r => r.slice());
+
+    if (spec.id === 'sim-groupby-having-rollup') {
+      return [
+        ['(us-east, enterprise)', 'FILTER (status=paid)', 40, '$124,000 ✓', '17ms'],
+        ['(us-east, pro)', 'FILTER (status=paid)', 88, '$44,000 ✓', '20ms'],
+        ['(us-east, refunded)', 'PRUNED BY FILTER', 0, '$0 (Excluded)', '—'],
+        ['(eu-west, enterprise)', 'FILTER (status=paid)', 30, '$91,500 ✓', '23ms'],
+        ['(ap-south, starter)', 'PRUNED BY HAVING < 5', 2, '$600 (Filtered)', '—']
+      ];
+    }
+    if (spec.id === 'sim-join-fanout-chasm-trap') {
+      return [
+        [501, '$100.00', 'CTE items_agg (3 items)', 'CTE pay_agg (1 card)', '$100.00 (Exact ✓)'],
+        [502, '$250.00', 'CTE items_agg (1 item)', 'CTE pay_agg (2 split)', '$350.00 (Exact ✓)'],
+        [503, '$175.00', 'CTE items_agg (2 items)', 'CTE pay_agg (1 wire)', '$525.00 (Exact ✓)'],
+        [504, '$90.00', 'CTE items_agg (0 items)', 'PRUNED (Unpaid Draft)', '$525.00 (Unchanged)']
+      ];
+    }
+    if (spec.id === 'sim-subquery-lateral-unnesting') {
+      return [
+        [1, 'Ada Lovelace', 'Hash Semi-Join Probe', 109, '$420.00 (Decorrelated ✓)'],
+        [2, 'Grace Hopper', 'Hash Semi-Join Probe', 112, '$890.00 (Decorrelated ✓)'],
+        [3, 'Barbara Liskov', 'Hash Semi-Join Probe', 105, '$275.00 (Decorrelated ✓)'],
+        [4, 'Niklaus Wirth', 'Hash Bucket Miss', null, 'PRUNED (No Matching Order)']
+      ];
+    }
+    if (spec.id === 'sim-recursive-cte-graph-hierarchy') {
+      return [
+        ['Iter 0 (Anchor)', 1, 'Node #1', null, 'path=[1] ✓'],
+        ['Iter 1', 2, 'Node #2', 1, 'path=[1, 2] ✓'],
+        ['Iter 2', 3, 'Node #3', 2, 'path=[1, 2, 3] ✓'],
+        ['Iter 3 (Cycle!)', 1, 'Edge 3 → 1', 3, 'PRUNED: 1 = ANY(path) Cycle Guard!']
+      ];
+    }
+    if (spec.id === 'sim-window-frame-sliding') {
+      return [
+        [1, 'Core DB', '$190k', 'ROW_NUMBER=1', 'RANK=1 / DENSE=1', 'Top-1 Winner ✓'],
+        [2, 'Core DB', '$190k', 'ROW_NUMBER=2', 'RANK=1 / DENSE=1', 'Peer Tie (RANK=1) ✓'],
+        [3, 'Core DB', '$165k', 'ROW_NUMBER=3', 'RANK=3 (Gap!) / DENSE=2', 'PRUNED by RANK <= 2'],
+        [4, 'Storage', '$210k', 'ROW_NUMBER=1', 'RANK=1 / DENSE=1', 'Partition Reset ✓'],
+        [5, 'Storage', '$180k', 'ROW_NUMBER=2', 'RANK=2 / DENSE=2', 'Top-2 Qualified ✓']
+      ];
+    }
+    if (spec.id === 'sim-gaps-islands-sessionization') {
+      return [
+        [1, 'card_99', '10:00', '1 tx / 10m', 0, 'SAFE ($40) ✓'],
+        [2, 'card_99', '10:03', '2 tx / 10m', 0, 'SAFE ($120) ✓'],
+        [3, 'card_99', '10:06', '3 tx / 10m', 1, 'BREACH: Velocity >= 3 in 10m!'],
+        [4, 'card_99', '10:08', '4 tx / 10m', 1, 'BREACH: Card Auto-Frozen!'],
+        [5, 'card_99', '10:25', '1 tx / 10m', 0, 'Window Reset ✓']
+      ];
+    }
+    return spec.baseRows.map(r => r.slice());
+  }
+
   function buildInteractiveFrames(spec, preset) {
     const frames = [];
     const cols = spec.columns;
-    const baseRows = spec.baseRows;
+    const baseRows = resolvePresetRows(spec, preset);
     const customNums = Array.isArray(preset.arr) && preset.arr.length >= 2 ? preset.arr : null;
 
     // Frame 0: Initial Table & Schema State
@@ -527,7 +585,7 @@ window.SIMULATORS = window.SIMULATORS || {};
             warn: warnRows,
             tags: { [i]: isWarn ? 'WARN/FILTER' : 'EVAL ✓' }
           }),
-        invariant: `Evaluating tuple [${i}] (${cols[0]}=${row[0]}): ${row.slice(1).map((v, cIdx) => cols[cIdx + 1] + '=' + (v === null ? 'NULL' : v)).join(', ')}.`,
+        invariant: `Evaluating tuple [${i}] (${cols[0]}=${row[0]}) under preset "${preset.label}": ${row.slice(1).map((v, cIdx) => cols[cIdx + 1] + '=' + (v === null ? 'NULL' : v)).join(', ')}.`,
         metrics: [
           { label: 'Cursor Tuple', value: `${i + 1} / ${baseRows.length}` },
           { label: 'Key', value: String(row[0]) },
@@ -566,7 +624,7 @@ window.SIMULATORS = window.SIMULATORS || {};
           warn: finalWarn,
           tags: { [baseRows.length - 1]: 'COMPLETE ✓' }
         }),
-      invariant: `Execution complete: ${finalMatch.length} tuple(s) emitted/verified, ${finalWarn.length} tuple(s) filtered/guarded under ${spec.badge}.`,
+      invariant: `Execution complete (${preset.label}): ${finalMatch.length} tuple(s) emitted/verified, ${finalWarn.length} tuple(s) filtered/guarded under ${spec.badge}.`,
       metrics: [
         { label: 'Total Scanned', value: String(baseRows.length) },
         { label: 'Emitted / Valid', value: String(finalMatch.length) },
@@ -594,6 +652,7 @@ window.SIMULATORS = window.SIMULATORS || {};
       blurb: spec.blurb,
       slugs: spec.slugs,
       presets: spec.presets,
+      customInput: false,
       buildFrames(preset) {
         return buildInteractiveFrames(spec, preset || spec.presets[0]);
       }

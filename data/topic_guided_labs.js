@@ -9607,13 +9607,23 @@
     };
   }
 
+  function resolveSlug(slug) {
+    if (labs[slug]) return slug;
+    var implPrimary = window.IMPLEMENTATIONS_DATA && window.IMPLEMENTATIONS_DATA[slug] && window.IMPLEMENTATIONS_DATA[slug].primarySlug;
+    if (implPrimary && labs[implPrimary]) return implPrimary;
+    var guidedPrimary = window.GUIDED_LABS_DATA && window.GUIDED_LABS_DATA[slug] && window.GUIDED_LABS_DATA[slug].primarySlug;
+    if (guidedPrimary && labs[guidedPrimary]) return guidedPrimary;
+    return slug;
+  }
+
   window.TOPIC_GUIDED_LABS = labs;
   window.TopicGuidedLabs = {
     getLab: function(slug, fallbackTitle, fallbackSql) {
-      return labs[slug] || buildFallbackSqlLab(slug, fallbackTitle, fallbackSql);
+      var resolved = resolveSlug(slug);
+      return labs[resolved] || buildFallbackSqlLab(slug, fallbackTitle, fallbackSql);
     },
     hasCuratedLab: function(slug) {
-      return Boolean(labs[slug]);
+      return Boolean(labs[resolveSlug(slug)]);
     },
     getAllCuratedSlugs: function() {
       return Object.keys(labs);

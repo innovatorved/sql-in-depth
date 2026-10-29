@@ -1,60 +1,44 @@
-# Project: SQL In Depth — Interactive Relational Database & SQL Mastery Platform
+# Project: SQL In Depth — Production-Readiness Audit, Remediation & Optimization (`sql-in-depth`)
 
-**SQL In Depth** (`https://sql-in-depth.vedgupta.in`) is an interactive, first-principles relational database and SQL mastery platform. It takes learners from foundational relational algebra and `SELECT` queries to Window Functions, Recursive CTEs, Normalization (1NF–5NF), Star Schemas, B+Tree Indexing, Cost-Based Query Optimization (`EXPLAIN ANALYZE`), ACID Concurrency & MVCC Internals, 8KB Slotted Pages & WAL Recovery, Columnar OLAP (DuckDB / ClickHouse / Parquet), and Distributed NewSQL.
-
-## 1. Non-Negotiable Architectural Invariants
-
-1. **Zero-Framework, Zero-Runtime-Bundler Static Architecture**:
-   - Pure semantic HTML5, CSS custom properties (`css/variables.css`, `css/layout.css`, `css/components.css`, `css/content.css`, `css/landing.css`, `css/simulators.css`), and vanilla ES2022 JavaScript (`window.*` namespaces).
-   - Self-hosted `Geist` and `Geist Mono` variable fonts (`fonts/geist-latin.woff2`, `fonts/geist-mono-latin.woff2`).
-2. **Browser-Native Dual WebAssembly SQL Execution (`@electric-sql/pglite` PostgreSQL 18 + `sql.js` SQLite 3)**:
-   - Vendored PostgreSQL 18 WASM (`js/vendor/pglite/pglite.bundle.js`, `pglite.wasm`, `pglite.data`) and SQLite 3 WASM (`js/vendor/sql-wasm.js` + `js/vendor/sql-wasm.wasm`) managed by `js/sql-engine.js`, with polyglot PostgreSQL/SQLite dialect normalization and real `EXPLAIN QUERY PLAN` / execution plan introspection.
-   - Pre-loaded with 5 rich production relational schemas (`ecommerce`, `org_hr`, `fintech_ledger`, `saas_telemetry`, `social_graph`) in `data/datasets.js` (26 disjoint base tables, 182 total seeded rows) plus the 26-table Unified Sandbox (`__unified__`).
-3. **Interactive Clause-by-Clause Table-Level Visualizer (`js/table-visualizer.js`)**:
-   - Decomposes and animates any SQL query step by step in logical execution order (`FROM/JOIN` → `WHERE` → `GROUP BY` → `HAVING` → `WINDOW` → `SELECT` → `DISTINCT` → `ORDER BY` → `LIMIT/OFFSET`), rendering live intermediate tables, matched/filtered row highlights, Three-Valued Logic (`TRUE`/`FALSE`/`NULL`) badges, sliding window frames, and `EXPLAIN QUERY PLAN` operator trees.
-4. **Complete 6-Track, 18-Module, 180-Unit Curriculum + 18 Build Labs**:
-   - 6 Tracks, 18 Modules (`m01`–`m18`), 180 Units (10 units per module: 8 progressive technical lessons + 1 real-world production case study `case-*` + 1 hands-on capstone build `build-*`).
-   - 18 Capstone Build Projects (`build-*`) with both 3-step Guided SQL Labs (`data/topic_guided_labs.js`) and 4-step JS/Engine Implementation Labs (`data/guided_labs.js`, `data/implementations_code.js`).
-5. **Static Pre-Rendering & Strict QA Gates**:
-   - `node tools/generate-static.js` pre-renders all 180 `/topic/<slug>/index.html` pages, all 18 `/build/<id>/index.html` pages, `index.html`, and `sitemap.xml`.
-   - `node tools/stamp-assets.js` stamps deterministic 8-char SHA-256 hashes (`?v=<hash>`) across all 201 HTML entrypoints and `js/manifest.js`.
-   - `node tools/validate.js` and `node tools/check-rendered.js` enforce zero errors before deployment.
+**SQL In Depth** (`https://sql-in-depth.vedgupta.in`) is an interactive, first-principles relational database and SQL mastery platform. It spans 6 tracks, 18 modules (`m01`–`m18`), 180 curriculum units (144 lessons, 18 case studies, 18 capstone builds), 720 assessment questions, 540 guided SQL lab steps, 12 production incident challenges, 36 interactive engine simulators, a clause-by-clause SQL table visualizer, and dual in-browser WebAssembly database runtimes (`@electric-sql/pglite` PostgreSQL 18.6 + `sql.js` SQLite 3).
 
 ---
 
 ## Architecture
 
-- **Boot & Routing Layer (`index.html`, `js/init.js`, `js/manifest.js`, `js/bootstrap.js`, `js/lazy.js`, `js/app.js`)**:
-  - Supports both SPA navigation (`/`, `/?view=...`, `#...`, `/sandbox`, `/challenges`, `/roadmap`, `/dashboard`, `/projects`) and direct landing on 198 pre-rendered static HTML pages (`/topic/<slug>/index.html` and `/build/<id>/index.html`).
-- **Dual WASM SQL Engine & Datasets (`js/sql-engine.js`, `data/datasets.js`)**:
-  - `window.SQLEngine` manages `postgres` (PGlite WASM) and `sqlite` (`sql.js` WASM) execution, schema introspection, query verification, and compatibility functions.
-- **Clause Visualizer & Inline Runner (`js/table-visualizer.js`)**:
-  - `window.TableVisualizer` mounts inline `.sql-runner` blocks in lessons, the landing Hero SQL Playground, the 3-step Guided SQL Lab execution workbench, and the Full-Screen SQL Studio Modal workbench.
-- **View Controllers & Renderers (`js/renderer.js`, `js/sandbox.js`, `js/challenges.js`, `js/roadmap.js`, `js/dashboard.js`, `js/simulators*.js`)**:
-  - Render lessons, builds, cheat sheets, full-page SQL Studio & Architecture Sandbox, Incident War-Room Challenges, Roadmap, and Dashboard.
+- **Boot, Routing & Shell Layer (`index.html`, `404.html`, `projects/index.html`, `js/init.js`, `js/manifest.js`, `js/bootstrap.js`, `js/lazy.js`, `js/app.js`, `js/404.js`, `js/search.js`, `js/landing.js`)**:
+  - Zero-framework vanilla HTML5/CSS/ES2022 static & SPA hybrid architecture supporting 201 static HTML entrypoints (`index.html`, `404.html`, `projects/index.html`, 180 `/topic/<slug>/index.html`, and 18 `/build/<id>/index.html`) plus SPA views (`/roadmap/`, `/challenges/`, `/sandbox/`, `/dashboard/`, `/glossary/`, `/projects/`).
+- **Dual WASM SQL Engine & Relational Datasets (`js/sql-engine.js`, `data/datasets.js`)**:
+  - `window.SQLEngine` manages `postgres` (`@electric-sql/pglite` WASM) and `sqlite` (`sql.js` WASM) execution, dialect normalization, savepoint `EXPLAIN ANALYZE`, and before/after DML diffing across 5 seeded relational datasets (`ecommerce`, `org_hr`, `fintech_ledger`, `saas_telemetry`, `social_graph` — 26 tables, 182 rows).
+- **Interactive Simulators, Clause Visualizer & SQL Workbenches (`js/simulators.js`, `js/simulators-*.js`, `js/table-visualizer.js`, `js/sandbox.js`, `js/challenges.js`, `data/challenges.js`, `data/topic_guided_labs.js`, `data/guided_labs.js`)**:
+  - `window.Simulators` (`js/simulators.js` + 6 domain modules: `relational`, `analytical`, `modeling`, `indexing`, `transactions`, `olap-ops`) powers 36 step-by-step interactive database engine simulators across all 180 units.
+  - `window.TableVisualizer` (`js/table-visualizer.js`) powers the 8-stage clause-by-clause SQL execution visualizer, practice clause chips, inline `.sql-runner` blocks, and guided SQL lab verification (`verifyQueryAgainstReference`).
+  - `window.SandboxController` (`js/sandbox.js`) powers `/sandbox` (Interactive SQL Studio & Architecture Capacity Sandbox).
+  - `window.ChallengesController` (`js/challenges.js` + `data/challenges.js`) powers `/challenges` (12 Production Incident War-Room troubleshooting & SQL hotfix challenges).
+- **Curriculum Renderer, Static Pre-Renderer & Asset Pipeline (`js/renderer.js`, `tools/generate-static.js`, `tools/stamp-assets.js`, `tools/build.js`, `tools/validate.js`, `tools/check-rendered.js`)**:
+  - `window.Renderer` (`js/renderer.js`) renders lessons, builds, cheat sheets, glossary, and KaTeX math (`renderMathInHtml`, `formatInlineCode`).
+  - `tools/generate-static.js` pre-renders 199 HTML pages and `sitemap.xml`; `tools/stamp-assets.js` computes SHA-256 hashes and stamps all 201 HTML files and `js/manifest.js`; `tools/build.js` packages `dist/`.
 
 ---
 
 ## Feature Inventory
 
-Every feature and issue discovered in the Phase 0 Survey (across `explorer_survey_1`, `explorer_survey_2_gen2`, and `explorer_survey_3`) is inventoried below and assigned to a milestone:
+Every feature and defect discovered in the Phase 0 Survey across `teamwork_preview_explorer_survey_1` (R1 & R4), `teamwork_preview_explorer_survey_2` (R2), and `teamwork_preview_explorer_survey_3` (R3) is inventoried below with its assigned milestone. Zero features are left unassigned.
 
-| # | Feature / Requirement Item | Description | Milestone | Source |
-|---|----------------------------|-------------|-----------|--------|
-| F1 | Async `SQLEngine.setEngineMode` & `init` | Return a Promise from `SQLEngine.setEngineMode(mode)` and await `initPglite()` when switching to or executing on `'postgres'`, fixing the `TypeError: ...setEngineMode(...).then is not a function` in `/sandbox` (`js/sandbox.js:2111`, `js/sql-engine.js:88-99`). | M1 | survey_1, survey_2 |
-| F2 | Eliminate PGlite Browser Startup Race | Fix `SQLEngine.execute()` (`js/sql-engine.js:829-836`) so `forceEngine === 'postgres'` awaits `initPglite()` instead of silently falling back to SQLite 3 while `_pgDb` is still loading in browser. | M1 | survey_1, survey_2 |
-| F3 | PostgreSQL 18 `instr(text, text)` Compatibility | Add `CREATE OR REPLACE FUNCTION instr(text, text) RETURNS integer AS $$ SELECT pg_catalog.strpos($1, $2); $$ LANGUAGE SQL IMMUTABLE;` in `initPglite()` (`js/sql-engine.js:239-243`) so `chal-05-recursive-cte-cycle-loop` and user queries using `INSTR()` pass in PostgreSQL 18. | M1 | survey_2 |
-| F4 | Dataset FK Metadata (`customers.referred_by`) & `introspectSchema` Filter | Add `fks: ['referred_by -> customers.customer_id']` and `"fk": "customers.customer_id"` on `customers.referred_by` in `data/datasets.js:75`; filter `introspectSchema(datasetId)` in `js/sql-engine.js:965-1016` by `SQL_DATASETS[datasetId].tables` when not `__unified__`. | M1 | survey_2 |
-| F5 | Clause Visualizer 3VL `WHERE` Verdict, `__unified__` Tables, Scoped PK/FK Badges & Positional `GROUP BY` | In `js/table-visualizer.js`: (a) compute `CASE WHEN NOT (<where>) THEN '✗ FALSE (Pruned)' ELSE '∅ UNKNOWN / NULL (Pruned)' END` in SQL (lines 689-708); (b) return all 26 tables in `getDatasetTableNames('__unified__')` (lines 95-99); (c) scope PK/FK badges in `renderStepTable` to `step.sourceTables` so shared columns don't collide (lines 1018-1027); (d) resolve positional `GROUP BY 1, 2` against `parsed.select` projections (lines 724-730). | M1 | survey_2 |
-| F6 | Clause Visualizer Light-Theme Inline Styles | Replace undefined `var(--bg-secondary,#0f172a)`, `var(--bg-primary,#0b0f19)`, `var(--text-primary,#f8fafc)`, `var(--text-secondary,#94a3b8)` and hardcoded `#f8fafc`/`#cbd5e1` in `js/table-visualizer.js:1185-1236` with valid `variables.css` tokens (`var(--bg-elevated)`, `var(--bg-surface)`, `var(--fg)`, `var(--fg-muted)`). | M1 | survey_3 |
-| F7 | Lesson Header "Run SQL Studio" CTA & Cheat Sheet SPA Link | In `js/renderer.js:795-802`, add `▶ Run SQL Studio` button (`data-action="open-topic-codelab" data-slug="${slug}" data-mode="modal"`) to `.lesson-header__actions`, and add `data-action="navigate-cheatsheet" data-module="${mod.id}"` to `📄 Cheat Sheet` link (`js/app.js` handler) to prevent full-page reload on static pages. | M2 | survey_1 |
-| F8 | Cheat Sheet `▶ Launch SQL Lab` Event Wiring | Wire `[data-open-topic-lab]` in `js/app.js` global click handler so clicking `▶ Launch SQL Lab` on any module Cheat Sheet opens the topic's interactive SQL Studio lab. | M2 | survey_1 |
-| F9 | Guided SQL Lab Step Completion Badge Selector Fix | In `js/app.js:2310` (`mountInlineTopicSqlLab`), update `.build-lab-step-card[data-step-idx="${activeStepIdx}"]` to `.build-lab-step-card[data-step="${activeStepIdx}"], .build-lab-step-card[data-step-index="${activeStepIdx}"]` so completed steps show `✓` and `.is-completed`. | M2 | survey_1 |
-| F10 | Static `/build/<id>/` Inline SQL Lab Hydration & Build Step Card Routing | In `js/app.js:409-424`, call `mountInlineTopicSqlLab(prerenderedBuildId, reader)` on static build page load; in `js/renderer.js:1132-1161`, wire the 3 SQL lab step cards & SQL Lab buttons to `data-action="open-topic-codelab" data-slug="${buildId}"` while preserving JS Engine Implementation IDE access (`open-code-lab`); fix `openBuildLab` in `js/app.js:910-949`; ensure `implementations_code.js` is available on SPA navigation from static topic pages (`tools/generate-static.js` / `js/renderer.js`). | M2 | survey_1, survey_2 |
-| F11 | Schema Explorer `PK`/`FK` Badges & 26-Table Count in Sandbox & Modal | Render `PK` (`Boolean(col.pk) || t.pk === colName`) and `FK` (`Boolean(col.fk)`) badges in both `js/sandbox.js:896-905` and `js/app.js:2565`; update `js/sandbox.js:1140` badge from `27 Tables` to `26 Tables`; sync dataset when clicking table preview in `js/sandbox.js:1791-1802`; update `NODE_TYPE_TO_CODELAB` (`js/sandbox.js:22-56`) and `_evaluateRubricAudit` (`js/sandbox.js:1601-1628`) to match the 18 SQL Build Labs and SQL node types. | M2 | survey_1, survey_2, survey_3 |
-| F12 | Fix KaTeX `$` Currency Regex Corruption in Simulator `<select>` Options | In `js/renderer.js:907` (`renderMathInHtml`), prevent `$ ... $` from matching across HTML tags `<` or `>` or matching currency values like `$120 ... $300` across `<option>` tags. | M2 | survey_1 |
-| F13 | CSS Light-Theme Overrides & Legacy Copy Cleanup (`roadmap.js`, `dashboard.js`, `app.js`, `challenges.js`) | In `css/components.css:5501`, replace `var(--bg-secondary)` with `var(--bg-elevated)`; in `css/simulators.css`, add `[data-theme="light"]` overrides for `.dsa-sim__visual-canvas`, `.dsa-sim__log`, `.dsa-sim__log-entry`, `.sql-rel-table th`, `.invariant-box`, `.invariant-box__text`, `.hardware-box`, `.hardware-box__text`; update legacy DSA headings/copy in `js/roadmap.js:121`, `js/dashboard.js:343, 457-711`, `js/app.js:145-160, 1397-1405`, and `js/challenges.js:474-487`. | M2 | survey_3 |
-| F14 | Static Site Regeneration, Asset Stamping, Browser E2E Verification & Cloudflare Deployment | Regenerate all static HTML pages (`node tools/generate-static.js`), stamp assets (`node tools/stamp-assets.js`), pass `tools/validate.js` + `tools/check-rendered.js` + full headless browser E2E test suite (`TEST_READY.md`), commit, push to `origin/main`, and deploy to Cloudflare Pages (`sql-in-depth`). | M3 | survey_1, survey_2, survey_3 |
+| # | Feature / Audit Item | Description | Milestone | Source |
+|---|----------------------|-------------|-----------|--------|
+| F1 | Step Simulator Auto-Play Timer Lifecycle (`R2 Bug 1`) | Add `after(ms, fn)` (tracked in a `timeouts` Set and cleared in `stop(id)` and `dispose()`) to `lifecycle()` in `js/simulators.js:284-309` so `waitMs(ms)` at `js/simulators.js:1498` resolves cleanly and clicking `⏵ Play` across all 36 interactive simulators animates without throwing `TypeError: lc.after is not a function`. | M1 | survey_2 |
+| F2 | Domain Simulator Preset Parameter Transformation & Custom Input Cleanup (`R2 Bug 2`) | In all 6 domain simulator files (`js/simulators-relational.js`, `js/simulators-analytical.js`, `js/simulators-modeling.js`, `js/simulators-indexing.js`, `js/simulators-transactions.js`, `js/simulators-olap-ops.js`), update `buildInteractiveFrames(spec, preset)` so switching presets (`preset.minTotal`, `preset.mode`, or secondary preset ID) meaningfully transforms/filters the relational rows, step frames, and metrics; disable the leftover DSA numeric array input (`customInput: false` in `buildInteractiveConfig` / `js/simulators.js:1359`) so no misleading DSA array input appears on SQL relational simulators. | M1 | survey_2 |
+| F3 | SQL Practice Clause Chips Wiring & Valid Schema Columns (`R2 Bug 3`) | (a) In `js/table-visualizer.js:669` (`buildPracticeChipsHtml`), emit `data-sql-chip="${escapeHtml(chip.id)}"` so click handlers at `lines 2580, 2834` match `c.id`; (b) in `js/sandbox.js:1955-1957`, look up `data-wb-sql-chip` by `c.id === chipAttr` (with index fallback); (c) in `SQL_PRACTICE_CHIPS` (`js/table-visualizer.js:650-663`), fix nonexistent column names (`full_name` → `name` in `'select'`, `total_amount` → `total_cents` in `'where'`, `'with_cte'`, `'case_when'`, and `salary` → `salary_usd` in `'window_over'`) so all 12 practice chips execute with 0 SQL errors. | M1 | survey_2 |
+| F4 | `/sandbox` SQL Studio Toolbar Actions & History Dropdown Wiring (`R2 Bug 4`) | In `js/sandbox.js`: (a) match `ideAct === 'format' || ideAct === 'format-sql'` and `ideAct === 'copy' || ideAct === 'copy-sql'` (`lines 1908-1915`); (b) read `#wb-sql-save-title-input` value first in `save-query` (`line 1920`) before falling back to `window.prompt`, and implement the `delete-saved` action handler (`line 1248, 1930`) calling `TableVisualizer.deleteSavedQuery`; (c) in `#wb-sql-saved-history-select` change handler (`line 2320`), support `history:<id>` option values (`line 961`) by looking up `hist.find(h => String(h.id) === selVal.slice(8))`. | M1 | survey_2 |
+| F5 | Production Incident Challenges SQL Verification & Hotfix Callback (`R2 Bug 5` + `R3-3`) | (a) In `data/challenges.js:239-256` (`chal-06-non-sargable-composite-index`), update date range from `'2025-01'` to `'2025-02'` (`'2025-02-01'..'2025-03-01'`) to match seeded `orders` rows; (b) in `data/challenges.js:407-424` (`chal-10-ab-ba-deadlock-storm`), update `product_id IN (5, 2, 8, 1)` to `IN (105, 102, 108, 101)` (and sorted `(101, 102, 105, 108)` in `solutionCode`) to match seeded `products` rows, and uppercase `FOR NO KEY UPDATE` in `invariants[1]`; (c) in `js/table-visualizer.js:2942-2985` (`verifyQueryAgainstReference`) and/or `js/app.js` / `js/challenges.js`, pass `buggyCode` / `forbiddenSql` or structural check so unedited `buggyCode` in `chal-04`, `chal-05`, and `chal-07` is rejected (`bugPasses: false`); (d) in `js/challenges.js:604`, call `e.stopPropagation()` on `[data-action="open-challenge-codelab"]` and export `markCodeHotfixPassed` on `ChallengesController` (`js/challenges.js:682`); (e) in `js/challenges.js:313`, format inline backtick code spans in `ch.invariants` as `<code>...</code>`. | M1 | survey_2, survey_3 |
+| F6 | Theme Tokens (`--bg-tertiary`), Dead `css/tokens.css` Cleanup & Theme Toggle Icon Parity (`R1 D2, D3, D6b`) | (a) Define `--bg-tertiary` in `css/variables.css` under both `:root, [data-theme="dark"]` (`rgba(39, 39, 42, 0.6)`) and `[data-theme="light"]` (`#f1f5f9`) so simulator explanation boxes and `404.html` `<kbd>` badges have proper light-mode contrast; (b) remove or sync unused `css/tokens.css`; (c) unify `.icon-sun` / `.icon-moon` display logic between `App.initTheme()` (`js/app.js:1656-1662`), `App.toggleTheme()` (`js/app.js:1221-1231`), and `js/404.js:5-12` so clicking `#theme-toggle` immediately switches the icon on the first click. | M2 | survey_1 |
+| F7 | Guided Builds (`/build/<id>`) `primarySlug` Resolution & Engine Workbench Assertion Runner (`R2 Bug 6`) | (a) In `getTopicLabSpec(slug)` (`js/app.js:2388`) and `Renderer.renderBuild(buildId)` (`js/renderer.js:1059`), resolve `window.IMPLEMENTATIONS_DATA?.[slug]?.primarySlug` when `slug` is a `build-*` ID so `/build/<buildId>` pages load the real 3-step Guided SQL Lab for their `primarySlug` instead of the generic `SELECT * FROM customers LIMIT 10;` fallback; (b) in `renderBuildView` (`js/app.js:931, 967-979`), ensure SQL studio mode uses the SQL lab step (`getTopicLabSpec`) rather than passing JS engine code into `openSqlStudioModal`; (c) in `mountEngineCodeLabWorkbench` (`js/app.js:2367-2382`), execute `guidedEntry.testHarness` against the user's code on `[data-cl-action="test"]` (or delegate to `window.CodeLab.mount`) so unedited starter code does not falsely report pass. | M2 | survey_2 |
+| F8 | Live DOM Inline Code Formatting (`R3-1`, `R3-2`) & Graceful Lesson Audio Fallback (`R3-4`) | (a) In `js/app.js:2320` (`mountEngineCodeLabWorkbench`) and `js/app.js:2523` (`mountInlineTopicSqlLab`), convert Markdown backticks `` `...` `` to `<code>...</code>` after HTML-escaping so no raw backticks leak in `.sql-guided-step-bar` across all 180 topic pages and 18 build pages; (b) in `js/renderer.js:1892` (`renderGlossary`), render `${renderMathInHtml(formatInlineCode(defText))}` so all 8 glossary definitions with backticks render `<code>` tags; (c) in `js/renderer.js:1618-1648` (`window.toggleAudio`), implement a clean Web Speech API (`window.speechSynthesis`) narration fallback (reading the lesson's overview & intuition text with play/pause state) when `audio/<slug>.mp3` is absent or errors, eliminating broken 404 audio playback. | M2 | survey_3 |
+| F9 | `404.html` CSS Tokens, `/?q=` Search Redirect Handling & Clean Pre-rendered Links (`R1 D5, D7` + `R3-5a`) | (a) In `404.html:33-132, 183`, replace undefined `--topbar-height` and `--radius-*` with `--topbar-h` and `--r-*`, and change `href="/#/glossary"` to `href="/glossary/"`; (b) in `js/app.js` (or `js/search.js`), inspect `new URLSearchParams(window.location.search).get('q')` on init and automatically open the search modal pre-populated with the query; (c) in `js/renderer.js:301`, change `href="#/glossary"` to `href="/glossary/"`; (d) in `js/landing.js:95`, render `href="/topic/${esc(demos[0].lesson)}/"` instead of `#topic/...`. | M2 | survey_1, survey_3 |
+| F10 | Build Pipeline Determinism, Local KaTeX JS Vendoring, `projects/index.html` Parity & `/glossary/` Sitemap/Validator Coverage (`R1 D4` + `R4 D1, D6a` + `R3-5b`) | (a) Vendor `node_modules/katex/dist/katex.min.js` and `node_modules/katex/dist/contrib/auto-render.min.js` into `js/vendor/katex/` and update `index.html:1254-1255` and `tools/generate-static.js:275-276` to load them locally instead of from `cdn.jsdelivr.net`; (b) in `tools/generate-static.js:331-337`, compute unique `youtubeId` count (`36`) for `SITE_COUNTS.videos` to match `tools/stamp-assets.js:71-87`, include `https://sql.mountainlab.com.au/glossary/` in `sitemap.xml` generation, and run `stamp-assets.js` at the end of `generate-static.js` so `npm run prerender` is self-contained and deterministic; (c) sync `projects/index.html` topbar (`SQL Studio`, `Glossary`), sidebar header (`Collapse` button), and deferred script bundle (`js/bootstrap.js` + simulator/ecosystem controllers) with `index.html`; (d) add `'/glossary/'` to `hubPaths` in `tools/validate.js:635`. | M3 | survey_1, survey_3 |
+| F11 | E2E Testing Track (4-Tier Opaque-Box Requirement-Driven Test Suite) | Design and implement `TEST_INFRA.md`, `tools/e2e-test.js` (and/or modular verification scripts), and `TEST_READY.md` covering Tiers 1–4 across all inventoried features F1–F10 and requirements R1–R4. | E2E | survey_1, survey_2, survey_3 |
+| F12 | Final Milestone: Full Static Regeneration, 100% E2E Pass (Tiers 1–4), Tier-5 Adversarial Hardening & `AUDIT_REPORT.md` | Regenerate all 201 static HTML pages (`npm run prerender`, `npm run stamp`, `npm run build`), pass `npm test` + `npm run stamp:check` + 100% of E2E tests (Tiers 1–4), execute Phase 2 Tier-5 white-box adversarial coverage hardening, and produce comprehensive `AUDIT_REPORT.md` in project root. | M4 | ORIGINAL_REQUEST |
 
 ---
 
@@ -62,41 +46,45 @@ Every feature and issue discovered in the Phase 0 Survey (across `explorer_surve
 
 | # | Name | Scope | Dependencies | Status |
 |---|------|-------|--------------|--------|
-| M1 | SQL Engine, Datasets & Clause Visualizer Core (`R1/R2`) | F1, F2, F3, F4, F5, F6 — Touching `data/datasets.js`, `js/sql-engine.js`, `js/table-visualizer.js` | none | DONE (`worker_m1_1` verified) |
-| M2 | Interactive SQL Studio Entry Points, Static Hydration & UI/UX Polish (`R1/R3/R4`) | F7, F8, F9, F10, F11, F12, F13 — Touching `js/app.js`, `js/renderer.js`, `js/sandbox.js`, `js/roadmap.js`, `js/dashboard.js`, `js/challenges.js`, `css/components.css`, `css/simulators.css`, `tools/generate-static.js` | none (disjoint files from M1) | DONE (`worker_m2_1` verified) |
-| E2E | E2E Testing Track (Opaque-Box Programmatic & Real Headless Browser Suite) | Design & implement comprehensive 4-tier E2E test suite (`TEST_INFRA.md`, `tools/e2e-test.js`, `TEST_READY.md`) testing all R1-R4 requirements and acceptance criteria | none (runs in parallel with M1 & M2) | DONE (`test_writer_e2e_1_gen2`: 165/165 passing) |
-| M3 | Final Milestone: Static Site Regeneration, 100% E2E Pass, Tier-5 Adversarial Hardening & Cloudflare Deployment | F14 — Run `node tools/generate-static.js && node tools/stamp-assets.js`, pass 100% of E2E tests (Tiers 1-4) + Tier 5 adversarial coverage hardening, commit, push to `origin/main`, and deploy to Cloudflare Pages (`sql-in-depth`) | M1, M2, E2E | IN_PROGRESS (Phase 1 static build done; running Reviewers, Challengers, Auditor & Deploy) |
+| M1 | Interactive Simulators, Clause Visualizer, Sandbox & Challenges (`R2` + `R3-3`) | F1, F2, F3, F4, F5 — Touching `js/simulators.js`, `js/simulators-*.js` (6 files), `js/table-visualizer.js`, `js/sandbox.js`, `js/challenges.js`, `data/challenges.js` | none | DONE (`0d37bbee-60e9-4a22-8ae7-0abe4dbfd49d`) |
+| M2 | UI/UX, Theme Parity, Guided Lab Formatting, Audio Fallback & Routing (`R1` + `R2 Bug 6` + `R3-1, R3-2, R3-4, R3-5a`) | F6, F7, F8, F9 — Touching `css/variables.css`, `css/tokens.css`, `js/app.js`, `js/renderer.js`, `js/404.js`, `js/search.js`, `js/landing.js`, `js/topic-codelab.js`, `404.html` | none (disjoint files from M1) | DONE (`14872693-98dd-4db3-a9c3-ff05cd8bdcf1`) |
+| M3 | Build Pipeline Determinism, Local KaTeX Vendoring, `projects/index.html` Parity & Pre-rendering (`R4` + `R1 D4` + `R3-5b`) | F10 — Touching `js/vendor/katex/*`, `index.html`, `projects/index.html`, `tools/generate-static.js`, `tools/stamp-assets.js`, `tools/build.js`, `tools/validate.js`, `tools/check-rendered.js`, plus regenerating `topic/**`, `build/**`, `sitemap.xml`, `js/manifest.js`, `dist/**`, `AUDIT_REPORT.md` | M1, M2 (runs static generation after M1 & M2 JS/CSS changes) | DONE (`33b45179-5876-460b-a32e-8732038f5d6b`) |
+| E2E | E2E Testing Track (4-Tier Requirement-Driven Suite) | F11 — Create `TEST_INFRA.md`, expand/build comprehensive 4-tier verification suite in `tools/e2e-test.js`, publish `TEST_READY.md` | none (runs in parallel with M1 & M2) | DONE (`7874dde5-dbb2-40d7-8cd9-4d5734722cbd`, 345/345 PASS) |
+| M4 | Final Milestone: Phase 1 (100% E2E Tiers 1–4 Pass), Phase 2 (Tier 5 Adversarial Hardening) & `AUDIT_REPORT.md` | F12 — Pass 100% of E2E tests (Tiers 1–4), run Tier 5 white-box Challenger → Worker → Reviewer hardening loop, and write `AUDIT_REPORT.md` | M1, M2, M3, E2E | DONE (Gate PASS: `auditor_m4_1` CLEAN, `reviewer_m4_1` APPROVE, `reviewer_m4_2_r2` APPROVE, `challenger_m4_1` APPROVE, `challenger_m4_2` APPROVE; `AUDIT_REPORT.md` published) |
 
 ---
 
 ## Interface Contracts
 
-### `window.SQLEngine` (`js/sql-engine.js`) ↔ View Controllers (`js/app.js`, `js/sandbox.js`, `js/table-visualizer.js`, `js/challenges.js`)
-- `SQLEngine.setEngineMode(mode: 'postgres' | 'sqlite'): Promise<'postgres' | 'sqlite'>`:
-  - Sets `_engineMode`, persists to `localStorage`, and returns a `Promise` that resolves to `_engineMode` once the selected engine (`initPglite()` for `'postgres'`, `initSqlite()` for `'sqlite'`) is initialized (falling back gracefully to SQLite if PGlite fails).
-  - Synchronous callers that ignore the return value continue to work; async callers using `.then(...)` or `await` receive a valid Promise.
-- `SQLEngine.execute(sql: string, datasetId?: string, options?: { engine?: 'postgres' | 'sqlite' }): Promise<ExecutionResult>`:
-  - When `forceEngine === 'postgres'`, awaits `executePostgres(sql, dsId)` (which internally awaits `initPglite()`) regardless of whether `_pgDb` was already initialized before the call. Only falls back to `executeSqlite(sql, dsId)` if `executePostgres` returns `null` (i.e. PGlite failed to initialize).
-- `SQLEngine.introspectSchema(datasetId?: string): Promise<TableSchema[]>`:
-  - When `datasetId` is a specific dataset in `window.SQL_DATASETS` (and not `'__unified__'`), filters returned tables to those defined in `window.SQL_DATASETS[datasetId].tables`.
+### 1. Step Simulator Lifecycle & Preset Frames (`js/simulators.js` ↔ `js/simulators-*.js`)
+- `lifecycle()` in `js/simulators.js:284-309`:
+  - Exposes `after(ms, fn)`: schedules a `setTimeout`, tracks its ID in a `timeouts` Set, removes it when fired, and clears it in both `stop(id)` (via `clearTimeout(id); clearInterval(id);`) and `dispose()`.
+- `buildInteractiveFrames(spec, preset)` across `js/simulators-{relational,analytical,modeling,indexing,transactions,olap-ops}.js`:
+  - Reads `preset` parameters (`preset.minTotal`, `preset.mode`, or `preset.id !== spec.presets[0].id`) to deterministically adjust row filtering/statuses/metrics across the generated frames so selecting the second preset visibly alters the relational step frames and output table.
+  - `buildInteractiveConfig(slug, spec)` sets `customInput: false` so the DSA array text box (`Custom array: e.g. 4, 2, 7, 1, 9, 3`) is not rendered on relational SQL simulators.
 
-### `window.TableVisualizer` (`js/table-visualizer.js`) ↔ `window.SQL_DATASETS` (`data/datasets.js`)
-- `getDatasetTableNames(datasetId)`:
-  - When `datasetId === '__unified__'` or not a specific single dataset, returns all 26 table names across all 5 datasets in `window.SQL_DATASETS`.
-- `buildStepPipeline(sql, datasetId, options)`:
-  - Step 3 (`WHERE` filter) computes pruned row 3VL verdicts via SQL `CASE WHEN NOT (<where>) THEN '✗ FALSE (Pruned)' ELSE '∅ UNKNOWN / NULL (Pruned)' END`.
-  - Step 4 (`GROUP BY`) resolves positional ordinals (`GROUP BY 1, 2`) against `parsed.select` columns.
-- `renderStepTable(step, datasetId)`:
-  - Scopes `pkSet` and `fkMap` to `step.sourceTables` (when present) so PK columns in parent tables do not simultaneously display FK badges from child tables.
+### 2. SQL Practice Chips & `/sandbox` Toolbar (`js/table-visualizer.js` ↔ `js/sandbox.js`)
+- `TableVisualizer.SQL_PRACTICE_CHIPS` (`js/table-visualizer.js:650-663`):
+  - Every chip snippet uses valid column names from `data/datasets.js` (`customers.name`, `orders.total_cents`, `employees.salary_usd`) and executes with `res.ok === true` on both SQLite 3 and PostgreSQL 18.
+  - `buildPracticeChipsHtml()` sets `data-sql-chip="${escapeHtml(chip.id)}"`.
+  - `js/sandbox.js:1955-1957` resolves `data-wb-sql-chip` via `chips.find(c => c.id === chipAttr) || chips[parseInt(chipAttr, 10)]`.
+- `/sandbox` Toolbar (`js/sandbox.js`):
+  - `[data-wb-ide-action]` handles both `'format'`/`'format-sql'`, `'copy'`/`'copy-sql'`, `'save-query'` (reading `#wb-sql-save-title-input` value first), and `'delete-saved'` (deleting the selected `saved:<id>` item in `#wb-sql-saved-history-select`).
+  - `#wb-sql-saved-history-select` handles both `history:<id>` (matching `item.id`) and `hist:<idx>`.
 
-### Lesson, Build & Cheat Sheet DOM Contracts (`js/renderer.js` ↔ `js/app.js`)
-- Lesson header (`.lesson-header__actions`):
-  - Includes `<button type="button" class="btn btn--secondary btn--sm" data-action="open-topic-codelab" data-slug="${slug}" data-mode="modal">▶ Run SQL Studio</button>`.
-  - Cheat sheet link uses `data-action="navigate-cheatsheet" data-module="${mod.id}"` handled in `js/app.js` without full-page reload.
-- Cheat Sheet topic cards (`renderCheatSheet`):
-  - `[data-open-topic-lab]` click is handled in `js/app.js` to open the topic's interactive SQL Studio lab (`openTopicCodeLab(slug, { mode: 'modal' })`).
-- Guided SQL Lab step cards (`.build-lab-step-card`):
-  - Uses `data-step="${idx}" data-step-index="${idx}"` and is matched in `js/app.js` via `.build-lab-step-card[data-step="${activeStepIdx}"], .build-lab-step-card[data-step-index="${activeStepIdx}"]`.
+### 3. Challenges Verification & Hotfix Callback (`data/challenges.js` ↔ `js/challenges.js` ↔ `js/table-visualizer.js` ↔ `js/app.js`)
+- `TableVisualizer.verifyQueryAgainstReference(userSql, referenceSql, options)`:
+  - When `options.buggyCode` (or `options.forbiddenSql`) is provided, adds a verification check that rejects `userSql` if its normalized SQL (trimmed, whitespace/case/semicolon-normalized) is identical to `options.buggyCode`, or if `options.requiredPattern` is not satisfied.
+- `window.ChallengesController` (`js/challenges.js`):
+  - Exposes `markCodeHotfixPassed(challengeId)` on its public return object (`js/challenges.js:682-687`) and calls `e.stopPropagation()` on `[data-action="open-challenge-codelab"]` (`js/challenges.js:604`).
+
+### 4. Guided Builds, Inline Code Formatting & Audio Fallback (`js/app.js` ↔ `js/renderer.js`)
+- `getTopicLabSpec(slug)` (`js/app.js:2388`) and `Renderer.renderBuild(buildId)` (`js/renderer.js:1059`):
+  - Resolve `const topicSlug = window.TOPIC_GUIDED_LABS?.[slug] ? slug : (window.IMPLEMENTATIONS_DATA?.[slug]?.primarySlug || slug)` so `/build/<buildId>` pages load the real 3-step SQL lab for their `primarySlug`.
+- Inline Code Formatting:
+  - `js/app.js:2320, 2523`, `js/renderer.js:1892`, and `js/challenges.js:313` convert Markdown `` `code` `` spans into `<code>code</code>` after HTML escaping.
+- Lesson Audio Narration (`window.toggleAudio(slug)` in `js/renderer.js:1618-1648`):
+  - If `<audio>` fails to load `/audio/${slug}.mp3` (or when `speechSynthesis` fallback is triggered), falls back gracefully to `window.speechSynthesis` (or cleanly notifies/narrates without unhandled promise rejections or console errors).
 
 ---
 
@@ -104,14 +92,12 @@ Every feature and issue discovered in the Phase 0 Survey (across `explorer_surve
 
 | File / Directory | Exclusive Write Owner Milestone | Purpose |
 |---|---|---|
-| `data/datasets.js` | M1 | 5 production relational datasets (26 tables, DDL, seed rows, PK/FK metadata, sample queries) |
-| `js/sql-engine.js` | M1 | Dual WASM SQL engine (`@electric-sql/pglite` PG18 + `sql.js` SQLite 3) |
-| `js/table-visualizer.js` | M1 | Interactive 8-stage SQL clause visualizer, inline `.sql-runner` enhancer, and hero playground |
-| `js/app.js` | M2 | SPA router, static hydration (`topic` & `build`), inline 3-step Guided SQL Lab, Full-Screen SQL Studio Modal |
-| `js/renderer.js` | M2 | HTML renderer for lessons, builds, module overviews, cheat sheets, and KaTeX math |
-| `js/sandbox.js` | M2 | Full-page Interactive SQL Studio (`/sandbox`) and Architecture Capacity Sandbox |
-| `js/roadmap.js`, `js/dashboard.js`, `js/challenges.js` | M2 | Roadmap view, Dashboard & Capacity Toolkit view, Incident War-Room Challenges view |
-| `css/components.css`, `css/simulators.css` | M2 | Component & simulator stylesheets including `[data-theme="light"]` overrides |
-| `tools/generate-static.js` | M2 | Static site generator for 180 topic pages + 18 build pages |
-| `tools/e2e-test.js`, `TEST_INFRA.md`, `TEST_READY.md` | E2E | Automated E2E verification suite (programmatic SQL + headless browser DOM verification) |
-| `topic/**`, `build/**`, `index.html`, `js/manifest.js`, `dist/**` | M3 | Generated static HTML artifacts, stamped asset hashes, and production build bundle |
+| `js/simulators.js`, `js/simulators-relational.js`, `js/simulators-analytical.js`, `js/simulators-modeling.js`, `js/simulators-indexing.js`, `js/simulators-transactions.js`, `js/simulators-olap-ops.js` | M1 | Interactive step simulator engine & 36 domain simulators |
+| `js/table-visualizer.js` | M1 | Clause-by-clause SQL visualizer, practice chips, and query verification |
+| `js/sandbox.js` | M1 | `/sandbox` SQL Studio & Architecture Capacity Sandbox |
+| `js/challenges.js`, `data/challenges.js` | M1 | `/challenges` Incident War-Room controller and challenge scenarios |
+| `css/variables.css`, `css/tokens.css` | M2 | Theme custom properties (`--bg-tertiary` in dark/light) & dead token file cleanup |
+| `js/app.js`, `js/renderer.js`, `js/404.js`, `js/search.js`, `js/landing.js`, `404.html` | M2 | SPA router, theme toggle, build lab resolution, inline backtick formatting, audio fallback, 404 page & `?q=` search |
+| `js/vendor/katex/*`, `index.html`, `projects/index.html`, `tools/generate-static.js`, `tools/stamp-assets.js`, `tools/build.js`, `tools/validate.js`, `tools/check-rendered.js`, `topic/**`, `build/**`, `sitemap.xml`, `js/manifest.js`, `dist/**` | M3 | Local KaTeX JS vendoring, `projects/index.html` parity, build/prerender/stamp pipeline, and regenerated static HTML |
+| `TEST_INFRA.md`, `tools/e2e-test.js`, `TEST_READY.md` | E2E | 4-Tier requirement-driven E2E verification suite |
+| `AUDIT_REPORT.md` | M4 | Comprehensive production-readiness audit and verification report |

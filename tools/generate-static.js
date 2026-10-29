@@ -275,7 +275,8 @@ const sitemapUrls = [
   { loc: `${baseUrl}/challenges/`, priority: '0.8', changefreq: 'weekly', lastmod: defaultLastmod },
   { loc: `${baseUrl}/sandbox/`, priority: '0.8', changefreq: 'weekly', lastmod: defaultLastmod },
   { loc: `${baseUrl}/dashboard/`, priority: '0.7', changefreq: 'weekly', lastmod: defaultLastmod },
-  { loc: `${baseUrl}/projects/`, priority: '0.8', changefreq: 'weekly', lastmod: defaultLastmod }
+  { loc: `${baseUrl}/projects/`, priority: '0.8', changefreq: 'weekly', lastmod: defaultLastmod },
+  { loc: `${baseUrl}/glossary/`, priority: '0.7', changefreq: 'monthly', lastmod: defaultLastmod }
 ];
 
 const challengesData = context.window.CHALLENGES_DATA || [];
@@ -328,12 +329,21 @@ function setJsonLd(doc, jsonLdObj) {
 console.log('Pre-rendering homepage index.html with crawlable curriculum & JSON-LD structured data...');
 const totalSims = Object.keys(context.window.SIMULATORS || {}).length;
 const totalBuilds = Object.keys(context.window.IMPLEMENTATIONS_DATA || {}).length;
+const uniqueVideos = new Set();
+let totalQuestions = 0;
+for (const m of Object.values(context.window.MODULE_CONTENT || {})) {
+  for (const u of Object.values(m)) {
+    if (u.video?.youtubeId) uniqueVideos.add(u.video.youtubeId);
+    (u.videos || []).forEach(v => v?.youtubeId && uniqueVideos.add(v.youtubeId));
+    totalQuestions += (u.quiz || []).length;
+  }
+}
 context.window.SITE_COUNTS = {
   topics: units.length,
   simulators: totalSims,
   builds: totalBuilds,
-  videos: units.length,
-  questions: 720
+  videos: uniqueVideos.size,
+  questions: totalQuestions || 720
 };
 
 let homeHtml = baseHtml;
@@ -380,6 +390,13 @@ homeHtml = setJsonLd(homeHtml, homeJsonLd);
 
 fs.writeFileSync(path.join(root, 'index.html'), homeHtml, 'utf8');
 console.log('✓ Pre-rendered homepage index.html with 180 crawlable topic links & JSON-LD');
+
+const projectsHtmlPath = path.join(root, 'projects', 'index.html');
+if (fs.existsSync(projectsHtmlPath)) {
+  const projectsHtml = fs.readFileSync(projectsHtmlPath, 'utf8');
+  const updatedProjectsHtml = replaceSidebarContent(projectsHtml, homeSidebarHtml);
+  fs.writeFileSync(projectsHtmlPath, updatedProjectsHtml, 'utf8');
+}
 
 console.log(`Starting SSG generation for ${units.length} curriculum units...`);
 
@@ -680,3 +697,7 @@ fs.writeFileSync(path.join(root, 'sitemap.xml'), sitemapXml, 'utf8');
 console.log(`✓ Generated sitemap.xml with ${sitemapUrls.length} entries`);
 
 console.log(`\nSSG Completed: ${generatedCount} units and ${generatedBuildsCount} build labs generated successfully.`);
+
+// 6. Stamp all generated HTML files & js/manifest.js with content hashes
+require('child_process').execFileSync(process.execPath, [path.join(__dirname, 'stamp-assets.js')], { stdio: 'inherit' });
+

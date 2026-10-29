@@ -310,7 +310,7 @@
       }).join('');
 
       var invariantsHtml = (ch.invariants || []).map(function(inv) {
-        return '<li>' + escapeHtml(inv) + '</li>';
+        return '<li>' + escapeHtml(inv).replace(/`([^`]+)`/g, '<code>$1</code>') + '</li>';
       }).join('');
 
       var timeseriesHtml = (m.timeseries || []).map(function(pt) {
@@ -518,6 +518,24 @@
       return res;
     },
 
+    markCodeHotfixPassed: function(chId) {
+      var targetId = chId || this._activeChallengeId;
+      this._codeHotfixPassed = true;
+      if (!this._hotfixSolvedMap) this._hotfixSolvedMap = {};
+      if (targetId) this._hotfixSolvedMap[targetId] = true;
+      if (root.Analytics && root.Analytics.trackChallengeHotfix) {
+        root.Analytics.trackChallengeHotfix({ challengeId: targetId, action: 'verified_codelab' });
+      }
+      var statusPill = this._container && this._container.querySelector('[data-hotfix-status]');
+      if (statusPill) {
+        statusPill.setAttribute('data-hotfix-status', 'verified');
+        statusPill.className = 'eco-pill eco-pill--success';
+        statusPill.textContent = '✓ SQL Hotfix Verified';
+      } else {
+        this.render();
+      }
+    },
+
     _openChallengeCodeLab: function(ch) {
       if (!ch || !ch.codeFix) return;
       var self = this;
@@ -525,13 +543,7 @@
         root.Analytics.trackChallengeHotfix({ challengeId: ch.id, action: 'open_codelab' });
       }
       var markHotfixVerified = function() {
-        self._codeHotfixPassed = true;
-        if (!self._hotfixSolvedMap) self._hotfixSolvedMap = {};
-        self._hotfixSolvedMap[ch.id] = true;
-        if (root.Analytics && root.Analytics.trackChallengeHotfix) {
-          root.Analytics.trackChallengeHotfix({ challengeId: ch.id, action: 'verified_codelab' });
-        }
-        self.render();
+        self.markCodeHotfixPassed(ch.id);
       };
 
       if (root.App && typeof root.App.openChallengeCodeLab === 'function') {
@@ -541,14 +553,20 @@
 
       var mountEl = this._container && this._container.querySelector('#challenge-inline-codelab-mount');
       if (mountEl && root.TableVisualizer && typeof root.TableVisualizer.mountClauseVisualizer === 'function') {
-        var sampleSql = (ch.codeFix && (ch.codeFix.solutionCode || ch.codeFix.buggyCode || ch.codeFix.sqlQuery)) || 'SELECT a.account_id, a.owner_name, a.posted_balance_cents, COUNT(j.entry_id) AS postings FROM accounts a LEFT JOIN journal_entries j ON j.account_id = a.account_id GROUP BY a.account_id, a.owner_name, a.posted_balance_cents ORDER BY a.account_id ASC;';
-        root.TableVisualizer.mountClauseVisualizer(mountEl, sampleSql, {
-          datasetId: (ch.codeFix && ch.codeFix.datasetId) || '__unified__',
+        var sampleSql = (ch.codeFix && (ch.codeFix.buggyCode || ch.codeFix.solutionCode || ch.codeFix.sqlQuery)) || 'SELECT a.account_id, a.owner_name, a.posted_balance_cents, COUNT(j.entry_id) AS postings FROM accounts a LEFT JOIN journal_entries j ON j.account_id = a.account_id GROUP BY a.account_id, a.owner_name, a.posted_balance_cents ORDER BY a.account_id ASC;';
+        root.TableVisualizer.mountClauseVisualizer(mountEl, {
+          datasetId: (ch.codeFix && ch.codeFix.datasetId) || 'ecommerce',
+          sql: sampleSql,
           referenceSql: (ch.codeFix && ch.codeFix.solutionCode) || sampleSql,
+          buggyCode: (ch.codeFix && ch.codeFix.buggyCode) || '',
+          showEditor: true,
           startAtFinal: true,
-          runTests: true
+          onVerify: function(vRes) {
+            if (vRes && vRes.passed) {
+              markHotfixVerified();
+            }
+          }
         });
-        markHotfixVerified();
       }
     },
 
@@ -601,6 +619,8 @@
 
         var codeLabBtn = e.target.closest('[data-action="open-challenge-codelab"]');
         if (codeLabBtn) {
+          e.preventDefault();
+          e.stopPropagation();
           var activeCh = self._findChallenge(self._activeChallengeId);
           self._openChallengeCodeLab(activeCh);
           return;

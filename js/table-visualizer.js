@@ -648,17 +648,17 @@
 
     // --- Interactive SQL Clause Practice Chips ---
     var SQL_PRACTICE_CHIPS = [
-        { id: 'select', label: 'SELECT', clause: 'SELECT', snippet: 'SELECT customer_id, full_name, tier\nFROM customers\nLIMIT 10;' },
-        { id: 'where', label: 'WHERE', clause: 'WHERE', snippet: "WHERE status = 'completed'\n  AND total_amount >= 100" },
-        { id: 'inner_join', label: 'INNER JOIN', clause: 'INNER JOIN', snippet: 'INNER JOIN orders o ON o.customer_id = c.customer_id' },
-        { id: 'left_join', label: 'LEFT JOIN', clause: 'LEFT JOIN', snippet: 'LEFT JOIN orders o ON o.customer_id = c.customer_id' },
-        { id: 'group_by', label: 'GROUP BY', clause: 'GROUP BY', snippet: 'GROUP BY 1\nORDER BY 2 DESC' },
-        { id: 'having', label: 'HAVING', clause: 'HAVING', snippet: 'HAVING COUNT(*) > 1' },
-        { id: 'window_over', label: 'WINDOW OVER', clause: 'WINDOW OVER', snippet: 'ROW_NUMBER() OVER (PARTITION BY dept_id ORDER BY salary DESC) AS dept_rank' },
-        { id: 'with_cte', label: 'WITH CTE', clause: 'WITH CTE', snippet: 'WITH summary_cte AS (\n  SELECT customer_id, SUM(total_amount) AS total_spent\n  FROM orders\n  GROUP BY customer_id\n)\nSELECT * FROM summary_cte;' },
-        { id: 'exists', label: 'EXISTS', clause: 'EXISTS', snippet: 'WHERE EXISTS (\n  SELECT 1 FROM orders o WHERE o.customer_id = c.customer_id\n)' },
-        { id: 'case_when', label: 'CASE WHEN', clause: 'CASE WHEN', snippet: "CASE\n  WHEN total_amount >= 200 THEN 'high'\n  WHEN total_amount >= 75 THEN 'medium'\n  ELSE 'low'\nEND AS spend_tier" },
-        { id: 'upsert', label: 'UPSERT', clause: 'UPSERT', snippet: "INSERT INTO categories (category_id, name)\nVALUES (1, 'Electronics')\nON CONFLICT (category_id) DO UPDATE SET name = EXCLUDED.name;" },
+        { id: 'select', label: 'SELECT', clause: 'SELECT', snippet: 'SELECT customer_id, name, tier\nFROM customers\nLIMIT 10;' },
+        { id: 'where', label: 'WHERE', clause: 'WHERE', snippet: "SELECT order_id, customer_id, status, total_cents\nFROM orders\nWHERE status = 'completed'\n  AND total_cents >= 50000;" },
+        { id: 'inner_join', label: 'INNER JOIN', clause: 'INNER JOIN', snippet: 'SELECT c.customer_id, c.name, o.order_id, o.total_cents\nFROM customers c\nINNER JOIN orders o ON o.customer_id = c.customer_id;' },
+        { id: 'left_join', label: 'LEFT JOIN', clause: 'LEFT JOIN', snippet: 'SELECT c.customer_id, c.name, o.order_id, o.status\nFROM customers c\nLEFT JOIN orders o ON o.customer_id = c.customer_id;' },
+        { id: 'group_by', label: 'GROUP BY', clause: 'GROUP BY', snippet: 'SELECT tier, COUNT(*) AS customer_count\nFROM customers\nGROUP BY 1\nORDER BY 2 DESC;' },
+        { id: 'having', label: 'HAVING', clause: 'HAVING', snippet: 'SELECT customer_id, COUNT(*) AS order_count\nFROM orders\nGROUP BY customer_id\nHAVING COUNT(*) > 1;' },
+        { id: 'window_over', label: 'WINDOW OVER', clause: 'WINDOW OVER', snippet: 'SELECT emp_id, name, dept_id, salary_usd,\n       ROW_NUMBER() OVER (PARTITION BY dept_id ORDER BY salary_usd DESC) AS dept_rank\nFROM employees;' },
+        { id: 'with_cte', label: 'WITH CTE', clause: 'WITH CTE', snippet: 'WITH summary_cte AS (\n  SELECT customer_id, SUM(total_cents) AS total_spent\n  FROM orders\n  GROUP BY customer_id\n)\nSELECT * FROM summary_cte;' },
+        { id: 'exists', label: 'EXISTS', clause: 'EXISTS', snippet: 'SELECT c.customer_id, c.name, c.tier\nFROM customers c\nWHERE EXISTS (\n  SELECT 1 FROM orders o WHERE o.customer_id = c.customer_id\n);' },
+        { id: 'case_when', label: 'CASE WHEN', clause: 'CASE WHEN', snippet: "SELECT order_id, total_cents,\n       CASE\n         WHEN total_cents >= 80000 THEN 'high'\n         WHEN total_cents >= 30000 THEN 'medium'\n         ELSE 'low'\n       END AS spend_tier\nFROM orders;" },
+        { id: 'upsert', label: 'UPSERT', clause: 'UPSERT', snippet: "INSERT INTO categories (category_id, name)\nVALUES (10, 'Hardware')\nON CONFLICT (category_id) DO UPDATE SET name = EXCLUDED.name;" },
         { id: 'explain', label: 'EXPLAIN', clause: 'EXPLAIN', snippet: 'EXPLAIN SELECT * FROM orders WHERE customer_id = 1;' }
     ];
 
@@ -666,7 +666,7 @@
         return '<div class="sql-practice-bar" role="toolbar" aria-label="SQL Clause Practice Chips">' +
             '<span class="sql-practice-label">Clause Snippets:</span>' +
             SQL_PRACTICE_CHIPS.map(function (chip) {
-                return '<button type="button" class="sql-practice-chip" data-sql-chip="' + escapeHtml(chip.label) + '" title="Insert ' + escapeHtml(chip.label) + ' clause snippet">+ ' + escapeHtml(chip.label) + '</button>';
+                return `<button type="button" class="sql-practice-chip" data-sql-chip="${escapeHtml(chip.id)}" data-sql-snippet="${escapeHtml(chip.snippet)}" title="Insert ${escapeHtml(chip.label)} clause snippet">+ ${escapeHtml(chip.label)}</button>`;
             }).join('') +
         '</div>';
     }
@@ -2090,7 +2090,10 @@
                 verifyBanner.style.color = 'var(--fg)';
                 verifyBanner.innerHTML = '⏳ Running automated relational assertions against reference schema &amp; tuples...';
                 await mountClauseVisualizer(stage, currentSql, datasetId, Object.assign({}, editorOpts, { startAtFinal: true }));
-                var vRes = await verifyQueryAgainstReference(currentSql, refSql, { datasetId: datasetId });
+                var vRes = await verifyQueryAgainstReference(currentSql, refSql, {
+                    datasetId: datasetId,
+                    buggyCode: options.buggyCode
+                });
                 var checksHtml = (vRes.checks || []).map(function (c) {
                     return '<div style="display:flex;align-items:center;gap:8px;padding:3px 0;">' +
                         '<span style="font-weight:700;color:' + (c.passed ? '#10b981' : '#ef4444') + ';">' + (c.passed ? '✓' : '✗') + '</span>' +
@@ -2110,6 +2113,9 @@
                     '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:4px 14px;">' + checksHtml + '</div>';
                 if (typeof options.onVerify === 'function') {
                     options.onVerify(vRes);
+                }
+                if (vRes.passed && typeof options.onTestsPass === 'function') {
+                    options.onTestsPass(vRes);
                 }
             }
 
@@ -2576,10 +2582,11 @@
 
             editorWrap.querySelectorAll('.sql-practice-chip[data-sql-chip]').forEach(function (chipBtn) {
                 chipBtn.addEventListener('click', function () {
-                    var chipId = chipBtn.getAttribute('data-sql-chip');
-                    var chipObj = SQL_PRACTICE_CHIPS.find(function (c) { return c.id === chipId; });
+                    var chipId = chipBtn.getAttribute('data-sql-chip-id') || chipBtn.getAttribute('data-sql-chip');
+                    var chipObj = SQL_PRACTICE_CHIPS.find(function (c) { return c.id === chipId || c.label === chipId; });
                     if (chipObj && textarea) {
                         insertSqlSnippet(textarea, chipObj.snippet);
+                        if (inlineIdeCtrl) inlineIdeCtrl.sync();
                     }
                 });
             });
@@ -2830,11 +2837,12 @@
 
             container.querySelectorAll('.sql-lab-editor-box .sql-practice-chip[data-sql-chip]').forEach(function (chipBtn) {
                 chipBtn.addEventListener('click', function () {
-                    var chipId = chipBtn.getAttribute('data-sql-chip');
-                    var chipObj = SQL_PRACTICE_CHIPS.find(function (c) { return c.id === chipId; });
+                    var chipId = chipBtn.getAttribute('data-sql-chip-id') || chipBtn.getAttribute('data-sql-chip');
+                    var chipObj = SQL_PRACTICE_CHIPS.find(function (c) { return c.id === chipId || c.label === chipId; });
                     if (chipObj && editor) {
                         insertSqlSnippet(editor, chipObj.snippet);
                         if (!isRefTab) draftSqlByStep[activeStepIdx] = editor.value;
+                        if (labIdeCtrl) labIdeCtrl.sync();
                     }
                 });
             });
@@ -2902,20 +2910,16 @@
                     passed = !!currentStep.verifyFn(userRes);
                     reason = passed ? 'All custom assertions passed!' : 'Result set did not match step assertions.';
                 } else if (targetSol) {
-                    var refRes = await getEngine().execute(targetSol, datasetId);
-                    if (!refRes.error) {
-                        var sameRowCount = userRes.rows.length === refRes.rows.length;
-                        var sameColCount = userRes.columns.length === refRes.columns.length;
-                        var sameData = JSON.stringify(userRes.rows) === JSON.stringify(refRes.rows);
-                        passed = sameRowCount && sameColCount && sameData;
-                        if (passed) {
-                            reason = 'Output matches reference solution (' + userRes.rows.length + ' rows × ' + userRes.columns.length + ' columns)!';
-                        } else {
-                            reason = 'Expected ' + refRes.rows.length + ' rows × ' + refRes.columns.length + ' cols, got ' + userRes.rows.length + ' rows × ' + userRes.columns.length + ' cols.';
-                        }
+                    var vCheck = await verifyQueryAgainstReference(userSql, targetSol, {
+                        datasetId: datasetId,
+                        buggyCode: currentStep.starterSql
+                    });
+                    passed = Boolean(vCheck && vCheck.passed);
+                    if (passed) {
+                        reason = 'Output matches reference solution (' + userRes.rows.length + ' rows × ' + userRes.columns.length + ' columns)!';
                     } else {
-                        passed = userRes.rows.length > 0;
-                        reason = 'Query executed cleanly (' + userRes.rows.length + ' rows).';
+                        var failedItem = (vCheck && vCheck.checks || []).find(function (c) { return !c.passed; });
+                        reason = failedItem ? (failedItem.name + ' — ' + failedItem.detail) : 'Output did not match reference assertions.';
                     }
                 } else {
                     passed = !userRes.error;
@@ -2937,6 +2941,17 @@
         }
 
         renderLabShell();
+    }
+
+    function normalizeSqlForVerification(s) {
+        return String(s || '')
+            .replace(/--[^\n]*/g, ' ')
+            .replace(/\/\*[\s\S]*?\*\//g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim()
+            .replace(/;+$/, '')
+            .trim()
+            .toLowerCase();
     }
 
     async function verifyQueryAgainstReference(userSql, referenceSql, options) {
@@ -2967,11 +2982,50 @@
             passed: Boolean(colsMatch),
             detail: 'Columns: [' + (uRes.columns || []).join(', ') + ']'
         });
-        var rowsEqual = !rRes.error && JSON.stringify(uRes.rows) === JSON.stringify(rRes.rows);
+
+        var normUser = normalizeSqlForVerification(userSql);
+        var normRef = normalizeSqlForVerification(referenceSql);
+        var matchedChallenge = null;
+        var rawChallenges = (root && (root.CHALLENGES_DATA || root.ChallengesData)) || [];
+        var challengeList = Array.isArray(rawChallenges) ? rawChallenges : (rawChallenges.challenges || []);
+        for (var ci = 0; ci < challengeList.length; ci++) {
+            var chItem = challengeList[ci];
+            if (chItem && chItem.codeFix && chItem.codeFix.solutionCode) {
+                if (normalizeSqlForVerification(chItem.codeFix.solutionCode) === normRef) {
+                    matchedChallenge = chItem;
+                    break;
+                }
+            }
+        }
+        var buggyCandidate = options.buggyCode || (matchedChallenge && matchedChallenge.codeFix && matchedChallenge.codeFix.buggyCode) || '';
+        var normBuggy = buggyCandidate ? normalizeSqlForVerification(buggyCandidate) : '';
+        var isUnmodifiedBuggy = Boolean(normRef && normUser !== normRef && normBuggy && normUser === normBuggy);
+        var hasUnresolvedAntiPattern = false;
+        var antiPatternDetail = '';
+        if (isUnmodifiedBuggy) {
+            hasUnresolvedAntiPattern = true;
+            antiPatternDetail = 'Unmodified buggy SQL query submitted — apply the required hotfix transformation';
+        } else if (normRef && normUser !== normRef) {
+            if (normRef.indexOf('rows between unbounded preceding') !== -1 && normUser.indexOf('rows between') === -1) {
+                hasUnresolvedAntiPattern = true;
+                antiPatternDetail = 'Missing explicit ROWS BETWEEN window frame & deterministic tie-breaker';
+            } else if (normRef.indexOf('created_at >=') !== -1 && /substr\s*\(\s*created_at/i.test(normUser)) {
+                hasUnresolvedAntiPattern = true;
+                antiPatternDetail = 'Non-SARGable SUBSTR(created_at, ...) function wrapper still present';
+            } else if (normRef.indexOf('group by customer_id') !== -1 && normUser.indexOf('group by') === -1) {
+                hasUnresolvedAntiPattern = true;
+                antiPatternDetail = 'Correlated per-row subquery still present instead of pre-aggregated GROUP BY join';
+            }
+        }
+
+        var tuplesMatch = !rRes.error && JSON.stringify(uRes.rows) === JSON.stringify(rRes.rows);
+        var rowsEqual = Boolean(tuplesMatch && !hasUnresolvedAntiPattern);
         checks.push({
             name: 'Test 4: Relational Tuple Equivalence',
             passed: Boolean(rowsEqual),
-            detail: rowsEqual ? 'Exact tuple match with reference solution' : 'Tuple values differ from reference'
+            detail: hasUnresolvedAntiPattern
+                ? antiPatternDetail
+                : (rowsEqual ? 'Exact tuple match with reference solution' : 'Tuple values differ from reference')
         });
         var passedCount = checks.filter(function (c) { return c.passed; }).length;
         return {

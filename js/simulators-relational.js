@@ -423,10 +423,82 @@ window.SIMULATORS = window.SIMULATORS || {};
   }
 ];
 
+  function resolvePresetRowsAndEvaluator(spec, preset) {
+    const isAlt = Boolean(preset && spec.presets && spec.presets[0] && preset.id !== spec.presets[0].id);
+    let rows = spec.baseRows.map(r => r.slice());
+
+    if (spec.id === 'sim-select-where-pipeline') {
+      const minCents = (preset && preset.minTotal ? preset.minTotal : 120) * 100;
+      return {
+        rows,
+        isWarnRow(row) {
+          return row[2] !== 'paid' || Number(row[3]) < minCents;
+        },
+        tagRow(row, warn) {
+          if (row[2] !== 'paid') return `Filtered (status=${row[2]} != paid)`;
+          if (Number(row[3]) < minCents) return `Filtered (${row[3]} < ${minCents})`;
+          return `Matched (>= $${(minCents / 100).toFixed(0)}) ✓`;
+        }
+      };
+    }
+
+    if (isAlt) {
+      if (spec.id === 'sim-three-valued-null-logic') {
+        rows = [
+          [1, 'acct_stripe_01', 10000, '100.00 (Exact)', '10000 cents ✓'],
+          [2, 'acct_stripe_02', 25000, '250.00000004 (IEEE-754)', 'DRIFT WARNING (+0.04c)'],
+          [3, 'acct_stripe_03', 18000, '180.00 (Exact)', '18000 cents ✓'],
+          [4, 'acct_stripe_04', 42000, '419.99999997 (IEEE-754)', 'DRIFT WARNING (-0.03c)'],
+          [5, 'acct_stripe_05', 15000, '150.00 (Exact)', '15000 cents ✓']
+        ];
+      } else if (spec.id === 'sim-ddl-constraints-fk-cascade') {
+        rows = [
+          [5001, 101, 'Phase 1: ADD COLUMN nullable', 2, 'VALID (Zero-Lock Expand ✓)'],
+          [5002, 101, 'Phase 2: Dual-Write Trigger', 1, 'VALID (Backfill Active ✓)'],
+          [5003, 103, 'Phase 3: NOT VALID + VALIDATE', 1, 'WAITING (ShareUpdateExclusive)'],
+          [5004, 105, 'Phase 4: Drop Legacy Column', 4, 'VALID (Contract Complete ✓)']
+        ];
+      } else if (spec.id === 'sim-dml-upsert-returning') {
+        rows = [
+          ['SKU-01', 'us-east', 55, 2, 'RETURNING old=40 → new=55 ✓'],
+          ['SKU-02', 'us-east', 15, 1, 'PRUNED (No stock delta)'],
+          ['SKU-03', 'eu-west', 95, 3, 'RETURNING old=80 → new=95 ✓'],
+          ['SKU-04', 'ap-south', 20, 2, 'RETURNING old=12 → new=20 ✓']
+        ];
+      } else if (spec.id === 'sim-relational-join-matrix') {
+        rows = [
+          [1, 'Ada Lovelace', 101, 'paid', '$185.00 (INNER + FULL ✓)'],
+          [1, 'Ada Lovelace', 104, 'refunded', '$210.00 (INNER + FULL ✓)'],
+          [2, 'Alan Turing', null, 'UNMATCHED LEFT', 'Filtered by INNER JOIN'],
+          [3, 'Grace Hopper', 103, 'paid', '$340.00 (INNER + FULL ✓)'],
+          [null, 'UNMATCHED RIGHT', 999, 'orphan_order', '$95.00 (FULL OUTER ONLY)']
+        ];
+      } else if (spec.id === 'sim-semi-anti-null-notin') {
+        rows = [
+          [10, 'ada@analytical.io', 'EXISTS (10 == 10)', 'TRUE (Short-Circuit)', 'NO (Filtered by NOT EXISTS)'],
+          [20, 'alan@enigma.uk', 'NOT EXISTS (No Match)', 'TRUE (NULL Ignored Safely)', 'YES — Emitted ✓'],
+          [30, 'grace@navy.mil', 'NOT EXISTS (No Match)', 'TRUE (NULL Ignored Safely)', 'YES — Emitted ✓'],
+          [40, 'edsger@utexas.edu', 'NOT EXISTS (No Match)', 'TRUE (NULL Ignored Safely)', 'YES — Emitted ✓']
+        ];
+      }
+    }
+
+    return {
+      rows,
+      isWarnRow(row) {
+        const rowStr = row.map(v => v === null ? 'NULL' : String(v)).join(' | ');
+        return /NULL|INFLATED|UNKNOWN|BREACH|WAITING|QUEUED|PRUNED|INVISIBLE|Wasted|DRIFT|Filtered by/i.test(rowStr);
+      },
+      tagRow(row, warn) {
+        return warn ? 'Filtered / Guarded' : 'Committed / Emitted ✓';
+      }
+    };
+  }
+
   function buildInteractiveFrames(spec, preset) {
     const frames = [];
     const cols = spec.columns;
-    const baseRows = spec.baseRows;
+    const { rows: baseRows, isWarnRow, tagRow } = resolvePresetRowsAndEvaluator(spec, preset);
     const customNums = Array.isArray(preset.arr) && preset.arr.length >= 2 ? preset.arr : null;
 
     // Frame 0: Initial Table & Schema State
@@ -451,9 +523,7 @@ window.SIMULATORS = window.SIMULATORS || {};
     // Intermediate row-by-row / operator steps
     for (let i = 0; i < baseRows.length; i++) {
       const row = baseRows[i];
-      const rowStr = row.map(v => v === null ? 'NULL' : String(v)).join(' | ');
-      const isWarn = /NULL|INFLATED|UNKNOWN|BREACH|WAITING|QUEUED|PRUNED|INVISIBLE|Wasted/i.test(rowStr);
-      const isMatch = /✓|VALID|paid|VISIBLE|SAFE|Winner|Index Scan|Keyset|NON-BLOCKING/i.test(rowStr) || (!isWarn && i % 2 === 0);
+      const isWarn = isWarnRow(row);
 
       const matchRows = [];
       const warnRows = [];
@@ -461,18 +531,17 @@ window.SIMULATORS = window.SIMULATORS || {};
       const rowTags = {};
 
       for (let k = 0; k <= i; k++) {
-        const kStr = baseRows[k].map(v => v === null ? 'NULL' : String(v)).join(' | ');
-        const kWarn = /NULL|INFLATED|UNKNOWN|BREACH|WAITING|QUEUED|PRUNED|INVISIBLE|Wasted/i.test(kStr);
+        const kWarn = isWarnRow(baseRows[k]);
         if (k === i) {
           rowTags[k] = isWarn ? '⚠ FLAGGED / FILTERED' : '✓ MATCHED / APPLIED';
           if (isWarn) warnRows.push(k);
           else matchRows.push(k);
         } else if (kWarn) {
           warnRows.push(k);
-          rowTags[k] = 'Filtered/Flagged';
+          rowTags[k] = tagRow(baseRows[k], true);
         } else {
           matchRows.push(k);
-          rowTags[k] = 'Verified ✓';
+          rowTags[k] = tagRow(baseRows[k], false);
         }
       }
 
@@ -494,7 +563,7 @@ window.SIMULATORS = window.SIMULATORS || {};
             warn: warnRows,
             tags: { [i]: isWarn ? 'WARN/FILTER' : 'EVAL ✓' }
           }),
-        invariant: `Evaluating tuple [${i}] (${cols[0]}=${row[0]}): ${row.slice(1).map((v, cIdx) => cols[cIdx + 1] + '=' + (v === null ? 'NULL' : v)).join(', ')}.`,
+        invariant: `Evaluating tuple [${i}] (${cols[0]}=${row[0]}) under preset "${preset.label}": ${row.slice(1).map((v, cIdx) => cols[cIdx + 1] + '=' + (v === null ? 'NULL' : v)).join(', ')}.`,
         metrics: [
           { label: 'Cursor Tuple', value: `${i + 1} / ${baseRows.length}` },
           { label: 'Key', value: String(row[0]) },
@@ -510,13 +579,13 @@ window.SIMULATORS = window.SIMULATORS || {};
     const finalWarn = [];
     const finalTags = {};
     baseRows.forEach((r, i) => {
-      const s = r.map(v => v === null ? 'NULL' : String(v)).join(' | ');
-      if (/INFLATED|UNKNOWN|BREACH|WAITING|QUEUED|PRUNED|INVISIBLE|Wasted/i.test(s)) {
+      const warn = isWarnRow(r);
+      if (warn) {
         finalWarn.push(i);
-        finalTags[i] = 'Filtered / Guarded';
+        finalTags[i] = tagRow(r, true);
       } else {
         finalMatch.push(i);
-        finalTags[i] = 'Committed / Emitted ✓';
+        finalTags[i] = tagRow(r, false);
       }
     });
 
@@ -533,7 +602,7 @@ window.SIMULATORS = window.SIMULATORS || {};
           warn: finalWarn,
           tags: { [baseRows.length - 1]: 'COMPLETE ✓' }
         }),
-      invariant: `Execution complete: ${finalMatch.length} tuple(s) emitted/verified, ${finalWarn.length} tuple(s) filtered/guarded under ${spec.badge}.`,
+      invariant: `Execution complete (${preset.label}): ${finalMatch.length} tuple(s) emitted/verified, ${finalWarn.length} tuple(s) filtered/guarded under ${spec.badge}.`,
       metrics: [
         { label: 'Total Scanned', value: String(baseRows.length) },
         { label: 'Emitted / Valid', value: String(finalMatch.length) },
@@ -561,6 +630,7 @@ window.SIMULATORS = window.SIMULATORS || {};
       blurb: spec.blurb,
       slugs: spec.slugs,
       presets: spec.presets,
+      customInput: false,
       buildFrames(preset) {
         return buildInteractiveFrames(spec, preset || spec.presets[0]);
       }

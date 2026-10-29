@@ -937,8 +937,8 @@
         "title": "Rewrite Non-SARGable Function Filter into SARGable B+Tree Range Scan",
         "summary": "Replace SUBSTR(created_at, 1, 7) function wrapping with a SARGable half-open range interval so idx_orders_customer_date is used.",
         "datasetId": "ecommerce",
-        "buggyCode": "-- BUGGY SQL: Wrapping created_at in SUBSTR() destroys SARGability and forces a full table scan!\nSELECT order_id,\n       customer_id,\n       status,\n       total_cents,\n       created_at\nFROM orders\nWHERE customer_id = 1\n  AND SUBSTR(created_at, 1, 7) = '2025-01'\nORDER BY created_at DESC;",
-        "solutionCode": "-- FIXED SQL: SARGable half-open range predicate [start, end) seeks directly on idx_orders_customer_date\nSELECT order_id,\n       customer_id,\n       status,\n       total_cents,\n       created_at\nFROM orders\nWHERE customer_id = 1\n  AND created_at >= '2025-01-01'\n  AND created_at < '2025-02-01'\nORDER BY created_at DESC;"
+        "buggyCode": "-- BUGGY SQL: Wrapping created_at in SUBSTR() destroys SARGability and forces a full table scan!\nSELECT order_id,\n       customer_id,\n       status,\n       total_cents,\n       created_at\nFROM orders\nWHERE customer_id = 1\n  AND SUBSTR(created_at, 1, 7) = '2025-02'\nORDER BY created_at DESC;",
+        "solutionCode": "-- FIXED SQL: SARGable half-open range predicate [start, end) seeks directly on idx_orders_customer_date\nSELECT order_id,\n       customer_id,\n       status,\n       total_cents,\n       created_at\nFROM orders\nWHERE customer_id = 1\n  AND created_at >= '2025-02-01'\n  AND created_at < '2025-03-01'\nORDER BY created_at DESC;"
       }
     },
     {
@@ -1510,7 +1510,7 @@
 ],
       invariants: [
         "Coffman's Circular Wait condition states that a deadlock cycle can exist only if transactions acquire resources out of global topological order.",
-        "Sorting target primary keys ascending (`SELECT ... WHERE id = ANY(:sorted_ids) ORDER BY id ASC FOR no KEY UPDATE`) eliminates AB-BA deadlocks.",
+        "Sorting target primary keys ascending (`SELECT ... WHERE id = ANY(:sorted_ids) ORDER BY id ASC FOR NO KEY UPDATE`) eliminates AB-BA deadlocks.",
         "Using FOR NO KEY UPDATE instead of FOR UPDATE when primary/unique keys are unchanged avoids blocking concurrent foreign-key checks."
 ],
       interactiveTuning: [
@@ -1558,8 +1558,8 @@
         "title": "Canonical Ascending Primary-Key Lock Ordering Plan",
         "summary": "Deduplicate and order target product_id rows in strict ascending primary-key order so concurrent multi-item checkouts cannot form AB-BA Wait-For Graph cycles.",
         "datasetId": "ecommerce",
-        "buggyCode": "-- BUGGY SQL: Fetches target SKU inventory rows in arbitrary non-deterministic order\nSELECT p.product_id,\n       p.sku,\n       p.name,\n       p.stock_qty,\n       p.price_cents\nFROM products p\nWHERE p.product_id IN (5, 2, 8, 1);",
-        "solutionCode": "-- FIXED SQL: Canonical ascending primary-key ordering (ORDER BY product_id ASC) prevents AB-BA deadlocks\nSELECT p.product_id,\n       p.sku,\n       p.name,\n       p.stock_qty,\n       p.price_cents,\n       ROW_NUMBER() OVER (ORDER BY p.product_id ASC) AS lock_acquisition_step\nFROM products p\nWHERE p.product_id IN (5, 2, 8, 1)\n  AND p.stock_qty > 0\nORDER BY p.product_id ASC;"
+        "buggyCode": "-- BUGGY SQL: Fetches target SKU inventory rows in arbitrary non-deterministic order\nSELECT p.product_id,\n       p.sku,\n       p.name,\n       p.stock_qty,\n       p.price_cents\nFROM products p\nWHERE p.product_id IN (105, 102, 108, 101);",
+        "solutionCode": "-- FIXED SQL: Canonical ascending primary-key ordering (ORDER BY product_id ASC) prevents AB-BA deadlocks\nSELECT p.product_id,\n       p.sku,\n       p.name,\n       p.stock_qty,\n       p.price_cents,\n       ROW_NUMBER() OVER (ORDER BY p.product_id ASC) AS lock_acquisition_step\nFROM products p\nWHERE p.product_id IN (105, 102, 108, 101)\n  AND p.stock_qty > 0\nORDER BY p.product_id ASC;"
       }
     },
     {

@@ -17,7 +17,7 @@
   <link rel="preload" href="fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/variables.css?v=b68ab27ba0">
+  <link rel="stylesheet" href="css/variables.css?v=fbe5a4fed0">
   <link rel="stylesheet" href="css/layout.css?v=a384f455dc">
   <link rel="stylesheet" href="css/components.css?v=6a661d5122">
   <link rel="stylesheet" href="css/content.css?v=178f3a2481">
@@ -25,12 +25,12 @@
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=59c953e95f"></script>
-  <script src="js/manifest.js?v=02cf7c8a30"></script>
+  <script src="js/manifest.js?v=f1c3a4b804"></script>
 
   <style>
     .not-found-wrapper {
       min-height: 100vh;
-      padding-top: var(--topbar-height, 52px);
+      padding-top: var(--topbar-h, 52px);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -50,7 +50,7 @@
       text-align: center;
       background: var(--bg-secondary);
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg, 12px);
+      border-radius: var(--r-lg, 12px);
       padding: 48px 36px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     }
@@ -92,7 +92,7 @@
       padding: 10px 14px;
       background: var(--bg-primary);
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md, 8px);
+      border-radius: var(--r-md, 8px);
       color: var(--fg-primary);
       font-size: 14px;
       outline: none;
@@ -131,7 +131,7 @@
       padding: 10px 14px;
       background: var(--bg-tertiary);
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm, 6px);
+      border-radius: var(--r-sm, 6px);
       color: var(--fg-primary);
       text-decoration: none;
       font-size: 13px;
@@ -180,7 +180,7 @@
 
     <div class="topbar__actions">
       <nav class="topbar__nav" style="display:flex; gap:0.4rem; margin-right:0.5rem;">
-        <a href="/#/glossary" class="btn btn--sm btn--outline" style="font-size:11px; padding:4px 8px; text-decoration:none; white-space:nowrap;">📖 Glossary</a>
+        <a href="/glossary/" class="btn btn--sm btn--outline" style="font-size:11px; padding:4px 8px; text-decoration:none; white-space:nowrap;">📖 Glossary</a>
       </nav>
 
       <div class="topbar__progress-pill" id="progress-pill" title="Overall progress">
@@ -247,6 +247,6 @@
     </footer>
   </div>
 
-  <script src="js/404.js?v=d111711fa6"></script>
+  <script src="js/404.js?v=bd442e5f09"></script>
 </body>
 </html>

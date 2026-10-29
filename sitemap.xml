@@ -37,6 +37,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://sql-in-depth.vedgupta.in/glossary/</loc>
+    <lastmod>2026-10-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://sql-in-depth.vedgupta.in/challenges/chal-01-not-in-null-outage/</loc>
     <lastmod>2026-10-26</lastmod>
     <changefreq>weekly</changefreq>

@@ -432,10 +432,63 @@ window.SIMULATORS = window.SIMULATORS || {};
   }
 ];
 
+  function resolvePresetRows(spec, preset) {
+    const isAlt = Boolean(preset && spec.presets && spec.presets[0] && preset.id !== spec.presets[0].id);
+    if (!isAlt) return spec.baseRows.map(r => r.slice());
+
+    if (spec.id === 'sim-bplustree-page-split') {
+      return [
+        ['Page #1 (Root)', 'Level 1 (Internal)', 'Seek Key >= 20 → Page #2', '+∞', 'Descent ✓'],
+        ['Page #2 (Leaf)', 'Level 0 (Leaf)', 'Match [20, 30] ✓', '30', 'Follow Sibling → Page #3 ✓'],
+        ['Page #3 (Leaf)', 'Level 0 (Leaf)', 'Match [40, 50, 55] ✓', '60', 'Stop at 60 > 55 ✓'],
+        ['Page #4 (Leaf)', 'Level 0 (Leaf)', 'PRUNED (60 > 55)', '+∞', 'Not Touched']
+      ];
+    }
+    if (spec.id === 'sim-composite-covering-index-prefix') {
+      return [
+        ['[0]', 10, 8, '09:45 (INCLUDE payload)', 'VM Bit=1 → Index-Only Hit (0 Heap I/O) ✓'],
+        ['[1]', 10, 8, '10:12 (INCLUDE payload)', 'VM Bit=1 → Index-Only Hit (0 Heap I/O) ✓'],
+        ['[2]', 10, 8, '10:30 (Dirty Page)', 'WAITING: VM Bit=0 → Heap Fetch Required'],
+        ['[3]', 10, 8, '10:45 (INCLUDE payload)', 'VM Bit=1 → Index-Only Hit (0 Heap I/O) ✓']
+      ];
+    }
+    if (spec.id === 'sim-explain-cost-histogram-planner') {
+      return [
+        ['make=Porsche AND model=911', 'Est: 12 (Naive Product)', '48.0', '—', '1850.0', 'INFLATED: Underestimated 100×!'],
+        ['Actual Rows = 1,200', 'Random Heap I/O Thrash', '3420.0 (Wasted!)', '410.0', '1850.0', 'BREACH: Nested Loop Timeout'],
+        ['CREATE STATISTICS (dependencies)', 'Est: 1,180 (Accurate!)', '3420.0', '410.0', '1850.0', 'Bitmap Heap Scan Winner ✓']
+      ];
+    }
+    if (spec.id === 'sim-sargability-topn-heapsort') {
+      return [
+        ['Bounded Heap Init (K=5)', 'work_mem = 64 KB', '5 rows', '0 KB', '0.1 ms ✓'],
+        ['Stream Tuple #500,000', 'score <= heap_min → PRUNED', '500,000', '0 KB', '22 ms'],
+        ['Stream Tuple #999,999', 'Sift-Down Replace Min', '1,000,000', '0 KB', '44 ms ✓'],
+        ['Emit Top-5 Sorted', 'In-Memory Heap Drain', '5 emitted', '0 KB', '45 ms ✓']
+      ];
+    }
+    if (spec.id === 'sim-physical-join-hash-merge-nlj') {
+      return [
+        ['Zipper #1', 'Left(101)', 'Right(101, $80)', '101 == 101 (Match)', 'Emit (101, $80) ✓'],
+        ['Zipper #2', 'Left(102)', 'Right(103, $150)', '102 < 103 (Advance Left)', 'PRUNED (No Right Match)'],
+        ['Zipper #3', 'Left(103)', 'Right(103, $150)', '103 == 103 (Match)', 'Emit (103, $150) ✓'],
+        ['Zipper #4', 'Left(105)', 'Right(105, $210)', '105 == 105 (Match)', 'Emit (105, $210) ✓']
+      ];
+    }
+    if (spec.id === 'sim-volcano-vectorized-pushdown') {
+      return [
+        ['Volcano Tuple-at-a-Time', '100,000 next() calls', 'Virtual dispatch per row', '100,000 calls', '65 cy (Wasted I-Cache!)'],
+        ['Vectorized Batch #1', '1,024 rows / batch', 'SIMD AVX2Tight Loop', '98 batches', '6 cy ✓'],
+        ['Selection Vector Filter', 'Late Materialization', 'Bitmask active lanes', '98 batches', '4 cy ✓']
+      ];
+    }
+    return spec.baseRows.map(r => r.slice());
+  }
+
   function buildInteractiveFrames(spec, preset) {
     const frames = [];
     const cols = spec.columns;
-    const baseRows = spec.baseRows;
+    const baseRows = resolvePresetRows(spec, preset);
     const customNums = Array.isArray(preset.arr) && preset.arr.length >= 2 ? preset.arr : null;
 
     // Frame 0: Initial Table & Schema State
@@ -503,7 +556,7 @@ window.SIMULATORS = window.SIMULATORS || {};
             warn: warnRows,
             tags: { [i]: isWarn ? 'WARN/FILTER' : 'EVAL ✓' }
           }),
-        invariant: `Evaluating tuple [${i}] (${cols[0]}=${row[0]}): ${row.slice(1).map((v, cIdx) => cols[cIdx + 1] + '=' + (v === null ? 'NULL' : v)).join(', ')}.`,
+        invariant: `Evaluating tuple [${i}] (${cols[0]}=${row[0]}) under preset "${preset.label}": ${row.slice(1).map((v, cIdx) => cols[cIdx + 1] + '=' + (v === null ? 'NULL' : v)).join(', ')}.`,
         metrics: [
           { label: 'Cursor Tuple', value: `${i + 1} / ${baseRows.length}` },
           { label: 'Key', value: String(row[0]) },
@@ -542,7 +595,7 @@ window.SIMULATORS = window.SIMULATORS || {};
           warn: finalWarn,
           tags: { [baseRows.length - 1]: 'COMPLETE ✓' }
         }),
-      invariant: `Execution complete: ${finalMatch.length} tuple(s) emitted/verified, ${finalWarn.length} tuple(s) filtered/guarded under ${spec.badge}.`,
+      invariant: `Execution complete (${preset.label}): ${finalMatch.length} tuple(s) emitted/verified, ${finalWarn.length} tuple(s) filtered/guarded under ${spec.badge}.`,
       metrics: [
         { label: 'Total Scanned', value: String(baseRows.length) },
         { label: 'Emitted / Valid', value: String(finalMatch.length) },
@@ -570,6 +623,7 @@ window.SIMULATORS = window.SIMULATORS || {};
       blurb: spec.blurb,
       slugs: spec.slugs,
       presets: spec.presets,
+      customInput: false,
       buildFrames(preset) {
         return buildInteractiveFrames(spec, preset || spec.presets[0]);
       }

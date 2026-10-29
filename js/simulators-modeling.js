@@ -382,10 +382,62 @@ window.SIMULATORS = window.SIMULATORS || {};
   }
 ];
 
+  function resolvePresetRows(spec, preset) {
+    const isAlt = Boolean(preset && spec.presets && spec.presets[0] && preset.id !== spec.presets[0].id);
+    if (!isAlt) return spec.baseRows.map(r => r.slice());
+
+    if (spec.id === 'sim-bcnf-dependency-decomposition') {
+      return [
+        ['S1', 'CS-445 (DB)', 'Dr. Codd', 'Gates 402 (Updated)', 'BREACH: Partial Update Anomaly!'],
+        ['S2', 'CS-445 (DB)', 'Dr. Codd', 'Gates 401 (Stale!)', 'INFLATED: Inconsistent Office Fact'],
+        ['S3', 'CS-511 (OS)', 'DELETE S3', 'NULL (Lost Fact!)', 'BREACH: Deletion Anomaly!'],
+        ['S4', 'CS-601 (New)', 'Dr. Stonebraker', 'Gates 501', 'NULL student_id Insertion Blocked!']
+      ];
+    }
+    if (spec.id === 'sim-denormalization-multi-tenant') {
+      return [
+        [42, 9001, 'EAV Join #1 (attr=color)', '5 random heap pages', '6.2 ms (Wasted Joins)'],
+        [42, 9001, 'EAV Join #2 (attr=size)', '12 random heap pages', '14.8 ms (Wasted Joins)'],
+        [42, 9002, 'Typed Cols + JSONB + GIN', '1 leaf page ✓', '0.4 ms (Single Read ✓)'],
+        [99, 1004, 'Typed Cols + JSONB + GIN', '1 leaf page ✓', '0.5 ms (Single Read ✓)']
+      ];
+    }
+    if (spec.id === 'sim-star-snowflake-scd2') {
+      return [
+        [1001, 'Fact Sale #801 (2025-03)', 'Starter', '2025-01-01', '2025-06-15', 'JOIN cust_sk=1001 (Starter ✓)'],
+        [1048, 'Fact Sale #855 (2025-11)', 'Pro', '2025-06-15', '2026-02-01', 'JOIN cust_sk=1048 (Pro ✓)'],
+        [1102, 'Fact Sale #910 (2026-03)', 'Enterprise', '2026-02-01', '9999-12-31', 'JOIN cust_sk=1102 (Enterprise ✓)'],
+        [9999, 'Late Arriving Fact (2024)', 'UNKNOWN', '—', '—', 'PRUNED: Unmatched Natural Key']
+      ];
+    }
+    if (spec.id === 'sim-bitemporal-json-idempotency') {
+      return [
+        ['req_1', 'ik_882a', '$120.00', 'INSERT ON CONFLICT DO NOTHING', 'CLAIMED (status=STARTED) ✓'],
+        ['req_2 (Retry)', 'ik_882a', '$120.00', 'CONFLICT on idempotency_key', 'PRUNED (Duplicate Suppressed)'],
+        ['req_1 (Done)', 'ik_882a', '$120.00', 'UPDATE status=COMPLETED', 'Cached Response Saved ✓']
+      ];
+    }
+    if (spec.id === 'sim-cohort-funnel-allen-intervals') {
+      return [
+        ['Cohort 2026-01', 'M0: 100% (500)', 'M1: 68% (340)', 'M2: 54% (270)', 'Active Retention ✓'],
+        ['Cohort 2026-02', 'M0: 100% (620)', 'M1: 72% (446)', 'M2: 61% (378)', 'Improved Onboarding ✓'],
+        ['Cohort 2026-03', 'M0: 100% (710)', 'M1: 75% (532)', 'M2: NULL (Future)', 'PRUNED (Future Bucket)']
+      ];
+    }
+    if (spec.id === 'sim-matview-triggers-sqli-defense') {
+      return [
+        ['1. Temp Snapshot', 'CREATE TEMP mv_new', 'Compute full fresh query result', 'SAFE (Readers use old MV) ✓'],
+        ['2. Outer Join Diff', 'mv_old FULL JOIN mv_new', 'Identify 12 INSERT / 3 DELETE deltas', 'SAFE (Unique Index Match) ✓'],
+        ['3. Apply Delta', 'INSERT / DELETE in-place', 'No AccessExclusiveLock acquired', 'NON-BLOCKING Refresh ✓']
+      ];
+    }
+    return spec.baseRows.map(r => r.slice());
+  }
+
   function buildInteractiveFrames(spec, preset) {
     const frames = [];
     const cols = spec.columns;
-    const baseRows = spec.baseRows;
+    const baseRows = resolvePresetRows(spec, preset);
     const customNums = Array.isArray(preset.arr) && preset.arr.length >= 2 ? preset.arr : null;
 
     // Frame 0: Initial Table & Schema State
@@ -453,7 +505,7 @@ window.SIMULATORS = window.SIMULATORS || {};
             warn: warnRows,
             tags: { [i]: isWarn ? 'WARN/FILTER' : 'EVAL ✓' }
           }),
-        invariant: `Evaluating tuple [${i}] (${cols[0]}=${row[0]}): ${row.slice(1).map((v, cIdx) => cols[cIdx + 1] + '=' + (v === null ? 'NULL' : v)).join(', ')}.`,
+        invariant: `Evaluating tuple [${i}] (${cols[0]}=${row[0]}) under preset "${preset.label}": ${row.slice(1).map((v, cIdx) => cols[cIdx + 1] + '=' + (v === null ? 'NULL' : v)).join(', ')}.`,
         metrics: [
           { label: 'Cursor Tuple', value: `${i + 1} / ${baseRows.length}` },
           { label: 'Key', value: String(row[0]) },
@@ -492,7 +544,7 @@ window.SIMULATORS = window.SIMULATORS || {};
           warn: finalWarn,
           tags: { [baseRows.length - 1]: 'COMPLETE ✓' }
         }),
-      invariant: `Execution complete: ${finalMatch.length} tuple(s) emitted/verified, ${finalWarn.length} tuple(s) filtered/guarded under ${spec.badge}.`,
+      invariant: `Execution complete (${preset.label}): ${finalMatch.length} tuple(s) emitted/verified, ${finalWarn.length} tuple(s) filtered/guarded under ${spec.badge}.`,
       metrics: [
         { label: 'Total Scanned', value: String(baseRows.length) },
         { label: 'Emitted / Valid', value: String(finalMatch.length) },
@@ -520,6 +572,7 @@ window.SIMULATORS = window.SIMULATORS || {};
       blurb: spec.blurb,
       slugs: spec.slugs,
       presets: spec.presets,
+      customInput: false,
       buildFrames(preset) {
         return buildInteractiveFrames(spec, preset || spec.presets[0]);
       }
