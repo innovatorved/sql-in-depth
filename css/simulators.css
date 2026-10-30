@@ -1677,18 +1677,18 @@
   padding: 4px 8px;
   border-radius: 5px;
   background: rgba(15, 23, 42, 0.7);
-  border-left: 3px solid #6366f1;
+  border: 1px solid rgba(148, 163, 184, 0.2);
   color: #cbd5e1;
 }
 
 .sql-explain-node.is-index {
-  border-left-color: #10b981;
+  border-color: rgba(16, 185, 129, 0.35);
   background: rgba(16, 185, 129, 0.08);
   color: #d1fae5;
 }
 
 .sql-explain-node.is-scan {
-  border-left-color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.35);
   background: rgba(245, 158, 11, 0.08);
 }
 

@@ -923,7 +923,7 @@
           return (
             '<div class="sql-schema-table-item" style="margin-bottom:6px;border:1px solid var(--border);border-radius:6px;background:var(--bg);overflow:hidden;">' +
               '<button type="button" data-sql-preview-table="' + escapeHtml(t.name) + '" data-sql-preview-ds="' + escapeHtml(dsKey) + '" style="width:100%;display:flex;justify-content:space-between;align-items:center;padding:6px 8px;background:var(--surface);border:none;color:var(--fg);font-family:var(--font-mono);font-size:0.78rem;font-weight:600;cursor:pointer;text-align:left;" title="Click to preview SELECT * FROM ' + escapeHtml(t.name) + ' LIMIT 15;">' +
-                '<span>▤ ' + escapeHtml(t.name) + '</span>' +
+                '<span>' + escapeHtml(t.name) + '</span>' +
                 '<span style="font-size:0.68rem;color:var(--fg-muted);font-weight:400;">' + (t.rowCount || (Array.isArray(t.rows) ? t.rows.length : 0)) + ' rows</span>' +
               '</button>' +
               '<div style="padding:4px 4px 6px;border-top:1px solid var(--border);">' + colsHtml + '</div>' +
@@ -932,34 +932,34 @@
         }).join('');
 
         return (
-          '<details class="sql-schema-ds-group" ' + (isCurrentDs ? 'open' : '') + ' style="margin-bottom:10px;border:1px solid var(--border-strong);border-radius:8px;background:var(--surface);padding:6px 8px;">' +
-            '<summary style="cursor:pointer;font-size:0.8rem;font-weight:700;color:var(--fg);display:flex;justify-content:space-between;align-items:center;padding:2px 0;">' +
-              '<span>🗄️ ' + escapeHtml(ds.title || dsKey) + '</span>' +
-              '<span class="eco-pill" style="font-size:0.68rem;">' + tables.length + ' tables</span>' +
+          '<details class="sql-schema-ds-group" ' + (isCurrentDs ? 'open' : '') + ' style="margin-bottom:8px;border:1px solid var(--border);border-radius:6px;background:var(--surface);padding:6px 8px;">' +
+            '<summary style="cursor:pointer;font-size:0.78rem;font-weight:600;color:var(--fg);display:flex;justify-content:space-between;align-items:center;padding:2px 0;">' +
+              '<span>' + escapeHtml(ds.title || dsKey) + '</span>' +
+              '<span style="font-size:0.68rem;font-family:var(--font-mono);color:var(--fg-muted);font-weight:400;">' + tables.length + ' tables</span>' +
             '</summary>' +
-            '<div style="margin-top:8px;">' + tablesHtml + '</div>' +
+            '<div style="margin-top:6px;">' + tablesHtml + '</div>' +
           '</details>'
         );
       }).join('');
     },
 
     _buildSavedHistoryOptionsHtml: function() {
-      if (!root.TableVisualizer) return '<option value="">📚 Saved Queries &amp; History (0)</option>';
+      if (!root.TableVisualizer) return '<option value="">Saved &amp; History (0)</option>';
       var saved = typeof root.TableVisualizer.getSavedQueries === 'function' ? root.TableVisualizer.getSavedQueries() : [];
       var history = typeof root.TableVisualizer.getQueryHistory === 'function' ? root.TableVisualizer.getQueryHistory() : [];
-      var html = '<option value="">📚 Saved Queries (' + saved.length + ') &amp; History (' + history.length + ')...</option>';
+      var html = '<option value="">Saved (' + saved.length + ') &amp; History (' + history.length + ')</option>';
       if (saved.length > 0) {
-        html += '<optgroup label="★ Saved Queries">';
+        html += '<optgroup label="Saved Queries">';
         saved.forEach(function(item) {
-          html += '<option value="saved:' + escapeHtml(item.id) + '">★ ' + escapeHtml(item.title) + ' (' + escapeHtml(item.datasetId || 'ecommerce') + ')</option>';
+          html += '<option value="saved:' + escapeHtml(item.id) + '">' + escapeHtml(item.title) + ' (' + escapeHtml(item.datasetId || 'ecommerce') + ')</option>';
         });
         html += '</optgroup>';
       }
       if (history.length > 0) {
-        html += '<optgroup label="🕒 Recent Executed Queries">';
+        html += '<optgroup label="Recent History">';
         history.forEach(function(item) {
           var snippet = String(item.sql || '').replace(/\s+/g, ' ').trim().slice(0, 56);
-          html += '<option value="history:' + escapeHtml(item.id) + '">🕒 ' + escapeHtml(snippet) + ' (' + (item.rowCount || 0) + ' rows)</option>';
+          html += '<option value="history:' + escapeHtml(item.id) + '">' + escapeHtml(snippet) + ' (' + (item.rowCount || 0) + ' rows)</option>';
         });
         html += '</optgroup>';
       }
@@ -984,7 +984,8 @@
         referenceSql: sql,
         startAtFinal: opts.startAtFinal !== false,
         focusExplain: Boolean(opts.focusExplain),
-        runTests: Boolean(opts.runTests)
+        runTests: Boolean(opts.runTests),
+        compactHeader: true
       });
       Promise.resolve(this._sqlStudioVizHandle).then(function() {
         var sel = self._container ? self._container.querySelector('#wb-sql-saved-history-select') : null;
@@ -1145,18 +1146,18 @@
       var capacityPanelHtml = this._renderCapacityEstimator(cap);
 
       var modeSwitcherHtml =
-        '<div class="wb-mode-switcher" role="tablist" aria-label="SQL Workbench Mode Switcher" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;margin-bottom:4px;">' +
-          '<button type="button" role="tab" aria-selected="' + (this._activeWorkbenchMode === 'sql-studio') + '" class="eco-btn ' + (this._activeWorkbenchMode === 'sql-studio' ? 'eco-btn--primary' : '') + '" data-workbench-mode="sql-studio">' +
-            '⚡ Interactive SQL &amp; Table Studio (PostgreSQL 18 / SQLite WASM)' +
+        '<div class="wb-mode-switcher" role="tablist" aria-label="SQL Workbench Mode Switcher" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">' +
+          '<button type="button" role="tab" aria-selected="' + (this._activeWorkbenchMode === 'sql-studio') + '" class="eco-btn eco-btn--sm ' + (this._activeWorkbenchMode === 'sql-studio' ? 'eco-btn--primary' : '') + '" data-workbench-mode="sql-studio">' +
+            'SQL Sandbox' +
           '</button>' +
-          '<button type="button" role="tab" aria-selected="' + (this._activeWorkbenchMode === 'architecture-canvas') + '" class="eco-btn ' + (this._activeWorkbenchMode === 'architecture-canvas' ? 'eco-btn--primary' : '') + '" data-workbench-mode="architecture-canvas">' +
-            '🗺️ Database Architecture &amp; Sharding Canvas' +
+          '<button type="button" role="tab" aria-selected="' + (this._activeWorkbenchMode === 'architecture-canvas') + '" class="eco-btn eco-btn--sm ' + (this._activeWorkbenchMode === 'architecture-canvas' ? 'eco-btn--primary' : '') + '" data-workbench-mode="architecture-canvas">' +
+            'Architecture Canvas' +
           '</button>' +
         '</div>';
 
       if (this._activeWorkbenchMode === 'sql-studio') {
         var templates = this._getSqlStudioTemplates();
-        var templateOptionsHtml = '<option value="">— Select Curated SQL Query Template —</option>' +
+        var templateOptionsHtml = '<option value="">Load example query...</option>' +
           templates.map(function(t) {
             return '<option value="' + escapeHtml(t.id) + '">' + escapeHtml(t.label) + '</option>';
           }).join('');
@@ -1164,7 +1165,7 @@
         var schemaExplorerHtml = this._renderSqlStudioSchemaExplorer();
         var practiceChipsHtml = (root.TableVisualizer && Array.isArray(root.TableVisualizer.SQL_PRACTICE_CHIPS))
           ? '<div class="sql-practice-bar" id="wb-sql-practice-bar">' +
-              '<span class="sql-practice-bar__label">⚡ Practice Clauses:</span>' +
+              '<span class="sql-practice-bar__label" style="font-size:0.72rem;color:var(--fg-muted);font-family:var(--font-mono);margin-right:4px;">Insert clause:</span>' +
               root.TableVisualizer.SQL_PRACTICE_CHIPS.map(function(c) {
                 return '<button type="button" class="sql-practice-chip" data-wb-sql-chip="' + escapeHtml(c.id) + '" data-sql-chip="' + escapeHtml(c.id) + '" title="Insert ' + escapeHtml(c.label) + ' clause">' + escapeHtml(c.label) + '</button>';
               }).join('') +
@@ -1172,89 +1173,87 @@
           : '';
 
         this._container.innerHTML =
-          '<div class="view-canvas sandbox-view">' +
-            '<header class="view-header">' +
-              '<div class="view-header__top">' +
-                '<div class="view-header__content">' +
-                  '<div class="view-badge-row">' +
-                    '<span class="eco-pill eco-pill--accent">Interactive SQL &amp; Table Studio</span>' +
-                    '<span class="eco-pill">PostgreSQL 18 (PGlite WASM) &amp; SQLite 3.46 WASM</span>' +
-                    '<span class="eco-pill">5 Relational Datasets · 26 Tables</span>' +
-                    '<span class="eco-pill">Step-by-Step Clause Visualizer</span>' +
-                  '</div>' +
-                  '<h1 class="view-title">SQL Workbench &amp; Relational Execution Studio</h1>' +
-                  '<p class="view-subtitle">Write and execute real SQL queries in your browser, inspect schemas &amp; foreign keys across 5 relational datasets, and step through every relational clause (FROM → JOIN → WHERE → GROUP BY → WINDOW → SELECT → ORDER BY).</p>' +
-                  modeSwitcherHtml +
-                '</div>' +
+          '<div class="view-canvas sandbox-view sandbox-view--clean">' +
+            '<header class="wb-sandbox-topbar">' +
+              '<div class="wb-sandbox-brand">' +
+                '<h1 class="view-title wb-sandbox-title">SQL Sandbox</h1>' +
+                '<span class="wb-sandbox-meta">5 Datasets · 26 Tables</span>' +
               '</div>' +
-              '<div class="sandbox-blueprint-bar" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 14px;">' +
-                '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
-                  '<label style="font-size:0.78rem;font-weight:600;color:var(--fg-muted);display:flex;align-items:center;gap:6px;">' +
-                    '<span>Engine:</span>' +
-                    '<select id="wb-sql-engine-select" class="eco-search-input" style="padding:4px 8px;font-size:0.78rem;min-width:210px;">' +
-                      '<option value="postgres" ' + (this._sqlStudioEngine === 'postgres' ? 'selected' : '') + '>PostgreSQL 18 (PGlite WASM)</option>' +
-                      '<option value="sqlite" ' + (this._sqlStudioEngine === 'sqlite' ? 'selected' : '') + '>SQLite 3.46 (sql.js WASM)</option>' +
-                    '</select>' +
-                  '</label>' +
-                  '<label style="font-size:0.78rem;font-weight:600;color:var(--fg-muted);display:flex;align-items:center;gap:6px;">' +
-                    '<span>Dataset:</span>' +
-                    '<select id="wb-sql-dataset-select" class="eco-search-input" style="padding:4px 8px;font-size:0.78rem;min-width:190px;">' +
-                      '<option value="__unified__" ' + (this._sqlStudioDatasetId === '__unified__' ? 'selected' : '') + '>All 5 Datasets (Unified Sandbox)</option>' +
-                      '<option value="ecommerce" ' + (this._sqlStudioDatasetId === 'ecommerce' ? 'selected' : '') + '>E-Commerce &amp; Orders</option>' +
-                      '<option value="org_hr" ' + (this._sqlStudioDatasetId === 'org_hr' ? 'selected' : '') + '>Org Hierarchy &amp; HR</option>' +
-                      '<option value="fintech_ledger" ' + (this._sqlStudioDatasetId === 'fintech_ledger' ? 'selected' : '') + '>Double-Entry Fintech Ledger</option>' +
-                      '<option value="saas_telemetry" ' + (this._sqlStudioDatasetId === 'saas_telemetry' ? 'selected' : '') + '>SaaS Subscriptions &amp; Telemetry</option>' +
-                      '<option value="social_graph" ' + (this._sqlStudioDatasetId === 'social_graph' ? 'selected' : '') + '>Social Graph &amp; Content Feed</option>' +
-                    '</select>' +
-                  '</label>' +
-                  '<label style="font-size:0.78rem;font-weight:600;color:var(--fg-muted);display:flex;align-items:center;gap:6px;">' +
-                    '<span>Templates:</span>' +
-                    '<select id="wb-sql-template-select" class="eco-search-input" style="padding:4px 8px;font-size:0.78rem;min-width:260px;">' +
-                      templateOptionsHtml +
-                    '</select>' +
-                  '</label>' +
-                '</div>' +
-                '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
-                  '<button type="button" class="eco-btn eco-btn--sm eco-btn--primary" data-sql-studio-action="execute">▶ Execute SQL (⌘↵)</button>' +
-                  '<button type="button" class="eco-btn eco-btn--sm" data-sql-studio-action="step-clauses">🔍 Step-by-Step Clause Visualizer</button>' +
-                  '<button type="button" class="eco-btn eco-btn--sm" data-sql-studio-action="explain">📊 EXPLAIN QUERY PLAN</button>' +
-                  '<button type="button" class="eco-btn eco-btn--sm" data-sql-studio-action="reset-db">↺ Reset DB</button>' +
-                '</div>' +
+              '<div class="wb-sandbox-controls">' +
+                '<label class="wb-ctrl-field">' +
+                  '<span>Engine</span>' +
+                  '<select id="wb-sql-engine-select" class="eco-search-input wb-ctrl-select">' +
+                    '<option value="postgres" ' + (this._sqlStudioEngine === 'postgres' ? 'selected' : '') + '>PostgreSQL 18 (WASM)</option>' +
+                    '<option value="sqlite" ' + (this._sqlStudioEngine === 'sqlite' ? 'selected' : '') + '>SQLite 3.46 (WASM)</option>' +
+                  '</select>' +
+                '</label>' +
+                '<label class="wb-ctrl-field">' +
+                  '<span>Dataset</span>' +
+                  '<select id="wb-sql-dataset-select" class="eco-search-input wb-ctrl-select">' +
+                    '<option value="__unified__" ' + (this._sqlStudioDatasetId === '__unified__' ? 'selected' : '') + '>All 5 Datasets (Unified)</option>' +
+                    '<option value="ecommerce" ' + (this._sqlStudioDatasetId === 'ecommerce' ? 'selected' : '') + '>E-Commerce &amp; Orders</option>' +
+                    '<option value="org_hr" ' + (this._sqlStudioDatasetId === 'org_hr' ? 'selected' : '') + '>Org Hierarchy &amp; HR</option>' +
+                    '<option value="fintech_ledger" ' + (this._sqlStudioDatasetId === 'fintech_ledger' ? 'selected' : '') + '>Fintech Ledger</option>' +
+                    '<option value="saas_telemetry" ' + (this._sqlStudioDatasetId === 'saas_telemetry' ? 'selected' : '') + '>SaaS Telemetry</option>' +
+                    '<option value="social_graph" ' + (this._sqlStudioDatasetId === 'social_graph' ? 'selected' : '') + '>Social Graph</option>' +
+                  '</select>' +
+                '</label>' +
+                '<label class="wb-ctrl-field">' +
+                  '<span>Examples</span>' +
+                  '<select id="wb-sql-template-select" class="eco-search-input wb-ctrl-select">' +
+                    templateOptionsHtml +
+                  '</select>' +
+                '</label>' +
+                '<label class="wb-ctrl-field">' +
+                  '<span>Saved</span>' +
+                  '<select id="wb-sql-saved-history-select" data-sql-ide-role="saved-history-select" aria-label="Saved Queries and Query History" class="eco-search-input wb-ctrl-select">' +
+                    this._buildSavedHistoryOptionsHtml() +
+                  '</select>' +
+                '</label>' +
               '</div>' +
             '</header>' +
             '<main class="view-body" id="sandbox-mount-target">' +
-              '<div class="sandbox-workspace" style="display:grid;grid-template-columns:280px 1fr;gap:16px;align-items:start;">' +
-                '<aside class="sandbox-palette" style="max-height:780px;overflow-y:auto;padding:12px;">' +
-                  '<div class="sandbox-palette__header" style="margin-bottom:10px;">' +
-                    '<h3 class="inspector-subtitle">Schema &amp; Table Explorer</h3>' +
-                    '<span class="sandbox-palette__hint">Click table to preview · Click column to insert</span>' +
+              '<div class="sandbox-workspace wb-sql-workspace">' +
+                '<aside class="sandbox-palette wb-schema-sidebar">' +
+                  '<div class="sandbox-palette__header wb-schema-sidebar__header">' +
+                    '<h3 class="inspector-subtitle">Schema</h3>' +
+                    '<span class="sandbox-palette__hint">Click table to preview, column to insert</span>' +
                   '</div>' +
                   '<div id="wb-sql-schema-sidebar">' + schemaExplorerHtml + '</div>' +
                 '</aside>' +
-                '<section class="sandbox-canvas-wrapper" style="display:flex;flex-direction:column;gap:14px;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;">' +
-                  '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">' +
-                    '<div style="display:flex;align-items:center;gap:8px;">' +
-                      '<span class="eco-pill eco-pill--accent">query.sql</span>' +
-                      '<span style="font-size:0.76rem;color:var(--fg-muted);">Write any SELECT, CTE, Window Function, JOIN, or DDL/DML statement</span>' +
+                '<section class="sandbox-canvas-wrapper wb-sql-main">' +
+                  '<div class="wb-editor-card">' +
+                    '<div class="wb-editor-toolbar">' +
+                      '<div class="wb-editor-toolbar__left">' +
+                        '<button type="button" class="eco-btn eco-btn--sm eco-btn--primary" data-sql-studio-action="execute">Run Query (Cmd+Enter)</button>' +
+                        '<button type="button" class="eco-btn eco-btn--sm" data-sql-studio-action="step-clauses">Step Clauses</button>' +
+                        '<button type="button" class="eco-btn eco-btn--sm" data-sql-studio-action="explain">Explain Plan</button>' +
+                      '</div>' +
+                      '<div class="wb-editor-toolbar__right">' +
+                        '<button type="button" class="eco-btn eco-btn--sm" data-wb-ide-action="format" data-sql-ide-action="format">Format</button>' +
+                        '<button type="button" class="eco-btn eco-btn--sm" data-wb-ide-action="copy" data-sql-ide-action="copy">Copy</button>' +
+                        '<button type="button" class="eco-btn eco-btn--sm" data-sql-studio-action="reset-db">Reset DB</button>' +
+                        '<details class="wb-tools-menu">' +
+                          '<summary class="eco-btn eco-btn--sm">Save / Export</summary>' +
+                          '<div class="wb-tools-popover sql-studio-saved-panel">' +
+                            '<div class="wb-tools-popover__row">' +
+                              '<input type="text" id="wb-sql-save-title-input" data-sql-ide-role="save-title-input" placeholder="Query name..." aria-label="Query title" class="wb-save-input" />' +
+                              '<button type="button" class="eco-btn eco-btn--sm" data-wb-ide-action="save-query" data-sql-ide-action="save-query">Save</button>' +
+                              '<button type="button" class="eco-btn eco-btn--sm" data-wb-ide-action="delete-saved" data-sql-ide-action="delete-saved">Delete Saved</button>' +
+                            '</div>' +
+                            '<div class="wb-tools-popover__row">' +
+                              '<span class="wb-tools-popover__label">Export:</span>' +
+                              '<button type="button" class="eco-btn eco-btn--sm" data-wb-ide-action="export-sql" data-sql-ide-action="export-sql">.sql</button>' +
+                              '<button type="button" class="eco-btn eco-btn--sm" data-wb-ide-action="export-csv" data-sql-ide-action="export-csv">.csv</button>' +
+                              '<button type="button" class="eco-btn eco-btn--sm" data-wb-ide-action="export-json" data-sql-ide-action="export-json">.json</button>' +
+                            '</div>' +
+                          '</div>' +
+                        '</details>' +
+                      '</div>' +
                     '</div>' +
-                    '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">' +
-                      '<button type="button" class="eco-btn eco-btn--sm" data-wb-ide-action="format" data-sql-ide-action="format">✨ Format SQL</button>' +
-                      '<button type="button" class="eco-btn eco-btn--sm" data-wb-ide-action="copy" data-sql-ide-action="copy">📋 Copy SQL</button>' +
-                      '<button type="button" class="eco-btn eco-btn--sm" data-wb-ide-action="export-sql" data-sql-ide-action="export-sql">⬇ .sql</button>' +
-                      '<button type="button" class="eco-btn eco-btn--sm" data-wb-ide-action="export-csv" data-sql-ide-action="export-csv">⬇ .csv</button>' +
-                      '<button type="button" class="eco-btn eco-btn--sm" data-wb-ide-action="export-json" data-sql-ide-action="export-json">⬇ .json</button>' +
-                    '</div>' +
+                    '<textarea class="sql-studio-editor sql-inline-workbench__editor" id="wb-sql-studio-editor" spellcheck="false" rows="8">' + escapeHtml(this._sqlStudioQuery) + '</textarea>' +
+                    practiceChipsHtml +
                   '</div>' +
-                  '<div class="sql-studio-saved-panel" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:6px 10px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;">' +
-                    '<input type="text" id="wb-sql-save-title-input" data-sql-ide-role="save-title-input" placeholder="Query title (optional)..." aria-label="Query title" style="background:var(--bg-surface);color:var(--fg);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:0.75rem;min-width:150px;" />' +
-                    '<button type="button" class="eco-btn eco-btn--sm" data-wb-ide-action="save-query" data-sql-ide-action="save-query">💾 Save Query</button>' +
-                    '<select id="wb-sql-saved-history-select" data-sql-ide-role="saved-history-select" aria-label="Saved Queries and Query History" style="background:var(--bg-surface);color:var(--fg);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:0.75rem;max-width:280px;">' +
-                      this._buildSavedHistoryOptionsHtml() +
-                    '</select>' +
-                    '<button type="button" class="eco-btn eco-btn--sm" data-wb-ide-action="delete-saved" data-sql-ide-action="delete-saved">🗑 Delete Saved</button>' +
-                  '</div>' +
-                  '<textarea class="sql-studio-editor sql-inline-workbench__editor" id="wb-sql-studio-editor" spellcheck="false" rows="9" style="width:100%;min-height:175px;font-family:var(--font-mono);font-size:0.84rem;line-height:1.55;padding:12px;border-radius:8px;border:1px solid var(--border-strong);background:var(--bg);color:var(--fg);resize:vertical;">' + escapeHtml(this._sqlStudioQuery) + '</textarea>' +
-                  practiceChipsHtml +
                   '<div id="wb-sql-studio-visualizer-slot"></div>' +
                 '</section>' +
               '</div>' +

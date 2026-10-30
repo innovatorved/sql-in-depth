@@ -6147,3 +6147,184 @@ body.view-ecosystem .main__content {
   border-color: #818cf8;
 }
 
+/* ── Clean SQL Sandbox Layout (/sandbox) ───────────────────── */
+.sandbox-view--clean {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.wb-sandbox-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg, 8px);
+}
+
+.wb-sandbox-brand {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.wb-sandbox-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.wb-sandbox-meta {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.74rem;
+  color: var(--fg-muted);
+}
+
+.wb-sandbox-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.wb-ctrl-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--fg-muted);
+}
+
+.wb-ctrl-select {
+  padding: 4px 8px;
+  font-size: 0.76rem;
+  height: 30px;
+  min-width: 150px;
+  max-width: 220px;
+}
+
+.wb-sql-workspace {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .wb-sql-workspace {
+    grid-template-columns: 1fr;
+  }
+}
+
+.wb-schema-sidebar {
+  max-height: 760px;
+  overflow-y: auto;
+  padding: 12px;
+  gap: 8px;
+}
+
+.wb-schema-sidebar__header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 4px;
+}
+
+.wb-sql-main {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  overflow: visible;
+}
+
+.wb-editor-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg, 8px);
+}
+
+.wb-editor-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.wb-editor-toolbar__left,
+.wb-editor-toolbar__right {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.wb-tools-menu {
+  position: relative;
+}
+
+.wb-tools-menu > summary {
+  list-style: none;
+  user-select: none;
+}
+
+.wb-tools-menu > summary::-webkit-details-marker {
+  display: none;
+}
+
+.wb-tools-popover {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 30;
+  min-width: 300px;
+  padding: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md, 6px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wb-tools-popover__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.wb-tools-popover__label {
+  font-size: 0.72rem;
+  font-family: var(--font-mono, monospace);
+  color: var(--fg-muted);
+  margin-right: 2px;
+}
+
+.wb-save-input {
+  flex: 1;
+  min-width: 130px;
+  height: 28px;
+  padding: 0 8px;
+  font-size: 0.75rem;
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm, 4px);
+}
+
+
