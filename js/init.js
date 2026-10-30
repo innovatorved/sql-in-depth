@@ -36,7 +36,7 @@
   } catch {}
 
   // 4. Google Analytics 4 & Consent Mode v2 (GDPR / DPDP compliant)
-  window.GA_MEASUREMENT_ID = 'G-GF7VK3LRPJ';
+  window.GA_MEASUREMENT_ID = 'G-ZXCPY54BY7';
   window.dataLayer = window.dataLayer || [];
   function gtag() { window.dataLayer.push(arguments); }
   window.gtag = gtag;
@@ -56,7 +56,7 @@
   });
 
   gtag('js', new Date());
-  gtag('config', 'G-GF7VK3LRPJ', {
+  gtag('config', 'G-ZXCPY54BY7', {
     send_page_view: false // Handled dynamically on SPA route changes by js/analytics.js
   });
 
