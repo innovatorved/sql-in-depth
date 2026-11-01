@@ -4,21 +4,23 @@ window.MODULE_CONTENT["m17"] = {
   "single-leader-replication-sync-async": {
     "title": "Single-Leader Replication: Physical WAL Streaming vs Logical Replication & Sync/Async",
     "video": {
-      "youtubeId": "o7bjRUcDMx0",
-      "title": "Single-Leader Replication: Physical WAL Streaming vs Logical Replication & Sync/Async — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:21:12",
+      "youtubeId": "IFLQBWY6dlE",
+      "title": "#23 - Distributed Databases: Partitioning & Replication (CMU Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 16m",
       "start": 0,
-      "length": "81m",
-      "why": "Builds first-principles mastery of Single-Leader Replication: Physical WAL Streaming vs Logical Replication & Sync/Async with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "76m",
+      "why": "Key focus timestamps: 14:10 Sharding strategies (hash vs range); 32:00 Two-Phase Commit (2PC); 51:30 Paxos & Raft consensus"
     },
     "videos": [
       {
-        "youtubeId": "3wNmpE6DsSs",
-        "title": "Replication, Partitioning, Sharding & Distributed NewSQL: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:19:30",
-        "why": "Complementary lecture covering production implementation details for Replication, Partitioning, Sharding & Distributed NewSQL."
+        "youtubeId": "aE2UPg3Ckck",
+        "title": "All Types of Database Replication Discussed",
+        "channel": "Hussein Nasser",
+        "duration": "26m 19s",
+        "length": "26m",
+        "role": "deep-dive",
+        "why": "Sync vs async replication, replication lag, read-your-own-writes consistency, and failover mechanics."
       }
     ],
     "intuition": "<p>In <strong>Single-Leader Replication: Physical WAL Streaming vs Logical Replication & Sync/Async</strong> (<code>single-leader-replication-sync-async</code>), Comparing byte-for-byte physical WAL streaming against row-level logical replication, and the latency vs RPO=0 trade-off of synchronous standbys. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Single-Leader Replication: Physical WAL Streaming vs Logical Replication & Sync/Async</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -47,21 +49,23 @@ window.MODULE_CONTENT["m17"] = {
   "read-replicas-consistency-models": {
     "title": "Scaling Reads with Replicas: Read-Your-Writes, Monotonic Reads & Lag Anomalies",
     "video": {
-      "youtubeId": "3wNmpE6DsSs",
-      "title": "Scaling Reads with Replicas: Read-Your-Writes, Monotonic Reads & Lag Anomalies — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:19:30",
+      "youtubeId": "IFLQBWY6dlE",
+      "title": "#23 - Distributed Databases: Partitioning & Replication (CMU Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 16m",
       "start": 0,
-      "length": "80m",
-      "why": "Builds first-principles mastery of Scaling Reads with Replicas: Read-Your-Writes, Monotonic Reads & Lag Anomalies with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "76m",
+      "why": "Key focus timestamps: 14:10 Sharding strategies (hash vs range); 32:00 Two-Phase Commit (2PC); 51:30 Paxos & Raft consensus"
     },
     "videos": [
       {
-        "youtubeId": "o7bjRUcDMx0",
-        "title": "Replication, Partitioning, Sharding & Distributed NewSQL: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:21:12",
-        "why": "Complementary lecture covering production implementation details for Replication, Partitioning, Sharding & Distributed NewSQL."
+        "youtubeId": "aE2UPg3Ckck",
+        "title": "All Types of Database Replication Discussed",
+        "channel": "Hussein Nasser",
+        "duration": "26m 19s",
+        "length": "26m",
+        "role": "deep-dive",
+        "why": "Sync vs async replication, replication lag, read-your-own-writes consistency, and failover mechanics."
       }
     ],
     "intuition": "<p>In <strong>Scaling Reads with Replicas: Read-Your-Writes, Monotonic Reads & Lag Anomalies</strong> (<code>read-replicas-consistency-models</code>), Why routing reads to asynchronous replicas causes users to think their just-saved data vanished, and fixing it with LSN causal tracking or primary pinning. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Scaling Reads with Replicas: Read-Your-Writes, Monotonic Reads & Lag Anomalies</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -90,21 +94,23 @@ window.MODULE_CONTENT["m17"] = {
   "failover-split-brain-fencing-tokens": {
     "title": "Automated High-Availability Failover, Split-Brain Hazards & Fencing Tokens",
     "video": {
-      "youtubeId": "o7bjRUcDMx0",
-      "title": "Automated High-Availability Failover, Split-Brain Hazards & Fencing Tokens — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:21:12",
+      "youtubeId": "IFLQBWY6dlE",
+      "title": "#23 - Distributed Databases: Partitioning & Replication (CMU Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 16m",
       "start": 0,
-      "length": "81m",
-      "why": "Builds first-principles mastery of Automated High-Availability Failover, Split-Brain Hazards & Fencing Tokens with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "76m",
+      "why": "Key focus timestamps: 14:10 Sharding strategies (hash vs range); 32:00 Two-Phase Commit (2PC); 51:30 Paxos & Raft consensus"
     },
     "videos": [
       {
-        "youtubeId": "3wNmpE6DsSs",
-        "title": "Replication, Partitioning, Sharding & Distributed NewSQL: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:19:30",
-        "why": "Complementary lecture covering production implementation details for Replication, Partitioning, Sharding & Distributed NewSQL."
+        "youtubeId": "aE2UPg3Ckck",
+        "title": "All Types of Database Replication Discussed",
+        "channel": "Hussein Nasser",
+        "duration": "26m 19s",
+        "length": "26m",
+        "role": "deep-dive",
+        "why": "Sync vs async replication, replication lag, read-your-own-writes consistency, and failover mechanics."
       }
     ],
     "intuition": "<p>In <strong>Automated High-Availability Failover, Split-Brain Hazards & Fencing Tokens</strong> (<code>failover-split-brain-fencing-tokens</code>), What happens when a partitioned primary comes back online believing it is still leader, and how consensus leases, STONITH, and monotonic fencing tokens prevent corruption. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Automated High-Availability Failover, Split-Brain Hazards & Fencing Tokens</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -133,21 +139,23 @@ window.MODULE_CONTENT["m17"] = {
   "declarative-table-partitioning": {
     "title": "Declarative Table Partitioning (Range, List, Hash) & Instant Retention Drops",
     "video": {
-      "youtubeId": "3wNmpE6DsSs",
-      "title": "Declarative Table Partitioning (Range, List, Hash) & Instant Retention Drops — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:19:30",
+      "youtubeId": "IFLQBWY6dlE",
+      "title": "#23 - Distributed Databases: Partitioning & Replication (CMU Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 16m",
       "start": 0,
-      "length": "80m",
-      "why": "Builds first-principles mastery of Declarative Table Partitioning (Range, List, Hash) & Instant Retention Drops with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "76m",
+      "why": "Key focus timestamps: 14:10 Sharding strategies (hash vs range); 32:00 Two-Phase Commit (2PC); 51:30 Paxos & Raft consensus"
     },
     "videos": [
       {
-        "youtubeId": "o7bjRUcDMx0",
-        "title": "Replication, Partitioning, Sharding & Distributed NewSQL: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:21:12",
-        "why": "Complementary lecture covering production implementation details for Replication, Partitioning, Sharding & Distributed NewSQL."
+        "youtubeId": "aE2UPg3Ckck",
+        "title": "All Types of Database Replication Discussed",
+        "channel": "Hussein Nasser",
+        "duration": "26m 19s",
+        "length": "26m",
+        "role": "deep-dive",
+        "why": "Sync vs async replication, replication lag, read-your-own-writes consistency, and failover mechanics."
       }
     ],
     "intuition": "<p>In <strong>Declarative Table Partitioning (Range, List, Hash) & Instant Retention Drops</strong> (<code>declarative-table-partitioning</code>), Splitting billion-row tables into monthly child partitions for planner partition pruning and instant O(1) data expiration via DROP/DETACH PARTITION instead of DELETE. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Declarative Table Partitioning (Range, List, Hash) & Instant Retention Drops</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -176,21 +184,23 @@ window.MODULE_CONTENT["m17"] = {
   "horizontal-sharding-routing-keys": {
     "title": "Horizontal Sharding (Vitess / Citus): Shard Keys, Consistent Hashing & Scatter-Gather",
     "video": {
-      "youtubeId": "o7bjRUcDMx0",
-      "title": "Horizontal Sharding (Vitess / Citus): Shard Keys, Consistent Hashing & Scatter-Gather — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:21:12",
+      "youtubeId": "IFLQBWY6dlE",
+      "title": "#23 - Distributed Databases: Partitioning & Replication (CMU Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 16m",
       "start": 0,
-      "length": "81m",
-      "why": "Builds first-principles mastery of Horizontal Sharding (Vitess / Citus): Shard Keys, Consistent Hashing & Scatter-Gather with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "76m",
+      "why": "Key focus timestamps: 14:10 Sharding strategies (hash vs range); 32:00 Two-Phase Commit (2PC); 51:30 Paxos & Raft consensus"
     },
     "videos": [
       {
-        "youtubeId": "3wNmpE6DsSs",
-        "title": "Replication, Partitioning, Sharding & Distributed NewSQL: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:19:30",
-        "why": "Complementary lecture covering production implementation details for Replication, Partitioning, Sharding & Distributed NewSQL."
+        "youtubeId": "aE2UPg3Ckck",
+        "title": "All Types of Database Replication Discussed",
+        "channel": "Hussein Nasser",
+        "duration": "26m 19s",
+        "length": "26m",
+        "role": "deep-dive",
+        "why": "Sync vs async replication, replication lag, read-your-own-writes consistency, and failover mechanics."
       }
     ],
     "intuition": "<p>In <strong>Horizontal Sharding (Vitess / Citus): Shard Keys, Consistent Hashing & Scatter-Gather</strong> (<code>horizontal-sharding-routing-keys</code>), Choosing a tenant or entity shard key so 99% of queries route to a single shard, avoiding cross-shard scatter-gather tail latency and celebrity hot-shard skew. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Horizontal Sharding (Vitess / Citus): Shard Keys, Consistent Hashing & Scatter-Gather</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -219,21 +229,23 @@ window.MODULE_CONTENT["m17"] = {
   "distributed-transactions-2pc-saga": {
     "title": "Distributed Transactions: Two-Phase Commit (2PC) Blocking vs Saga Pattern",
     "video": {
-      "youtubeId": "3wNmpE6DsSs",
-      "title": "Distributed Transactions: Two-Phase Commit (2PC) Blocking vs Saga Pattern — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:19:30",
+      "youtubeId": "IFLQBWY6dlE",
+      "title": "#23 - Distributed Databases: Partitioning & Replication (CMU Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 16m",
       "start": 0,
-      "length": "80m",
-      "why": "Builds first-principles mastery of Distributed Transactions: Two-Phase Commit (2PC) Blocking vs Saga Pattern with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "76m",
+      "why": "Key focus timestamps: 14:10 Sharding strategies (hash vs range); 32:00 Two-Phase Commit (2PC); 51:30 Paxos & Raft consensus"
     },
     "videos": [
       {
-        "youtubeId": "o7bjRUcDMx0",
-        "title": "Replication, Partitioning, Sharding & Distributed NewSQL: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:21:12",
-        "why": "Complementary lecture covering production implementation details for Replication, Partitioning, Sharding & Distributed NewSQL."
+        "youtubeId": "aE2UPg3Ckck",
+        "title": "All Types of Database Replication Discussed",
+        "channel": "Hussein Nasser",
+        "duration": "26m 19s",
+        "length": "26m",
+        "role": "deep-dive",
+        "why": "Sync vs async replication, replication lag, read-your-own-writes consistency, and failover mechanics."
       }
     ],
     "intuition": "<p>In <strong>Distributed Transactions: Two-Phase Commit (2PC) Blocking vs Saga Pattern</strong> (<code>distributed-transactions-2pc-saga</code>), Why atomic Two-Phase Commit (Prepare + Commit) amplifies latency and locks resources if the coordinator crashes, and when compensating Sagas win. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Distributed Transactions: Two-Phase Commit (2PC) Blocking vs Saga Pattern</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -262,21 +274,23 @@ window.MODULE_CONTENT["m17"] = {
   "distributed-sql-spanner-cockroachdb": {
     "title": "Distributed NewSQL Internals (Spanner & CockroachDB): Raft Ranges, TrueTime & HLC",
     "video": {
-      "youtubeId": "o7bjRUcDMx0",
-      "title": "Distributed NewSQL Internals (Spanner & CockroachDB): Raft Ranges, TrueTime & HLC — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:21:12",
+      "youtubeId": "IFLQBWY6dlE",
+      "title": "#23 - Distributed Databases: Partitioning & Replication (CMU Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 16m",
       "start": 0,
-      "length": "81m",
-      "why": "Builds first-principles mastery of Distributed NewSQL Internals (Spanner & CockroachDB): Raft Ranges, TrueTime & HLC with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "76m",
+      "why": "Key focus timestamps: 14:10 Sharding strategies (hash vs range); 32:00 Two-Phase Commit (2PC); 51:30 Paxos & Raft consensus"
     },
     "videos": [
       {
-        "youtubeId": "3wNmpE6DsSs",
-        "title": "Replication, Partitioning, Sharding & Distributed NewSQL: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:19:30",
-        "why": "Complementary lecture covering production implementation details for Replication, Partitioning, Sharding & Distributed NewSQL."
+        "youtubeId": "aE2UPg3Ckck",
+        "title": "All Types of Database Replication Discussed",
+        "channel": "Hussein Nasser",
+        "duration": "26m 19s",
+        "length": "26m",
+        "role": "deep-dive",
+        "why": "Sync vs async replication, replication lag, read-your-own-writes consistency, and failover mechanics."
       }
     ],
     "intuition": "<p>In <strong>Distributed NewSQL Internals (Spanner & CockroachDB): Raft Ranges, TrueTime & HLC</strong> (<code>distributed-sql-spanner-cockroachdb</code>), How NewSQL engines shard sorted key-value ranges across Raft consensus groups and use atomic/GPS TrueTime or Hybrid Logical Clocks for external consistency. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Distributed NewSQL Internals (Spanner & CockroachDB): Raft Ranges, TrueTime & HLC</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -305,21 +319,23 @@ window.MODULE_CONTENT["m17"] = {
   "connection-pooling-pgbouncer-proxies": {
     "title": "Connection Pooling Architecture: Process-Per-Connection Overhead & PgBouncer Modes",
     "video": {
-      "youtubeId": "3wNmpE6DsSs",
-      "title": "Connection Pooling Architecture: Process-Per-Connection Overhead & PgBouncer Modes — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:19:30",
+      "youtubeId": "IFLQBWY6dlE",
+      "title": "#23 - Distributed Databases: Partitioning & Replication (CMU Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 16m",
       "start": 0,
-      "length": "80m",
-      "why": "Builds first-principles mastery of Connection Pooling Architecture: Process-Per-Connection Overhead & PgBouncer Modes with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "76m",
+      "why": "Key focus timestamps: 14:10 Sharding strategies (hash vs range); 32:00 Two-Phase Commit (2PC); 51:30 Paxos & Raft consensus"
     },
     "videos": [
       {
-        "youtubeId": "o7bjRUcDMx0",
-        "title": "Replication, Partitioning, Sharding & Distributed NewSQL: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:21:12",
-        "why": "Complementary lecture covering production implementation details for Replication, Partitioning, Sharding & Distributed NewSQL."
+        "youtubeId": "aE2UPg3Ckck",
+        "title": "All Types of Database Replication Discussed",
+        "channel": "Hussein Nasser",
+        "duration": "26m 19s",
+        "length": "26m",
+        "role": "deep-dive",
+        "why": "Sync vs async replication, replication lag, read-your-own-writes consistency, and failover mechanics."
       }
     ],
     "intuition": "<p>In <strong>Connection Pooling Architecture: Process-Per-Connection Overhead & PgBouncer Modes</strong> (<code>connection-pooling-pgbouncer-proxies</code>), Why 5,000 idle application connections exhaust PostgreSQL RAM and snapshot scalability, and how transaction-mode multiplexing shares 100 server connections. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Connection Pooling Architecture: Process-Per-Connection Overhead & PgBouncer Modes</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -348,21 +364,23 @@ window.MODULE_CONTENT["m17"] = {
   "case-figma-postgres-horizontal-sharding": {
     "title": "Production Case Study: Evolving from a Single Postgres Primary to Sharded Clusters",
     "video": {
-      "youtubeId": "o7bjRUcDMx0",
-      "title": "Production Case Study: Evolving from a Single Postgres Primary to Sharded Clusters — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:21:12",
+      "youtubeId": "IFLQBWY6dlE",
+      "title": "#23 - Distributed Databases: Partitioning & Replication (CMU Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 16m",
       "start": 0,
-      "length": "81m",
-      "why": "Builds first-principles mastery of Production Case Study: Evolving from a Single Postgres Primary to Sharded Clusters with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "76m",
+      "why": "Key focus timestamps: 14:10 Sharding strategies (hash vs range); 32:00 Two-Phase Commit (2PC); 51:30 Paxos & Raft consensus"
     },
     "videos": [
       {
-        "youtubeId": "3wNmpE6DsSs",
-        "title": "Replication, Partitioning, Sharding & Distributed NewSQL: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:19:30",
-        "why": "Complementary lecture covering production implementation details for Replication, Partitioning, Sharding & Distributed NewSQL."
+        "youtubeId": "aE2UPg3Ckck",
+        "title": "All Types of Database Replication Discussed",
+        "channel": "Hussein Nasser",
+        "duration": "26m 19s",
+        "length": "26m",
+        "role": "deep-dive",
+        "why": "Sync vs async replication, replication lag, read-your-own-writes consistency, and failover mechanics."
       }
     ],
     "intuition": "<p>In <strong>Production Case Study: Evolving from a Single Postgres Primary to Sharded Clusters</strong> (<code>case-figma-postgres-horizontal-sharding</code>), Tracing the architectural journey from vertical scaling and read replicas to vertical table functional splitting and zero-downtime logical shard splits. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Production Case Study: Evolving from a Single Postgres Primary to Sharded Clusters</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -391,21 +409,23 @@ window.MODULE_CONTENT["m17"] = {
   "build-sharded-query-router": {
     "title": "Hands-On Build: Consistent-Hash Shard Router with Partition Pruning & Scatter-Gather",
     "video": {
-      "youtubeId": "3wNmpE6DsSs",
-      "title": "Hands-On Build: Consistent-Hash Shard Router with Partition Pruning & Scatter-Gather — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:19:30",
+      "youtubeId": "IFLQBWY6dlE",
+      "title": "#23 - Distributed Databases: Partitioning & Replication (CMU Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 16m",
       "start": 0,
-      "length": "80m",
-      "why": "Builds first-principles mastery of Hands-On Build: Consistent-Hash Shard Router with Partition Pruning & Scatter-Gather with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "76m",
+      "why": "Key focus timestamps: 14:10 Sharding strategies (hash vs range); 32:00 Two-Phase Commit (2PC); 51:30 Paxos & Raft consensus"
     },
     "videos": [
       {
-        "youtubeId": "o7bjRUcDMx0",
-        "title": "Replication, Partitioning, Sharding & Distributed NewSQL: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:21:12",
-        "why": "Complementary lecture covering production implementation details for Replication, Partitioning, Sharding & Distributed NewSQL."
+        "youtubeId": "aE2UPg3Ckck",
+        "title": "All Types of Database Replication Discussed",
+        "channel": "Hussein Nasser",
+        "duration": "26m 19s",
+        "length": "26m",
+        "role": "deep-dive",
+        "why": "Sync vs async replication, replication lag, read-your-own-writes consistency, and failover mechanics."
       }
     ],
     "intuition": "<p>In <strong>Hands-On Build: Consistent-Hash Shard Router with Partition Pruning & Scatter-Gather</strong> (<code>build-sharded-query-router</code>), Implement a distributed SQL shard router that directs point-key queries to a single virtual node and executes scatter-gather merges for unsharded queries. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Hands-On Build: Consistent-Hash Shard Router with Partition Pruning & Scatter-Gather</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",

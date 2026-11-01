@@ -4,21 +4,23 @@ window.MODULE_CONTENT["m02"] = {
   "create-table-ddl-anatomy": {
     "title": "CREATE TABLE, ALTER TABLE, DROP, TRUNCATE vs DELETE & Catalogs",
     "video": {
-      "youtubeId": "p3qvj9hO_Bo",
-      "title": "CREATE TABLE, ALTER TABLE, DROP, TRUNCATE vs DELETE & Catalogs — Database Systems & SQL Architecture Lecture",
-      "channel": "Web Dev Simplified",
-      "duration": "56:23",
+      "youtubeId": "qw--VYLpxG4",
+      "title": "Learn PostgreSQL Tutorial - Full Course for Beginners",
+      "channel": "Amigoscode (freeCodeCamp.org)",
+      "duration": "4h 19m",
       "start": 0,
-      "length": "56m",
-      "why": "Builds first-principles mastery of CREATE TABLE, ALTER TABLE, DROP, TRUNCATE vs DELETE & Catalogs with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "259m",
+      "why": "Key focus timestamps: 0:49:12 Constraints; 2:29:24 Primary Keys; 3:11:09 ON CONFLICT (Upsert); 3:16:41 Foreign Keys & CASCADE"
     },
     "videos": [
       {
-        "youtubeId": "Wbg2HoYjLHU",
-        "title": "DDL, Schema Constraints & DML Mutations: Companion Deep-Dive Lecture",
-        "channel": "PGConf.EU (PostgreSQL Europe)",
-        "duration": "43:20",
-        "why": "Complementary lecture covering production implementation details for DDL, Schema Constraints & DML Mutations."
+        "youtubeId": "PQLKQng-nJA",
+        "title": "PostgreSQL Schema Design & Zero-Downtime Migrations",
+        "channel": "PGConf.EU",
+        "duration": "16m 29s",
+        "length": "16m",
+        "role": "deep-dive",
+        "why": "Provides clear syntax drills for table creation, referential integrity, and UPSERT, paired with production schema migration patterns."
       }
     ],
     "intuition": "<p>In <strong>CREATE TABLE, ALTER TABLE, DROP, TRUNCATE vs DELETE & Catalogs</strong> (<code>create-table-ddl-anatomy</code>), How DDL statements mutate system catalog tables (pg_class, sqlite_master), physical storage allocation, and fast O(1) file truncation vs row-by-row DELETE. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>CREATE TABLE, ALTER TABLE, DROP, TRUNCATE vs DELETE & Catalogs</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -47,21 +49,23 @@ window.MODULE_CONTENT["m02"] = {
   "primary-keys-surrogate-vs-natural": {
     "title": "Primary Keys: Composite Keys, IDENTITY & UUIDv4 vs UUIDv7 Locality",
     "video": {
-      "youtubeId": "Wbg2HoYjLHU",
-      "title": "Primary Keys: Composite Keys, IDENTITY & UUIDv4 vs UUIDv7 Locality — Database Systems & SQL Architecture Lecture",
-      "channel": "PGConf.EU (PostgreSQL Europe)",
-      "duration": "43:20",
+      "youtubeId": "qw--VYLpxG4",
+      "title": "Learn PostgreSQL Tutorial - Full Course for Beginners",
+      "channel": "Amigoscode (freeCodeCamp.org)",
+      "duration": "4h 19m",
       "start": 0,
-      "length": "43m",
-      "why": "Builds first-principles mastery of Primary Keys: Composite Keys, IDENTITY & UUIDv4 vs UUIDv7 Locality with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "259m",
+      "why": "Key focus timestamps: 0:49:12 Constraints; 2:29:24 Primary Keys; 3:11:09 ON CONFLICT (Upsert); 3:16:41 Foreign Keys & CASCADE"
     },
     "videos": [
       {
-        "youtubeId": "p3qvj9hO_Bo",
-        "title": "DDL, Schema Constraints & DML Mutations: Companion Deep-Dive Lecture",
-        "channel": "Web Dev Simplified",
-        "duration": "56:23",
-        "why": "Complementary lecture covering production implementation details for DDL, Schema Constraints & DML Mutations."
+        "youtubeId": "PQLKQng-nJA",
+        "title": "PostgreSQL Schema Design & Zero-Downtime Migrations",
+        "channel": "PGConf.EU",
+        "duration": "16m 29s",
+        "length": "16m",
+        "role": "deep-dive",
+        "why": "Provides clear syntax drills for table creation, referential integrity, and UPSERT, paired with production schema migration patterns."
       }
     ],
     "intuition": "<p>In <strong>Primary Keys: Composite Keys, IDENTITY & UUIDv4 vs UUIDv7 Locality</strong> (<code>primary-keys-surrogate-vs-natural</code>), Choosing between natural keys, auto-incrementing 64-bit integers, and time-ordered UUIDv7 to eliminate random B+Tree leaf page splits. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Primary Keys: Composite Keys, IDENTITY & UUIDv4 vs UUIDv7 Locality</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -90,21 +94,23 @@ window.MODULE_CONTENT["m02"] = {
   "foreign-keys-referential-integrity": {
     "title": "Foreign Keys, Parent/Child Tables & Referential Actions (CASCADE / RESTRICT)",
     "video": {
-      "youtubeId": "p3qvj9hO_Bo",
-      "title": "Foreign Keys, Parent/Child Tables & Referential Actions (CASCADE / RESTRICT) — Database Systems & SQL Architecture Lecture",
-      "channel": "Web Dev Simplified",
-      "duration": "56:23",
+      "youtubeId": "qw--VYLpxG4",
+      "title": "Learn PostgreSQL Tutorial - Full Course for Beginners",
+      "channel": "Amigoscode (freeCodeCamp.org)",
+      "duration": "4h 19m",
       "start": 0,
-      "length": "56m",
-      "why": "Builds first-principles mastery of Foreign Keys, Parent/Child Tables & Referential Actions (CASCADE / RESTRICT) with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "259m",
+      "why": "Key focus timestamps: 0:49:12 Constraints; 2:29:24 Primary Keys; 3:11:09 ON CONFLICT (Upsert); 3:16:41 Foreign Keys & CASCADE"
     },
     "videos": [
       {
-        "youtubeId": "Wbg2HoYjLHU",
-        "title": "DDL, Schema Constraints & DML Mutations: Companion Deep-Dive Lecture",
-        "channel": "PGConf.EU (PostgreSQL Europe)",
-        "duration": "43:20",
-        "why": "Complementary lecture covering production implementation details for DDL, Schema Constraints & DML Mutations."
+        "youtubeId": "PQLKQng-nJA",
+        "title": "PostgreSQL Schema Design & Zero-Downtime Migrations",
+        "channel": "PGConf.EU",
+        "duration": "16m 29s",
+        "length": "16m",
+        "role": "deep-dive",
+        "why": "Provides clear syntax drills for table creation, referential integrity, and UPSERT, paired with production schema migration patterns."
       }
     ],
     "intuition": "<p>In <strong>Foreign Keys, Parent/Child Tables & Referential Actions (CASCADE / RESTRICT)</strong> (<code>foreign-keys-referential-integrity</code>), Enforcing relational graph invariants at the storage engine layer with ON DELETE CASCADE, RESTRICT, SET NULL, and deferred constraint checking. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Foreign Keys, Parent/Child Tables & Referential Actions (CASCADE / RESTRICT)</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -133,21 +139,23 @@ window.MODULE_CONTENT["m02"] = {
   "check-unique-not-null-defaults": {
     "title": "Domain Integrity: CHECK, UNIQUE, NOT NULL, DEFAULT & Generated Columns",
     "video": {
-      "youtubeId": "Wbg2HoYjLHU",
-      "title": "Domain Integrity: CHECK, UNIQUE, NOT NULL, DEFAULT & Generated Columns — Database Systems & SQL Architecture Lecture",
-      "channel": "PGConf.EU (PostgreSQL Europe)",
-      "duration": "43:20",
+      "youtubeId": "qw--VYLpxG4",
+      "title": "Learn PostgreSQL Tutorial - Full Course for Beginners",
+      "channel": "Amigoscode (freeCodeCamp.org)",
+      "duration": "4h 19m",
       "start": 0,
-      "length": "43m",
-      "why": "Builds first-principles mastery of Domain Integrity: CHECK, UNIQUE, NOT NULL, DEFAULT & Generated Columns with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "259m",
+      "why": "Key focus timestamps: 0:49:12 Constraints; 2:29:24 Primary Keys; 3:11:09 ON CONFLICT (Upsert); 3:16:41 Foreign Keys & CASCADE"
     },
     "videos": [
       {
-        "youtubeId": "p3qvj9hO_Bo",
-        "title": "DDL, Schema Constraints & DML Mutations: Companion Deep-Dive Lecture",
-        "channel": "Web Dev Simplified",
-        "duration": "56:23",
-        "why": "Complementary lecture covering production implementation details for DDL, Schema Constraints & DML Mutations."
+        "youtubeId": "PQLKQng-nJA",
+        "title": "PostgreSQL Schema Design & Zero-Downtime Migrations",
+        "channel": "PGConf.EU",
+        "duration": "16m 29s",
+        "length": "16m",
+        "role": "deep-dive",
+        "why": "Provides clear syntax drills for table creation, referential integrity, and UPSERT, paired with production schema migration patterns."
       }
     ],
     "intuition": "<p>In <strong>Domain Integrity: CHECK, UNIQUE, NOT NULL, DEFAULT & Generated Columns</strong> (<code>check-unique-not-null-defaults</code>), Encoding business invariants directly into table definitions using CHECK predicates, multi-column UNIQUE indexes with NULLs, and stored/virtual generated columns. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Domain Integrity: CHECK, UNIQUE, NOT NULL, DEFAULT & Generated Columns</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -176,21 +184,23 @@ window.MODULE_CONTENT["m02"] = {
   "insert-bulk-loading-returning": {
     "title": "Single & Multi-Row INSERT, INSERT ... SELECT, COPY & RETURNING",
     "video": {
-      "youtubeId": "p3qvj9hO_Bo",
-      "title": "Single & Multi-Row INSERT, INSERT ... SELECT, COPY & RETURNING — Database Systems & SQL Architecture Lecture",
-      "channel": "Web Dev Simplified",
-      "duration": "56:23",
+      "youtubeId": "qw--VYLpxG4",
+      "title": "Learn PostgreSQL Tutorial - Full Course for Beginners",
+      "channel": "Amigoscode (freeCodeCamp.org)",
+      "duration": "4h 19m",
       "start": 0,
-      "length": "56m",
-      "why": "Builds first-principles mastery of Single & Multi-Row INSERT, INSERT ... SELECT, COPY & RETURNING with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "259m",
+      "why": "Key focus timestamps: 0:49:12 Constraints; 2:29:24 Primary Keys; 3:11:09 ON CONFLICT (Upsert); 3:16:41 Foreign Keys & CASCADE"
     },
     "videos": [
       {
-        "youtubeId": "Wbg2HoYjLHU",
-        "title": "DDL, Schema Constraints & DML Mutations: Companion Deep-Dive Lecture",
-        "channel": "PGConf.EU (PostgreSQL Europe)",
-        "duration": "43:20",
-        "why": "Complementary lecture covering production implementation details for DDL, Schema Constraints & DML Mutations."
+        "youtubeId": "PQLKQng-nJA",
+        "title": "PostgreSQL Schema Design & Zero-Downtime Migrations",
+        "channel": "PGConf.EU",
+        "duration": "16m 29s",
+        "length": "16m",
+        "role": "deep-dive",
+        "why": "Provides clear syntax drills for table creation, referential integrity, and UPSERT, paired with production schema migration patterns."
       }
     ],
     "intuition": "<p>In <strong>Single & Multi-Row INSERT, INSERT ... SELECT, COPY & RETURNING</strong> (<code>insert-bulk-loading-returning</code>), Amortizing network round-trips and WAL fsync overhead with multi-row batched INSERT statements and atomic server-generated ID retrieval via RETURNING. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Single & Multi-Row INSERT, INSERT ... SELECT, COPY & RETURNING</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -219,21 +229,23 @@ window.MODULE_CONTENT["m02"] = {
   "upsert-on-conflict-merge": {
     "title": "Idempotent Writes: ON CONFLICT DO UPDATE (Upsert) & MERGE",
     "video": {
-      "youtubeId": "Wbg2HoYjLHU",
-      "title": "Idempotent Writes: ON CONFLICT DO UPDATE (Upsert) & MERGE — Database Systems & SQL Architecture Lecture",
-      "channel": "PGConf.EU (PostgreSQL Europe)",
-      "duration": "43:20",
+      "youtubeId": "qw--VYLpxG4",
+      "title": "Learn PostgreSQL Tutorial - Full Course for Beginners",
+      "channel": "Amigoscode (freeCodeCamp.org)",
+      "duration": "4h 19m",
       "start": 0,
-      "length": "43m",
-      "why": "Builds first-principles mastery of Idempotent Writes: ON CONFLICT DO UPDATE (Upsert) & MERGE with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "259m",
+      "why": "Key focus timestamps: 0:49:12 Constraints; 2:29:24 Primary Keys; 3:11:09 ON CONFLICT (Upsert); 3:16:41 Foreign Keys & CASCADE"
     },
     "videos": [
       {
-        "youtubeId": "p3qvj9hO_Bo",
-        "title": "DDL, Schema Constraints & DML Mutations: Companion Deep-Dive Lecture",
-        "channel": "Web Dev Simplified",
-        "duration": "56:23",
-        "why": "Complementary lecture covering production implementation details for DDL, Schema Constraints & DML Mutations."
+        "youtubeId": "PQLKQng-nJA",
+        "title": "PostgreSQL Schema Design & Zero-Downtime Migrations",
+        "channel": "PGConf.EU",
+        "duration": "16m 29s",
+        "length": "16m",
+        "role": "deep-dive",
+        "why": "Provides clear syntax drills for table creation, referential integrity, and UPSERT, paired with production schema migration patterns."
       }
     ],
     "intuition": "<p>In <strong>Idempotent Writes: ON CONFLICT DO UPDATE (Upsert) & MERGE</strong> (<code>upsert-on-conflict-merge</code>), Resolving concurrent insert races atomically with ON CONFLICT (key) DO UPDATE, EXCLUDED pseudo-tuples, and SQL standard MERGE pipelines. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Idempotent Writes: ON CONFLICT DO UPDATE (Upsert) & MERGE</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -262,21 +274,23 @@ window.MODULE_CONTENT["m02"] = {
   "update-delete-safe-mutations": {
     "title": "Safe Mutations: UPDATE, UPDATE ... FROM, DELETE & Soft-Delete Tradeoffs",
     "video": {
-      "youtubeId": "p3qvj9hO_Bo",
-      "title": "Safe Mutations: UPDATE, UPDATE ... FROM, DELETE & Soft-Delete Tradeoffs — Database Systems & SQL Architecture Lecture",
-      "channel": "Web Dev Simplified",
-      "duration": "56:23",
+      "youtubeId": "qw--VYLpxG4",
+      "title": "Learn PostgreSQL Tutorial - Full Course for Beginners",
+      "channel": "Amigoscode (freeCodeCamp.org)",
+      "duration": "4h 19m",
       "start": 0,
-      "length": "56m",
-      "why": "Builds first-principles mastery of Safe Mutations: UPDATE, UPDATE ... FROM, DELETE & Soft-Delete Tradeoffs with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "259m",
+      "why": "Key focus timestamps: 0:49:12 Constraints; 2:29:24 Primary Keys; 3:11:09 ON CONFLICT (Upsert); 3:16:41 Foreign Keys & CASCADE"
     },
     "videos": [
       {
-        "youtubeId": "Wbg2HoYjLHU",
-        "title": "DDL, Schema Constraints & DML Mutations: Companion Deep-Dive Lecture",
-        "channel": "PGConf.EU (PostgreSQL Europe)",
-        "duration": "43:20",
-        "why": "Complementary lecture covering production implementation details for DDL, Schema Constraints & DML Mutations."
+        "youtubeId": "PQLKQng-nJA",
+        "title": "PostgreSQL Schema Design & Zero-Downtime Migrations",
+        "channel": "PGConf.EU",
+        "duration": "16m 29s",
+        "length": "16m",
+        "role": "deep-dive",
+        "why": "Provides clear syntax drills for table creation, referential integrity, and UPSERT, paired with production schema migration patterns."
       }
     ],
     "intuition": "<p>In <strong>Safe Mutations: UPDATE, UPDATE ... FROM, DELETE & Soft-Delete Tradeoffs</strong> (<code>update-delete-safe-mutations</code>), Writing bounded mutations, joining reference tables during UPDATE, and weighing tombstone soft deletes (deleted_at) against partial index bloat. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Safe Mutations: UPDATE, UPDATE ... FROM, DELETE & Soft-Delete Tradeoffs</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -305,21 +319,23 @@ window.MODULE_CONTENT["m02"] = {
   "views-temp-tables-ctas": {
     "title": "Virtual & Ephemeral Relations: Views, Updatable Views, CTAS & Temp Tables",
     "video": {
-      "youtubeId": "Wbg2HoYjLHU",
-      "title": "Virtual & Ephemeral Relations: Views, Updatable Views, CTAS & Temp Tables — Database Systems & SQL Architecture Lecture",
-      "channel": "PGConf.EU (PostgreSQL Europe)",
-      "duration": "43:20",
+      "youtubeId": "qw--VYLpxG4",
+      "title": "Learn PostgreSQL Tutorial - Full Course for Beginners",
+      "channel": "Amigoscode (freeCodeCamp.org)",
+      "duration": "4h 19m",
       "start": 0,
-      "length": "43m",
-      "why": "Builds first-principles mastery of Virtual & Ephemeral Relations: Views, Updatable Views, CTAS & Temp Tables with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "259m",
+      "why": "Key focus timestamps: 0:49:12 Constraints; 2:29:24 Primary Keys; 3:11:09 ON CONFLICT (Upsert); 3:16:41 Foreign Keys & CASCADE"
     },
     "videos": [
       {
-        "youtubeId": "p3qvj9hO_Bo",
-        "title": "DDL, Schema Constraints & DML Mutations: Companion Deep-Dive Lecture",
-        "channel": "Web Dev Simplified",
-        "duration": "56:23",
-        "why": "Complementary lecture covering production implementation details for DDL, Schema Constraints & DML Mutations."
+        "youtubeId": "PQLKQng-nJA",
+        "title": "PostgreSQL Schema Design & Zero-Downtime Migrations",
+        "channel": "PGConf.EU",
+        "duration": "16m 29s",
+        "length": "16m",
+        "role": "deep-dive",
+        "why": "Provides clear syntax drills for table creation, referential integrity, and UPSERT, paired with production schema migration patterns."
       }
     ],
     "intuition": "<p>In <strong>Virtual & Ephemeral Relations: Views, Updatable Views, CTAS & Temp Tables</strong> (<code>views-temp-tables-ctas</code>), Query tree view expansion, security barrier views, session-scoped temporary tables, and staging pipelines with CREATE TABLE AS SELECT. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Virtual & Ephemeral Relations: Views, Updatable Views, CTAS & Temp Tables</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -348,21 +364,23 @@ window.MODULE_CONTENT["m02"] = {
   "case-github-zero-downtime-migrations": {
     "title": "Production Case Study: Zero-Downtime Schema Migrations (Expand & Contract)",
     "video": {
-      "youtubeId": "p3qvj9hO_Bo",
-      "title": "Production Case Study: Zero-Downtime Schema Migrations (Expand & Contract) — Database Systems & SQL Architecture Lecture",
-      "channel": "Web Dev Simplified",
-      "duration": "56:23",
+      "youtubeId": "qw--VYLpxG4",
+      "title": "Learn PostgreSQL Tutorial - Full Course for Beginners",
+      "channel": "Amigoscode (freeCodeCamp.org)",
+      "duration": "4h 19m",
       "start": 0,
-      "length": "56m",
-      "why": "Builds first-principles mastery of Production Case Study: Zero-Downtime Schema Migrations (Expand & Contract) with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "259m",
+      "why": "Key focus timestamps: 0:49:12 Constraints; 2:29:24 Primary Keys; 3:11:09 ON CONFLICT (Upsert); 3:16:41 Foreign Keys & CASCADE"
     },
     "videos": [
       {
-        "youtubeId": "Wbg2HoYjLHU",
-        "title": "DDL, Schema Constraints & DML Mutations: Companion Deep-Dive Lecture",
-        "channel": "PGConf.EU (PostgreSQL Europe)",
-        "duration": "43:20",
-        "why": "Complementary lecture covering production implementation details for DDL, Schema Constraints & DML Mutations."
+        "youtubeId": "PQLKQng-nJA",
+        "title": "PostgreSQL Schema Design & Zero-Downtime Migrations",
+        "channel": "PGConf.EU",
+        "duration": "16m 29s",
+        "length": "16m",
+        "role": "deep-dive",
+        "why": "Provides clear syntax drills for table creation, referential integrity, and UPSERT, paired with production schema migration patterns."
       }
     ],
     "intuition": "<p>In <strong>Production Case Study: Zero-Downtime Schema Migrations (Expand & Contract)</strong> (<code>case-github-zero-downtime-migrations</code>), Why naive ALTER TABLE ADD COLUMN with defaults or NOT NULL locks production traffic and how the Expand-Backfill-Contract pattern ships safely. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Production Case Study: Zero-Downtime Schema Migrations (Expand & Contract)</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -391,21 +409,23 @@ window.MODULE_CONTENT["m02"] = {
   "build-ecommerce-schema-ddl": {
     "title": "Hands-On Build: E-Commerce Schema with Referential Integrity & Upsert Pipeline",
     "video": {
-      "youtubeId": "Wbg2HoYjLHU",
-      "title": "Hands-On Build: E-Commerce Schema with Referential Integrity & Upsert Pipeline — Database Systems & SQL Architecture Lecture",
-      "channel": "PGConf.EU (PostgreSQL Europe)",
-      "duration": "43:20",
+      "youtubeId": "qw--VYLpxG4",
+      "title": "Learn PostgreSQL Tutorial - Full Course for Beginners",
+      "channel": "Amigoscode (freeCodeCamp.org)",
+      "duration": "4h 19m",
       "start": 0,
-      "length": "43m",
-      "why": "Builds first-principles mastery of Hands-On Build: E-Commerce Schema with Referential Integrity & Upsert Pipeline with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "259m",
+      "why": "Key focus timestamps: 0:49:12 Constraints; 2:29:24 Primary Keys; 3:11:09 ON CONFLICT (Upsert); 3:16:41 Foreign Keys & CASCADE"
     },
     "videos": [
       {
-        "youtubeId": "p3qvj9hO_Bo",
-        "title": "DDL, Schema Constraints & DML Mutations: Companion Deep-Dive Lecture",
-        "channel": "Web Dev Simplified",
-        "duration": "56:23",
-        "why": "Complementary lecture covering production implementation details for DDL, Schema Constraints & DML Mutations."
+        "youtubeId": "PQLKQng-nJA",
+        "title": "PostgreSQL Schema Design & Zero-Downtime Migrations",
+        "channel": "PGConf.EU",
+        "duration": "16m 29s",
+        "length": "16m",
+        "role": "deep-dive",
+        "why": "Provides clear syntax drills for table creation, referential integrity, and UPSERT, paired with production schema migration patterns."
       }
     ],
     "intuition": "<p>In <strong>Hands-On Build: E-Commerce Schema with Referential Integrity & Upsert Pipeline</strong> (<code>build-ecommerce-schema-ddl</code>), Design and verify a normalized e-commerce relational schema enforcing foreign keys, CHECK constraints, and idempotent inventory upserts. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Hands-On Build: E-Commerce Schema with Referential Integrity & Upsert Pipeline</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",

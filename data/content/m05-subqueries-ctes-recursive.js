@@ -4,21 +4,23 @@ window.MODULE_CONTENT["m05"] = {
   "scalar-row-table-subqueries": {
     "title": "Subquery Taxonomy: Scalar, Row, Array & Derived Table Subqueries",
     "video": {
-      "youtubeId": "HNtlew7mCc4",
-      "title": "Subquery Taxonomy: Scalar, Row, Array & Derived Table Subqueries — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:19:40",
+      "youtubeId": "5x1uodxEIaM",
+      "title": "SQL CTE Visually Explained (Common Table Expressions)",
+      "channel": "Data with Baraa",
+      "duration": "54m 30s",
       "start": 0,
-      "length": "80m",
-      "why": "Builds first-principles mastery of Subquery Taxonomy: Scalar, Row, Array & Derived Table Subqueries with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "55m",
+      "why": "Key focus timestamps: 12:10 CTE vs Subquery performance; 29:30 Multiple & chained CTEs; 47:26 Recursive CTE hierarchical traversal"
     },
     "videos": [
       {
-        "youtubeId": "Ugf6IAsaJqk",
-        "title": "Subqueries, Correlated Queries, Lateral Joins & CTEs: Companion Deep-Dive Lecture",
-        "channel": "Citus Data / PostgreSQL",
-        "duration": "58:35",
-        "why": "Complementary lecture covering production implementation details for Subqueries, Correlated Queries, Lateral Joins & CTEs."
+        "youtubeId": "O5gU9NQjCAs",
+        "title": "#02 - Modern SQL (CMU Intro to Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 17m",
+        "length": "77m",
+        "role": "deep-dive",
+        "why": "Visual intuition on derived tables and CTE scoping paired with Pavlo's deep look at optimizer unnesting and LATERAL joins."
       }
     ],
     "intuition": "<p>In <strong>Subquery Taxonomy: Scalar, Row, Array & Derived Table Subqueries</strong> (<code>scalar-row-table-subqueries</code>), Where subqueries can legally appear across SELECT, FROM, and WHERE, runtime cardinality assertions for scalar subqueries, and inline views. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Subquery Taxonomy: Scalar, Row, Array & Derived Table Subqueries</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -47,21 +49,23 @@ window.MODULE_CONTENT["m05"] = {
   "correlated-subqueries-mechanics": {
     "title": "Correlated Subqueries: Outer Reference Binding & Optimizer Unnesting",
     "video": {
-      "youtubeId": "Ugf6IAsaJqk",
-      "title": "Correlated Subqueries: Outer Reference Binding & Optimizer Unnesting — Database Systems & SQL Architecture Lecture",
-      "channel": "Citus Data / PostgreSQL",
-      "duration": "58:35",
+      "youtubeId": "5x1uodxEIaM",
+      "title": "SQL CTE Visually Explained (Common Table Expressions)",
+      "channel": "Data with Baraa",
+      "duration": "54m 30s",
       "start": 0,
-      "length": "59m",
-      "why": "Builds first-principles mastery of Correlated Subqueries: Outer Reference Binding & Optimizer Unnesting with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "55m",
+      "why": "Key focus timestamps: 12:10 CTE vs Subquery performance; 29:30 Multiple & chained CTEs; 47:26 Recursive CTE hierarchical traversal"
     },
     "videos": [
       {
-        "youtubeId": "HNtlew7mCc4",
-        "title": "Subqueries, Correlated Queries, Lateral Joins & CTEs: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:19:40",
-        "why": "Complementary lecture covering production implementation details for Subqueries, Correlated Queries, Lateral Joins & CTEs."
+        "youtubeId": "O5gU9NQjCAs",
+        "title": "#02 - Modern SQL (CMU Intro to Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 17m",
+        "length": "77m",
+        "role": "deep-dive",
+        "why": "Visual intuition on derived tables and CTE scoping paired with Pavlo's deep look at optimizer unnesting and LATERAL joins."
       }
     ],
     "intuition": "<p>In <strong>Correlated Subqueries: Outer Reference Binding & Optimizer Unnesting</strong> (<code>correlated-subqueries-mechanics</code>), How correlated subqueries bind outer tuple attributes, why naive execution is O(N×M), and how modern optimizers decorrelate them into hash joins. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Correlated Subqueries: Outer Reference Binding & Optimizer Unnesting</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -90,21 +94,23 @@ window.MODULE_CONTENT["m05"] = {
   "exists-not-exists-null-safety": {
     "title": "EXISTS & NOT EXISTS: Short-Circuit Semi-Joins & Complete NULL Safety",
     "video": {
-      "youtubeId": "HNtlew7mCc4",
-      "title": "EXISTS & NOT EXISTS: Short-Circuit Semi-Joins & Complete NULL Safety — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:19:40",
+      "youtubeId": "5x1uodxEIaM",
+      "title": "SQL CTE Visually Explained (Common Table Expressions)",
+      "channel": "Data with Baraa",
+      "duration": "54m 30s",
       "start": 0,
-      "length": "80m",
-      "why": "Builds first-principles mastery of EXISTS & NOT EXISTS: Short-Circuit Semi-Joins & Complete NULL Safety with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "55m",
+      "why": "Key focus timestamps: 12:10 CTE vs Subquery performance; 29:30 Multiple & chained CTEs; 47:26 Recursive CTE hierarchical traversal"
     },
     "videos": [
       {
-        "youtubeId": "Ugf6IAsaJqk",
-        "title": "Subqueries, Correlated Queries, Lateral Joins & CTEs: Companion Deep-Dive Lecture",
-        "channel": "Citus Data / PostgreSQL",
-        "duration": "58:35",
-        "why": "Complementary lecture covering production implementation details for Subqueries, Correlated Queries, Lateral Joins & CTEs."
+        "youtubeId": "O5gU9NQjCAs",
+        "title": "#02 - Modern SQL (CMU Intro to Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 17m",
+        "length": "77m",
+        "role": "deep-dive",
+        "why": "Visual intuition on derived tables and CTE scoping paired with Pavlo's deep look at optimizer unnesting and LATERAL joins."
       }
     ],
     "intuition": "<p>In <strong>EXISTS & NOT EXISTS: Short-Circuit Semi-Joins & Complete NULL Safety</strong> (<code>exists-not-exists-null-safety</code>), Why EXISTS stops scanning on the first matching tuple and why NOT EXISTS is immune to the Three-Valued Logic NULL catastrophe of NOT IN. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>EXISTS & NOT EXISTS: Short-Circuit Semi-Joins & Complete NULL Safety</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -133,21 +139,23 @@ window.MODULE_CONTENT["m05"] = {
   "lateral-joins-cross-apply": {
     "title": "LATERAL Subqueries (CROSS APPLY / OUTER APPLY) & Top-N-Per-Group",
     "video": {
-      "youtubeId": "Ugf6IAsaJqk",
-      "title": "LATERAL Subqueries (CROSS APPLY / OUTER APPLY) & Top-N-Per-Group — Database Systems & SQL Architecture Lecture",
-      "channel": "Citus Data / PostgreSQL",
-      "duration": "58:35",
+      "youtubeId": "5x1uodxEIaM",
+      "title": "SQL CTE Visually Explained (Common Table Expressions)",
+      "channel": "Data with Baraa",
+      "duration": "54m 30s",
       "start": 0,
-      "length": "59m",
-      "why": "Builds first-principles mastery of LATERAL Subqueries (CROSS APPLY / OUTER APPLY) & Top-N-Per-Group with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "55m",
+      "why": "Key focus timestamps: 12:10 CTE vs Subquery performance; 29:30 Multiple & chained CTEs; 47:26 Recursive CTE hierarchical traversal"
     },
     "videos": [
       {
-        "youtubeId": "HNtlew7mCc4",
-        "title": "Subqueries, Correlated Queries, Lateral Joins & CTEs: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:19:40",
-        "why": "Complementary lecture covering production implementation details for Subqueries, Correlated Queries, Lateral Joins & CTEs."
+        "youtubeId": "O5gU9NQjCAs",
+        "title": "#02 - Modern SQL (CMU Intro to Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 17m",
+        "length": "77m",
+        "role": "deep-dive",
+        "why": "Visual intuition on derived tables and CTE scoping paired with Pavlo's deep look at optimizer unnesting and LATERAL joins."
       }
     ],
     "intuition": "<p>In <strong>LATERAL Subqueries (CROSS APPLY / OUTER APPLY) & Top-N-Per-Group</strong> (<code>lateral-joins-cross-apply</code>), Evaluating correlated derived tables that can reference preceding FROM tables and return multiple columns and rows per outer tuple. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>LATERAL Subqueries (CROSS APPLY / OUTER APPLY) & Top-N-Per-Group</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -176,21 +184,23 @@ window.MODULE_CONTENT["m05"] = {
   "common-table-expressions-with": {
     "title": "Common Table Expressions (WITH): Modular Multi-Stage SQL Pipelines",
     "video": {
-      "youtubeId": "HNtlew7mCc4",
-      "title": "Common Table Expressions (WITH): Modular Multi-Stage SQL Pipelines — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:19:40",
+      "youtubeId": "5x1uodxEIaM",
+      "title": "SQL CTE Visually Explained (Common Table Expressions)",
+      "channel": "Data with Baraa",
+      "duration": "54m 30s",
       "start": 0,
-      "length": "80m",
-      "why": "Builds first-principles mastery of Common Table Expressions (WITH): Modular Multi-Stage SQL Pipelines with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "55m",
+      "why": "Key focus timestamps: 12:10 CTE vs Subquery performance; 29:30 Multiple & chained CTEs; 47:26 Recursive CTE hierarchical traversal"
     },
     "videos": [
       {
-        "youtubeId": "Ugf6IAsaJqk",
-        "title": "Subqueries, Correlated Queries, Lateral Joins & CTEs: Companion Deep-Dive Lecture",
-        "channel": "Citus Data / PostgreSQL",
-        "duration": "58:35",
-        "why": "Complementary lecture covering production implementation details for Subqueries, Correlated Queries, Lateral Joins & CTEs."
+        "youtubeId": "O5gU9NQjCAs",
+        "title": "#02 - Modern SQL (CMU Intro to Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 17m",
+        "length": "77m",
+        "role": "deep-dive",
+        "why": "Visual intuition on derived tables and CTE scoping paired with Pavlo's deep look at optimizer unnesting and LATERAL joins."
       }
     ],
     "intuition": "<p>In <strong>Common Table Expressions (WITH): Modular Multi-Stage SQL Pipelines</strong> (<code>common-table-expressions-with</code>), Refactoring deeply nested subqueries into readable, testable DAGs of named intermediate relations using chained WITH clauses. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Common Table Expressions (WITH): Modular Multi-Stage SQL Pipelines</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -219,21 +229,23 @@ window.MODULE_CONTENT["m05"] = {
   "cte-materialization-optimization-fence": {
     "title": "CTE Inlining vs Materialization: Optimization Fences & MATERIALIZED Hints",
     "video": {
-      "youtubeId": "Ugf6IAsaJqk",
-      "title": "CTE Inlining vs Materialization: Optimization Fences & MATERIALIZED Hints — Database Systems & SQL Architecture Lecture",
-      "channel": "Citus Data / PostgreSQL",
-      "duration": "58:35",
+      "youtubeId": "5x1uodxEIaM",
+      "title": "SQL CTE Visually Explained (Common Table Expressions)",
+      "channel": "Data with Baraa",
+      "duration": "54m 30s",
       "start": 0,
-      "length": "59m",
-      "why": "Builds first-principles mastery of CTE Inlining vs Materialization: Optimization Fences & MATERIALIZED Hints with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "55m",
+      "why": "Key focus timestamps: 12:10 CTE vs Subquery performance; 29:30 Multiple & chained CTEs; 47:26 Recursive CTE hierarchical traversal"
     },
     "videos": [
       {
-        "youtubeId": "HNtlew7mCc4",
-        "title": "Subqueries, Correlated Queries, Lateral Joins & CTEs: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:19:40",
-        "why": "Complementary lecture covering production implementation details for Subqueries, Correlated Queries, Lateral Joins & CTEs."
+        "youtubeId": "O5gU9NQjCAs",
+        "title": "#02 - Modern SQL (CMU Intro to Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 17m",
+        "length": "77m",
+        "role": "deep-dive",
+        "why": "Visual intuition on derived tables and CTE scoping paired with Pavlo's deep look at optimizer unnesting and LATERAL joins."
       }
     ],
     "intuition": "<p>In <strong>CTE Inlining vs Materialization: Optimization Fences & MATERIALIZED Hints</strong> (<code>cte-materialization-optimization-fence</code>), When the planner folds a CTE into the main query for predicate pushdown vs materializing it into a temp table once (PostgreSQL 12+ & SQLite semantics). When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>CTE Inlining vs Materialization: Optimization Fences & MATERIALIZED Hints</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -262,21 +274,23 @@ window.MODULE_CONTENT["m05"] = {
   "recursive-ctes-hierarchies": {
     "title": "Recursive CTEs (WITH RECURSIVE): Anchor, Recursive Member & Fixpoint",
     "video": {
-      "youtubeId": "HNtlew7mCc4",
-      "title": "Recursive CTEs (WITH RECURSIVE): Anchor, Recursive Member & Fixpoint — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:19:40",
+      "youtubeId": "5x1uodxEIaM",
+      "title": "SQL CTE Visually Explained (Common Table Expressions)",
+      "channel": "Data with Baraa",
+      "duration": "54m 30s",
       "start": 0,
-      "length": "80m",
-      "why": "Builds first-principles mastery of Recursive CTEs (WITH RECURSIVE): Anchor, Recursive Member & Fixpoint with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "55m",
+      "why": "Key focus timestamps: 12:10 CTE vs Subquery performance; 29:30 Multiple & chained CTEs; 47:26 Recursive CTE hierarchical traversal"
     },
     "videos": [
       {
-        "youtubeId": "Ugf6IAsaJqk",
-        "title": "Subqueries, Correlated Queries, Lateral Joins & CTEs: Companion Deep-Dive Lecture",
-        "channel": "Citus Data / PostgreSQL",
-        "duration": "58:35",
-        "why": "Complementary lecture covering production implementation details for Subqueries, Correlated Queries, Lateral Joins & CTEs."
+        "youtubeId": "O5gU9NQjCAs",
+        "title": "#02 - Modern SQL (CMU Intro to Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 17m",
+        "length": "77m",
+        "role": "deep-dive",
+        "why": "Visual intuition on derived tables and CTE scoping paired with Pavlo's deep look at optimizer unnesting and LATERAL joins."
       }
     ],
     "intuition": "<p>In <strong>Recursive CTEs (WITH RECURSIVE): Anchor, Recursive Member & Fixpoint</strong> (<code>recursive-ctes-hierarchies</code>), Executing iterative fixpoint worktable algorithms in pure SQL to traverse organizational charts, category trees, and parent-child hierarchies. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Recursive CTEs (WITH RECURSIVE): Anchor, Recursive Member & Fixpoint</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -305,21 +319,23 @@ window.MODULE_CONTENT["m05"] = {
   "graph-traversal-cycle-detection-sql": {
     "title": "Graph Traversal, Bill-of-Materials (BOM) & Cycle Detection in SQL",
     "video": {
-      "youtubeId": "Ugf6IAsaJqk",
-      "title": "Graph Traversal, Bill-of-Materials (BOM) & Cycle Detection in SQL — Database Systems & SQL Architecture Lecture",
-      "channel": "Citus Data / PostgreSQL",
-      "duration": "58:35",
+      "youtubeId": "5x1uodxEIaM",
+      "title": "SQL CTE Visually Explained (Common Table Expressions)",
+      "channel": "Data with Baraa",
+      "duration": "54m 30s",
       "start": 0,
-      "length": "59m",
-      "why": "Builds first-principles mastery of Graph Traversal, Bill-of-Materials (BOM) & Cycle Detection in SQL with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "55m",
+      "why": "Key focus timestamps: 12:10 CTE vs Subquery performance; 29:30 Multiple & chained CTEs; 47:26 Recursive CTE hierarchical traversal"
     },
     "videos": [
       {
-        "youtubeId": "HNtlew7mCc4",
-        "title": "Subqueries, Correlated Queries, Lateral Joins & CTEs: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:19:40",
-        "why": "Complementary lecture covering production implementation details for Subqueries, Correlated Queries, Lateral Joins & CTEs."
+        "youtubeId": "O5gU9NQjCAs",
+        "title": "#02 - Modern SQL (CMU Intro to Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 17m",
+        "length": "77m",
+        "role": "deep-dive",
+        "why": "Visual intuition on derived tables and CTE scoping paired with Pavlo's deep look at optimizer unnesting and LATERAL joins."
       }
     ],
     "intuition": "<p>In <strong>Graph Traversal, Bill-of-Materials (BOM) & Cycle Detection in SQL</strong> (<code>graph-traversal-cycle-detection-sql</code>), Preventing infinite recursion loops on cyclic graphs using path strings or visited arrays, computing shortest paths, and aggregating BOM part costs. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Graph Traversal, Bill-of-Materials (BOM) & Cycle Detection in SQL</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -348,21 +364,23 @@ window.MODULE_CONTENT["m05"] = {
   "case-recursive-org-permission-engine": {
     "title": "Production Case Study: Hierarchical RBAC Permission Inheritance in SQL",
     "video": {
-      "youtubeId": "HNtlew7mCc4",
-      "title": "Production Case Study: Hierarchical RBAC Permission Inheritance in SQL — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:19:40",
+      "youtubeId": "5x1uodxEIaM",
+      "title": "SQL CTE Visually Explained (Common Table Expressions)",
+      "channel": "Data with Baraa",
+      "duration": "54m 30s",
       "start": 0,
-      "length": "80m",
-      "why": "Builds first-principles mastery of Production Case Study: Hierarchical RBAC Permission Inheritance in SQL with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "55m",
+      "why": "Key focus timestamps: 12:10 CTE vs Subquery performance; 29:30 Multiple & chained CTEs; 47:26 Recursive CTE hierarchical traversal"
     },
     "videos": [
       {
-        "youtubeId": "Ugf6IAsaJqk",
-        "title": "Subqueries, Correlated Queries, Lateral Joins & CTEs: Companion Deep-Dive Lecture",
-        "channel": "Citus Data / PostgreSQL",
-        "duration": "58:35",
-        "why": "Complementary lecture covering production implementation details for Subqueries, Correlated Queries, Lateral Joins & CTEs."
+        "youtubeId": "O5gU9NQjCAs",
+        "title": "#02 - Modern SQL (CMU Intro to Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 17m",
+        "length": "77m",
+        "role": "deep-dive",
+        "why": "Visual intuition on derived tables and CTE scoping paired with Pavlo's deep look at optimizer unnesting and LATERAL joins."
       }
     ],
     "intuition": "<p>In <strong>Production Case Study: Hierarchical RBAC Permission Inheritance in SQL</strong> (<code>case-recursive-org-permission-engine</code>), Designing a sub-5ms hierarchical folder and organization permission evaluator using indexed recursive CTEs and transitive closure tables. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Production Case Study: Hierarchical RBAC Permission Inheritance in SQL</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -391,21 +409,23 @@ window.MODULE_CONTENT["m05"] = {
   "build-hierarchical-graph-query-engine": {
     "title": "Hands-On Build: Bill-of-Materials & Social Graph Reachability Engine",
     "video": {
-      "youtubeId": "Ugf6IAsaJqk",
-      "title": "Hands-On Build: Bill-of-Materials & Social Graph Reachability Engine — Database Systems & SQL Architecture Lecture",
-      "channel": "Citus Data / PostgreSQL",
-      "duration": "58:35",
+      "youtubeId": "5x1uodxEIaM",
+      "title": "SQL CTE Visually Explained (Common Table Expressions)",
+      "channel": "Data with Baraa",
+      "duration": "54m 30s",
       "start": 0,
-      "length": "59m",
-      "why": "Builds first-principles mastery of Hands-On Build: Bill-of-Materials & Social Graph Reachability Engine with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "55m",
+      "why": "Key focus timestamps: 12:10 CTE vs Subquery performance; 29:30 Multiple & chained CTEs; 47:26 Recursive CTE hierarchical traversal"
     },
     "videos": [
       {
-        "youtubeId": "HNtlew7mCc4",
-        "title": "Subqueries, Correlated Queries, Lateral Joins & CTEs: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:19:40",
-        "why": "Complementary lecture covering production implementation details for Subqueries, Correlated Queries, Lateral Joins & CTEs."
+        "youtubeId": "O5gU9NQjCAs",
+        "title": "#02 - Modern SQL (CMU Intro to Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 17m",
+        "length": "77m",
+        "role": "deep-dive",
+        "why": "Visual intuition on derived tables and CTE scoping paired with Pavlo's deep look at optimizer unnesting and LATERAL joins."
       }
     ],
     "intuition": "<p>In <strong>Hands-On Build: Bill-of-Materials & Social Graph Reachability Engine</strong> (<code>build-hierarchical-graph-query-engine</code>), Build a recursive SQL engine that computes multi-level organizational reporting chains, detects dependency cycles, and rolls up hierarchical budgets. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Hands-On Build: Bill-of-Materials & Social Graph Reachability Engine</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",

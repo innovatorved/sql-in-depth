@@ -4,21 +4,23 @@ window.MODULE_CONTENT["m04"] = {
   "aggregate-functions-internals": {
     "title": "Aggregate Internals: COUNT(*) vs COUNT(col), COUNT(DISTINCT), SUM & AVG",
     "video": {
-      "youtubeId": "mM3sFwSuGNY",
-      "title": "Aggregate Internals: COUNT(*) vs COUNT(col), COUNT(DISTINCT), SUM & AVG — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:21:05",
+      "youtubeId": "O5gU9NQjCAs",
+      "title": "#02 - Modern SQL & Advanced Query Techniques (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 18m",
       "start": 0,
-      "length": "81m",
-      "why": "Builds first-principles mastery of Aggregate Internals: COUNT(*) vs COUNT(col), COUNT(DISTINCT), SUM & AVG with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "78m",
+      "why": "Key focus timestamps: 14:10 Aggregates; 28:40 GROUP BY semantics & HashAggregate; 44:00 GROUPING SETS, ROLLUP & CUBE"
     },
     "videos": [
       {
-        "youtubeId": "tOsb-tFoPCg",
-        "title": "Grouping, Aggregations & Multi-Dimensional Rollups: Companion Deep-Dive Lecture",
-        "channel": "Arpit Bhayani (Asli Engineering)",
-        "duration": "13:22",
-        "why": "Complementary lecture covering production implementation details for Grouping, Aggregations & Multi-Dimensional Rollups."
+        "youtubeId": "LzyKTpeIgts",
+        "title": "#11 - Sorting & Aggregation Algorithms (CMU Intro to Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 20m",
+        "length": "80m",
+        "role": "deep-dive",
+        "why": "Lecture #02 teaches grouping sets syntax; Lecture #11 explains external merge sort, in-memory hashing, and buffer pool spill cost."
       }
     ],
     "intuition": "<p>In <strong>Aggregate Internals: COUNT(*) vs COUNT(col), COUNT(DISTINCT), SUM & AVG</strong> (<code>aggregate-functions-internals</code>), How state transition functions accumulate values per group, why COUNT(col) skips NULLs while COUNT(*) counts tuples, and AVG(NULL) pitfalls. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Aggregate Internals: COUNT(*) vs COUNT(col), COUNT(DISTINCT), SUM & AVG</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -47,21 +49,23 @@ window.MODULE_CONTENT["m04"] = {
   "group-by-execution-mechanics": {
     "title": "GROUP BY Execution Mechanics, HashAggregate vs GroupAggregate & Functional Dependency",
     "video": {
-      "youtubeId": "tOsb-tFoPCg",
-      "title": "GROUP BY Execution Mechanics, HashAggregate vs GroupAggregate & Functional Dependency — Database Systems & SQL Architecture Lecture",
-      "channel": "Arpit Bhayani (Asli Engineering)",
-      "duration": "13:22",
+      "youtubeId": "O5gU9NQjCAs",
+      "title": "#02 - Modern SQL & Advanced Query Techniques (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 18m",
       "start": 0,
-      "length": "13m",
-      "why": "Builds first-principles mastery of GROUP BY Execution Mechanics, HashAggregate vs GroupAggregate & Functional Dependency with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "78m",
+      "why": "Key focus timestamps: 14:10 Aggregates; 28:40 GROUP BY semantics & HashAggregate; 44:00 GROUPING SETS, ROLLUP & CUBE"
     },
     "videos": [
       {
-        "youtubeId": "mM3sFwSuGNY",
-        "title": "Grouping, Aggregations & Multi-Dimensional Rollups: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:21:05",
-        "why": "Complementary lecture covering production implementation details for Grouping, Aggregations & Multi-Dimensional Rollups."
+        "youtubeId": "LzyKTpeIgts",
+        "title": "#11 - Sorting & Aggregation Algorithms (CMU Intro to Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 20m",
+        "length": "80m",
+        "role": "deep-dive",
+        "why": "Lecture #02 teaches grouping sets syntax; Lecture #11 explains external merge sort, in-memory hashing, and buffer pool spill cost."
       }
     ],
     "intuition": "<p>In <strong>GROUP BY Execution Mechanics, HashAggregate vs GroupAggregate & Functional Dependency</strong> (<code>group-by-execution-mechanics</code>), How the execution engine partitions rows via hashing or sorting, and why selecting non-grouped columns without functional dependency is invalid. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>GROUP BY Execution Mechanics, HashAggregate vs GroupAggregate & Functional Dependency</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -90,21 +94,23 @@ window.MODULE_CONTENT["m04"] = {
   "having-vs-where-pipeline": {
     "title": "Pre-Filter (WHERE) vs Post-Aggregate Filter (HAVING) Pipeline",
     "video": {
-      "youtubeId": "mM3sFwSuGNY",
-      "title": "Pre-Filter (WHERE) vs Post-Aggregate Filter (HAVING) Pipeline — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:21:05",
+      "youtubeId": "O5gU9NQjCAs",
+      "title": "#02 - Modern SQL & Advanced Query Techniques (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 18m",
       "start": 0,
-      "length": "81m",
-      "why": "Builds first-principles mastery of Pre-Filter (WHERE) vs Post-Aggregate Filter (HAVING) Pipeline with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "78m",
+      "why": "Key focus timestamps: 14:10 Aggregates; 28:40 GROUP BY semantics & HashAggregate; 44:00 GROUPING SETS, ROLLUP & CUBE"
     },
     "videos": [
       {
-        "youtubeId": "tOsb-tFoPCg",
-        "title": "Grouping, Aggregations & Multi-Dimensional Rollups: Companion Deep-Dive Lecture",
-        "channel": "Arpit Bhayani (Asli Engineering)",
-        "duration": "13:22",
-        "why": "Complementary lecture covering production implementation details for Grouping, Aggregations & Multi-Dimensional Rollups."
+        "youtubeId": "LzyKTpeIgts",
+        "title": "#11 - Sorting & Aggregation Algorithms (CMU Intro to Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 20m",
+        "length": "80m",
+        "role": "deep-dive",
+        "why": "Lecture #02 teaches grouping sets syntax; Lecture #11 explains external merge sort, in-memory hashing, and buffer pool spill cost."
       }
     ],
     "intuition": "<p>In <strong>Pre-Filter (WHERE) vs Post-Aggregate Filter (HAVING) Pipeline</strong> (<code>having-vs-where-pipeline</code>), Why pushing selective predicates into WHERE prunes rows before hash table allocation, reserving HAVING strictly for group-level aggregates. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Pre-Filter (WHERE) vs Post-Aggregate Filter (HAVING) Pipeline</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -133,21 +139,23 @@ window.MODULE_CONTENT["m04"] = {
   "conditional-aggregation-filter": {
     "title": "Pivoting & Conditional Aggregation: SUM(CASE WHEN) & FILTER (WHERE ...)",
     "video": {
-      "youtubeId": "tOsb-tFoPCg",
-      "title": "Pivoting & Conditional Aggregation: SUM(CASE WHEN) & FILTER (WHERE ...) — Database Systems & SQL Architecture Lecture",
-      "channel": "Arpit Bhayani (Asli Engineering)",
-      "duration": "13:22",
+      "youtubeId": "O5gU9NQjCAs",
+      "title": "#02 - Modern SQL & Advanced Query Techniques (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 18m",
       "start": 0,
-      "length": "13m",
-      "why": "Builds first-principles mastery of Pivoting & Conditional Aggregation: SUM(CASE WHEN) & FILTER (WHERE ...) with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "78m",
+      "why": "Key focus timestamps: 14:10 Aggregates; 28:40 GROUP BY semantics & HashAggregate; 44:00 GROUPING SETS, ROLLUP & CUBE"
     },
     "videos": [
       {
-        "youtubeId": "mM3sFwSuGNY",
-        "title": "Grouping, Aggregations & Multi-Dimensional Rollups: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:21:05",
-        "why": "Complementary lecture covering production implementation details for Grouping, Aggregations & Multi-Dimensional Rollups."
+        "youtubeId": "LzyKTpeIgts",
+        "title": "#11 - Sorting & Aggregation Algorithms (CMU Intro to Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 20m",
+        "length": "80m",
+        "role": "deep-dive",
+        "why": "Lecture #02 teaches grouping sets syntax; Lecture #11 explains external merge sort, in-memory hashing, and buffer pool spill cost."
       }
     ],
     "intuition": "<p>In <strong>Pivoting & Conditional Aggregation: SUM(CASE WHEN) & FILTER (WHERE ...)</strong> (<code>conditional-aggregation-filter</code>), Computing multiple filtered metrics in a single table scan using CASE expressions and the SQL:2003 FILTER (WHERE ...) clause. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Pivoting & Conditional Aggregation: SUM(CASE WHEN) & FILTER (WHERE ...)</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -176,21 +184,23 @@ window.MODULE_CONTENT["m04"] = {
   "string-json-array-aggregation": {
     "title": "List & Document Rollups: GROUP_CONCAT, STRING_AGG & JSON Aggregation",
     "video": {
-      "youtubeId": "mM3sFwSuGNY",
-      "title": "List & Document Rollups: GROUP_CONCAT, STRING_AGG & JSON Aggregation — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:21:05",
+      "youtubeId": "O5gU9NQjCAs",
+      "title": "#02 - Modern SQL & Advanced Query Techniques (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 18m",
       "start": 0,
-      "length": "81m",
-      "why": "Builds first-principles mastery of List & Document Rollups: GROUP_CONCAT, STRING_AGG & JSON Aggregation with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "78m",
+      "why": "Key focus timestamps: 14:10 Aggregates; 28:40 GROUP BY semantics & HashAggregate; 44:00 GROUPING SETS, ROLLUP & CUBE"
     },
     "videos": [
       {
-        "youtubeId": "tOsb-tFoPCg",
-        "title": "Grouping, Aggregations & Multi-Dimensional Rollups: Companion Deep-Dive Lecture",
-        "channel": "Arpit Bhayani (Asli Engineering)",
-        "duration": "13:22",
-        "why": "Complementary lecture covering production implementation details for Grouping, Aggregations & Multi-Dimensional Rollups."
+        "youtubeId": "LzyKTpeIgts",
+        "title": "#11 - Sorting & Aggregation Algorithms (CMU Intro to Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 20m",
+        "length": "80m",
+        "role": "deep-dive",
+        "why": "Lecture #02 teaches grouping sets syntax; Lecture #11 explains external merge sort, in-memory hashing, and buffer pool spill cost."
       }
     ],
     "intuition": "<p>In <strong>List & Document Rollups: GROUP_CONCAT, STRING_AGG & JSON Aggregation</strong> (<code>string-json-array-aggregation</code>), Collapsing one-to-many child rows into ordered delimited strings or nested JSON arrays without N+1 application round-trips. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>List & Document Rollups: GROUP_CONCAT, STRING_AGG & JSON Aggregation</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -219,21 +229,23 @@ window.MODULE_CONTENT["m04"] = {
   "grouping-sets-rollup-cube": {
     "title": "Multi-Dimensional OLAP: GROUPING SETS, ROLLUP, CUBE & GROUPING()",
     "video": {
-      "youtubeId": "tOsb-tFoPCg",
-      "title": "Multi-Dimensional OLAP: GROUPING SETS, ROLLUP, CUBE & GROUPING() — Database Systems & SQL Architecture Lecture",
-      "channel": "Arpit Bhayani (Asli Engineering)",
-      "duration": "13:22",
+      "youtubeId": "O5gU9NQjCAs",
+      "title": "#02 - Modern SQL & Advanced Query Techniques (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 18m",
       "start": 0,
-      "length": "13m",
-      "why": "Builds first-principles mastery of Multi-Dimensional OLAP: GROUPING SETS, ROLLUP, CUBE & GROUPING() with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "78m",
+      "why": "Key focus timestamps: 14:10 Aggregates; 28:40 GROUP BY semantics & HashAggregate; 44:00 GROUPING SETS, ROLLUP & CUBE"
     },
     "videos": [
       {
-        "youtubeId": "mM3sFwSuGNY",
-        "title": "Grouping, Aggregations & Multi-Dimensional Rollups: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:21:05",
-        "why": "Complementary lecture covering production implementation details for Grouping, Aggregations & Multi-Dimensional Rollups."
+        "youtubeId": "LzyKTpeIgts",
+        "title": "#11 - Sorting & Aggregation Algorithms (CMU Intro to Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 20m",
+        "length": "80m",
+        "role": "deep-dive",
+        "why": "Lecture #02 teaches grouping sets syntax; Lecture #11 explains external merge sort, in-memory hashing, and buffer pool spill cost."
       }
     ],
     "intuition": "<p>In <strong>Multi-Dimensional OLAP: GROUPING SETS, ROLLUP, CUBE & GROUPING()</strong> (<code>grouping-sets-rollup-cube</code>), Generating subtotals, hierarchical rollups, and full cross-tabulation cubes in a single pass while distinguishing real NULLs via GROUPING(). When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Multi-Dimensional OLAP: GROUPING SETS, ROLLUP, CUBE & GROUPING()</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -262,21 +274,23 @@ window.MODULE_CONTENT["m04"] = {
   "join-fanout-chasm-traps": {
     "title": "The One-to-Many Join Fanout & Chasm Traps (Why SUM Double-Counts)",
     "video": {
-      "youtubeId": "mM3sFwSuGNY",
-      "title": "The One-to-Many Join Fanout & Chasm Traps (Why SUM Double-Counts) — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:21:05",
+      "youtubeId": "O5gU9NQjCAs",
+      "title": "#02 - Modern SQL & Advanced Query Techniques (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 18m",
       "start": 0,
-      "length": "81m",
-      "why": "Builds first-principles mastery of The One-to-Many Join Fanout & Chasm Traps (Why SUM Double-Counts) with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "78m",
+      "why": "Key focus timestamps: 14:10 Aggregates; 28:40 GROUP BY semantics & HashAggregate; 44:00 GROUPING SETS, ROLLUP & CUBE"
     },
     "videos": [
       {
-        "youtubeId": "tOsb-tFoPCg",
-        "title": "Grouping, Aggregations & Multi-Dimensional Rollups: Companion Deep-Dive Lecture",
-        "channel": "Arpit Bhayani (Asli Engineering)",
-        "duration": "13:22",
-        "why": "Complementary lecture covering production implementation details for Grouping, Aggregations & Multi-Dimensional Rollups."
+        "youtubeId": "LzyKTpeIgts",
+        "title": "#11 - Sorting & Aggregation Algorithms (CMU Intro to Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 20m",
+        "length": "80m",
+        "role": "deep-dive",
+        "why": "Lecture #02 teaches grouping sets syntax; Lecture #11 explains external merge sort, in-memory hashing, and buffer pool spill cost."
       }
     ],
     "intuition": "<p>In <strong>The One-to-Many Join Fanout & Chasm Traps (Why SUM Double-Counts)</strong> (<code>join-fanout-chasm-traps</code>), Visualizing how joining two independent one-to-many child tables multiplies parent rows and inflates SUM/COUNT aggregates unless pre-aggregated. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>The One-to-Many Join Fanout & Chasm Traps (Why SUM Double-Counts)</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -305,21 +319,23 @@ window.MODULE_CONTENT["m04"] = {
   "histograms-percentiles-medians": {
     "title": "Statistical SQL: Equi-Width Histograms, Percentiles & Medians",
     "video": {
-      "youtubeId": "tOsb-tFoPCg",
-      "title": "Statistical SQL: Equi-Width Histograms, Percentiles & Medians — Database Systems & SQL Architecture Lecture",
-      "channel": "Arpit Bhayani (Asli Engineering)",
-      "duration": "13:22",
+      "youtubeId": "O5gU9NQjCAs",
+      "title": "#02 - Modern SQL & Advanced Query Techniques (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 18m",
       "start": 0,
-      "length": "13m",
-      "why": "Builds first-principles mastery of Statistical SQL: Equi-Width Histograms, Percentiles & Medians with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "78m",
+      "why": "Key focus timestamps: 14:10 Aggregates; 28:40 GROUP BY semantics & HashAggregate; 44:00 GROUPING SETS, ROLLUP & CUBE"
     },
     "videos": [
       {
-        "youtubeId": "mM3sFwSuGNY",
-        "title": "Grouping, Aggregations & Multi-Dimensional Rollups: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:21:05",
-        "why": "Complementary lecture covering production implementation details for Grouping, Aggregations & Multi-Dimensional Rollups."
+        "youtubeId": "LzyKTpeIgts",
+        "title": "#11 - Sorting & Aggregation Algorithms (CMU Intro to Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 20m",
+        "length": "80m",
+        "role": "deep-dive",
+        "why": "Lecture #02 teaches grouping sets syntax; Lecture #11 explains external merge sort, in-memory hashing, and buffer pool spill cost."
       }
     ],
     "intuition": "<p>In <strong>Statistical SQL: Equi-Width Histograms, Percentiles & Medians</strong> (<code>histograms-percentiles-medians</code>), Computing exact and approximate p50/p95/p99 latencies, discrete vs continuous percentiles, and bucketed frequency distributions in SQL. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Statistical SQL: Equi-Width Histograms, Percentiles & Medians</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -348,21 +364,23 @@ window.MODULE_CONTENT["m04"] = {
   "case-analytics-double-counting-bug": {
     "title": "Production Case Study: Diagnosing a 3x Revenue Over-Reporting Fanout Bug",
     "video": {
-      "youtubeId": "mM3sFwSuGNY",
-      "title": "Production Case Study: Diagnosing a 3x Revenue Over-Reporting Fanout Bug — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:21:05",
+      "youtubeId": "O5gU9NQjCAs",
+      "title": "#02 - Modern SQL & Advanced Query Techniques (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 18m",
       "start": 0,
-      "length": "81m",
-      "why": "Builds first-principles mastery of Production Case Study: Diagnosing a 3x Revenue Over-Reporting Fanout Bug with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "78m",
+      "why": "Key focus timestamps: 14:10 Aggregates; 28:40 GROUP BY semantics & HashAggregate; 44:00 GROUPING SETS, ROLLUP & CUBE"
     },
     "videos": [
       {
-        "youtubeId": "tOsb-tFoPCg",
-        "title": "Grouping, Aggregations & Multi-Dimensional Rollups: Companion Deep-Dive Lecture",
-        "channel": "Arpit Bhayani (Asli Engineering)",
-        "duration": "13:22",
-        "why": "Complementary lecture covering production implementation details for Grouping, Aggregations & Multi-Dimensional Rollups."
+        "youtubeId": "LzyKTpeIgts",
+        "title": "#11 - Sorting & Aggregation Algorithms (CMU Intro to Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 20m",
+        "length": "80m",
+        "role": "deep-dive",
+        "why": "Lecture #02 teaches grouping sets syntax; Lecture #11 explains external merge sort, in-memory hashing, and buffer pool spill cost."
       }
     ],
     "intuition": "<p>In <strong>Production Case Study: Diagnosing a 3x Revenue Over-Reporting Fanout Bug</strong> (<code>case-analytics-double-counting-bug</code>), Tracing an executive dashboard incident where joining orders to both order_items and shipments inflated reported revenue by 310%. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Production Case Study: Diagnosing a 3x Revenue Over-Reporting Fanout Bug</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -391,21 +409,23 @@ window.MODULE_CONTENT["m04"] = {
   "build-executive-kpi-aggregation-suite": {
     "title": "Hands-On Build: Multi-Dimensional Revenue, Cohort & Funnel Aggregation Suite",
     "video": {
-      "youtubeId": "tOsb-tFoPCg",
-      "title": "Hands-On Build: Multi-Dimensional Revenue, Cohort & Funnel Aggregation Suite — Database Systems & SQL Architecture Lecture",
-      "channel": "Arpit Bhayani (Asli Engineering)",
-      "duration": "13:22",
+      "youtubeId": "O5gU9NQjCAs",
+      "title": "#02 - Modern SQL & Advanced Query Techniques (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 18m",
       "start": 0,
-      "length": "13m",
-      "why": "Builds first-principles mastery of Hands-On Build: Multi-Dimensional Revenue, Cohort & Funnel Aggregation Suite with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "78m",
+      "why": "Key focus timestamps: 14:10 Aggregates; 28:40 GROUP BY semantics & HashAggregate; 44:00 GROUPING SETS, ROLLUP & CUBE"
     },
     "videos": [
       {
-        "youtubeId": "mM3sFwSuGNY",
-        "title": "Grouping, Aggregations & Multi-Dimensional Rollups: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:21:05",
-        "why": "Complementary lecture covering production implementation details for Grouping, Aggregations & Multi-Dimensional Rollups."
+        "youtubeId": "LzyKTpeIgts",
+        "title": "#11 - Sorting & Aggregation Algorithms (CMU Intro to Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 20m",
+        "length": "80m",
+        "role": "deep-dive",
+        "why": "Lecture #02 teaches grouping sets syntax; Lecture #11 explains external merge sort, in-memory hashing, and buffer pool spill cost."
       }
     ],
     "intuition": "<p>In <strong>Hands-On Build: Multi-Dimensional Revenue, Cohort & Funnel Aggregation Suite</strong> (<code>build-executive-kpi-aggregation-suite</code>), Construct a fanout-safe executive KPI query suite combining conditional aggregation, pre-aggregated CTEs, and multi-dimensional rollups. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Hands-On Build: Multi-Dimensional Revenue, Cohort & Funnel Aggregation Suite</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",

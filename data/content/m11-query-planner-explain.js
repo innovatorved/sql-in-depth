@@ -4,21 +4,23 @@ window.MODULE_CONTENT["m11"] = {
   "life-of-a-sql-query-pipeline": {
     "title": "Life of a SQL Query: Parser, Binder, Logical Plan, Cost Optimizer & Executor",
     "video": {
-      "youtubeId": "X8EHO8VLeG0",
-      "title": "Life of a SQL Query: Parser, Binder, Logical Plan, Cost Optimizer & Executor — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:20:45",
+      "youtubeId": "b53huOGcsZ8",
+      "title": "#15 - Query Planning & Optimization I (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 14m",
       "start": 0,
-      "length": "81m",
-      "why": "Builds first-principles mastery of Life of a SQL Query: Parser, Binder, Logical Plan, Cost Optimizer & Executor with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "74m",
+      "why": "Key focus timestamps: 10:15 Relational equivalence rules; 29:30 Cost estimation & catalog statistics; 51:00 Cost-based search algorithm"
     },
     "videos": [
       {
-        "youtubeId": "P7EUFtjeAmI",
-        "title": "The Query Planner, Cost-Based Optimizer & EXPLAIN: Companion Deep-Dive Lecture",
-        "channel": "Hussein Nasser",
-        "duration": "10:17",
-        "why": "Complementary lecture covering production implementation details for The Query Planner, Cost-Based Optimizer & EXPLAIN."
+        "youtubeId": "azTHRpzl10o",
+        "title": "#16 - Query Optimization II (CMU Intro to Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 21m",
+        "length": "81m",
+        "role": "deep-dive",
+        "why": "Comprehensive breakdown of System R vs Cascades dynamic programming, memo tables, and EXPLAIN cost models."
       }
     ],
     "intuition": "<p>In <strong>Life of a SQL Query: Parser, Binder, Logical Plan, Cost Optimizer & Executor</strong> (<code>life-of-a-sql-query-pipeline</code>), Tracing a SQL string from lexical tokenization and AST generation to catalog binding, relational algebra rewrites, cost estimation, and physical execution. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Life of a SQL Query: Parser, Binder, Logical Plan, Cost Optimizer & Executor</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -47,21 +49,23 @@ window.MODULE_CONTENT["m11"] = {
   "reading-explain-and-explain-analyze": {
     "title": "Mastering EXPLAIN & EXPLAIN ANALYZE: Cost Units, Actual Rows, Loops & Buffers",
     "video": {
-      "youtubeId": "P7EUFtjeAmI",
-      "title": "Mastering EXPLAIN & EXPLAIN ANALYZE: Cost Units, Actual Rows, Loops & Buffers — Database Systems & SQL Architecture Lecture",
-      "channel": "Hussein Nasser",
-      "duration": "10:17",
+      "youtubeId": "b53huOGcsZ8",
+      "title": "#15 - Query Planning & Optimization I (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 14m",
       "start": 0,
-      "length": "10m",
-      "why": "Builds first-principles mastery of Mastering EXPLAIN & EXPLAIN ANALYZE: Cost Units, Actual Rows, Loops & Buffers with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "74m",
+      "why": "Key focus timestamps: 10:15 Relational equivalence rules; 29:30 Cost estimation & catalog statistics; 51:00 Cost-based search algorithm"
     },
     "videos": [
       {
-        "youtubeId": "X8EHO8VLeG0",
-        "title": "The Query Planner, Cost-Based Optimizer & EXPLAIN: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:20:45",
-        "why": "Complementary lecture covering production implementation details for The Query Planner, Cost-Based Optimizer & EXPLAIN."
+        "youtubeId": "azTHRpzl10o",
+        "title": "#16 - Query Optimization II (CMU Intro to Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 21m",
+        "length": "81m",
+        "role": "deep-dive",
+        "why": "Comprehensive breakdown of System R vs Cascades dynamic programming, memo tables, and EXPLAIN cost models."
       }
     ],
     "intuition": "<p>In <strong>Mastering EXPLAIN & EXPLAIN ANALYZE: Cost Units, Actual Rows, Loops & Buffers</strong> (<code>reading-explain-and-explain-analyze</code>), Decoding bottom-up execution trees: startup cost vs total cost, estimated vs actual row counts, loop multipliers, and shared buffer hits vs reads. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Mastering EXPLAIN & EXPLAIN ANALYZE: Cost Units, Actual Rows, Loops & Buffers</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -90,21 +94,23 @@ window.MODULE_CONTENT["m11"] = {
   "table-statistics-histograms-cardinality": {
     "title": "Table Statistics (ANALYZE): Null Fraction, NDV, Most Common Values & Histograms",
     "video": {
-      "youtubeId": "X8EHO8VLeG0",
-      "title": "Table Statistics (ANALYZE): Null Fraction, NDV, Most Common Values & Histograms — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:20:45",
+      "youtubeId": "b53huOGcsZ8",
+      "title": "#15 - Query Planning & Optimization I (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 14m",
       "start": 0,
-      "length": "81m",
-      "why": "Builds first-principles mastery of Table Statistics (ANALYZE): Null Fraction, NDV, Most Common Values & Histograms with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "74m",
+      "why": "Key focus timestamps: 10:15 Relational equivalence rules; 29:30 Cost estimation & catalog statistics; 51:00 Cost-based search algorithm"
     },
     "videos": [
       {
-        "youtubeId": "P7EUFtjeAmI",
-        "title": "The Query Planner, Cost-Based Optimizer & EXPLAIN: Companion Deep-Dive Lecture",
-        "channel": "Hussein Nasser",
-        "duration": "10:17",
-        "why": "Complementary lecture covering production implementation details for The Query Planner, Cost-Based Optimizer & EXPLAIN."
+        "youtubeId": "azTHRpzl10o",
+        "title": "#16 - Query Optimization II (CMU Intro to Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 21m",
+        "length": "81m",
+        "role": "deep-dive",
+        "why": "Comprehensive breakdown of System R vs Cascades dynamic programming, memo tables, and EXPLAIN cost models."
       }
     ],
     "intuition": "<p>In <strong>Table Statistics (ANALYZE): Null Fraction, NDV, Most Common Values & Histograms</strong> (<code>table-statistics-histograms-cardinality</code>), How ANALYZE samples pages to populate pg_statistic / sqlite_stat1 with Most Common Values (MCV) lists and equi-depth histogram bounds. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Table Statistics (ANALYZE): Null Fraction, NDV, Most Common Values & Histograms</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -133,21 +139,23 @@ window.MODULE_CONTENT["m11"] = {
   "selectivity-estimation-correlated-columns": {
     "title": "Selectivity Math, Independence Assumption Failures & Extended Statistics",
     "video": {
-      "youtubeId": "P7EUFtjeAmI",
-      "title": "Selectivity Math, Independence Assumption Failures & Extended Statistics — Database Systems & SQL Architecture Lecture",
-      "channel": "Hussein Nasser",
-      "duration": "10:17",
+      "youtubeId": "b53huOGcsZ8",
+      "title": "#15 - Query Planning & Optimization I (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 14m",
       "start": 0,
-      "length": "10m",
-      "why": "Builds first-principles mastery of Selectivity Math, Independence Assumption Failures & Extended Statistics with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "74m",
+      "why": "Key focus timestamps: 10:15 Relational equivalence rules; 29:30 Cost estimation & catalog statistics; 51:00 Cost-based search algorithm"
     },
     "videos": [
       {
-        "youtubeId": "X8EHO8VLeG0",
-        "title": "The Query Planner, Cost-Based Optimizer & EXPLAIN: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:20:45",
-        "why": "Complementary lecture covering production implementation details for The Query Planner, Cost-Based Optimizer & EXPLAIN."
+        "youtubeId": "azTHRpzl10o",
+        "title": "#16 - Query Optimization II (CMU Intro to Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 21m",
+        "length": "81m",
+        "role": "deep-dive",
+        "why": "Comprehensive breakdown of System R vs Cascades dynamic programming, memo tables, and EXPLAIN cost models."
       }
     ],
     "intuition": "<p>In <strong>Selectivity Math, Independence Assumption Failures & Extended Statistics</strong> (<code>selectivity-estimation-correlated-columns</code>), Calculating P(A AND B) = P(A)×P(B), why correlated columns (city and zip_code) fool the planner by 100x, and fixing it with CREATE STATISTICS. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Selectivity Math, Independence Assumption Failures & Extended Statistics</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -176,21 +184,23 @@ window.MODULE_CONTENT["m11"] = {
   "scan-operators-seq-index-bitmap": {
     "title": "Physical Scan Operators: Seq Scan, Index Scan, Index-Only & Bitmap Heap Scan",
     "video": {
-      "youtubeId": "X8EHO8VLeG0",
-      "title": "Physical Scan Operators: Seq Scan, Index Scan, Index-Only & Bitmap Heap Scan — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:20:45",
+      "youtubeId": "b53huOGcsZ8",
+      "title": "#15 - Query Planning & Optimization I (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 14m",
       "start": 0,
-      "length": "81m",
-      "why": "Builds first-principles mastery of Physical Scan Operators: Seq Scan, Index Scan, Index-Only & Bitmap Heap Scan with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "74m",
+      "why": "Key focus timestamps: 10:15 Relational equivalence rules; 29:30 Cost estimation & catalog statistics; 51:00 Cost-based search algorithm"
     },
     "videos": [
       {
-        "youtubeId": "P7EUFtjeAmI",
-        "title": "The Query Planner, Cost-Based Optimizer & EXPLAIN: Companion Deep-Dive Lecture",
-        "channel": "Hussein Nasser",
-        "duration": "10:17",
-        "why": "Complementary lecture covering production implementation details for The Query Planner, Cost-Based Optimizer & EXPLAIN."
+        "youtubeId": "azTHRpzl10o",
+        "title": "#16 - Query Optimization II (CMU Intro to Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 21m",
+        "length": "81m",
+        "role": "deep-dive",
+        "why": "Comprehensive breakdown of System R vs Cascades dynamic programming, memo tables, and EXPLAIN cost models."
       }
     ],
     "intuition": "<p>In <strong>Physical Scan Operators: Seq Scan, Index Scan, Index-Only & Bitmap Heap Scan</strong> (<code>scan-operators-seq-index-bitmap</code>), How Bitmap Index Scan + Bitmap Heap Scan bridges the gap between single-row Index Scans and full Sequential Scans by sorting page IDs first. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Physical Scan Operators: Seq Scan, Index Scan, Index-Only & Bitmap Heap Scan</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -219,21 +229,23 @@ window.MODULE_CONTENT["m11"] = {
   "sargability-functions-on-columns": {
     "title": "SARGability: Why Functions, Arithmetic & Implicit Casts on Columns Defeat Indexes",
     "video": {
-      "youtubeId": "P7EUFtjeAmI",
-      "title": "SARGability: Why Functions, Arithmetic & Implicit Casts on Columns Defeat Indexes — Database Systems & SQL Architecture Lecture",
-      "channel": "Hussein Nasser",
-      "duration": "10:17",
+      "youtubeId": "b53huOGcsZ8",
+      "title": "#15 - Query Planning & Optimization I (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 14m",
       "start": 0,
-      "length": "10m",
-      "why": "Builds first-principles mastery of SARGability: Why Functions, Arithmetic & Implicit Casts on Columns Defeat Indexes with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "74m",
+      "why": "Key focus timestamps: 10:15 Relational equivalence rules; 29:30 Cost estimation & catalog statistics; 51:00 Cost-based search algorithm"
     },
     "videos": [
       {
-        "youtubeId": "X8EHO8VLeG0",
-        "title": "The Query Planner, Cost-Based Optimizer & EXPLAIN: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:20:45",
-        "why": "Complementary lecture covering production implementation details for The Query Planner, Cost-Based Optimizer & EXPLAIN."
+        "youtubeId": "azTHRpzl10o",
+        "title": "#16 - Query Optimization II (CMU Intro to Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 21m",
+        "length": "81m",
+        "role": "deep-dive",
+        "why": "Comprehensive breakdown of System R vs Cascades dynamic programming, memo tables, and EXPLAIN cost models."
       }
     ],
     "intuition": "<p>In <strong>SARGability: Why Functions, Arithmetic & Implicit Casts on Columns Defeat Indexes</strong> (<code>sargability-functions-on-columns</code>), Rewriting non-SARGable anti-patterns (WHERE strftime('%Y', created_at) = '2025' or WHERE amount / 100 > 50) into range-seekable predicates. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>SARGability: Why Functions, Arithmetic & Implicit Casts on Columns Defeat Indexes</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -262,21 +274,23 @@ window.MODULE_CONTENT["m11"] = {
   "or-conditions-in-lists-union-rewrites": {
     "title": "Optimizing OR Predicates, Large IN Lists, BitmapOr & UNION ALL Rewrites",
     "video": {
-      "youtubeId": "X8EHO8VLeG0",
-      "title": "Optimizing OR Predicates, Large IN Lists, BitmapOr & UNION ALL Rewrites — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:20:45",
+      "youtubeId": "b53huOGcsZ8",
+      "title": "#15 - Query Planning & Optimization I (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 14m",
       "start": 0,
-      "length": "81m",
-      "why": "Builds first-principles mastery of Optimizing OR Predicates, Large IN Lists, BitmapOr & UNION ALL Rewrites with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "74m",
+      "why": "Key focus timestamps: 10:15 Relational equivalence rules; 29:30 Cost estimation & catalog statistics; 51:00 Cost-based search algorithm"
     },
     "videos": [
       {
-        "youtubeId": "P7EUFtjeAmI",
-        "title": "The Query Planner, Cost-Based Optimizer & EXPLAIN: Companion Deep-Dive Lecture",
-        "channel": "Hussein Nasser",
-        "duration": "10:17",
-        "why": "Complementary lecture covering production implementation details for The Query Planner, Cost-Based Optimizer & EXPLAIN."
+        "youtubeId": "azTHRpzl10o",
+        "title": "#16 - Query Optimization II (CMU Intro to Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 21m",
+        "length": "81m",
+        "role": "deep-dive",
+        "why": "Comprehensive breakdown of System R vs Cascades dynamic programming, memo tables, and EXPLAIN cost models."
       }
     ],
     "intuition": "<p>In <strong>Optimizing OR Predicates, Large IN Lists, BitmapOr & UNION ALL Rewrites</strong> (<code>or-conditions-in-lists-union-rewrites</code>), Why WHERE a = 1 OR b = 2 often forces a full table scan and how optimizers or manual UNION ALL rewrites combine separate index paths. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Optimizing OR Predicates, Large IN Lists, BitmapOr & UNION ALL Rewrites</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -305,21 +319,23 @@ window.MODULE_CONTENT["m11"] = {
   "sorting-spill-to-disk-top-n-heapsort": {
     "title": "Physical Sorting: QuickSort, Bounded Top-N Heap Sort, Incremental Sort & Disk Spills",
     "video": {
-      "youtubeId": "P7EUFtjeAmI",
-      "title": "Physical Sorting: QuickSort, Bounded Top-N Heap Sort, Incremental Sort & Disk Spills — Database Systems & SQL Architecture Lecture",
-      "channel": "Hussein Nasser",
-      "duration": "10:17",
+      "youtubeId": "b53huOGcsZ8",
+      "title": "#15 - Query Planning & Optimization I (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 14m",
       "start": 0,
-      "length": "10m",
-      "why": "Builds first-principles mastery of Physical Sorting: QuickSort, Bounded Top-N Heap Sort, Incremental Sort & Disk Spills with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "74m",
+      "why": "Key focus timestamps: 10:15 Relational equivalence rules; 29:30 Cost estimation & catalog statistics; 51:00 Cost-based search algorithm"
     },
     "videos": [
       {
-        "youtubeId": "X8EHO8VLeG0",
-        "title": "The Query Planner, Cost-Based Optimizer & EXPLAIN: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:20:45",
-        "why": "Complementary lecture covering production implementation details for The Query Planner, Cost-Based Optimizer & EXPLAIN."
+        "youtubeId": "azTHRpzl10o",
+        "title": "#16 - Query Optimization II (CMU Intro to Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 21m",
+        "length": "81m",
+        "role": "deep-dive",
+        "why": "Comprehensive breakdown of System R vs Cascades dynamic programming, memo tables, and EXPLAIN cost models."
       }
     ],
     "intuition": "<p>In <strong>Physical Sorting: QuickSort, Bounded Top-N Heap Sort, Incremental Sort & Disk Spills</strong> (<code>sorting-spill-to-disk-top-n-heapsort</code>), Why ORDER BY ... LIMIT 10 uses an O(N log K) bounded heap in memory while unbounded sorts exceeding work_mem spill to multi-pass external merge files. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Physical Sorting: QuickSort, Bounded Top-N Heap Sort, Incremental Sort & Disk Spills</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -348,21 +364,23 @@ window.MODULE_CONTENT["m11"] = {
   "case-stale-statistics-plan-flip": {
     "title": "Production Case Study: Anatomy of a Query Plan Flip from Stale Statistics",
     "video": {
-      "youtubeId": "X8EHO8VLeG0",
-      "title": "Production Case Study: Anatomy of a Query Plan Flip from Stale Statistics — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:20:45",
+      "youtubeId": "b53huOGcsZ8",
+      "title": "#15 - Query Planning & Optimization I (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 14m",
       "start": 0,
-      "length": "81m",
-      "why": "Builds first-principles mastery of Production Case Study: Anatomy of a Query Plan Flip from Stale Statistics with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "74m",
+      "why": "Key focus timestamps: 10:15 Relational equivalence rules; 29:30 Cost estimation & catalog statistics; 51:00 Cost-based search algorithm"
     },
     "videos": [
       {
-        "youtubeId": "P7EUFtjeAmI",
-        "title": "The Query Planner, Cost-Based Optimizer & EXPLAIN: Companion Deep-Dive Lecture",
-        "channel": "Hussein Nasser",
-        "duration": "10:17",
-        "why": "Complementary lecture covering production implementation details for The Query Planner, Cost-Based Optimizer & EXPLAIN."
+        "youtubeId": "azTHRpzl10o",
+        "title": "#16 - Query Optimization II (CMU Intro to Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 21m",
+        "length": "81m",
+        "role": "deep-dive",
+        "why": "Comprehensive breakdown of System R vs Cascades dynamic programming, memo tables, and EXPLAIN cost models."
       }
     ],
     "intuition": "<p>In <strong>Production Case Study: Anatomy of a Query Plan Flip from Stale Statistics</strong> (<code>case-stale-statistics-plan-flip</code>), How a bulk ingestion of 5 million rows before autovacuum ANALYZE caused the planner to pick a Nested Loop Join instead of a Hash Join, stalling CPU at 100%. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Production Case Study: Anatomy of a Query Plan Flip from Stale Statistics</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -391,21 +409,23 @@ window.MODULE_CONTENT["m11"] = {
   "build-visual-explain-plan-analyzer": {
     "title": "Hands-On Build: Interactive EXPLAIN Plan Bottleneck Detector & Query Rewriter",
     "video": {
-      "youtubeId": "P7EUFtjeAmI",
-      "title": "Hands-On Build: Interactive EXPLAIN Plan Bottleneck Detector & Query Rewriter — Database Systems & SQL Architecture Lecture",
-      "channel": "Hussein Nasser",
-      "duration": "10:17",
+      "youtubeId": "b53huOGcsZ8",
+      "title": "#15 - Query Planning & Optimization I (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 14m",
       "start": 0,
-      "length": "10m",
-      "why": "Builds first-principles mastery of Hands-On Build: Interactive EXPLAIN Plan Bottleneck Detector & Query Rewriter with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "74m",
+      "why": "Key focus timestamps: 10:15 Relational equivalence rules; 29:30 Cost estimation & catalog statistics; 51:00 Cost-based search algorithm"
     },
     "videos": [
       {
-        "youtubeId": "X8EHO8VLeG0",
-        "title": "The Query Planner, Cost-Based Optimizer & EXPLAIN: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:20:45",
-        "why": "Complementary lecture covering production implementation details for The Query Planner, Cost-Based Optimizer & EXPLAIN."
+        "youtubeId": "azTHRpzl10o",
+        "title": "#16 - Query Optimization II (CMU Intro to Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 21m",
+        "length": "81m",
+        "role": "deep-dive",
+        "why": "Comprehensive breakdown of System R vs Cascades dynamic programming, memo tables, and EXPLAIN cost models."
       }
     ],
     "intuition": "<p>In <strong>Hands-On Build: Interactive EXPLAIN Plan Bottleneck Detector & Query Rewriter</strong> (<code>build-visual-explain-plan-analyzer</code>), Build a diagnostic engine that parses EXPLAIN QUERY PLAN outputs, detects full table scans and temp B-Tree sorts, and verifies SARGable query rewrites. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Hands-On Build: Interactive EXPLAIN Plan Bottleneck Detector & Query Rewriter</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",

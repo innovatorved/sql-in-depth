@@ -4,21 +4,23 @@ window.MODULE_CONTENT["m13"] = {
   "acid-properties-under-the-hood": {
     "title": "ACID Under the Hood: Atomicity (Undo), Consistency, Isolation & Durability (WAL)",
     "video": {
-      "youtubeId": "4y656idl8ZU",
-      "title": "ACID Under the Hood: Atomicity (Undo), Consistency, Isolation & Durability (WAL) — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:21:30",
+      "youtubeId": "tMFAgvDViAI",
+      "title": "#17 - Concurrency Control Theory (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 15m",
       "start": 0,
-      "length": "82m",
-      "why": "Builds first-principles mastery of ACID Under the Hood: Atomicity (Undo), Consistency, Isolation & Durability (WAL) with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "75m",
+      "why": "Key focus timestamps: 11:20 Atomicity & Consistency; 24:10 Conflict Serializability & Precedence Graphs; 55:30 View Serializability"
     },
     "videos": [
       {
-        "youtubeId": "5ZjhNTM8XU8",
-        "title": "ACID Transactions, Concurrency Anomalies & Isolation Levels: Companion Deep-Dive Lecture",
-        "channel": "Goto Conferences (Martin Kleppmann)",
-        "duration": "41:08",
-        "why": "Complementary lecture covering production implementation details for ACID Transactions, Concurrency Anomalies & Isolation Levels."
+        "youtubeId": "pomxJOFVcQs",
+        "title": "Relational Database ACID Transactions (Explained by Example)",
+        "channel": "Hussein Nasser",
+        "duration": "19m 40s",
+        "length": "20m",
+        "role": "deep-dive",
+        "why": "Full video: Concrete practical examples of dirty reads, non-repeatable reads, and phantom anomalies."
       }
     ],
     "intuition": "<p>In <strong>ACID Under the Hood: Atomicity (Undo), Consistency, Isolation & Durability (WAL)</strong> (<code>acid-properties-under-the-hood</code>), Moving beyond textbook acronyms: how undo logs/MVCC implement Atomicity, concurrency protocols enforce Isolation, and WAL fsync guarantees Durability. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>ACID Under the Hood: Atomicity (Undo), Consistency, Isolation & Durability (WAL)</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -47,21 +49,23 @@ window.MODULE_CONTENT["m13"] = {
   "transaction-lifecycle-savepoints": {
     "title": "Transaction Lifecycle: BEGIN, COMMIT, ROLLBACK, SAVEPOINT & Autocommit Hazards",
     "video": {
-      "youtubeId": "5ZjhNTM8XU8",
-      "title": "Transaction Lifecycle: BEGIN, COMMIT, ROLLBACK, SAVEPOINT & Autocommit Hazards — Database Systems & SQL Architecture Lecture",
-      "channel": "Goto Conferences (Martin Kleppmann)",
-      "duration": "41:08",
+      "youtubeId": "tMFAgvDViAI",
+      "title": "#17 - Concurrency Control Theory (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 15m",
       "start": 0,
-      "length": "41m",
-      "why": "Builds first-principles mastery of Transaction Lifecycle: BEGIN, COMMIT, ROLLBACK, SAVEPOINT & Autocommit Hazards with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "75m",
+      "why": "Key focus timestamps: 11:20 Atomicity & Consistency; 24:10 Conflict Serializability & Precedence Graphs; 55:30 View Serializability"
     },
     "videos": [
       {
-        "youtubeId": "4y656idl8ZU",
-        "title": "ACID Transactions, Concurrency Anomalies & Isolation Levels: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:21:30",
-        "why": "Complementary lecture covering production implementation details for ACID Transactions, Concurrency Anomalies & Isolation Levels."
+        "youtubeId": "pomxJOFVcQs",
+        "title": "Relational Database ACID Transactions (Explained by Example)",
+        "channel": "Hussein Nasser",
+        "duration": "19m 40s",
+        "length": "20m",
+        "role": "deep-dive",
+        "why": "Full video: Concrete practical examples of dirty reads, non-repeatable reads, and phantom anomalies."
       }
     ],
     "intuition": "<p>In <strong>Transaction Lifecycle: BEGIN, COMMIT, ROLLBACK, SAVEPOINT & Autocommit Hazards</strong> (<code>transaction-lifecycle-savepoints</code>), Managing transaction boundaries, partial rollbacks via nested SAVEPOINTs, and why long-running idle-in-transaction sessions poison database health. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Transaction Lifecycle: BEGIN, COMMIT, ROLLBACK, SAVEPOINT & Autocommit Hazards</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -90,21 +94,23 @@ window.MODULE_CONTENT["m13"] = {
   "read-phenomena-dirty-nonrepeatable-phantom": {
     "title": "Read Anomalies: Dirty Reads, Non-Repeatable Reads & Phantom Reads Visualized",
     "video": {
-      "youtubeId": "4y656idl8ZU",
-      "title": "Read Anomalies: Dirty Reads, Non-Repeatable Reads & Phantom Reads Visualized — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:21:30",
+      "youtubeId": "tMFAgvDViAI",
+      "title": "#17 - Concurrency Control Theory (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 15m",
       "start": 0,
-      "length": "82m",
-      "why": "Builds first-principles mastery of Read Anomalies: Dirty Reads, Non-Repeatable Reads & Phantom Reads Visualized with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "75m",
+      "why": "Key focus timestamps: 11:20 Atomicity & Consistency; 24:10 Conflict Serializability & Precedence Graphs; 55:30 View Serializability"
     },
     "videos": [
       {
-        "youtubeId": "5ZjhNTM8XU8",
-        "title": "ACID Transactions, Concurrency Anomalies & Isolation Levels: Companion Deep-Dive Lecture",
-        "channel": "Goto Conferences (Martin Kleppmann)",
-        "duration": "41:08",
-        "why": "Complementary lecture covering production implementation details for ACID Transactions, Concurrency Anomalies & Isolation Levels."
+        "youtubeId": "pomxJOFVcQs",
+        "title": "Relational Database ACID Transactions (Explained by Example)",
+        "channel": "Hussein Nasser",
+        "duration": "19m 40s",
+        "length": "20m",
+        "role": "deep-dive",
+        "why": "Full video: Concrete practical examples of dirty reads, non-repeatable reads, and phantom anomalies."
       }
     ],
     "intuition": "<p>In <strong>Read Anomalies: Dirty Reads, Non-Repeatable Reads & Phantom Reads Visualized</strong> (<code>read-phenomena-dirty-nonrepeatable-phantom</code>), Stepping through dual-session timelines (T1 & T2) to witness uncommitted reads, mid-transaction value changes, and newly appearing phantom tuples. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Read Anomalies: Dirty Reads, Non-Repeatable Reads & Phantom Reads Visualized</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -133,21 +139,23 @@ window.MODULE_CONTENT["m13"] = {
   "write-anomalies-lost-update-write-skew": {
     "title": "Write Anomalies: Dirty Writes, Lost Updates, Read Skew & Write Skew",
     "video": {
-      "youtubeId": "5ZjhNTM8XU8",
-      "title": "Write Anomalies: Dirty Writes, Lost Updates, Read Skew & Write Skew — Database Systems & SQL Architecture Lecture",
-      "channel": "Goto Conferences (Martin Kleppmann)",
-      "duration": "41:08",
+      "youtubeId": "tMFAgvDViAI",
+      "title": "#17 - Concurrency Control Theory (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 15m",
       "start": 0,
-      "length": "41m",
-      "why": "Builds first-principles mastery of Write Anomalies: Dirty Writes, Lost Updates, Read Skew & Write Skew with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "75m",
+      "why": "Key focus timestamps: 11:20 Atomicity & Consistency; 24:10 Conflict Serializability & Precedence Graphs; 55:30 View Serializability"
     },
     "videos": [
       {
-        "youtubeId": "4y656idl8ZU",
-        "title": "ACID Transactions, Concurrency Anomalies & Isolation Levels: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:21:30",
-        "why": "Complementary lecture covering production implementation details for ACID Transactions, Concurrency Anomalies & Isolation Levels."
+        "youtubeId": "pomxJOFVcQs",
+        "title": "Relational Database ACID Transactions (Explained by Example)",
+        "channel": "Hussein Nasser",
+        "duration": "19m 40s",
+        "length": "20m",
+        "role": "deep-dive",
+        "why": "Full video: Concrete practical examples of dirty reads, non-repeatable reads, and phantom anomalies."
       }
     ],
     "intuition": "<p>In <strong>Write Anomalies: Dirty Writes, Lost Updates, Read Skew & Write Skew</strong> (<code>write-anomalies-lost-update-write-skew</code>), Why preventing standard SQL-92 read phenomena is not enough: how concurrent read-modify-write cycles lose updates and how Write Skew breaks multi-row invariants. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Write Anomalies: Dirty Writes, Lost Updates, Read Skew & Write Skew</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -176,21 +184,23 @@ window.MODULE_CONTENT["m13"] = {
   "read-uncommitted-read-committed": {
     "title": "READ UNCOMMITTED & READ COMMITTED: Statement-Level Snapshots in Practice",
     "video": {
-      "youtubeId": "4y656idl8ZU",
-      "title": "READ UNCOMMITTED & READ COMMITTED: Statement-Level Snapshots in Practice — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:21:30",
+      "youtubeId": "tMFAgvDViAI",
+      "title": "#17 - Concurrency Control Theory (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 15m",
       "start": 0,
-      "length": "82m",
-      "why": "Builds first-principles mastery of READ UNCOMMITTED & READ COMMITTED: Statement-Level Snapshots in Practice with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "75m",
+      "why": "Key focus timestamps: 11:20 Atomicity & Consistency; 24:10 Conflict Serializability & Precedence Graphs; 55:30 View Serializability"
     },
     "videos": [
       {
-        "youtubeId": "5ZjhNTM8XU8",
-        "title": "ACID Transactions, Concurrency Anomalies & Isolation Levels: Companion Deep-Dive Lecture",
-        "channel": "Goto Conferences (Martin Kleppmann)",
-        "duration": "41:08",
-        "why": "Complementary lecture covering production implementation details for ACID Transactions, Concurrency Anomalies & Isolation Levels."
+        "youtubeId": "pomxJOFVcQs",
+        "title": "Relational Database ACID Transactions (Explained by Example)",
+        "channel": "Hussein Nasser",
+        "duration": "19m 40s",
+        "length": "20m",
+        "role": "deep-dive",
+        "why": "Full video: Concrete practical examples of dirty reads, non-repeatable reads, and phantom anomalies."
       }
     ],
     "intuition": "<p>In <strong>READ UNCOMMITTED & READ COMMITTED: Statement-Level Snapshots in Practice</strong> (<code>read-uncommitted-read-committed</code>), Why PostgreSQL treats READ UNCOMMITTED as READ COMMITTED, and how taking a fresh snapshot per statement allows non-repeatable reads and read skew. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>READ UNCOMMITTED & READ COMMITTED: Statement-Level Snapshots in Practice</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -219,21 +229,23 @@ window.MODULE_CONTENT["m13"] = {
   "repeatable-read-snapshot-isolation": {
     "title": "REPEATABLE READ & Snapshot Isolation (SI): First-Committer-Wins & Write Skew",
     "video": {
-      "youtubeId": "5ZjhNTM8XU8",
-      "title": "REPEATABLE READ & Snapshot Isolation (SI): First-Committer-Wins & Write Skew — Database Systems & SQL Architecture Lecture",
-      "channel": "Goto Conferences (Martin Kleppmann)",
-      "duration": "41:08",
+      "youtubeId": "tMFAgvDViAI",
+      "title": "#17 - Concurrency Control Theory (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 15m",
       "start": 0,
-      "length": "41m",
-      "why": "Builds first-principles mastery of REPEATABLE READ & Snapshot Isolation (SI): First-Committer-Wins & Write Skew with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "75m",
+      "why": "Key focus timestamps: 11:20 Atomicity & Consistency; 24:10 Conflict Serializability & Precedence Graphs; 55:30 View Serializability"
     },
     "videos": [
       {
-        "youtubeId": "4y656idl8ZU",
-        "title": "ACID Transactions, Concurrency Anomalies & Isolation Levels: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:21:30",
-        "why": "Complementary lecture covering production implementation details for ACID Transactions, Concurrency Anomalies & Isolation Levels."
+        "youtubeId": "pomxJOFVcQs",
+        "title": "Relational Database ACID Transactions (Explained by Example)",
+        "channel": "Hussein Nasser",
+        "duration": "19m 40s",
+        "length": "20m",
+        "role": "deep-dive",
+        "why": "Full video: Concrete practical examples of dirty reads, non-repeatable reads, and phantom anomalies."
       }
     ],
     "intuition": "<p>In <strong>REPEATABLE READ & Snapshot Isolation (SI): First-Committer-Wins & Write Skew</strong> (<code>repeatable-read-snapshot-isolation</code>), How transaction-start snapshots guarantee repeatable reads and automatically abort concurrent Lost Updates while still permitting Write Skew. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>REPEATABLE READ & Snapshot Isolation (SI): First-Committer-Wins & Write Skew</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -262,21 +274,23 @@ window.MODULE_CONTENT["m13"] = {
   "serializable-2pl-vs-ssi": {
     "title": "True Serializability: Strict Two-Phase Locking (2PL) vs Serializable Snapshot Isolation (SSI)",
     "video": {
-      "youtubeId": "4y656idl8ZU",
-      "title": "True Serializability: Strict Two-Phase Locking (2PL) vs Serializable Snapshot Isolation (SSI) — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:21:30",
+      "youtubeId": "tMFAgvDViAI",
+      "title": "#17 - Concurrency Control Theory (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 15m",
       "start": 0,
-      "length": "82m",
-      "why": "Builds first-principles mastery of True Serializability: Strict Two-Phase Locking (2PL) vs Serializable Snapshot Isolation (SSI) with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "75m",
+      "why": "Key focus timestamps: 11:20 Atomicity & Consistency; 24:10 Conflict Serializability & Precedence Graphs; 55:30 View Serializability"
     },
     "videos": [
       {
-        "youtubeId": "5ZjhNTM8XU8",
-        "title": "ACID Transactions, Concurrency Anomalies & Isolation Levels: Companion Deep-Dive Lecture",
-        "channel": "Goto Conferences (Martin Kleppmann)",
-        "duration": "41:08",
-        "why": "Complementary lecture covering production implementation details for ACID Transactions, Concurrency Anomalies & Isolation Levels."
+        "youtubeId": "pomxJOFVcQs",
+        "title": "Relational Database ACID Transactions (Explained by Example)",
+        "channel": "Hussein Nasser",
+        "duration": "19m 40s",
+        "length": "20m",
+        "role": "deep-dive",
+        "why": "Full video: Concrete practical examples of dirty reads, non-repeatable reads, and phantom anomalies."
       }
     ],
     "intuition": "<p>In <strong>True Serializability: Strict Two-Phase Locking (2PL) vs Serializable Snapshot Isolation (SSI)</strong> (<code>serializable-2pl-vs-ssi</code>), Comparing pessimistic Strict 2PL (shared/exclusive read-write locks) against PostgreSQL's lock-free SSI rw-antidependency conflict graph detection. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>True Serializability: Strict Two-Phase Locking (2PL) vs Serializable Snapshot Isolation (SSI)</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -305,21 +319,23 @@ window.MODULE_CONTENT["m13"] = {
   "optimistic-vs-pessimistic-concurrency": {
     "title": "Optimistic Concurrency (Compare-and-Swap Version) vs Pessimistic SELECT FOR UPDATE",
     "video": {
-      "youtubeId": "5ZjhNTM8XU8",
-      "title": "Optimistic Concurrency (Compare-and-Swap Version) vs Pessimistic SELECT FOR UPDATE — Database Systems & SQL Architecture Lecture",
-      "channel": "Goto Conferences (Martin Kleppmann)",
-      "duration": "41:08",
+      "youtubeId": "tMFAgvDViAI",
+      "title": "#17 - Concurrency Control Theory (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 15m",
       "start": 0,
-      "length": "41m",
-      "why": "Builds first-principles mastery of Optimistic Concurrency (Compare-and-Swap Version) vs Pessimistic SELECT FOR UPDATE with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "75m",
+      "why": "Key focus timestamps: 11:20 Atomicity & Consistency; 24:10 Conflict Serializability & Precedence Graphs; 55:30 View Serializability"
     },
     "videos": [
       {
-        "youtubeId": "4y656idl8ZU",
-        "title": "ACID Transactions, Concurrency Anomalies & Isolation Levels: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:21:30",
-        "why": "Complementary lecture covering production implementation details for ACID Transactions, Concurrency Anomalies & Isolation Levels."
+        "youtubeId": "pomxJOFVcQs",
+        "title": "Relational Database ACID Transactions (Explained by Example)",
+        "channel": "Hussein Nasser",
+        "duration": "19m 40s",
+        "length": "20m",
+        "role": "deep-dive",
+        "why": "Full video: Concrete practical examples of dirty reads, non-repeatable reads, and phantom anomalies."
       }
     ],
     "intuition": "<p>In <strong>Optimistic Concurrency (Compare-and-Swap Version) vs Pessimistic SELECT FOR UPDATE</strong> (<code>optimistic-vs-pessimistic-concurrency</code>), Choosing between explicit row locks (SELECT ... FOR UPDATE), atomic SQL increments, and optimistic version columns (WHERE version = expected). When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Optimistic Concurrency (Compare-and-Swap Version) vs Pessimistic SELECT FOR UPDATE</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -348,21 +364,23 @@ window.MODULE_CONTENT["m13"] = {
   "case-fintech-double-spend-race-condition": {
     "title": "Production Case Study: Exploiting & Fixing a Concurrent Balance Double-Spend",
     "video": {
-      "youtubeId": "4y656idl8ZU",
-      "title": "Production Case Study: Exploiting & Fixing a Concurrent Balance Double-Spend — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:21:30",
+      "youtubeId": "tMFAgvDViAI",
+      "title": "#17 - Concurrency Control Theory (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 15m",
       "start": 0,
-      "length": "82m",
-      "why": "Builds first-principles mastery of Production Case Study: Exploiting & Fixing a Concurrent Balance Double-Spend with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "75m",
+      "why": "Key focus timestamps: 11:20 Atomicity & Consistency; 24:10 Conflict Serializability & Precedence Graphs; 55:30 View Serializability"
     },
     "videos": [
       {
-        "youtubeId": "5ZjhNTM8XU8",
-        "title": "ACID Transactions, Concurrency Anomalies & Isolation Levels: Companion Deep-Dive Lecture",
-        "channel": "Goto Conferences (Martin Kleppmann)",
-        "duration": "41:08",
-        "why": "Complementary lecture covering production implementation details for ACID Transactions, Concurrency Anomalies & Isolation Levels."
+        "youtubeId": "pomxJOFVcQs",
+        "title": "Relational Database ACID Transactions (Explained by Example)",
+        "channel": "Hussein Nasser",
+        "duration": "19m 40s",
+        "length": "20m",
+        "role": "deep-dive",
+        "why": "Full video: Concrete practical examples of dirty reads, non-repeatable reads, and phantom anomalies."
       }
     ],
     "intuition": "<p>In <strong>Production Case Study: Exploiting & Fixing a Concurrent Balance Double-Spend</strong> (<code>case-fintech-double-spend-race-condition</code>), Reproducing a classic wallet withdrawal race condition under READ COMMITTED where two concurrent requests withdraw $100 from a $100 balance. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Production Case Study: Exploiting & Fixing a Concurrent Balance Double-Spend</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -391,21 +409,23 @@ window.MODULE_CONTENT["m13"] = {
   "build-transaction-anomaly-simulator": {
     "title": "Hands-On Build: Dual-Session Concurrency Anomaly & Isolation Verifier",
     "video": {
-      "youtubeId": "5ZjhNTM8XU8",
-      "title": "Hands-On Build: Dual-Session Concurrency Anomaly & Isolation Verifier — Database Systems & SQL Architecture Lecture",
-      "channel": "Goto Conferences (Martin Kleppmann)",
-      "duration": "41:08",
+      "youtubeId": "tMFAgvDViAI",
+      "title": "#17 - Concurrency Control Theory (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 15m",
       "start": 0,
-      "length": "41m",
-      "why": "Builds first-principles mastery of Hands-On Build: Dual-Session Concurrency Anomaly & Isolation Verifier with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "75m",
+      "why": "Key focus timestamps: 11:20 Atomicity & Consistency; 24:10 Conflict Serializability & Precedence Graphs; 55:30 View Serializability"
     },
     "videos": [
       {
-        "youtubeId": "4y656idl8ZU",
-        "title": "ACID Transactions, Concurrency Anomalies & Isolation Levels: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:21:30",
-        "why": "Complementary lecture covering production implementation details for ACID Transactions, Concurrency Anomalies & Isolation Levels."
+        "youtubeId": "pomxJOFVcQs",
+        "title": "Relational Database ACID Transactions (Explained by Example)",
+        "channel": "Hussein Nasser",
+        "duration": "19m 40s",
+        "length": "20m",
+        "role": "deep-dive",
+        "why": "Full video: Concrete practical examples of dirty reads, non-repeatable reads, and phantom anomalies."
       }
     ],
     "intuition": "<p>In <strong>Hands-On Build: Dual-Session Concurrency Anomaly & Isolation Verifier</strong> (<code>build-transaction-anomaly-simulator</code>), Build a transaction schedule analyzer that simulates interleaved T1/T2 read-write operations and detects Dirty Reads, Lost Updates, and Write Skew. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Hands-On Build: Dual-Session Concurrency Anomaly & Isolation Verifier</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",

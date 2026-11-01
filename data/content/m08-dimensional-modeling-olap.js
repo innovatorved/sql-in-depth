@@ -4,21 +4,23 @@ window.MODULE_CONTENT["m08"] = {
   "oltp-vs-olap-workload-physics": {
     "title": "OLTP vs OLAP Workload Physics: Point Lookups vs Billion-Row Scans",
     "video": {
-      "youtubeId": "nhlpwmOBEiE",
-      "title": "OLTP vs OLAP Workload Physics: Point Lookups vs Billion-Row Scans — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:23:10",
+      "youtubeId": "gRE3E7VUzRU",
+      "title": "Data Modeling Tutorial: Star Schema (aka Kimball Approach)",
+      "channel": "Kahan Data Solutions",
+      "duration": "24m 50s",
       "start": 0,
-      "length": "83m",
-      "why": "Builds first-principles mastery of OLTP vs OLAP Workload Physics: Point Lookups vs Billion-Row Scans with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "25m",
+      "why": "Key focus timestamps: 03:15 Fact vs Dimension; 09:30 Grain definition; 15:10 Surrogate keys; 19:45 Snowflake vs Star tradeoffs"
     },
     "videos": [
       {
-        "youtubeId": "fU9hR3kiOK0",
-        "title": "Dimensional Modeling & Analytical Schema Design: Companion Deep-Dive Lecture",
-        "channel": "Strange Loop (Martin Kleppmann)",
-        "duration": "47:43",
-        "why": "Complementary lecture covering production implementation details for Dimensional Modeling & Analytical Schema Design."
+        "youtubeId": "fsZA4K0E3kQ",
+        "title": "Slowly Changing Dimensions (SCD Type 0, 1, 2, 3, 4, 6) Explained",
+        "channel": "Seattle Data Guy",
+        "duration": "19m 55s",
+        "length": "20m",
+        "role": "deep-dive",
+        "why": "Upgrades the companion from PrepWithSid (294 views) to an industry-standard authority covering enterprise SCD Type 2 pipelines."
       }
     ],
     "intuition": "<p>In <strong>OLTP vs OLAP Workload Physics: Point Lookups vs Billion-Row Scans</strong> (<code>oltp-vs-olap-workload-physics</code>), Contrasting high-concurrency transactional point mutations against wide analytical aggregations and why they demand different schema topologies. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>OLTP vs OLAP Workload Physics: Point Lookups vs Billion-Row Scans</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -47,21 +49,23 @@ window.MODULE_CONTENT["m08"] = {
   "star-schema-facts-dimensions": {
     "title": "Kimball Star Schema: Fact Table Grain, Additive Measures & Conformed Dimensions",
     "video": {
-      "youtubeId": "fU9hR3kiOK0",
-      "title": "Kimball Star Schema: Fact Table Grain, Additive Measures & Conformed Dimensions — Database Systems & SQL Architecture Lecture",
-      "channel": "Strange Loop (Martin Kleppmann)",
-      "duration": "47:43",
+      "youtubeId": "gRE3E7VUzRU",
+      "title": "Data Modeling Tutorial: Star Schema (aka Kimball Approach)",
+      "channel": "Kahan Data Solutions",
+      "duration": "24m 50s",
       "start": 0,
-      "length": "48m",
-      "why": "Builds first-principles mastery of Kimball Star Schema: Fact Table Grain, Additive Measures & Conformed Dimensions with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "25m",
+      "why": "Key focus timestamps: 03:15 Fact vs Dimension; 09:30 Grain definition; 15:10 Surrogate keys; 19:45 Snowflake vs Star tradeoffs"
     },
     "videos": [
       {
-        "youtubeId": "nhlpwmOBEiE",
-        "title": "Dimensional Modeling & Analytical Schema Design: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:23:10",
-        "why": "Complementary lecture covering production implementation details for Dimensional Modeling & Analytical Schema Design."
+        "youtubeId": "fsZA4K0E3kQ",
+        "title": "Slowly Changing Dimensions (SCD Type 0, 1, 2, 3, 4, 6) Explained",
+        "channel": "Seattle Data Guy",
+        "duration": "19m 55s",
+        "length": "20m",
+        "role": "deep-dive",
+        "why": "Upgrades the companion from PrepWithSid (294 views) to an industry-standard authority covering enterprise SCD Type 2 pipelines."
       }
     ],
     "intuition": "<p>In <strong>Kimball Star Schema: Fact Table Grain, Additive Measures & Conformed Dimensions</strong> (<code>star-schema-facts-dimensions</code>), Declaring an unambiguous fact grain, classifying additive, semi-additive (account balances), and non-additive measures, and surrogate dimension keys. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Kimball Star Schema: Fact Table Grain, Additive Measures & Conformed Dimensions</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -90,21 +94,23 @@ window.MODULE_CONTENT["m08"] = {
   "snowflake-vs-star-vs-obt": {
     "title": "Snowflake Schema vs Star Schema vs One Big Table (OBT) in Cloud Warehouses",
     "video": {
-      "youtubeId": "nhlpwmOBEiE",
-      "title": "Snowflake Schema vs Star Schema vs One Big Table (OBT) in Cloud Warehouses — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:23:10",
+      "youtubeId": "gRE3E7VUzRU",
+      "title": "Data Modeling Tutorial: Star Schema (aka Kimball Approach)",
+      "channel": "Kahan Data Solutions",
+      "duration": "24m 50s",
       "start": 0,
-      "length": "83m",
-      "why": "Builds first-principles mastery of Snowflake Schema vs Star Schema vs One Big Table (OBT) in Cloud Warehouses with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "25m",
+      "why": "Key focus timestamps: 03:15 Fact vs Dimension; 09:30 Grain definition; 15:10 Surrogate keys; 19:45 Snowflake vs Star tradeoffs"
     },
     "videos": [
       {
-        "youtubeId": "fU9hR3kiOK0",
-        "title": "Dimensional Modeling & Analytical Schema Design: Companion Deep-Dive Lecture",
-        "channel": "Strange Loop (Martin Kleppmann)",
-        "duration": "47:43",
-        "why": "Complementary lecture covering production implementation details for Dimensional Modeling & Analytical Schema Design."
+        "youtubeId": "fsZA4K0E3kQ",
+        "title": "Slowly Changing Dimensions (SCD Type 0, 1, 2, 3, 4, 6) Explained",
+        "channel": "Seattle Data Guy",
+        "duration": "19m 55s",
+        "length": "20m",
+        "role": "deep-dive",
+        "why": "Upgrades the companion from PrepWithSid (294 views) to an industry-standard authority covering enterprise SCD Type 2 pipelines."
       }
     ],
     "intuition": "<p>In <strong>Snowflake Schema vs Star Schema vs One Big Table (OBT) in Cloud Warehouses</strong> (<code>snowflake-vs-star-vs-obt</code>), Benchmarking join cost vs storage compression across normalized Snowflake dimensions, classic Star schemas, and wide columnar One Big Tables. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Snowflake Schema vs Star Schema vs One Big Table (OBT) in Cloud Warehouses</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -133,21 +139,23 @@ window.MODULE_CONTENT["m08"] = {
   "slowly-changing-dimensions-scd": {
     "title": "Slowly Changing Dimensions: SCD Type 0, 1, 2 (Effective Dates), 3 & 6",
     "video": {
-      "youtubeId": "fU9hR3kiOK0",
-      "title": "Slowly Changing Dimensions: SCD Type 0, 1, 2 (Effective Dates), 3 & 6 — Database Systems & SQL Architecture Lecture",
-      "channel": "Strange Loop (Martin Kleppmann)",
-      "duration": "47:43",
+      "youtubeId": "gRE3E7VUzRU",
+      "title": "Data Modeling Tutorial: Star Schema (aka Kimball Approach)",
+      "channel": "Kahan Data Solutions",
+      "duration": "24m 50s",
       "start": 0,
-      "length": "48m",
-      "why": "Builds first-principles mastery of Slowly Changing Dimensions: SCD Type 0, 1, 2 (Effective Dates), 3 & 6 with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "25m",
+      "why": "Key focus timestamps: 03:15 Fact vs Dimension; 09:30 Grain definition; 15:10 Surrogate keys; 19:45 Snowflake vs Star tradeoffs"
     },
     "videos": [
       {
-        "youtubeId": "nhlpwmOBEiE",
-        "title": "Dimensional Modeling & Analytical Schema Design: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:23:10",
-        "why": "Complementary lecture covering production implementation details for Dimensional Modeling & Analytical Schema Design."
+        "youtubeId": "fsZA4K0E3kQ",
+        "title": "Slowly Changing Dimensions (SCD Type 0, 1, 2, 3, 4, 6) Explained",
+        "channel": "Seattle Data Guy",
+        "duration": "19m 55s",
+        "length": "20m",
+        "role": "deep-dive",
+        "why": "Upgrades the companion from PrepWithSid (294 views) to an industry-standard authority covering enterprise SCD Type 2 pipelines."
       }
     ],
     "intuition": "<p>In <strong>Slowly Changing Dimensions: SCD Type 0, 1, 2 (Effective Dates), 3 & 6</strong> (<code>slowly-changing-dimensions-scd</code>), Preserving point-in-time historical truth when customer tiers or territories change using SCD Type 2 (valid_from, valid_to, is_current) rows. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Slowly Changing Dimensions: SCD Type 0, 1, 2 (Effective Dates), 3 & 6</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -176,21 +184,23 @@ window.MODULE_CONTENT["m08"] = {
   "bridge-tables-junk-role-dimensions": {
     "title": "Role-Playing Dimensions, Junk Dimensions & Many-to-Many Bridge Tables",
     "video": {
-      "youtubeId": "nhlpwmOBEiE",
-      "title": "Role-Playing Dimensions, Junk Dimensions & Many-to-Many Bridge Tables — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:23:10",
+      "youtubeId": "gRE3E7VUzRU",
+      "title": "Data Modeling Tutorial: Star Schema (aka Kimball Approach)",
+      "channel": "Kahan Data Solutions",
+      "duration": "24m 50s",
       "start": 0,
-      "length": "83m",
-      "why": "Builds first-principles mastery of Role-Playing Dimensions, Junk Dimensions & Many-to-Many Bridge Tables with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "25m",
+      "why": "Key focus timestamps: 03:15 Fact vs Dimension; 09:30 Grain definition; 15:10 Surrogate keys; 19:45 Snowflake vs Star tradeoffs"
     },
     "videos": [
       {
-        "youtubeId": "fU9hR3kiOK0",
-        "title": "Dimensional Modeling & Analytical Schema Design: Companion Deep-Dive Lecture",
-        "channel": "Strange Loop (Martin Kleppmann)",
-        "duration": "47:43",
-        "why": "Complementary lecture covering production implementation details for Dimensional Modeling & Analytical Schema Design."
+        "youtubeId": "fsZA4K0E3kQ",
+        "title": "Slowly Changing Dimensions (SCD Type 0, 1, 2, 3, 4, 6) Explained",
+        "channel": "Seattle Data Guy",
+        "duration": "19m 55s",
+        "length": "20m",
+        "role": "deep-dive",
+        "why": "Upgrades the companion from PrepWithSid (294 views) to an industry-standard authority covering enterprise SCD Type 2 pipelines."
       }
     ],
     "intuition": "<p>In <strong>Role-Playing Dimensions, Junk Dimensions & Many-to-Many Bridge Tables</strong> (<code>bridge-tables-junk-role-dimensions</code>), Joining a single date dimension multiple times (Order Date, Ship Date), consolidating low-cardinality flags into Junk Dimensions, and weighting bridge tables. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Role-Playing Dimensions, Junk Dimensions & Many-to-Many Bridge Tables</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -219,21 +229,23 @@ window.MODULE_CONTENT["m08"] = {
   "temporal-tables-bitemporal-sql": {
     "title": "Temporal & Bitemporal SQL: System Time vs Valid Application Time",
     "video": {
-      "youtubeId": "fU9hR3kiOK0",
-      "title": "Temporal & Bitemporal SQL: System Time vs Valid Application Time — Database Systems & SQL Architecture Lecture",
-      "channel": "Strange Loop (Martin Kleppmann)",
-      "duration": "47:43",
+      "youtubeId": "gRE3E7VUzRU",
+      "title": "Data Modeling Tutorial: Star Schema (aka Kimball Approach)",
+      "channel": "Kahan Data Solutions",
+      "duration": "24m 50s",
       "start": 0,
-      "length": "48m",
-      "why": "Builds first-principles mastery of Temporal & Bitemporal SQL: System Time vs Valid Application Time with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "25m",
+      "why": "Key focus timestamps: 03:15 Fact vs Dimension; 09:30 Grain definition; 15:10 Surrogate keys; 19:45 Snowflake vs Star tradeoffs"
     },
     "videos": [
       {
-        "youtubeId": "nhlpwmOBEiE",
-        "title": "Dimensional Modeling & Analytical Schema Design: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:23:10",
-        "why": "Complementary lecture covering production implementation details for Dimensional Modeling & Analytical Schema Design."
+        "youtubeId": "fsZA4K0E3kQ",
+        "title": "Slowly Changing Dimensions (SCD Type 0, 1, 2, 3, 4, 6) Explained",
+        "channel": "Seattle Data Guy",
+        "duration": "19m 55s",
+        "length": "20m",
+        "role": "deep-dive",
+        "why": "Upgrades the companion from PrepWithSid (294 views) to an industry-standard authority covering enterprise SCD Type 2 pipelines."
       }
     ],
     "intuition": "<p>In <strong>Temporal & Bitemporal SQL: System Time vs Valid Application Time</strong> (<code>temporal-tables-bitemporal-sql</code>), Tracking both when a fact was true in reality (valid time) and when it was recorded in the database (transaction time) for audit-grade time travel. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Temporal & Bitemporal SQL: System Time vs Valid Application Time</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -262,21 +274,23 @@ window.MODULE_CONTENT["m08"] = {
   "json-semi-structured-hybrid-schemas": {
     "title": "Hybrid Relational + JSONB Schemas, Generated Columns & Schema Evolution",
     "video": {
-      "youtubeId": "nhlpwmOBEiE",
-      "title": "Hybrid Relational + JSONB Schemas, Generated Columns & Schema Evolution — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:23:10",
+      "youtubeId": "gRE3E7VUzRU",
+      "title": "Data Modeling Tutorial: Star Schema (aka Kimball Approach)",
+      "channel": "Kahan Data Solutions",
+      "duration": "24m 50s",
       "start": 0,
-      "length": "83m",
-      "why": "Builds first-principles mastery of Hybrid Relational + JSONB Schemas, Generated Columns & Schema Evolution with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "25m",
+      "why": "Key focus timestamps: 03:15 Fact vs Dimension; 09:30 Grain definition; 15:10 Surrogate keys; 19:45 Snowflake vs Star tradeoffs"
     },
     "videos": [
       {
-        "youtubeId": "fU9hR3kiOK0",
-        "title": "Dimensional Modeling & Analytical Schema Design: Companion Deep-Dive Lecture",
-        "channel": "Strange Loop (Martin Kleppmann)",
-        "duration": "47:43",
-        "why": "Complementary lecture covering production implementation details for Dimensional Modeling & Analytical Schema Design."
+        "youtubeId": "fsZA4K0E3kQ",
+        "title": "Slowly Changing Dimensions (SCD Type 0, 1, 2, 3, 4, 6) Explained",
+        "channel": "Seattle Data Guy",
+        "duration": "19m 55s",
+        "length": "20m",
+        "role": "deep-dive",
+        "why": "Upgrades the companion from PrepWithSid (294 views) to an industry-standard authority covering enterprise SCD Type 2 pipelines."
       }
     ],
     "intuition": "<p>In <strong>Hybrid Relational + JSONB Schemas, Generated Columns & Schema Evolution</strong> (<code>json-semi-structured-hybrid-schemas</code>), Combining strict relational columns for core entities with flexible JSON attributes and indexing hot JSON paths via virtual/stored generated columns. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Hybrid Relational + JSONB Schemas, Generated Columns & Schema Evolution</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -305,21 +319,23 @@ window.MODULE_CONTENT["m08"] = {
   "idempotency-audit-logs-event-tables": {
     "title": "Immutable Ledger Tables, Append-Only Audit Logs & Transactional Outbox",
     "video": {
-      "youtubeId": "fU9hR3kiOK0",
-      "title": "Immutable Ledger Tables, Append-Only Audit Logs & Transactional Outbox — Database Systems & SQL Architecture Lecture",
-      "channel": "Strange Loop (Martin Kleppmann)",
-      "duration": "47:43",
+      "youtubeId": "gRE3E7VUzRU",
+      "title": "Data Modeling Tutorial: Star Schema (aka Kimball Approach)",
+      "channel": "Kahan Data Solutions",
+      "duration": "24m 50s",
       "start": 0,
-      "length": "48m",
-      "why": "Builds first-principles mastery of Immutable Ledger Tables, Append-Only Audit Logs & Transactional Outbox with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "25m",
+      "why": "Key focus timestamps: 03:15 Fact vs Dimension; 09:30 Grain definition; 15:10 Surrogate keys; 19:45 Snowflake vs Star tradeoffs"
     },
     "videos": [
       {
-        "youtubeId": "nhlpwmOBEiE",
-        "title": "Dimensional Modeling & Analytical Schema Design: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:23:10",
-        "why": "Complementary lecture covering production implementation details for Dimensional Modeling & Analytical Schema Design."
+        "youtubeId": "fsZA4K0E3kQ",
+        "title": "Slowly Changing Dimensions (SCD Type 0, 1, 2, 3, 4, 6) Explained",
+        "channel": "Seattle Data Guy",
+        "duration": "19m 55s",
+        "length": "20m",
+        "role": "deep-dive",
+        "why": "Upgrades the companion from PrepWithSid (294 views) to an industry-standard authority covering enterprise SCD Type 2 pipelines."
       }
     ],
     "intuition": "<p>In <strong>Immutable Ledger Tables, Append-Only Audit Logs & Transactional Outbox</strong> (<code>idempotency-audit-logs-event-tables</code>), Designing tamper-evident append-only event tables and guaranteeing reliable microservice event publishing via the Transactional Outbox pattern. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Immutable Ledger Tables, Append-Only Audit Logs & Transactional Outbox</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -348,21 +364,23 @@ window.MODULE_CONTENT["m08"] = {
   "case-airbnb-minerva-metric-layer": {
     "title": "Production Case Study: Designing a Canonical Metric Store at Petabyte Scale",
     "video": {
-      "youtubeId": "nhlpwmOBEiE",
-      "title": "Production Case Study: Designing a Canonical Metric Store at Petabyte Scale — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:23:10",
+      "youtubeId": "gRE3E7VUzRU",
+      "title": "Data Modeling Tutorial: Star Schema (aka Kimball Approach)",
+      "channel": "Kahan Data Solutions",
+      "duration": "24m 50s",
       "start": 0,
-      "length": "83m",
-      "why": "Builds first-principles mastery of Production Case Study: Designing a Canonical Metric Store at Petabyte Scale with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "25m",
+      "why": "Key focus timestamps: 03:15 Fact vs Dimension; 09:30 Grain definition; 15:10 Surrogate keys; 19:45 Snowflake vs Star tradeoffs"
     },
     "videos": [
       {
-        "youtubeId": "fU9hR3kiOK0",
-        "title": "Dimensional Modeling & Analytical Schema Design: Companion Deep-Dive Lecture",
-        "channel": "Strange Loop (Martin Kleppmann)",
-        "duration": "47:43",
-        "why": "Complementary lecture covering production implementation details for Dimensional Modeling & Analytical Schema Design."
+        "youtubeId": "fsZA4K0E3kQ",
+        "title": "Slowly Changing Dimensions (SCD Type 0, 1, 2, 3, 4, 6) Explained",
+        "channel": "Seattle Data Guy",
+        "duration": "19m 55s",
+        "length": "20m",
+        "role": "deep-dive",
+        "why": "Upgrades the companion from PrepWithSid (294 views) to an industry-standard authority covering enterprise SCD Type 2 pipelines."
       }
     ],
     "intuition": "<p>In <strong>Production Case Study: Designing a Canonical Metric Store at Petabyte Scale</strong> (<code>case-airbnb-minerva-metric-layer</code>), How standardized dimensional star schemas and certified metric definitions eliminate conflicting KPI numbers across hundreds of product teams. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Production Case Study: Designing a Canonical Metric Store at Petabyte Scale</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -391,21 +409,23 @@ window.MODULE_CONTENT["m08"] = {
   "build-scd-type2-warehouse-pipeline": {
     "title": "Hands-On Build: Star Schema with Automated SCD Type 2 Dimension Pipeline",
     "video": {
-      "youtubeId": "fU9hR3kiOK0",
-      "title": "Hands-On Build: Star Schema with Automated SCD Type 2 Dimension Pipeline — Database Systems & SQL Architecture Lecture",
-      "channel": "Strange Loop (Martin Kleppmann)",
-      "duration": "47:43",
+      "youtubeId": "gRE3E7VUzRU",
+      "title": "Data Modeling Tutorial: Star Schema (aka Kimball Approach)",
+      "channel": "Kahan Data Solutions",
+      "duration": "24m 50s",
       "start": 0,
-      "length": "48m",
-      "why": "Builds first-principles mastery of Hands-On Build: Star Schema with Automated SCD Type 2 Dimension Pipeline with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "25m",
+      "why": "Key focus timestamps: 03:15 Fact vs Dimension; 09:30 Grain definition; 15:10 Surrogate keys; 19:45 Snowflake vs Star tradeoffs"
     },
     "videos": [
       {
-        "youtubeId": "nhlpwmOBEiE",
-        "title": "Dimensional Modeling & Analytical Schema Design: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:23:10",
-        "why": "Complementary lecture covering production implementation details for Dimensional Modeling & Analytical Schema Design."
+        "youtubeId": "fsZA4K0E3kQ",
+        "title": "Slowly Changing Dimensions (SCD Type 0, 1, 2, 3, 4, 6) Explained",
+        "channel": "Seattle Data Guy",
+        "duration": "19m 55s",
+        "length": "20m",
+        "role": "deep-dive",
+        "why": "Upgrades the companion from PrepWithSid (294 views) to an industry-standard authority covering enterprise SCD Type 2 pipelines."
       }
     ],
     "intuition": "<p>In <strong>Hands-On Build: Star Schema with Automated SCD Type 2 Dimension Pipeline</strong> (<code>build-scd-type2-warehouse-pipeline</code>), Build a Kimball star schema and write the idempotent SCD Type 2 merge pipeline that expires old dimension versions and inserts new historical rows. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Hands-On Build: Star Schema with Automated SCD Type 2 Dimension Pipeline</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",

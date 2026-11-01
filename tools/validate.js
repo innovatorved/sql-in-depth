@@ -383,6 +383,14 @@ for (const mod of Object.values(moduleContent)) {
       uniqueVideoIds.add(unit.video.youtubeId);
       totalVideoEntries++;
     }
+    if (Array.isArray(unit.videos)) {
+      for (const v of unit.videos) {
+        if (v && v.youtubeId) {
+          uniqueVideoIds.add(v.youtubeId);
+          totalVideoEntries++;
+        }
+      }
+    }
   }
 }
 reportSuccess(`Programmatic stats: ${contentMermaidCount} Mermaid diagrams, ${uniqueVideoIds.size} unique YouTube videos (${totalVideoEntries} total entries)`);

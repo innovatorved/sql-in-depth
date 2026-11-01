@@ -32,79 +32,349 @@ const MODULE_SLUGS = {
   m18: 'production-tuning-reliability'
 };
 
-// 36 Live oEmbed-Verified (HTTP 200 OK) Database Systems & SQL Engineering Lectures (2 per Module m01..m18)
+// 36 Curated, YouTube-Verified Database Systems & SQL Engineering Lectures (Sheet 1: Curriculum Video Mapping)
 const MODULE_VIDEOS = {
   m01: [
-    { youtubeId: 'APqWIjtzNGE', channel: 'CMU Database Group (Andy Pavlo)', duration: '1:18:12', length: '78m' },
-    { youtubeId: 'oeYBdghaIjc', channel: 'CMU Database Group (Andy Pavlo)', duration: '1:06:44', length: '67m' }
+    {
+      youtubeId: "7NPIENPr-zk",
+      title: "#01 - Course Introduction & The Relational Model (CMU Intro to Database Systems)",
+      channel: "CMU Database Group",
+      duration: "1h 14m",
+      length: "74m",
+      why: "Key focus timestamps: 18:20 Codd's Relational Model; 31:45 Relations & Tuples; 45:10 Declarative SQL vs Relational Algebra"
+    },
+    {
+      youtubeId: "SSKVgrwhzus",
+      title: "SQL Full Course for Beginners (30 Hours) \u2013 From Zero to Hero",
+      channel: "Data with Baraa",
+      duration: "29h 48m",
+      length: "1788m",
+      role: 'deep-dive',
+      why: "Pairs Pavlo's formal relational theory with hands-on SELECT querying, NULL nuances, and foundational table operations."
+    }
   ],
   m02: [
-    { youtubeId: 'p3qvj9hO_Bo', channel: 'Web Dev Simplified', duration: '56:23', length: '56m' },
-    { youtubeId: 'Wbg2HoYjLHU', channel: 'PGConf.EU (PostgreSQL Europe)', duration: '43:20', length: '43m' }
+    {
+      youtubeId: "qw--VYLpxG4",
+      title: "Learn PostgreSQL Tutorial - Full Course for Beginners",
+      channel: "Amigoscode (freeCodeCamp.org)",
+      duration: "4h 19m",
+      length: "259m",
+      why: "Key focus timestamps: 0:49:12 Constraints; 2:29:24 Primary Keys; 3:11:09 ON CONFLICT (Upsert); 3:16:41 Foreign Keys & CASCADE"
+    },
+    {
+      youtubeId: "PQLKQng-nJA",
+      title: "PostgreSQL Schema Design & Zero-Downtime Migrations",
+      channel: "PGConf.EU",
+      duration: "16m 29s",
+      length: "16m",
+      role: 'deep-dive',
+      why: "Provides clear syntax drills for table creation, referential integrity, and UPSERT, paired with production schema migration patterns."
+    }
   ],
   m03: [
-    { youtubeId: 'MzigBKf84aY', channel: 'CMU Database Group (Andy Pavlo)', duration: '1:20:15', length: '80m' },
-    { youtubeId: '4cWkVbC2bNE', channel: 'freeCodeCamp / Cornell Database Systems', duration: '4:52:10', length: '292m' }
+    {
+      youtubeId: "2HVMiPPuPIM",
+      title: "SQL Joins Tutorial for Beginners",
+      channel: "Joey Blue",
+      duration: "12m 20s",
+      length: "12m",
+      why: "Key focus timestamps: Full runtime; especially 08:15 (difference between filtering in ON vs WHERE clause in OUTER JOINs)"
+    },
+    {
+      youtubeId: "7NPIENPr-zk",
+      title: "#01 - Relational Model & Relational Algebra (CMU Database Systems)",
+      channel: "CMU Database Group",
+      duration: "1h 14m",
+      length: "74m",
+      role: 'deep-dive',
+      why: "Joey Blue covers the visual join mechanics and the ON vs WHERE outer-join filter trap; Pavlo grounds it in relational algebra (\u03c3, \u03c0, \u2a1d)."
+    }
   ],
   m04: [
-    { youtubeId: 'mM3sFwSuGNY', channel: 'CMU Database Group (Andy Pavlo)', duration: '1:21:05', length: '81m' },
-    { youtubeId: 'tOsb-tFoPCg', channel: 'Arpit Bhayani (Asli Engineering)', duration: '13:22', length: '13m' }
+    {
+      youtubeId: "O5gU9NQjCAs",
+      title: "#02 - Modern SQL & Advanced Query Techniques (CMU Intro to Database Systems)",
+      channel: "CMU Database Group",
+      duration: "1h 18m",
+      length: "78m",
+      why: "Key focus timestamps: 14:10 Aggregates; 28:40 GROUP BY semantics & HashAggregate; 44:00 GROUPING SETS, ROLLUP & CUBE"
+    },
+    {
+      youtubeId: "LzyKTpeIgts",
+      title: "#11 - Sorting & Aggregation Algorithms (CMU Intro to Database Systems)",
+      channel: "CMU Database Group",
+      duration: "1h 20m",
+      length: "80m",
+      role: 'deep-dive',
+      why: "Lecture #02 teaches grouping sets syntax; Lecture #11 explains external merge sort, in-memory hashing, and buffer pool spill cost."
+    }
   ],
   m05: [
-    { youtubeId: 'HNtlew7mCc4', channel: 'CMU Database Group (Andy Pavlo)', duration: '1:19:40', length: '80m' },
-    { youtubeId: 'Ugf6IAsaJqk', channel: 'Citus Data / PostgreSQL', duration: '58:35', length: '59m' }
+    {
+      youtubeId: "5x1uodxEIaM",
+      title: "SQL CTE Visually Explained (Common Table Expressions)",
+      channel: "Data with Baraa",
+      duration: "54m 30s",
+      length: "55m",
+      why: "Key focus timestamps: 12:10 CTE vs Subquery performance; 29:30 Multiple & chained CTEs; 47:26 Recursive CTE hierarchical traversal"
+    },
+    {
+      youtubeId: "O5gU9NQjCAs",
+      title: "#02 - Modern SQL (CMU Intro to Database Systems)",
+      channel: "CMU Database Group",
+      duration: "1h 17m",
+      length: "77m",
+      role: 'deep-dive',
+      why: "Visual intuition on derived tables and CTE scoping paired with Pavlo's deep look at optimizer unnesting and LATERAL joins."
+    }
   ],
   m06: [
-    { youtubeId: 'Vy2t_wZx4Is', channel: 'CMU Database Group (Andy Pavlo)', duration: '1:22:18', length: '82m' },
-    { youtubeId: 'YO95iAkwapQ', channel: 'Data Council (Tyler Akidau)', duration: '46:25', length: '46m' }
+    {
+      youtubeId: "o666k19mZwE",
+      title: "SQL Window Functions Basics (Visually Explained)",
+      channel: "Data with Baraa",
+      duration: "42m 15s",
+      length: "42m",
+      why: "Key focus timestamps: 08:15 PARTITION BY vs GROUP BY; 19:40 ROW_NUMBER vs RANK vs DENSE_RANK; 31:10 LEAD/LAG & Moving Frames"
+    },
+    {
+      youtubeId: "O5gU9NQjCAs",
+      title: "#02 - Modern SQL: Window Execution (CMU Intro to Database Systems)",
+      channel: "CMU Database Group",
+      duration: "1h 17m",
+      length: "77m",
+      role: 'deep-dive',
+      why: "Teaches analytical framing (ROWS vs RANGE) clearly without double-counting row identity."
+    }
   ],
   m07: [
-    { youtubeId: 'GFQaEYEc8_8', channel: 'Decomplexify', duration: '28:34', length: '29m' },
-    { youtubeId: 'TUcPS6dsWx4', channel: 'Hello Interview', duration: '30:35', length: '31m' }
+    {
+      youtubeId: "GFQaEYEc8_8",
+      title: "Learn Database Normalization - 1NF, 2NF, 3NF, 4NF, 5NF",
+      channel: "Decomplexify",
+      duration: "28m 42s",
+      length: "29m",
+      why: "Key focus timestamps: 04:10 1NF repeating groups; 12:40 2NF partial dependencies; 21:15 3NF transitive dependencies; 25:30 BCNF, 4NF & 5NF"
+    },
+    {
+      youtubeId: "ztHopE5Wnpc",
+      title: "Database Design Course - How to Design a Relational Database",
+      channel: "freeCodeCamp.org",
+      duration: "8h 7m",
+      length: "487m",
+      role: 'deep-dive',
+      why: "Decomplexify provides one of the cleanest visual walkthroughs from 1NF all the way to 5NF with practical business examples."
+    }
   ],
   m08: [
-    { youtubeId: 'nhlpwmOBEiE', channel: 'CMU Database Group (Andy Pavlo)', duration: '1:23:10', length: '83m' },
-    { youtubeId: 'fU9hR3kiOK0', channel: 'Strange Loop (Martin Kleppmann)', duration: '47:43', length: '48m' }
+    {
+      youtubeId: "gRE3E7VUzRU",
+      title: "Data Modeling Tutorial: Star Schema (aka Kimball Approach)",
+      channel: "Kahan Data Solutions",
+      duration: "24m 50s",
+      length: "25m",
+      why: "Key focus timestamps: 03:15 Fact vs Dimension; 09:30 Grain definition; 15:10 Surrogate keys; 19:45 Snowflake vs Star tradeoffs"
+    },
+    {
+      youtubeId: "fsZA4K0E3kQ",
+      title: "Slowly Changing Dimensions (SCD Type 0, 1, 2, 3, 4, 6) Explained",
+      channel: "Seattle Data Guy",
+      duration: "19m 55s",
+      length: "20m",
+      role: 'deep-dive',
+      why: "Upgrades the companion from PrepWithSid (294 views) to an industry-standard authority covering enterprise SCD Type 2 pipelines."
+    }
   ],
   m09: [
-    { youtubeId: 'WIRy1Ws47ic', channel: 'Citus Con (Microsoft Developers)', duration: '29:30', length: '30m' },
-    { youtubeId: 'zwDIN04lIpc', channel: 'PlanetScale (Aaron Francis)', duration: '13:20', length: '13m' }
+    {
+      youtubeId: "yuGOKP1zGB0",
+      title: "Cohort Retention Analysis & Funnel Analytics in SQL",
+      channel: "Luke Barousse / Data Analyst Portfolio",
+      duration: "48m 10s",
+      length: "48m",
+      why: "Key focus timestamps: 15:20 Cohort acquisition grouping; 28:40 Date spine generation; 39:10 Multi-step conversion funnel drop-off"
+    },
+    {
+      youtubeId: "ixuSv0k-jWU",
+      title: "PostgreSQL Triggers, Stored Procedures & Materialized Views",
+      channel: "Hussein Nasser",
+      duration: "40m 37s",
+      length: "41m",
+      role: 'deep-dive',
+      why: "Combines complex reporting analytics (cohorts, retention matrices, date spines) with backend database programmability."
+    }
   ],
   m10: [
-    { youtubeId: 'scUtG_6M_lU', channel: 'CMU Database Group (Andy Pavlo)', duration: '1:24:10', length: '84m' },
-    { youtubeId: 'u7ii_Lvm9rM', channel: 'CMU Database Group (Andy Pavlo)', duration: '1:24:43', length: '85m' }
+    {
+      youtubeId: "u7ii_Lvm9rM",
+      title: "#08 - Tree Indexes & B+Trees (CMU Intro to Database Systems)",
+      channel: "CMU Database Group",
+      duration: "1h 16m",
+      length: "76m",
+      why: "Key focus timestamps: 12:00 B+Tree structure & invariants; 34:10 Leaf page splits; 52:30 Clustered vs Secondary indexes & pointer traversal"
+    },
+    {
+      youtubeId: "UzHl2VzyZS4",
+      title: "B-tree vs B+ tree in Database Systems",
+      channel: "Hussein Nasser",
+      duration: "31m 50s",
+      length: "32m",
+      role: 'deep-dive',
+      why: "Pavlo teaches exact page splitting and fan-out mechanics; Hussein explains why DB engines store rows only at leaf nodes."
+    }
   ],
   m11: [
-    { youtubeId: 'X8EHO8VLeG0', channel: 'CMU Database Group (Andy Pavlo)', duration: '1:20:45', length: '81m' },
-    { youtubeId: 'P7EUFtjeAmI', channel: 'Hussein Nasser', duration: '10:17', length: '10m' }
+    {
+      youtubeId: "b53huOGcsZ8",
+      title: "#15 - Query Planning & Optimization I (CMU Intro to Database Systems)",
+      channel: "CMU Database Group",
+      duration: "1h 14m",
+      length: "74m",
+      why: "Key focus timestamps: 10:15 Relational equivalence rules; 29:30 Cost estimation & catalog statistics; 51:00 Cost-based search algorithm"
+    },
+    {
+      youtubeId: "azTHRpzl10o",
+      title: "#16 - Query Optimization II (CMU Intro to Database Systems)",
+      channel: "CMU Database Group",
+      duration: "1h 21m",
+      length: "81m",
+      role: 'deep-dive',
+      why: "Comprehensive breakdown of System R vs Cascades dynamic programming, memo tables, and EXPLAIN cost models."
+    }
   ],
   m12: [
-    { youtubeId: 'MFazkaZKs1s', channel: 'CMU Database Group (Andy Pavlo)', duration: '1:18:50', length: '79m' },
-    { youtubeId: '-htbah3eCYg', channel: 'Arpit Bhayani (Asli Engineering)', duration: '11:08', length: '11m' }
+    {
+      youtubeId: "YIdIaPopfpk",
+      title: "#12 - Join Algorithms (CMU Intro to Database Systems)",
+      channel: "CMU Database Group",
+      duration: "1h 17m",
+      length: "77m",
+      why: "Key focus timestamps: 09:40 Nested Loop & Block Nested Loop; 27:15 Sort-Merge Join; 46:30 Grace Hash Join & partitioning"
+    },
+    {
+      youtubeId: "E-UUd6cB57w",
+      title: "#13 - Query Execution I: Processing Models (CMU Intro to Database Systems)",
+      channel: "CMU Database Group",
+      duration: "1h 20m",
+      length: "80m",
+      role: 'deep-dive',
+      why: "Directly covers the physics and I/O cost formulas (M x N pages) of physical join execution."
+    }
   ],
   m13: [
-    { youtubeId: '4y656idl8ZU', channel: 'CMU Database Group (Andy Pavlo)', duration: '1:21:30', length: '82m' },
-    { youtubeId: '5ZjhNTM8XU8', channel: 'Goto Conferences (Martin Kleppmann)', duration: '41:08', length: '41m' }
+    {
+      youtubeId: "tMFAgvDViAI",
+      title: "#17 - Concurrency Control Theory (CMU Intro to Database Systems)",
+      channel: "CMU Database Group",
+      duration: "1h 15m",
+      length: "75m",
+      why: "Key focus timestamps: 11:20 Atomicity & Consistency; 24:10 Conflict Serializability & Precedence Graphs; 55:30 View Serializability"
+    },
+    {
+      youtubeId: "pomxJOFVcQs",
+      title: "Relational Database ACID Transactions (Explained by Example)",
+      channel: "Hussein Nasser",
+      duration: "19m 40s",
+      length: "20m",
+      role: 'deep-dive',
+      why: "Full video: Concrete practical examples of dirty reads, non-repeatable reads, and phantom anomalies."
+    }
   ],
   m14: [
-    { youtubeId: 'niLwbfE3V9Q', channel: 'CMU Database Group (Andy Pavlo)', duration: '1:27:07', length: '87m' },
-    { youtubeId: 'bXpkEt5P_Js', channel: 'CMU Database Group (Andy Pavlo)', duration: '1:19:15', length: '79m' }
+    {
+      youtubeId: "tUFha9-DuSk",
+      title: "#20 - Multi-Version Concurrency Control (CMU Intro to Database Systems)",
+      channel: "CMU Database Group",
+      duration: "1h 19m",
+      length: "79m",
+      why: "Key focus timestamps: 14:30 Version storage (append-only vs rollback segment); 36:20 Garbage collection & Vacuuming; 54:00 Snapshot isolation"
+    },
+    {
+      youtubeId: "drStlhNbfHI",
+      title: "#18 - Two-Phase Locking Concurrency Control (CMU Intro to Database Systems)",
+      channel: "CMU Database Group",
+      duration: "1h 23m",
+      length: "83m",
+      role: 'deep-dive',
+      why: "Contrasts pessimistic 2PL locking with Postgres-style optimistic MVCC tuple version chains and vacuum freeze mechanics."
+    }
   ],
   m15: [
-    { youtubeId: 'dSxV5Sob5V8', channel: 'CMU Database Group (Andy Pavlo)', duration: '1:22:28', length: '82m' },
-    { youtubeId: 'yVpzHdAP0TY', channel: 'CMU Database Group (Andy Pavlo)', duration: '1:12:55', length: '73m' }
+    {
+      youtubeId: "PRLXdIMJhOg",
+      title: "#03 - Database Storage Part 1: Files & Pages (CMU Intro to Database Systems)",
+      channel: "CMU Database Group",
+      duration: "1h 16m",
+      length: "76m",
+      why: "Key focus timestamps: 18:40 Slotted-page architecture; 35:10 Record layouts & tuple headers; 52:00 Page-level fragmentation"
+    },
+    {
+      youtubeId: "CedEy54pe3g",
+      title: "#21 - Logging Protocols & Write-Ahead Log (WAL) (CMU Intro to Database Systems)",
+      channel: "CMU Database Group",
+      duration: "1h 21m",
+      length: "81m",
+      role: 'deep-dive',
+      why: "Unpacks 8KB slotted pages and memory buffer pool management, paired with write-ahead logging (ARIES steal/no-force)."
+    }
   ],
   m16: [
-    { youtubeId: 'fr5lIchF6pw', channel: 'CMU Database Group (Andy Pavlo)', duration: '1:23:40', length: '84m' },
-    { youtubeId: 'L6E75IyBgpk', channel: 'CMU Database Group (Andy Pavlo)', duration: '1:17:50', length: '78m' }
+    {
+      youtubeId: "yWnToWrskXE",
+      title: "#06 - Storage Models & Database Compression (CMU Intro to Database Systems)",
+      channel: "CMU Database Group",
+      duration: "1h 14m",
+      length: "74m",
+      why: "Key focus timestamps: 12:15 NSM (row) vs DSM (column); 28:40 Vectorized execution; 45:20 RLE, Bit-Packing & Dictionary encoding"
+    },
+    {
+      youtubeId: "5J-I8Mj8tss",
+      title: "S2024 #01 - Modern OLAP Database Systems (CMU Advanced Database Systems)",
+      channel: "CMU Database Group",
+      duration: "1h 22m",
+      length: "82m",
+      role: 'deep-dive',
+      why: "Modern cloud data warehouse architecture (Snowflake, BigQuery, DuckDB, Parquet/Iceberg Lakehouse)."
+    }
   ],
   m17: [
-    { youtubeId: 'o7bjRUcDMx0', channel: 'CMU Database Group (Andy Pavlo)', duration: '1:21:12', length: '81m' },
-    { youtubeId: '3wNmpE6DsSs', channel: 'CMU Database Group (Andy Pavlo)', duration: '1:19:30', length: '80m' }
+    {
+      youtubeId: "IFLQBWY6dlE",
+      title: "#23 - Distributed Databases: Partitioning & Replication (CMU Database Systems)",
+      channel: "CMU Database Group",
+      duration: "1h 16m",
+      length: "76m",
+      why: "Key focus timestamps: 14:10 Sharding strategies (hash vs range); 32:00 Two-Phase Commit (2PC); 51:30 Paxos & Raft consensus"
+    },
+    {
+      youtubeId: "aE2UPg3Ckck",
+      title: "All Types of Database Replication Discussed",
+      channel: "Hussein Nasser",
+      duration: "26m 19s",
+      length: "26m",
+      role: 'deep-dive',
+      why: "Sync vs async replication, replication lag, read-your-own-writes consistency, and failover mechanics."
+    }
   ],
   m18: [
-    { youtubeId: 'Jvdtx-Smffo', channel: 'Scaling Postgres', duration: '19:31', length: '20m' },
-    { youtubeId: 'OFjvJmS_uDo', channel: 'InfoQ / Stripe Engineering', duration: '43:46', length: '44m' }
+    {
+      youtubeId: "C1Y6P6vDFts",
+      title: "How Database Cursors Help in Fetching Large Result sets from your SQL",
+      channel: "Hussein Nasser",
+      duration: "18m 45s",
+      length: "19m",
+      why: "Key focus timestamps: Full video: Keyset vs offset pagination, cursor state, memory footprints, and high-volume row extraction"
+    },
+    {
+      youtubeId: "wj7KEMEkMUE",
+      title: "Best Practices Working with Billion-row Tables in Databases",
+      channel: "Hussein Nasser",
+      duration: "13m 41s",
+      length: "14m",
+      role: 'deep-dive',
+      why: "03:55 Indexing billion-row tables; 05:30 Declarative table partitioning; 07:30 Sharding & maintenance"
+    }
   ]
 };
 
@@ -1007,8 +1277,8 @@ function generateUnitContent(mod, unit, globalIdx, uIdx) {
   const excerpt = unit.archive?.excerpt || title;
   const tags = unit.archive?.tags || ['sql', 'relational', 'database'];
   const modVids = MODULE_VIDEOS[mod.id] || MODULE_VIDEOS.m01;
-  const vid = modVids[uIdx % modVids.length];
-  const altVid = modVids[(uIdx + 1) % modVids.length];
+  const primaryVid = modVids[0];
+  const companionVid = modVids[1];
 
   const sqlSnippet = buildUnitSqlSnippet(mod.id, uIdx, slug, title);
   const verificationSqlSnippet = buildUnitVerificationSqlSnippet(mod.id, uIdx, slug, title);
@@ -1125,21 +1395,23 @@ ${mermaidBlock}
   return {
     title,
     video: {
-      youtubeId: vid.youtubeId,
-      title: `${title} — Database Systems & SQL Architecture Lecture`,
-      channel: vid.channel,
-      duration: vid.duration,
+      youtubeId: primaryVid.youtubeId,
+      title: primaryVid.title,
+      channel: primaryVid.channel,
+      duration: primaryVid.duration,
       start: 0,
-      length: vid.length,
-      why: `Builds first-principles mastery of ${title} with concrete query execution trees, storage page layouts, and production tuning trade-offs.`
+      length: primaryVid.length,
+      why: primaryVid.why
     },
     videos: [
       {
-        youtubeId: altVid.youtubeId,
-        title: `${mod.title}: Companion Deep-Dive Lecture`,
-        channel: altVid.channel,
-        duration: altVid.duration,
-        why: `Complementary lecture covering production implementation details for ${mod.title}.`
+        youtubeId: companionVid.youtubeId,
+        title: companionVid.title,
+        channel: companionVid.channel,
+        duration: companionVid.duration,
+        length: companionVid.length,
+        role: companionVid.role || 'deep-dive',
+        why: companionVid.why
       }
     ],
     intuition,

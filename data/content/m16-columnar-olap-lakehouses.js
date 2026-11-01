@@ -4,21 +4,23 @@ window.MODULE_CONTENT["m16"] = {
   "columnar-storage-layout-parquet": {
     "title": "Row-Store (NSM) vs Column-Store (DSM) & Apache Parquet PAX Hybrid Layout",
     "video": {
-      "youtubeId": "fr5lIchF6pw",
-      "title": "Row-Store (NSM) vs Column-Store (DSM) & Apache Parquet PAX Hybrid Layout — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:23:40",
+      "youtubeId": "yWnToWrskXE",
+      "title": "#06 - Storage Models & Database Compression (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 14m",
       "start": 0,
-      "length": "84m",
-      "why": "Builds first-principles mastery of Row-Store (NSM) vs Column-Store (DSM) & Apache Parquet PAX Hybrid Layout with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "74m",
+      "why": "Key focus timestamps: 12:15 NSM (row) vs DSM (column); 28:40 Vectorized execution; 45:20 RLE, Bit-Packing & Dictionary encoding"
     },
     "videos": [
       {
-        "youtubeId": "L6E75IyBgpk",
-        "title": "Columnar Storage, Vectorized OLAP & Modern Lakehouses: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:17:50",
-        "why": "Complementary lecture covering production implementation details for Columnar Storage, Vectorized OLAP & Modern Lakehouses."
+        "youtubeId": "5J-I8Mj8tss",
+        "title": "S2024 #01 - Modern OLAP Database Systems (CMU Advanced Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 22m",
+        "length": "82m",
+        "role": "deep-dive",
+        "why": "Modern cloud data warehouse architecture (Snowflake, BigQuery, DuckDB, Parquet/Iceberg Lakehouse)."
       }
     ],
     "intuition": "<p>In <strong>Row-Store (NSM) vs Column-Store (DSM) & Apache Parquet PAX Hybrid Layout</strong> (<code>columnar-storage-layout-parquet</code>), Why analytical queries reading 4 of 100 columns waste 96% of I/O bandwidth on row stores, and how Parquet organizes Row Groups, Column Chunks, and Pages. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Row-Store (NSM) vs Column-Store (DSM) & Apache Parquet PAX Hybrid Layout</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -47,21 +49,23 @@ window.MODULE_CONTENT["m16"] = {
   "columnar-compression-rle-dictionary-delta": {
     "title": "Columnar Compression: Run-Length (RLE), Dictionary, Bit-Packing & Delta Encoding",
     "video": {
-      "youtubeId": "L6E75IyBgpk",
-      "title": "Columnar Compression: Run-Length (RLE), Dictionary, Bit-Packing & Delta Encoding — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:17:50",
+      "youtubeId": "yWnToWrskXE",
+      "title": "#06 - Storage Models & Database Compression (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 14m",
       "start": 0,
-      "length": "78m",
-      "why": "Builds first-principles mastery of Columnar Compression: Run-Length (RLE), Dictionary, Bit-Packing & Delta Encoding with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "74m",
+      "why": "Key focus timestamps: 12:15 NSM (row) vs DSM (column); 28:40 Vectorized execution; 45:20 RLE, Bit-Packing & Dictionary encoding"
     },
     "videos": [
       {
-        "youtubeId": "fr5lIchF6pw",
-        "title": "Columnar Storage, Vectorized OLAP & Modern Lakehouses: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:23:40",
-        "why": "Complementary lecture covering production implementation details for Columnar Storage, Vectorized OLAP & Modern Lakehouses."
+        "youtubeId": "5J-I8Mj8tss",
+        "title": "S2024 #01 - Modern OLAP Database Systems (CMU Advanced Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 22m",
+        "length": "82m",
+        "role": "deep-dive",
+        "why": "Modern cloud data warehouse architecture (Snowflake, BigQuery, DuckDB, Parquet/Iceberg Lakehouse)."
       }
     ],
     "intuition": "<p>In <strong>Columnar Compression: Run-Length (RLE), Dictionary, Bit-Packing & Delta Encoding</strong> (<code>columnar-compression-rle-dictionary-delta</code>), Exploiting homogeneous column data types to achieve 10x–40x compression using Dictionary codes, Run-Length triples, Frame-of-Reference, and Delta encoding. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Columnar Compression: Run-Length (RLE), Dictionary, Bit-Packing & Delta Encoding</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -90,21 +94,23 @@ window.MODULE_CONTENT["m16"] = {
   "late-materialization-simd-vectorization": {
     "title": "Late Materialization & SIMD Vectorized Execution on Compressed Columns",
     "video": {
-      "youtubeId": "fr5lIchF6pw",
-      "title": "Late Materialization & SIMD Vectorized Execution on Compressed Columns — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:23:40",
+      "youtubeId": "yWnToWrskXE",
+      "title": "#06 - Storage Models & Database Compression (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 14m",
       "start": 0,
-      "length": "84m",
-      "why": "Builds first-principles mastery of Late Materialization & SIMD Vectorized Execution on Compressed Columns with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "74m",
+      "why": "Key focus timestamps: 12:15 NSM (row) vs DSM (column); 28:40 Vectorized execution; 45:20 RLE, Bit-Packing & Dictionary encoding"
     },
     "videos": [
       {
-        "youtubeId": "L6E75IyBgpk",
-        "title": "Columnar Storage, Vectorized OLAP & Modern Lakehouses: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:17:50",
-        "why": "Complementary lecture covering production implementation details for Columnar Storage, Vectorized OLAP & Modern Lakehouses."
+        "youtubeId": "5J-I8Mj8tss",
+        "title": "S2024 #01 - Modern OLAP Database Systems (CMU Advanced Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 22m",
+        "length": "82m",
+        "role": "deep-dive",
+        "why": "Modern cloud data warehouse architecture (Snowflake, BigQuery, DuckDB, Parquet/Iceberg Lakehouse)."
       }
     ],
     "intuition": "<p>In <strong>Late Materialization & SIMD Vectorized Execution on Compressed Columns</strong> (<code>late-materialization-simd-vectorization</code>), Evaluating WHERE predicates directly on compressed dictionary IDs and bitmasks using AVX-512 SIMD instructions before reconstructing matching tuples. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Late Materialization & SIMD Vectorized Execution on Compressed Columns</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -133,21 +139,23 @@ window.MODULE_CONTENT["m16"] = {
   "zone-maps-min-max-pruning-bloom": {
     "title": "Zone Maps (Min/Max Skipping Indexes), Partition Pruning & Z-Order Clustering",
     "video": {
-      "youtubeId": "L6E75IyBgpk",
-      "title": "Zone Maps (Min/Max Skipping Indexes), Partition Pruning & Z-Order Clustering — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:17:50",
+      "youtubeId": "yWnToWrskXE",
+      "title": "#06 - Storage Models & Database Compression (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 14m",
       "start": 0,
-      "length": "78m",
-      "why": "Builds first-principles mastery of Zone Maps (Min/Max Skipping Indexes), Partition Pruning & Z-Order Clustering with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "74m",
+      "why": "Key focus timestamps: 12:15 NSM (row) vs DSM (column); 28:40 Vectorized execution; 45:20 RLE, Bit-Packing & Dictionary encoding"
     },
     "videos": [
       {
-        "youtubeId": "fr5lIchF6pw",
-        "title": "Columnar Storage, Vectorized OLAP & Modern Lakehouses: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:23:40",
-        "why": "Complementary lecture covering production implementation details for Columnar Storage, Vectorized OLAP & Modern Lakehouses."
+        "youtubeId": "5J-I8Mj8tss",
+        "title": "S2024 #01 - Modern OLAP Database Systems (CMU Advanced Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 22m",
+        "length": "82m",
+        "role": "deep-dive",
+        "why": "Modern cloud data warehouse architecture (Snowflake, BigQuery, DuckDB, Parquet/Iceberg Lakehouse)."
       }
     ],
     "intuition": "<p>In <strong>Zone Maps (Min/Max Skipping Indexes), Partition Pruning & Z-Order Clustering</strong> (<code>zone-maps-min-max-pruning-bloom</code>), Skipping 99% of Parquet row groups or micro-partitions using per-block min/max metadata headers and multi-dimensional Z-Order / Hilbert space-filling curves. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Zone Maps (Min/Max Skipping Indexes), Partition Pruning & Z-Order Clustering</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -176,21 +184,23 @@ window.MODULE_CONTENT["m16"] = {
   "embedded-olap-duckdb-architecture": {
     "title": "Embedded Analytical SQL (DuckDB): Morsel-Driven Parallelism & Out-of-Core Execution",
     "video": {
-      "youtubeId": "fr5lIchF6pw",
-      "title": "Embedded Analytical SQL (DuckDB): Morsel-Driven Parallelism & Out-of-Core Execution — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:23:40",
+      "youtubeId": "yWnToWrskXE",
+      "title": "#06 - Storage Models & Database Compression (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 14m",
       "start": 0,
-      "length": "84m",
-      "why": "Builds first-principles mastery of Embedded Analytical SQL (DuckDB): Morsel-Driven Parallelism & Out-of-Core Execution with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "74m",
+      "why": "Key focus timestamps: 12:15 NSM (row) vs DSM (column); 28:40 Vectorized execution; 45:20 RLE, Bit-Packing & Dictionary encoding"
     },
     "videos": [
       {
-        "youtubeId": "L6E75IyBgpk",
-        "title": "Columnar Storage, Vectorized OLAP & Modern Lakehouses: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:17:50",
-        "why": "Complementary lecture covering production implementation details for Columnar Storage, Vectorized OLAP & Modern Lakehouses."
+        "youtubeId": "5J-I8Mj8tss",
+        "title": "S2024 #01 - Modern OLAP Database Systems (CMU Advanced Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 22m",
+        "length": "82m",
+        "role": "deep-dive",
+        "why": "Modern cloud data warehouse architecture (Snowflake, BigQuery, DuckDB, Parquet/Iceberg Lakehouse)."
       }
     ],
     "intuition": "<p>In <strong>Embedded Analytical SQL (DuckDB): Morsel-Driven Parallelism & Out-of-Core Execution</strong> (<code>embedded-olap-duckdb-architecture</code>), Why scale-up single-node vectorized execution over local Parquet/Arrow files often beats distributed cluster overhead for datasets under 1 TB. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Embedded Analytical SQL (DuckDB): Morsel-Driven Parallelism & Out-of-Core Execution</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -219,21 +229,23 @@ window.MODULE_CONTENT["m16"] = {
   "realtime-olap-clickhouse-mergetree": {
     "title": "Real-Time OLAP (ClickHouse): Sparse Primary Indexes & MergeTree Engines",
     "video": {
-      "youtubeId": "L6E75IyBgpk",
-      "title": "Real-Time OLAP (ClickHouse): Sparse Primary Indexes & MergeTree Engines — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:17:50",
+      "youtubeId": "yWnToWrskXE",
+      "title": "#06 - Storage Models & Database Compression (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 14m",
       "start": 0,
-      "length": "78m",
-      "why": "Builds first-principles mastery of Real-Time OLAP (ClickHouse): Sparse Primary Indexes & MergeTree Engines with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "74m",
+      "why": "Key focus timestamps: 12:15 NSM (row) vs DSM (column); 28:40 Vectorized execution; 45:20 RLE, Bit-Packing & Dictionary encoding"
     },
     "videos": [
       {
-        "youtubeId": "fr5lIchF6pw",
-        "title": "Columnar Storage, Vectorized OLAP & Modern Lakehouses: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:23:40",
-        "why": "Complementary lecture covering production implementation details for Columnar Storage, Vectorized OLAP & Modern Lakehouses."
+        "youtubeId": "5J-I8Mj8tss",
+        "title": "S2024 #01 - Modern OLAP Database Systems (CMU Advanced Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 22m",
+        "length": "82m",
+        "role": "deep-dive",
+        "why": "Modern cloud data warehouse architecture (Snowflake, BigQuery, DuckDB, Parquet/Iceberg Lakehouse)."
       }
     ],
     "intuition": "<p>In <strong>Real-Time OLAP (ClickHouse): Sparse Primary Indexes & MergeTree Engines</strong> (<code>realtime-olap-clickhouse-mergetree</code>), How ClickHouse ingests millions of events/sec using immutable sorted data parts, sparse granule primary indexes (1 entry per 8,192 rows), and background merges. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Real-Time OLAP (ClickHouse): Sparse Primary Indexes & MergeTree Engines</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -262,21 +274,23 @@ window.MODULE_CONTENT["m16"] = {
   "cloud-warehouses-snowflake-bigquery": {
     "title": "Cloud Data Warehouses (Snowflake & BigQuery): Disaggregated Storage & Compute",
     "video": {
-      "youtubeId": "fr5lIchF6pw",
-      "title": "Cloud Data Warehouses (Snowflake & BigQuery): Disaggregated Storage & Compute — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:23:40",
+      "youtubeId": "yWnToWrskXE",
+      "title": "#06 - Storage Models & Database Compression (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 14m",
       "start": 0,
-      "length": "84m",
-      "why": "Builds first-principles mastery of Cloud Data Warehouses (Snowflake & BigQuery): Disaggregated Storage & Compute with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "74m",
+      "why": "Key focus timestamps: 12:15 NSM (row) vs DSM (column); 28:40 Vectorized execution; 45:20 RLE, Bit-Packing & Dictionary encoding"
     },
     "videos": [
       {
-        "youtubeId": "L6E75IyBgpk",
-        "title": "Columnar Storage, Vectorized OLAP & Modern Lakehouses: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:17:50",
-        "why": "Complementary lecture covering production implementation details for Columnar Storage, Vectorized OLAP & Modern Lakehouses."
+        "youtubeId": "5J-I8Mj8tss",
+        "title": "S2024 #01 - Modern OLAP Database Systems (CMU Advanced Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 22m",
+        "length": "82m",
+        "role": "deep-dive",
+        "why": "Modern cloud data warehouse architecture (Snowflake, BigQuery, DuckDB, Parquet/Iceberg Lakehouse)."
       }
     ],
     "intuition": "<p>In <strong>Cloud Data Warehouses (Snowflake & BigQuery): Disaggregated Storage & Compute</strong> (<code>cloud-warehouses-snowflake-bigquery</code>), Separating immutable object-store micro-partitions (S3/GCS) from stateless elastic compute clusters with local SSD caching and distributed shuffle fabrics. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Cloud Data Warehouses (Snowflake & BigQuery): Disaggregated Storage & Compute</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -305,21 +319,23 @@ window.MODULE_CONTENT["m16"] = {
   "open-table-formats-iceberg-delta": {
     "title": "Open Lakehouse Table Formats (Apache Iceberg & Delta Lake): ACID on Object Storage",
     "video": {
-      "youtubeId": "L6E75IyBgpk",
-      "title": "Open Lakehouse Table Formats (Apache Iceberg & Delta Lake): ACID on Object Storage — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:17:50",
+      "youtubeId": "yWnToWrskXE",
+      "title": "#06 - Storage Models & Database Compression (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 14m",
       "start": 0,
-      "length": "78m",
-      "why": "Builds first-principles mastery of Open Lakehouse Table Formats (Apache Iceberg & Delta Lake): ACID on Object Storage with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "74m",
+      "why": "Key focus timestamps: 12:15 NSM (row) vs DSM (column); 28:40 Vectorized execution; 45:20 RLE, Bit-Packing & Dictionary encoding"
     },
     "videos": [
       {
-        "youtubeId": "fr5lIchF6pw",
-        "title": "Columnar Storage, Vectorized OLAP & Modern Lakehouses: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:23:40",
-        "why": "Complementary lecture covering production implementation details for Columnar Storage, Vectorized OLAP & Modern Lakehouses."
+        "youtubeId": "5J-I8Mj8tss",
+        "title": "S2024 #01 - Modern OLAP Database Systems (CMU Advanced Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 22m",
+        "length": "82m",
+        "role": "deep-dive",
+        "why": "Modern cloud data warehouse architecture (Snowflake, BigQuery, DuckDB, Parquet/Iceberg Lakehouse)."
       }
     ],
     "intuition": "<p>In <strong>Open Lakehouse Table Formats (Apache Iceberg & Delta Lake): ACID on Object Storage</strong> (<code>open-table-formats-iceberg-delta</code>), Bringing atomic schema evolution, hidden partitioning, snapshot isolation, and time-travel queries to Parquet files on S3 via metadata manifest trees. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Open Lakehouse Table Formats (Apache Iceberg & Delta Lake): ACID on Object Storage</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -348,21 +364,23 @@ window.MODULE_CONTENT["m16"] = {
   "case-cloudflare-clickhouse-log-analytics": {
     "title": "Production Case Study: Querying Millions of HTTP Events/Sec with Columnar MergeTree",
     "video": {
-      "youtubeId": "fr5lIchF6pw",
-      "title": "Production Case Study: Querying Millions of HTTP Events/Sec with Columnar MergeTree — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:23:40",
+      "youtubeId": "yWnToWrskXE",
+      "title": "#06 - Storage Models & Database Compression (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 14m",
       "start": 0,
-      "length": "84m",
-      "why": "Builds first-principles mastery of Production Case Study: Querying Millions of HTTP Events/Sec with Columnar MergeTree with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "74m",
+      "why": "Key focus timestamps: 12:15 NSM (row) vs DSM (column); 28:40 Vectorized execution; 45:20 RLE, Bit-Packing & Dictionary encoding"
     },
     "videos": [
       {
-        "youtubeId": "L6E75IyBgpk",
-        "title": "Columnar Storage, Vectorized OLAP & Modern Lakehouses: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:17:50",
-        "why": "Complementary lecture covering production implementation details for Columnar Storage, Vectorized OLAP & Modern Lakehouses."
+        "youtubeId": "5J-I8Mj8tss",
+        "title": "S2024 #01 - Modern OLAP Database Systems (CMU Advanced Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 22m",
+        "length": "82m",
+        "role": "deep-dive",
+        "why": "Modern cloud data warehouse architecture (Snowflake, BigQuery, DuckDB, Parquet/Iceberg Lakehouse)."
       }
     ],
     "intuition": "<p>In <strong>Production Case Study: Querying Millions of HTTP Events/Sec with Columnar MergeTree</strong> (<code>case-cloudflare-clickhouse-log-analytics</code>), How ordenar sorting keys, low-cardinality dictionary encoding, and materialized rollup tables power sub-second analytics over petabytes of network telemetry. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Production Case Study: Querying Millions of HTTP Events/Sec with Columnar MergeTree</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -391,21 +409,23 @@ window.MODULE_CONTENT["m16"] = {
   "build-columnar-compression-query-engine": {
     "title": "Hands-On Build: Columnar RLE/Dictionary Encoder with Zone-Map Predicate Pushdown",
     "video": {
-      "youtubeId": "L6E75IyBgpk",
-      "title": "Hands-On Build: Columnar RLE/Dictionary Encoder with Zone-Map Predicate Pushdown — Database Systems & SQL Architecture Lecture",
-      "channel": "CMU Database Group (Andy Pavlo)",
-      "duration": "1:17:50",
+      "youtubeId": "yWnToWrskXE",
+      "title": "#06 - Storage Models & Database Compression (CMU Intro to Database Systems)",
+      "channel": "CMU Database Group",
+      "duration": "1h 14m",
       "start": 0,
-      "length": "78m",
-      "why": "Builds first-principles mastery of Hands-On Build: Columnar RLE/Dictionary Encoder with Zone-Map Predicate Pushdown with concrete query execution trees, storage page layouts, and production tuning trade-offs."
+      "length": "74m",
+      "why": "Key focus timestamps: 12:15 NSM (row) vs DSM (column); 28:40 Vectorized execution; 45:20 RLE, Bit-Packing & Dictionary encoding"
     },
     "videos": [
       {
-        "youtubeId": "fr5lIchF6pw",
-        "title": "Columnar Storage, Vectorized OLAP & Modern Lakehouses: Companion Deep-Dive Lecture",
-        "channel": "CMU Database Group (Andy Pavlo)",
-        "duration": "1:23:40",
-        "why": "Complementary lecture covering production implementation details for Columnar Storage, Vectorized OLAP & Modern Lakehouses."
+        "youtubeId": "5J-I8Mj8tss",
+        "title": "S2024 #01 - Modern OLAP Database Systems (CMU Advanced Database Systems)",
+        "channel": "CMU Database Group",
+        "duration": "1h 22m",
+        "length": "82m",
+        "role": "deep-dive",
+        "why": "Modern cloud data warehouse architecture (Snowflake, BigQuery, DuckDB, Parquet/Iceberg Lakehouse)."
       }
     ],
     "intuition": "<p>In <strong>Hands-On Build: Columnar RLE/Dictionary Encoder with Zone-Map Predicate Pushdown</strong> (<code>build-columnar-compression-query-engine</code>), Build a columnar storage engine that compresses column chunks with Dictionary and Run-Length Encoding and prunes blocks via Zone Map min/max metadata. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Hands-On Build: Columnar RLE/Dictionary Encoder with Zone-Map Predicate Pushdown</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
