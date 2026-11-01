@@ -4,23 +4,23 @@ window.MODULE_CONTENT["m09"] = {
   "calendar-tables-date-spines": {
     "title": "Calendar Tables & Date Spines: Filling Missing Zero-Activity Time Buckets",
     "video": {
-      "youtubeId": "yuGOKP1zGB0",
-      "title": "Cohort Retention Analysis & Funnel Analytics in SQL",
-      "channel": "Luke Barousse / Data Analyst Portfolio",
-      "duration": "48m 10s",
+      "youtubeId": "0UCosrhH9uY",
+      "title": "SQL generate_series Explained: Calendar Tables, Filling Missing Dates, Gaps and Number Tables",
+      "channel": "Prateek Goel | GrowAsEngineers",
+      "duration": "9m 10s",
       "start": 0,
-      "length": "48m",
-      "why": "Key focus timestamps: 15:20 Cohort acquisition grouping; 28:40 Date spine generation; 39:10 Multi-step conversion funnel drop-off"
+      "length": "9m",
+      "why": "Core video covering Calendar Tables & Date Spines: Filling Missing Zero-Activity Time Buckets (calendar-tables-date-spines): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "ixuSv0k-jWU",
-        "title": "PostgreSQL Triggers, Stored Procedures & Materialized Views",
-        "channel": "Hussein Nasser",
-        "duration": "40m 37s",
-        "length": "41m",
+        "youtubeId": "XeSetBrfPd0",
+        "title": "Finding Missing Sequence Dates - Part 28 | Recursive CTE | DATEADD | Skipped Dates Using SQL",
+        "channel": "SQL With RaviMartha",
+        "duration": "6m 21s",
+        "length": "6m",
         "role": "deep-dive",
-        "why": "Combines complex reporting analytics (cohorts, retention matrices, date spines) with backend database programmability."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Calendar Tables & Date Spines: Filling Missing Zero-Activity Time Buckets."
       }
     ],
     "intuition": "<p>In <strong>Calendar Tables & Date Spines: Filling Missing Zero-Activity Time Buckets</strong> (<code>calendar-tables-date-spines</code>), Using recursive CTEs or generate_series to build continuous date spines so time-series charts never skip days with zero orders. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Calendar Tables & Date Spines: Filling Missing Zero-Activity Time Buckets</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -49,23 +49,23 @@ window.MODULE_CONTENT["m09"] = {
   "cohort-retention-matrix-sql": {
     "title": "Triangle Cohort Retention & Net Dollar Retention (NDR) Matrices in SQL",
     "video": {
-      "youtubeId": "yuGOKP1zGB0",
-      "title": "Cohort Retention Analysis & Funnel Analytics in SQL",
-      "channel": "Luke Barousse / Data Analyst Portfolio",
-      "duration": "48m 10s",
+      "youtubeId": "uAdCNVfbuFk",
+      "title": "How to Calculate Churn & Retention with Cohort Analysis (SQL + Google Sheets)",
+      "channel": "mackan.sql: Senior Data Analytics & Modeling",
+      "duration": "12m 35s",
       "start": 0,
-      "length": "48m",
-      "why": "Key focus timestamps: 15:20 Cohort acquisition grouping; 28:40 Date spine generation; 39:10 Multi-step conversion funnel drop-off"
+      "length": "12m",
+      "why": "Core video covering Triangle Cohort Retention & Net Dollar Retention (NDR) Matrices in SQL (cohort-retention-matrix-sql): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "ixuSv0k-jWU",
-        "title": "PostgreSQL Triggers, Stored Procedures & Materialized Views",
-        "channel": "Hussein Nasser",
-        "duration": "40m 37s",
-        "length": "41m",
+        "youtubeId": "mYSqc6Funuc",
+        "title": "Cohort Analysis Explained with SQL — Retention Made Simple!",
+        "channel": "Krishna Verma",
+        "duration": "18m 44s",
+        "length": "18m",
         "role": "deep-dive",
-        "why": "Combines complex reporting analytics (cohorts, retention matrices, date spines) with backend database programmability."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Triangle Cohort Retention & Net Dollar Retention (NDR) Matrices in SQL."
       }
     ],
     "intuition": "<p>In <strong>Triangle Cohort Retention & Net Dollar Retention (NDR) Matrices in SQL</strong> (<code>cohort-retention-matrix-sql</code>), Grouping users by signup cohort month, calculating active lifecycle offsets (Month 0, Month 1, Month N), and computing Net Dollar Retention. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Triangle Cohort Retention & Net Dollar Retention (NDR) Matrices in SQL</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -94,23 +94,23 @@ window.MODULE_CONTENT["m09"] = {
   "funnel-conversion-attribution-sql": {
     "title": "Multi-Step Ordered Funnel Conversion & First/Last-Touch Attribution",
     "video": {
-      "youtubeId": "yuGOKP1zGB0",
-      "title": "Cohort Retention Analysis & Funnel Analytics in SQL",
-      "channel": "Luke Barousse / Data Analyst Portfolio",
-      "duration": "48m 10s",
+      "youtubeId": "IqUTG2U7AbU",
+      "title": "Customer Funnel Analysis — Registration to Retention | Multi-Stage CTE + Conversion Rate",
+      "channel": "Dive in Data",
+      "duration": "12m 2s",
       "start": 0,
-      "length": "48m",
-      "why": "Key focus timestamps: 15:20 Cohort acquisition grouping; 28:40 Date spine generation; 39:10 Multi-step conversion funnel drop-off"
+      "length": "12m",
+      "why": "Core video covering Multi-Step Ordered Funnel Conversion & First/Last-Touch Attribution (funnel-conversion-attribution-sql): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "ixuSv0k-jWU",
-        "title": "PostgreSQL Triggers, Stored Procedures & Materialized Views",
-        "channel": "Hussein Nasser",
-        "duration": "40m 37s",
-        "length": "41m",
+        "youtubeId": "p0ZAjUf1h4A",
+        "title": "This SQL Trick Shows Why Users Aren’t Converting! | Funnel Analysis Using SQL",
+        "channel": "Krishna Verma",
+        "duration": "20m 46s",
+        "length": "20m",
         "role": "deep-dive",
-        "why": "Combines complex reporting analytics (cohorts, retention matrices, date spines) with backend database programmability."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Multi-Step Ordered Funnel Conversion & First/Last-Touch Attribution."
       }
     ],
     "intuition": "<p>In <strong>Multi-Step Ordered Funnel Conversion & First/Last-Touch Attribution</strong> (<code>funnel-conversion-attribution-sql</code>), Measuring drop-off across strict chronological user funnels (Signup → Connect → Query → Upgrade) and attributing revenue to marketing touches. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Multi-Step Ordered Funnel Conversion & First/Last-Touch Attribution</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -139,23 +139,23 @@ window.MODULE_CONTENT["m09"] = {
   "interval-overlap-allen-algebra": {
     "title": "Temporal Interval Overlap (Allen's Algebra) & Packing Contiguous Intervals",
     "video": {
-      "youtubeId": "yuGOKP1zGB0",
-      "title": "Cohort Retention Analysis & Funnel Analytics in SQL",
-      "channel": "Luke Barousse / Data Analyst Portfolio",
-      "duration": "48m 10s",
+      "youtubeId": "IexN60k62jo",
+      "title": "Merge Overlapping Intervals | Brute, Optimal with Precise TC analysis",
+      "channel": "take U forward",
+      "duration": "22m 35s",
       "start": 0,
-      "length": "48m",
-      "why": "Key focus timestamps: 15:20 Cohort acquisition grouping; 28:40 Date spine generation; 39:10 Multi-step conversion funnel drop-off"
+      "length": "22m",
+      "why": "Core video covering Temporal Interval Overlap (Allen's Algebra) & Packing Contiguous Intervals (interval-overlap-allen-algebra): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "ixuSv0k-jWU",
-        "title": "PostgreSQL Triggers, Stored Procedures & Materialized Views",
-        "channel": "Hussein Nasser",
-        "duration": "40m 37s",
-        "length": "41m",
+        "youtubeId": "HDHQ8lAWakY",
+        "title": "L8. Non Overlapping Intervals | Greedy Algorithms Playlist",
+        "channel": "take U forward",
+        "duration": "8m 46s",
+        "length": "8m",
         "role": "deep-dive",
-        "why": "Combines complex reporting analytics (cohorts, retention matrices, date spines) with backend database programmability."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Temporal Interval Overlap (Allen's Algebra) & Packing Contiguous Intervals."
       }
     ],
     "intuition": "<p>In <strong>Temporal Interval Overlap (Allen's Algebra) & Packing Contiguous Intervals</strong> (<code>interval-overlap-allen-algebra</code>), Mastering the canonical two-condition overlap predicate (start_a < end_b AND end_a > start_b) to detect double-bookings and merge overlapping windows. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Temporal Interval Overlap (Allen's Algebra) & Packing Contiguous Intervals</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -184,23 +184,23 @@ window.MODULE_CONTENT["m09"] = {
   "pivoting-unpivoting-cross-tabs": {
     "title": "Rows to Columns & Back: Cross-Tab Pivoting and Unpivoting Patterns",
     "video": {
-      "youtubeId": "yuGOKP1zGB0",
-      "title": "Cohort Retention Analysis & Funnel Analytics in SQL",
-      "channel": "Luke Barousse / Data Analyst Portfolio",
-      "duration": "48m 10s",
+      "youtubeId": "O6mDdUIvx9k",
+      "title": "SQL Convert Rows to Columns and Columns to Rows without using Pivot Functions",
+      "channel": "Ankit Bansal",
+      "duration": "8m 54s",
       "start": 0,
-      "length": "48m",
-      "why": "Key focus timestamps: 15:20 Cohort acquisition grouping; 28:40 Date spine generation; 39:10 Multi-step conversion funnel drop-off"
+      "length": "8m",
+      "why": "Core video covering Rows to Columns & Back: Cross-Tab Pivoting and Unpivoting Patterns (pivoting-unpivoting-cross-tabs): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "ixuSv0k-jWU",
-        "title": "PostgreSQL Triggers, Stored Procedures & Materialized Views",
-        "channel": "Hussein Nasser",
-        "duration": "40m 37s",
-        "length": "41m",
+        "youtubeId": "XN77aowTGsw",
+        "title": "SQL Unpivot Simplified (Turn Columns into Rows)",
+        "channel": "Ryan & Matt Data Science",
+        "duration": "8m 24s",
+        "length": "8m",
         "role": "deep-dive",
-        "why": "Combines complex reporting analytics (cohorts, retention matrices, date spines) with backend database programmability."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Rows to Columns & Back: Cross-Tab Pivoting and Unpivoting Patterns."
       }
     ],
     "intuition": "<p>In <strong>Rows to Columns & Back: Cross-Tab Pivoting and Unpivoting Patterns</strong> (<code>pivoting-unpivoting-cross-tabs</code>), Transforming normalized tall tables into wide report matrices and unpivoting wide spreadsheet imports using UNION ALL or LATERAL values. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Rows to Columns & Back: Cross-Tab Pivoting and Unpivoting Patterns</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -229,23 +229,23 @@ window.MODULE_CONTENT["m09"] = {
   "triggers-stored-procedures-udfs": {
     "title": "Database Programmability: Triggers (OLD/NEW), Stored Procedures & UDF Overhead",
     "video": {
-      "youtubeId": "yuGOKP1zGB0",
-      "title": "Cohort Retention Analysis & Funnel Analytics in SQL",
-      "channel": "Luke Barousse / Data Analyst Portfolio",
-      "duration": "48m 10s",
+      "youtubeId": "AOeM7gGXirQ",
+      "title": "SQL Stored Procedures Explained with Real World Scenarios",
+      "channel": "KnowHow Academy",
+      "duration": "14m 13s",
       "start": 0,
-      "length": "48m",
-      "why": "Key focus timestamps: 15:20 Cohort acquisition grouping; 28:40 Date spine generation; 39:10 Multi-step conversion funnel drop-off"
+      "length": "14m",
+      "why": "Core video covering Database Programmability: Triggers (OLD/NEW), Stored Procedures & UDF Overhead (triggers-stored-procedures-udfs): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "ixuSv0k-jWU",
-        "title": "PostgreSQL Triggers, Stored Procedures & Materialized Views",
-        "channel": "Hussein Nasser",
-        "duration": "40m 37s",
-        "length": "41m",
+        "youtubeId": "09lsHOi3vP4",
+        "title": "Day 12 : SQL Views | Functions | Stored Procedure | Trigger | #learnwithdsa",
+        "channel": "Data Streams Academy",
+        "duration": "19m 57s",
+        "length": "19m",
         "role": "deep-dive",
-        "why": "Combines complex reporting analytics (cohorts, retention matrices, date spines) with backend database programmability."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Database Programmability: Triggers (OLD/NEW), Stored Procedures & UDF Overhead."
       }
     ],
     "intuition": "<p>In <strong>Database Programmability: Triggers (OLD/NEW), Stored Procedures & UDF Overhead</strong> (<code>triggers-stored-procedures-udfs</code>), Writing BEFORE/AFTER row triggers for audit logging and invariant enforcement, while understanding why non-inlined scalar UDFs cripple query parallelism. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Database Programmability: Triggers (OLD/NEW), Stored Procedures & UDF Overhead</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -274,23 +274,23 @@ window.MODULE_CONTENT["m09"] = {
   "materialized-views-incremental-refresh": {
     "title": "Materialized Views, Refresh Strategies & Incremental View Maintenance (IVM)",
     "video": {
-      "youtubeId": "yuGOKP1zGB0",
-      "title": "Cohort Retention Analysis & Funnel Analytics in SQL",
-      "channel": "Luke Barousse / Data Analyst Portfolio",
-      "duration": "48m 10s",
+      "youtubeId": "WzkBZ0byoYE",
+      "title": "Materialized View in SQL | Faster SQL Queries using Materialized Views",
+      "channel": "techTFQ",
+      "duration": "16m 39s",
       "start": 0,
-      "length": "48m",
-      "why": "Key focus timestamps: 15:20 Cohort acquisition grouping; 28:40 Date spine generation; 39:10 Multi-step conversion funnel drop-off"
+      "length": "16m",
+      "why": "Core video covering Materialized Views, Refresh Strategies & Incremental View Maintenance (IVM) (materialized-views-incremental-refresh): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "ixuSv0k-jWU",
-        "title": "PostgreSQL Triggers, Stored Procedures & Materialized Views",
-        "channel": "Hussein Nasser",
-        "duration": "40m 37s",
-        "length": "41m",
+        "youtubeId": "LtRt3T05hRo",
+        "title": "42 Streaming Tables and Materialized Views in DBSQL | Background Working | Schedule data Refresh",
+        "channel": "Ease With Data",
+        "duration": "21m 15s",
+        "length": "21m",
         "role": "deep-dive",
-        "why": "Combines complex reporting analytics (cohorts, retention matrices, date spines) with backend database programmability."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Materialized Views, Refresh Strategies & Incremental View Maintenance (IVM)."
       }
     ],
     "intuition": "<p>In <strong>Materialized Views, Refresh Strategies & Incremental View Maintenance (IVM)</strong> (<code>materialized-views-incremental-refresh</code>), Precomputing expensive multi-join aggregations on disk, REFRESH MATERIALIZED VIEW CONCURRENTLY, and delta-based incremental maintenance. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Materialized Views, Refresh Strategies & Incremental View Maintenance (IVM)</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -319,23 +319,23 @@ window.MODULE_CONTENT["m09"] = {
   "sql-injection-parameterized-security": {
     "title": "SQL Injection AST Mechanics, Prepared Statements & Row-Level Security (RLS)",
     "video": {
-      "youtubeId": "yuGOKP1zGB0",
-      "title": "Cohort Retention Analysis & Funnel Analytics in SQL",
-      "channel": "Luke Barousse / Data Analyst Portfolio",
-      "duration": "48m 10s",
+      "youtubeId": "TVDoSbptOoA",
+      "title": "🛡️ PHP MySQL: Secure Database Queries with Prepared Statements",
+      "channel": "CodeLucky",
+      "duration": "3m 54s",
       "start": 0,
-      "length": "48m",
-      "why": "Key focus timestamps: 15:20 Cohort acquisition grouping; 28:40 Date spine generation; 39:10 Multi-step conversion funnel drop-off"
+      "length": "3m",
+      "why": "Core video covering SQL Injection AST Mechanics, Prepared Statements & Row-Level Security (RLS) (sql-injection-parameterized-security): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "ixuSv0k-jWU",
-        "title": "PostgreSQL Triggers, Stored Procedures & Materialized Views",
-        "channel": "Hussein Nasser",
-        "duration": "40m 37s",
-        "length": "41m",
+        "youtubeId": "WONbg6ZjiXk",
+        "title": "SQL Injection Prevention: Security Simplified",
+        "channel": "Vickie Li Dev",
+        "duration": "9m 44s",
+        "length": "9m",
         "role": "deep-dive",
-        "why": "Combines complex reporting analytics (cohorts, retention matrices, date spines) with backend database programmability."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for SQL Injection AST Mechanics, Prepared Statements & Row-Level Security (RLS)."
       }
     ],
     "intuition": "<p>In <strong>SQL Injection AST Mechanics, Prepared Statements & Row-Level Security (RLS)</strong> (<code>sql-injection-parameterized-security</code>), How string concatenation allows untrusted input to rewrite the SQL AST, why parameterized bind variables prevent injection 100%, and Postgres RLS policies. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>SQL Injection AST Mechanics, Prepared Statements & Row-Level Security (RLS)</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -364,23 +364,23 @@ window.MODULE_CONTENT["m09"] = {
   "case-double-booking-hotel-inventory": {
     "title": "Production Case Study: Preventing Concurrent Calendar Double-Bookings",
     "video": {
-      "youtubeId": "yuGOKP1zGB0",
-      "title": "Cohort Retention Analysis & Funnel Analytics in SQL",
-      "channel": "Luke Barousse / Data Analyst Portfolio",
-      "duration": "48m 10s",
+      "youtubeId": "qYzaN-56wmA",
+      "title": "How to Sync Booking Calendars with iCal | Avoid Double Bookings.",
+      "channel": "Bookla - API-first scheduling and automations",
+      "duration": "7m 19s",
       "start": 0,
-      "length": "48m",
-      "why": "Key focus timestamps: 15:20 Cohort acquisition grouping; 28:40 Date spine generation; 39:10 Multi-step conversion funnel drop-off"
+      "length": "7m",
+      "why": "Core video covering Production Case Study: Preventing Concurrent Calendar Double-Bookings (case-double-booking-hotel-inventory): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "ixuSv0k-jWU",
-        "title": "PostgreSQL Triggers, Stored Procedures & Materialized Views",
-        "channel": "Hussein Nasser",
-        "duration": "40m 37s",
-        "length": "41m",
+        "youtubeId": "J_G-V7Ln52Y",
+        "title": "HighLevel Calendar Setup: Connect Google and Stop Double Bookings",
+        "channel": "Behind the Practice",
+        "duration": "6m 16s",
+        "length": "6m",
         "role": "deep-dive",
-        "why": "Combines complex reporting analytics (cohorts, retention matrices, date spines) with backend database programmability."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Production Case Study: Preventing Concurrent Calendar Double-Bookings."
       }
     ],
     "intuition": "<p>In <strong>Production Case Study: Preventing Concurrent Calendar Double-Bookings</strong> (<code>case-double-booking-hotel-inventory</code>), Why application-level SELECT-then-INSERT checks fail under concurrency and how range exclusion constraints and interval locks guarantee zero overlap. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Production Case Study: Preventing Concurrent Calendar Double-Bookings</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -409,23 +409,23 @@ window.MODULE_CONTENT["m09"] = {
   "build-saas-cohort-funnel-workbench": {
     "title": "Hands-On Build: Complete SaaS Analytics Engine (MRR, Cohorts & Funnels)",
     "video": {
-      "youtubeId": "yuGOKP1zGB0",
-      "title": "Cohort Retention Analysis & Funnel Analytics in SQL",
-      "channel": "Luke Barousse / Data Analyst Portfolio",
-      "duration": "48m 10s",
+      "youtubeId": "_wmE4nHYQrs",
+      "title": "SQL Cohort Retention & Churn Analysis: SaaS Funnels | Ep. 25",
+      "channel": "Darshan Builds",
+      "duration": "15m 20s",
       "start": 0,
-      "length": "48m",
-      "why": "Key focus timestamps: 15:20 Cohort acquisition grouping; 28:40 Date spine generation; 39:10 Multi-step conversion funnel drop-off"
+      "length": "15m",
+      "why": "Core video covering Hands-On Build: Complete SaaS Analytics Engine (MRR, Cohorts & Funnels) (build-saas-cohort-funnel-workbench): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "ixuSv0k-jWU",
-        "title": "PostgreSQL Triggers, Stored Procedures & Materialized Views",
-        "channel": "Hussein Nasser",
-        "duration": "40m 37s",
-        "length": "41m",
+        "youtubeId": "N15XQjZ2qbE",
+        "title": "SaaS Data Modeling: Calculate Churn & Reactivation with SQL / Subscription Metrics",
+        "channel": "mackan.sql: Senior Data Analytics & Modeling",
+        "duration": "16m 3s",
+        "length": "16m",
         "role": "deep-dive",
-        "why": "Combines complex reporting analytics (cohorts, retention matrices, date spines) with backend database programmability."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Hands-On Build: Complete SaaS Analytics Engine (MRR, Cohorts & Funnels)."
       }
     ],
     "intuition": "<p>In <strong>Hands-On Build: Complete SaaS Analytics Engine (MRR, Cohorts & Funnels)</strong> (<code>build-saas-cohort-funnel-workbench</code>), Build an end-to-end SaaS analytics SQL suite calculating MRR expansion/churn movements, cohort retention triangles, and step-by-step funnel conversion. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Hands-On Build: Complete SaaS Analytics Engine (MRR, Cohorts & Funnels)</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",

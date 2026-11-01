@@ -14,13 +14,13 @@ window.MODULE_CONTENT["m01"] = {
     },
     "videos": [
       {
-        "youtubeId": "SSKVgrwhzus",
-        "title": "SQL Full Course for Beginners (30 Hours) – From Zero to Hero",
-        "channel": "Data with Baraa",
-        "duration": "29h 48m",
-        "length": "1788m",
+        "youtubeId": "lvCZk3k4-34",
+        "title": "The Untold Story of Databases",
+        "channel": "CodeSource",
+        "duration": "15m 24s",
+        "length": "15m",
         "role": "deep-dive",
-        "why": "Pairs Pavlo's formal relational theory with hands-on SELECT querying, NULL nuances, and foundational table operations."
+        "why": "Visual history and motivation for relational database systems replacing flat files."
       }
     ],
     "intuition": "<p>In <strong>Filesystems vs. Relational DBMS, Codd's 12 Rules & Declarative SQL</strong> (<code>why-databases-exist</code>), Why ad-hoc CSV/JSON files fail under concurrent mutations and how Edgar Codd's relational model separated physical storage from declarative queries. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Filesystems vs. Relational DBMS, Codd's 12 Rules & Declarative SQL</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -49,23 +49,23 @@ window.MODULE_CONTENT["m01"] = {
   "tables-rows-columns-types": {
     "title": "Relations, Tuples, Attributes, Domains & SQL Data Types",
     "video": {
-      "youtubeId": "7NPIENPr-zk",
-      "title": "#01 - Course Introduction & The Relational Model (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 14m",
+      "youtubeId": "FZ1yRBLe0OQ",
+      "title": "SQL Data Types Explained: INT, VARCHAR, DATE, DECIMAL | SQL Lesson 3",
+      "channel": "     The Learning Stack",
+      "duration": "7m 40s",
       "start": 0,
-      "length": "74m",
-      "why": "Key focus timestamps: 18:20 Codd's Relational Model; 31:45 Relations & Tuples; 45:10 Declarative SQL vs Relational Algebra"
+      "length": "7m",
+      "why": "Core video covering Relations, Tuples, Attributes, Domains & SQL Data Types (tables-rows-columns-types): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "SSKVgrwhzus",
-        "title": "SQL Full Course for Beginners (30 Hours) – From Zero to Hero",
-        "channel": "Data with Baraa",
-        "duration": "29h 48m",
-        "length": "1788m",
+        "youtubeId": "sBHWI9d_wF0",
+        "title": "Sql Data Types in Telugu",
+        "channel": "PythonLife",
+        "duration": "9m 43s",
+        "length": "9m",
         "role": "deep-dive",
-        "why": "Pairs Pavlo's formal relational theory with hands-on SELECT querying, NULL nuances, and foundational table operations."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Relations, Tuples, Attributes, Domains & SQL Data Types."
       }
     ],
     "intuition": "<p>In <strong>Relations, Tuples, Attributes, Domains & SQL Data Types</strong> (<code>tables-rows-columns-types</code>), Mapping mathematical relations to SQL tables, strict vs dynamic type affinity, exact NUMERIC/DECIMAL vs IEEE-754 FLOAT, and UTF-8 text encoding. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Relations, Tuples, Attributes, Domains & SQL Data Types</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -94,23 +94,23 @@ window.MODULE_CONTENT["m01"] = {
   "select-projection-aliases": {
     "title": "SELECT Projection, Expressions, Aliases & Logical Execution Order",
     "video": {
-      "youtubeId": "7NPIENPr-zk",
-      "title": "#01 - Course Introduction & The Relational Model (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 14m",
+      "youtubeId": "uEmAvzuA7u8",
+      "title": "SQL Order of Execution (Logical Explanation) | Namaste SQL | Ankit Bansal",
+      "channel": "Ankit Bansal",
+      "duration": "15m 28s",
       "start": 0,
-      "length": "74m",
-      "why": "Key focus timestamps: 18:20 Codd's Relational Model; 31:45 Relations & Tuples; 45:10 Declarative SQL vs Relational Algebra"
+      "length": "15m",
+      "why": "Core video covering SELECT Projection, Expressions, Aliases & Logical Execution Order (select-projection-aliases): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "SSKVgrwhzus",
-        "title": "SQL Full Course for Beginners (30 Hours) – From Zero to Hero",
+        "youtubeId": "-Xmrrj7U34g",
+        "title": "SQL Order of Execution (Visually Explained) | Understanding How Queries Run",
         "channel": "Data with Baraa",
-        "duration": "29h 48m",
-        "length": "1788m",
+        "duration": "4m 4s",
+        "length": "4m",
         "role": "deep-dive",
-        "why": "Pairs Pavlo's formal relational theory with hands-on SELECT querying, NULL nuances, and foundational table operations."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for SELECT Projection, Expressions, Aliases & Logical Execution Order."
       }
     ],
     "intuition": "<p>In <strong>SELECT Projection, Expressions, Aliases & Logical Execution Order</strong> (<code>select-projection-aliases</code>), How the SQL engine binds FROM before evaluating SELECT projections, why column aliases fail inside WHERE, and expression evaluation pipelines. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>SELECT Projection, Expressions, Aliases & Logical Execution Order</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -139,23 +139,23 @@ window.MODULE_CONTENT["m01"] = {
   "where-filtering-predicates": {
     "title": "WHERE Clause, Comparison Operators, BETWEEN, IN, LIKE & SARGability",
     "video": {
-      "youtubeId": "7NPIENPr-zk",
-      "title": "#01 - Course Introduction & The Relational Model (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 14m",
+      "youtubeId": "Uiv82g1gatE",
+      "title": "When Does SARGability Matter Most?",
+      "channel": "Brent Ozar Unlimited",
+      "duration": "21m 7s",
       "start": 0,
-      "length": "74m",
-      "why": "Key focus timestamps: 18:20 Codd's Relational Model; 31:45 Relations & Tuples; 45:10 Declarative SQL vs Relational Algebra"
+      "length": "21m",
+      "why": "Core video covering WHERE Clause, Comparison Operators, BETWEEN, IN, LIKE & SARGability (where-filtering-predicates): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "SSKVgrwhzus",
-        "title": "SQL Full Course for Beginners (30 Hours) – From Zero to Hero",
-        "channel": "Data with Baraa",
-        "duration": "29h 48m",
-        "length": "1788m",
+        "youtubeId": "BIlFTFrEFOI",
+        "title": "SQL indexing best practices | How to make your database FASTER!",
+        "channel": "CockroachDB",
+        "duration": "4m 8s",
+        "length": "4m",
         "role": "deep-dive",
-        "why": "Pairs Pavlo's formal relational theory with hands-on SELECT querying, NULL nuances, and foundational table operations."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for WHERE Clause, Comparison Operators, BETWEEN, IN, LIKE & SARGability."
       }
     ],
     "intuition": "<p>In <strong>WHERE Clause, Comparison Operators, BETWEEN, IN, LIKE & SARGability</strong> (<code>where-filtering-predicates</code>), Row-level tuple filtering with comparison operators, range bounds, pattern matching, and an introduction to Search Argument Able (SARGable) predicates. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>WHERE Clause, Comparison Operators, BETWEEN, IN, LIKE & SARGability</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -184,23 +184,23 @@ window.MODULE_CONTENT["m01"] = {
   "boolean-logic-three-valued-null": {
     "title": "Boolean Logic, Operator Precedence & Three-Valued Logic (3VL)",
     "video": {
-      "youtubeId": "7NPIENPr-zk",
-      "title": "#01 - Course Introduction & The Relational Model (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 14m",
+      "youtubeId": "u2Kdw1raQJ4",
+      "title": "Nulls and Three Valued Logic in SQL Programming",
+      "channel": "The SQL Professor",
+      "duration": "10m 28s",
       "start": 0,
-      "length": "74m",
-      "why": "Key focus timestamps: 18:20 Codd's Relational Model; 31:45 Relations & Tuples; 45:10 Declarative SQL vs Relational Algebra"
+      "length": "10m",
+      "why": "Core video covering Boolean Logic, Operator Precedence & Three-Valued Logic (3VL) (boolean-logic-three-valued-null): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "SSKVgrwhzus",
-        "title": "SQL Full Course for Beginners (30 Hours) – From Zero to Hero",
-        "channel": "Data with Baraa",
-        "duration": "29h 48m",
-        "length": "1788m",
+        "youtubeId": "p6GiE5aDgjk",
+        "title": "This weird SQL NULL logic cost me hours | SQL 3-valued logic",
+        "channel": "Just a Dev",
+        "duration": "6m 54s",
+        "length": "6m",
         "role": "deep-dive",
-        "why": "Pairs Pavlo's formal relational theory with hands-on SELECT querying, NULL nuances, and foundational table operations."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Boolean Logic, Operator Precedence & Three-Valued Logic (3VL)."
       }
     ],
     "intuition": "<p>In <strong>Boolean Logic, Operator Precedence & Three-Valued Logic (3VL)</strong> (<code>boolean-logic-three-valued-null</code>), How SQL extends Boolean algebra with UNKNOWN (NULL), truth tables for AND/OR/NOT, and why NOT (col = 5) drops NULL rows silently. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Boolean Logic, Operator Precedence & Three-Valued Logic (3VL)</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -229,23 +229,23 @@ window.MODULE_CONTENT["m01"] = {
   "null-semantics-coalesce-nullif": {
     "title": "NULL Semantics: IS NULL, IS DISTINCT FROM, COALESCE & NULLIF",
     "video": {
-      "youtubeId": "7NPIENPr-zk",
-      "title": "#01 - Course Introduction & The Relational Model (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 14m",
+      "youtubeId": "X_cPXHV2NQ4",
+      "title": "SQL NULL Functions | COALESCE, ISNULL, NULLIF, IS (NOT) NULL | #SQL Course 18",
+      "channel": "Data with Baraa",
+      "duration": "53m 0s",
       "start": 0,
-      "length": "74m",
-      "why": "Key focus timestamps: 18:20 Codd's Relational Model; 31:45 Relations & Tuples; 45:10 Declarative SQL vs Relational Algebra"
+      "length": "53m",
+      "why": "Core video covering NULL Semantics: IS NULL, IS DISTINCT FROM, COALESCE & NULLIF (null-semantics-coalesce-nullif): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "SSKVgrwhzus",
-        "title": "SQL Full Course for Beginners (30 Hours) – From Zero to Hero",
-        "channel": "Data with Baraa",
-        "duration": "29h 48m",
-        "length": "1788m",
+        "youtubeId": "oUzY1CbETnE",
+        "title": "Null Values in SQL - 5 tips in 14 min (IFNULL & COALESCE)",
+        "channel": "Jess Ramos | Data, AI, & Tech ⚡️",
+        "duration": "14m 18s",
+        "length": "14m",
         "role": "deep-dive",
-        "why": "Pairs Pavlo's formal relational theory with hands-on SELECT querying, NULL nuances, and foundational table operations."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for NULL Semantics: IS NULL, IS DISTINCT FROM, COALESCE & NULLIF."
       }
     ],
     "intuition": "<p>In <strong>NULL Semantics: IS NULL, IS DISTINCT FROM, COALESCE & NULLIF</strong> (<code>null-semantics-coalesce-nullif</code>), Null-safe comparisons with IS NOT DISTINCT FROM, fallback chains via COALESCE, division-by-zero guards with NULLIF, and aggregate NULL rules. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>NULL Semantics: IS NULL, IS DISTINCT FROM, COALESCE & NULLIF</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -274,23 +274,23 @@ window.MODULE_CONTENT["m01"] = {
   "order-by-limit-offset-distinct": {
     "title": "Sorting & Deduplication: ORDER BY, NULLS FIRST/LAST, DISTINCT & LIMIT",
     "video": {
-      "youtubeId": "7NPIENPr-zk",
-      "title": "#01 - Course Introduction & The Relational Model (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 14m",
+      "youtubeId": "1eejs85vHOM",
+      "title": "Master SQL Sorting & Filtering | ORDER BY, LIMIT, DISTINCT Tutorial",
+      "channel": "The Data Girl",
+      "duration": "29m 55s",
       "start": 0,
-      "length": "74m",
-      "why": "Key focus timestamps: 18:20 Codd's Relational Model; 31:45 Relations & Tuples; 45:10 Declarative SQL vs Relational Algebra"
+      "length": "29m",
+      "why": "Core video covering Sorting & Deduplication: ORDER BY, NULLS FIRST/LAST, DISTINCT & LIMIT (order-by-limit-offset-distinct): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "SSKVgrwhzus",
-        "title": "SQL Full Course for Beginners (30 Hours) – From Zero to Hero",
-        "channel": "Data with Baraa",
-        "duration": "29h 48m",
-        "length": "1788m",
+        "youtubeId": "8nl4e6QMO0k",
+        "title": "SQL session 6 | Distinct, Order By, Limit, Like Keyword | Trendytech",
+        "channel": "Sumit Mittal",
+        "duration": "31m 56s",
+        "length": "31m",
         "role": "deep-dive",
-        "why": "Pairs Pavlo's formal relational theory with hands-on SELECT querying, NULL nuances, and foundational table operations."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Sorting & Deduplication: ORDER BY, NULLS FIRST/LAST, DISTINCT & LIMIT."
       }
     ],
     "intuition": "<p>In <strong>Sorting & Deduplication: ORDER BY, NULLS FIRST/LAST, DISTINCT & LIMIT</strong> (<code>order-by-limit-offset-distinct</code>), Deterministic multi-column sorting, NULL sort ordering across dialects, hash vs sort deduplication for DISTINCT, and Top-N heap slicing. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Sorting & Deduplication: ORDER BY, NULLS FIRST/LAST, DISTINCT & LIMIT</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -319,23 +319,23 @@ window.MODULE_CONTENT["m01"] = {
   "case-expressions-type-casting": {
     "title": "Conditional SQL: CASE Expressions, CAST / :: & Data Cleaning",
     "video": {
-      "youtubeId": "7NPIENPr-zk",
-      "title": "#01 - Course Introduction & The Relational Model (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 14m",
+      "youtubeId": "GHPHZ8XJxeg",
+      "title": "SQL CASE WHEN Statement (Visually Explained) | #SQL Course 20",
+      "channel": "Data with Baraa",
+      "duration": "36m 18s",
       "start": 0,
-      "length": "74m",
-      "why": "Key focus timestamps: 18:20 Codd's Relational Model; 31:45 Relations & Tuples; 45:10 Declarative SQL vs Relational Algebra"
+      "length": "36m",
+      "why": "Core video covering Conditional SQL: CASE Expressions, CAST / :: & Data Cleaning (case-expressions-type-casting): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "SSKVgrwhzus",
-        "title": "SQL Full Course for Beginners (30 Hours) – From Zero to Hero",
+        "youtubeId": "V81Smc6xrBY",
+        "title": "SQL Triggers (Visually Explained) | Audit Logs Use Case | #SQL Course 34",
         "channel": "Data with Baraa",
-        "duration": "29h 48m",
-        "length": "1788m",
+        "duration": "11m 13s",
+        "length": "11m",
         "role": "deep-dive",
-        "why": "Pairs Pavlo's formal relational theory with hands-on SELECT querying, NULL nuances, and foundational table operations."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Conditional SQL: CASE Expressions, CAST / :: & Data Cleaning."
       }
     ],
     "intuition": "<p>In <strong>Conditional SQL: CASE Expressions, CAST / :: & Data Cleaning</strong> (<code>case-expressions-type-casting</code>), Branching inside projections and predicates with searched CASE WHEN expressions, safe type conversions, and defensive data normalization. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Conditional SQL: CASE Expressions, CAST / :: & Data Cleaning</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -364,23 +364,23 @@ window.MODULE_CONTENT["m01"] = {
   "case-stripe-ledger-precision": {
     "title": "Production Case Study: Why Floating-Point Corrupts Financial Ledgers",
     "video": {
-      "youtubeId": "7NPIENPr-zk",
-      "title": "#01 - Course Introduction & The Relational Model (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 14m",
+      "youtubeId": "aADY0-KQWSA",
+      "title": "The FLOAT Mistake That Crashed a Stock Exchange | INT vs DECIMAL vs FLOAT in SQL",
+      "channel": "StructuredCS",
+      "duration": "9m 23s",
       "start": 0,
-      "length": "74m",
-      "why": "Key focus timestamps: 18:20 Codd's Relational Model; 31:45 Relations & Tuples; 45:10 Declarative SQL vs Relational Algebra"
+      "length": "9m",
+      "why": "Core video covering Production Case Study: Why Floating-Point Corrupts Financial Ledgers (case-stripe-ledger-precision): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "SSKVgrwhzus",
-        "title": "SQL Full Course for Beginners (30 Hours) – From Zero to Hero",
-        "channel": "Data with Baraa",
-        "duration": "29h 48m",
-        "length": "1788m",
+        "youtubeId": "lUdRbZDBgEE",
+        "title": "How do Floating Point Numbers Work?",
+        "channel": "Alex Mux",
+        "duration": "3m 27s",
+        "length": "3m",
         "role": "deep-dive",
-        "why": "Pairs Pavlo's formal relational theory with hands-on SELECT querying, NULL nuances, and foundational table operations."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Production Case Study: Why Floating-Point Corrupts Financial Ledgers."
       }
     ],
     "intuition": "<p>In <strong>Production Case Study: Why Floating-Point Corrupts Financial Ledgers</strong> (<code>case-stripe-ledger-precision</code>), How binary IEEE-754 floating-point rounding drift causes penny imbalances at scale and how integer cents + exact NUMERIC enforce ledger invariants. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Production Case Study: Why Floating-Point Corrupts Financial Ledgers</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -409,23 +409,23 @@ window.MODULE_CONTENT["m01"] = {
   "build-sql-query-interpreter": {
     "title": "Hands-On Build: Mini Relational Tuple Filter & Projection Engine",
     "video": {
-      "youtubeId": "7NPIENPr-zk",
-      "title": "#01 - Course Introduction & The Relational Model (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 14m",
+      "youtubeId": "5Pc18ge9ohI",
+      "title": "Writing My Own Database From Scratch",
+      "channel": "Tony Saro",
+      "duration": "42m 0s",
       "start": 0,
-      "length": "74m",
-      "why": "Key focus timestamps: 18:20 Codd's Relational Model; 31:45 Relations & Tuples; 45:10 Declarative SQL vs Relational Algebra"
+      "length": "42m",
+      "why": "Core video covering Hands-On Build: Mini Relational Tuple Filter & Projection Engine (build-sql-query-interpreter): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "SSKVgrwhzus",
-        "title": "SQL Full Course for Beginners (30 Hours) – From Zero to Hero",
-        "channel": "Data with Baraa",
-        "duration": "29h 48m",
-        "length": "1788m",
+        "youtubeId": "mm3BwVOUYhI",
+        "title": "Writing A Database Engine From Scratch In C++ : 0x01 Creating the Lexer, Parser for the SQL Compiler",
+        "channel": "ary27x",
+        "duration": "5h 37m",
+        "length": "337m",
         "role": "deep-dive",
-        "why": "Pairs Pavlo's formal relational theory with hands-on SELECT querying, NULL nuances, and foundational table operations."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Hands-On Build: Mini Relational Tuple Filter & Projection Engine."
       }
     ],
     "intuition": "<p>In <strong>Hands-On Build: Mini Relational Tuple Filter & Projection Engine</strong> (<code>build-sql-query-interpreter</code>), Implement a clause-by-clause relational tuple evaluator supporting FROM, WHERE with Three-Valued NULL logic, SELECT projection, and ORDER BY. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Hands-On Build: Mini Relational Tuple Filter & Projection Engine</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",

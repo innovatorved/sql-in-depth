@@ -32,7 +32,18 @@ const MODULE_SLUGS = {
   m18: 'production-tuning-reliability'
 };
 
-// 36 Curated, YouTube-Verified Database Systems & SQL Engineering Lectures (Sheet 1: Curriculum Video Mapping)
+// Topic-specific verified video mappings (all 180 topics)
+const TOPIC_VIDEOS_PATH = path.join(__dirname, '../data/topic_videos.json');
+let TOPIC_VIDEOS = {};
+if (fs.existsSync(TOPIC_VIDEOS_PATH)) {
+  try {
+    TOPIC_VIDEOS = JSON.parse(fs.readFileSync(TOPIC_VIDEOS_PATH, 'utf8'));
+  } catch (e) {
+    console.warn('Warning: Could not parse topic_videos.json:', e.message);
+  }
+}
+
+// 36 Curated, YouTube-Verified Database Systems & SQL Engineering Lectures (Fallback Module Video Mapping)
 const MODULE_VIDEOS = {
   m01: [
     {
@@ -1277,8 +1288,9 @@ function generateUnitContent(mod, unit, globalIdx, uIdx) {
   const excerpt = unit.archive?.excerpt || title;
   const tags = unit.archive?.tags || ['sql', 'relational', 'database'];
   const modVids = MODULE_VIDEOS[mod.id] || MODULE_VIDEOS.m01;
-  const primaryVid = modVids[0];
-  const companionVid = modVids[1];
+  const topicOverride = TOPIC_VIDEOS[slug];
+  const primaryVid = (topicOverride && topicOverride.primary) || modVids[0];
+  const companionVid = (topicOverride && topicOverride.companion) || modVids[1];
 
   const sqlSnippet = buildUnitSqlSnippet(mod.id, uIdx, slug, title);
   const verificationSqlSnippet = buildUnitVerificationSqlSnippet(mod.id, uIdx, slug, title);

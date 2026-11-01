@@ -4,23 +4,23 @@ window.MODULE_CONTENT["m10"] = {
   "why-indexes-work-io-cost-model": {
     "title": "Why Indexes Work: Full Table Scan O(N) vs Index Seek O(log_B N) I/O Physics",
     "video": {
-      "youtubeId": "u7ii_Lvm9rM",
-      "title": "#08 - Tree Indexes & B+Trees (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 16m",
+      "youtubeId": "r4u1qFg_0KE",
+      "title": "55 SQL Server Indexes: Table Scan vs Index Seek Explained",
+      "channel": "Parvesh",
+      "duration": "6m 52s",
       "start": 0,
-      "length": "76m",
-      "why": "Key focus timestamps: 12:00 B+Tree structure & invariants; 34:10 Leaf page splits; 52:30 Clustered vs Secondary indexes & pointer traversal"
+      "length": "6m",
+      "why": "Core video covering Why Indexes Work: Full Table Scan O(N) vs Index Seek O(log_B N) I/O Physics (why-indexes-work-io-cost-model): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "UzHl2VzyZS4",
-        "title": "B-tree vs B+ tree in Database Systems",
-        "channel": "Hussein Nasser",
-        "duration": "31m 50s",
-        "length": "32m",
+        "youtubeId": "1oySBkVuvI8",
+        "title": "What is Index Scan ,Index Seek and Table Scan?||SQLSERVER #index #sqlserver",
+        "channel": "Sql Is Easy",
+        "duration": "6m 34s",
+        "length": "6m",
         "role": "deep-dive",
-        "why": "Pavlo teaches exact page splitting and fan-out mechanics; Hussein explains why DB engines store rows only at leaf nodes."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Why Indexes Work: Full Table Scan O(N) vs Index Seek O(log_B N) I/O Physics."
       }
     ],
     "intuition": "<p>In <strong>Why Indexes Work: Full Table Scan O(N) vs Index Seek O(log_B N) I/O Physics</strong> (<code>why-indexes-work-io-cost-model</code>), Quantifying 8KB page reads: why scanning 1,000,000 rows touches 12,500 heap pages while a height-3 B+Tree seek reads just 4 pages. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Why Indexes Work: Full Table Scan O(N) vs Index Seek O(log_B N) I/O Physics</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -49,23 +49,23 @@ window.MODULE_CONTENT["m10"] = {
   "btree-bplustree-internal-anatomy": {
     "title": "B-Tree vs B+Tree Internal Anatomy: High Fanout, Routing Keys & Leaf Links",
     "video": {
-      "youtubeId": "u7ii_Lvm9rM",
-      "title": "#08 - Tree Indexes & B+Trees (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 16m",
+      "youtubeId": "aZjYr87r1b8",
+      "title": "10.2  B Trees and B+ Trees. How they are useful in Databases",
+      "channel": "Abdul Bari",
+      "duration": "39m 41s",
       "start": 0,
-      "length": "76m",
-      "why": "Key focus timestamps: 12:00 B+Tree structure & invariants; 34:10 Leaf page splits; 52:30 Clustered vs Secondary indexes & pointer traversal"
+      "length": "39m",
+      "why": "Core video covering B-Tree vs B+Tree Internal Anatomy: High Fanout, Routing Keys & Leaf Links (btree-bplustree-internal-anatomy): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "UzHl2VzyZS4",
-        "title": "B-tree vs B+ tree in Database Systems",
-        "channel": "Hussein Nasser",
-        "duration": "31m 50s",
-        "length": "32m",
+        "youtubeId": "BwUvgG29fPc",
+        "title": "Lec-117: Difference b/w B-Tree & B+Tree  in Hindi with examples",
+        "channel": "Gate Smashers",
+        "duration": "14m 57s",
+        "length": "14m",
         "role": "deep-dive",
-        "why": "Pavlo teaches exact page splitting and fan-out mechanics; Hussein explains why DB engines store rows only at leaf nodes."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for B-Tree vs B+Tree Internal Anatomy: High Fanout, Routing Keys & Leaf Links."
       }
     ],
     "intuition": "<p>In <strong>B-Tree vs B+Tree Internal Anatomy: High Fanout, Routing Keys & Leaf Links</strong> (<code>btree-bplustree-internal-anatomy</code>), Why databases use B+Trees instead of binary trees or B-Trees: packing ~500 separator keys per 8KB internal page and linking leaf pages for range scans. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>B-Tree vs B+Tree Internal Anatomy: High Fanout, Routing Keys & Leaf Links</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -94,23 +94,23 @@ window.MODULE_CONTENT["m10"] = {
   "clustered-vs-secondary-indexes": {
     "title": "Clustered Indexes (InnoDB / WITHOUT ROWID) vs Heap + Secondary Index (Postgres)",
     "video": {
-      "youtubeId": "u7ii_Lvm9rM",
-      "title": "#08 - Tree Indexes & B+Trees (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 16m",
+      "youtubeId": "_EJV_E8sopk",
+      "title": "SQL Server Indexes: Clustered vs. Non-Clustered Explained",
+      "channel": "KnowHow Academy",
+      "duration": "10m 2s",
       "start": 0,
-      "length": "76m",
-      "why": "Key focus timestamps: 12:00 B+Tree structure & invariants; 34:10 Leaf page splits; 52:30 Clustered vs Secondary indexes & pointer traversal"
+      "length": "10m",
+      "why": "Core video covering Clustered Indexes (InnoDB / WITHOUT ROWID) vs Heap + Secondary Index (Postgres) (clustered-vs-secondary-indexes): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "UzHl2VzyZS4",
-        "title": "B-tree vs B+ tree in Database Systems",
-        "channel": "Hussein Nasser",
-        "duration": "31m 50s",
-        "length": "32m",
+        "youtubeId": "BxAj3bl00-o",
+        "title": "SQL Indexes (Visually Explained) | Clustered vs Nonclustered | #SQL Course 35",
+        "channel": "Data with Baraa",
+        "duration": "43m 10s",
+        "length": "43m",
         "role": "deep-dive",
-        "why": "Pavlo teaches exact page splitting and fan-out mechanics; Hussein explains why DB engines store rows only at leaf nodes."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Clustered Indexes (InnoDB / WITHOUT ROWID) vs Heap + Secondary Index (Postgres)."
       }
     ],
     "intuition": "<p>In <strong>Clustered Indexes (InnoDB / WITHOUT ROWID) vs Heap + Secondary Index (Postgres)</strong> (<code>clustered-vs-secondary-indexes</code>), Comparing MySQL InnoDB (where the primary key B+Tree leaf IS the table row) against PostgreSQL heap storage (where secondary indexes point to ctid). When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Clustered Indexes (InnoDB / WITHOUT ROWID) vs Heap + Secondary Index (Postgres)</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -139,23 +139,23 @@ window.MODULE_CONTENT["m10"] = {
   "composite-indexes-leftmost-prefix": {
     "title": "Composite Indexes (a, b, c): Leftmost Prefix Rule & Equality-Before-Range",
     "video": {
-      "youtubeId": "u7ii_Lvm9rM",
-      "title": "#08 - Tree Indexes & B+Trees (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 16m",
+      "youtubeId": "OWdxY5CH6uo",
+      "title": "Composite Indexes and Column Order: Leftmost Prefix, Equality Before Range, ORDER BY (PostgreSQL)",
+      "channel": "Prateek Goel | GrowAsEngineers",
+      "duration": "8m 32s",
       "start": 0,
-      "length": "76m",
-      "why": "Key focus timestamps: 12:00 B+Tree structure & invariants; 34:10 Leaf page splits; 52:30 Clustered vs Secondary indexes & pointer traversal"
+      "length": "8m",
+      "why": "Core video covering Composite Indexes (a, b, c): Leftmost Prefix Rule & Equality-Before-Range (composite-indexes-leftmost-prefix): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "UzHl2VzyZS4",
-        "title": "B-tree vs B+ tree in Database Systems",
-        "channel": "Hussein Nasser",
-        "duration": "31m 50s",
-        "length": "32m",
+        "youtubeId": "XVkx3Yva-7I",
+        "title": "Why Your Database Ignores Your Composite Index (Leftmost Prefix Rule)",
+        "channel": "Aniruddha Mahamuni",
+        "duration": "5m 57s",
+        "length": "5m",
         "role": "deep-dive",
-        "why": "Pavlo teaches exact page splitting and fan-out mechanics; Hussein explains why DB engines store rows only at leaf nodes."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Composite Indexes (a, b, c): Leftmost Prefix Rule & Equality-Before-Range."
       }
     ],
     "intuition": "<p>In <strong>Composite Indexes (a, b, c): Leftmost Prefix Rule & Equality-Before-Range</strong> (<code>composite-indexes-leftmost-prefix</code>), How lexicographical tuple ordering inside a multi-column B+Tree dictates why equality predicates must precede range predicates for full index utilization. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Composite Indexes (a, b, c): Leftmost Prefix Rule & Equality-Before-Range</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -184,23 +184,23 @@ window.MODULE_CONTENT["m10"] = {
   "covering-indexes-index-only-scans": {
     "title": "Covering Indexes, INCLUDE Columns & Index-Only Scans (Visibility Map)",
     "video": {
-      "youtubeId": "u7ii_Lvm9rM",
-      "title": "#08 - Tree Indexes & B+Trees (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 16m",
+      "youtubeId": "5KOTGHVY2o8",
+      "title": "PostgreSQL Making use of Index-Only Scans and Covering Indexes 07/12",
+      "channel": "Code with Lucian",
+      "duration": "3m 12s",
       "start": 0,
-      "length": "76m",
-      "why": "Key focus timestamps: 12:00 B+Tree structure & invariants; 34:10 Leaf page splits; 52:30 Clustered vs Secondary indexes & pointer traversal"
+      "length": "3m",
+      "why": "Core video covering Covering Indexes, INCLUDE Columns & Index-Only Scans (Visibility Map) (covering-indexes-index-only-scans): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "UzHl2VzyZS4",
-        "title": "B-tree vs B+ tree in Database Systems",
-        "channel": "Hussein Nasser",
-        "duration": "31m 50s",
-        "length": "32m",
+        "youtubeId": "Wf04Hd6lRKY",
+        "title": "Why This PostgreSQL Query Never Reads the Table (Covering Index)",
+        "channel": "Aniruddha Mahamuni",
+        "duration": "5m 2s",
+        "length": "5m",
         "role": "deep-dive",
-        "why": "Pavlo teaches exact page splitting and fan-out mechanics; Hussein explains why DB engines store rows only at leaf nodes."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Covering Indexes, INCLUDE Columns & Index-Only Scans (Visibility Map)."
       }
     ],
     "intuition": "<p>In <strong>Covering Indexes, INCLUDE Columns & Index-Only Scans (Visibility Map)</strong> (<code>covering-indexes-index-only-scans</code>), Eliminating random heap table fetches completely by including payload columns in the index leaf and consulting PostgreSQL's Visibility Map. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Covering Indexes, INCLUDE Columns & Index-Only Scans (Visibility Map)</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -229,23 +229,23 @@ window.MODULE_CONTENT["m10"] = {
   "partial-filtered-expression-indexes": {
     "title": "Partial (Filtered) Indexes & Functional / Expression Indexes",
     "video": {
-      "youtubeId": "u7ii_Lvm9rM",
-      "title": "#08 - Tree Indexes & B+Trees (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 16m",
+      "youtubeId": "CMw2-Eo7108",
+      "title": "How to partially index a table",
+      "channel": "SQL and Database explained!",
+      "duration": "3m 43s",
       "start": 0,
-      "length": "76m",
-      "why": "Key focus timestamps: 12:00 B+Tree structure & invariants; 34:10 Leaf page splits; 52:30 Clustered vs Secondary indexes & pointer traversal"
+      "length": "3m",
+      "why": "Core video covering Partial (Filtered) Indexes & Functional / Expression Indexes (partial-filtered-expression-indexes): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "UzHl2VzyZS4",
-        "title": "B-tree vs B+ tree in Database Systems",
-        "channel": "Hussein Nasser",
-        "duration": "31m 50s",
-        "length": "32m",
+        "youtubeId": "PU2ajABOH-w",
+        "title": "SQL Unique & Filtered Indexes (Visually Explained) | #SQL Course 37",
+        "channel": "Data with Baraa",
+        "duration": "12m 2s",
+        "length": "12m",
         "role": "deep-dive",
-        "why": "Pavlo teaches exact page splitting and fan-out mechanics; Hussein explains why DB engines store rows only at leaf nodes."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Partial (Filtered) Indexes & Functional / Expression Indexes."
       }
     ],
     "intuition": "<p>In <strong>Partial (Filtered) Indexes & Functional / Expression Indexes</strong> (<code>partial-filtered-expression-indexes</code>), Shrinking index footprint by 90% with WHERE predicates (e.g. WHERE status = 'pending') and indexing computed expressions like LOWER(email). When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Partial (Filtered) Indexes & Functional / Expression Indexes</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -274,23 +274,23 @@ window.MODULE_CONTENT["m10"] = {
   "hash-gin-gist-brin-bloom-indexes": {
     "title": "Specialized Indexes: Hash, GIN (Inverted), GiST, BRIN (Block Range) & Bitmap",
     "video": {
-      "youtubeId": "u7ii_Lvm9rM",
-      "title": "#08 - Tree Indexes & B+Trees (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 16m",
+      "youtubeId": "8s35iHLGHww",
+      "title": "How to Choose PostgreSQL Indexes: B-Tree, Hash, BRIN, GIN & GiST",
+      "channel": "JaneExplainsIT",
+      "duration": "13m 5s",
       "start": 0,
-      "length": "76m",
-      "why": "Key focus timestamps: 12:00 B+Tree structure & invariants; 34:10 Leaf page splits; 52:30 Clustered vs Secondary indexes & pointer traversal"
+      "length": "13m",
+      "why": "Core video covering Specialized Indexes: Hash, GIN (Inverted), GiST, BRIN (Block Range) & Bitmap (hash-gin-gist-brin-bloom-indexes): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "UzHl2VzyZS4",
-        "title": "B-tree vs B+ tree in Database Systems",
-        "channel": "Hussein Nasser",
-        "duration": "31m 50s",
-        "length": "32m",
+        "youtubeId": "9eqKRT5K8hI",
+        "title": "PostgreSQL indexes. B-Tree or Hash. What is better? How it works?",
+        "channel": "JaneExplainsIT",
+        "duration": "5m 49s",
+        "length": "5m",
         "role": "deep-dive",
-        "why": "Pavlo teaches exact page splitting and fan-out mechanics; Hussein explains why DB engines store rows only at leaf nodes."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Specialized Indexes: Hash, GIN (Inverted), GiST, BRIN (Block Range) & Bitmap."
       }
     ],
     "intuition": "<p>In <strong>Specialized Indexes: Hash, GIN (Inverted), GiST, BRIN (Block Range) & Bitmap</strong> (<code>hash-gin-gist-brin-bloom-indexes</code>), Choosing the right access method beyond B+Trees: inverted posting lists (GIN) for JSONB/FTS, Tiny block summaries (BRIN) for time-series, and R-Trees (GiST). When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Specialized Indexes: Hash, GIN (Inverted), GiST, BRIN (Block Range) & Bitmap</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -319,23 +319,23 @@ window.MODULE_CONTENT["m10"] = {
   "index-bloat-write-amplification-traps": {
     "title": "When Indexes Hurt: Write Amplification, Page Splits & Selectivity Thresholds",
     "video": {
-      "youtubeId": "u7ii_Lvm9rM",
-      "title": "#08 - Tree Indexes & B+Trees (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 16m",
+      "youtubeId": "m-nO91y5K_4",
+      "title": "The Cost of Indexes: Storage, Write Amplification, HOT Updates and Over-Indexing (PostgreSQL)",
+      "channel": "Prateek Goel | GrowAsEngineers",
+      "duration": "6m 42s",
       "start": 0,
-      "length": "76m",
-      "why": "Key focus timestamps: 12:00 B+Tree structure & invariants; 34:10 Leaf page splits; 52:30 Clustered vs Secondary indexes & pointer traversal"
+      "length": "6m",
+      "why": "Core video covering When Indexes Hurt: Write Amplification, Page Splits & Selectivity Thresholds (index-bloat-write-amplification-traps): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "UzHl2VzyZS4",
-        "title": "B-tree vs B+ tree in Database Systems",
-        "channel": "Hussein Nasser",
-        "duration": "31m 50s",
-        "length": "32m",
+        "youtubeId": "amcqdWqi_1Q",
+        "title": "Index Tuning – Page Splits & Fragmentation (by Amit Bansal)",
+        "channel": "SQLMaestros",
+        "duration": "28m 8s",
+        "length": "28m",
         "role": "deep-dive",
-        "why": "Pavlo teaches exact page splitting and fan-out mechanics; Hussein explains why DB engines store rows only at leaf nodes."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for When Indexes Hurt: Write Amplification, Page Splits & Selectivity Thresholds."
       }
     ],
     "intuition": "<p>In <strong>When Indexes Hurt: Write Amplification, Page Splits & Selectivity Thresholds</strong> (<code>index-bloat-write-amplification-traps</code>), Why every additional secondary index slows down INSERT/UPDATE/DELETE, how 50/50 leaf page splits fragment space, and when a Seq Scan beats an Index Scan. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>When Indexes Hurt: Write Amplification, Page Splits & Selectivity Thresholds</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -364,23 +364,23 @@ window.MODULE_CONTENT["m10"] = {
   "case-slack-composite-index-incident": {
     "title": "Production Case Study: How Reordering Two Index Columns Cut Latency by 99.4%",
     "video": {
-      "youtubeId": "u7ii_Lvm9rM",
-      "title": "#08 - Tree Indexes & B+Trees (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 16m",
+      "youtubeId": "d2xoxmlcCBM",
+      "title": "Oracle SQL Tuning Case Study 18 - Table Access By Index RowId",
+      "channel": "Virsess !!!",
+      "duration": "4m 14s",
       "start": 0,
-      "length": "76m",
-      "why": "Key focus timestamps: 12:00 B+Tree structure & invariants; 34:10 Leaf page splits; 52:30 Clustered vs Secondary indexes & pointer traversal"
+      "length": "4m",
+      "why": "Core video covering Production Case Study: How Reordering Two Index Columns Cut Latency by 99.4% (case-slack-composite-index-incident): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "UzHl2VzyZS4",
-        "title": "B-tree vs B+ tree in Database Systems",
-        "channel": "Hussein Nasser",
-        "duration": "31m 50s",
-        "length": "32m",
+        "youtubeId": "GNShMhwQBiA",
+        "title": "Oracle SQL Tuning Case Study 7 - Multiple same Column Predicates",
+        "channel": "Virsess !!!",
+        "duration": "7m 2s",
+        "length": "7m",
         "role": "deep-dive",
-        "why": "Pavlo teaches exact page splitting and fan-out mechanics; Hussein explains why DB engines store rows only at leaf nodes."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Production Case Study: How Reordering Two Index Columns Cut Latency by 99.4%."
       }
     ],
     "intuition": "<p>In <strong>Production Case Study: How Reordering Two Index Columns Cut Latency by 99.4%</strong> (<code>case-slack-composite-index-incident</code>), Analyzing a production slow-query incident where an index on (created_at, channel_id) scanned 400,000 index entries instead of 15 with (channel_id, created_at). When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Production Case Study: How Reordering Two Index Columns Cut Latency by 99.4%</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -409,23 +409,23 @@ window.MODULE_CONTENT["m10"] = {
   "build-btree-index-advisor": {
     "title": "Hands-On Build: B+Tree Page Simulator & Automated Workload Index Advisor",
     "video": {
-      "youtubeId": "u7ii_Lvm9rM",
-      "title": "#08 - Tree Indexes & B+Trees (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 16m",
+      "youtubeId": "jjwTWXOzGyw",
+      "title": "How Database Indexes Work (B-Tree, Full Scan & Query Planner Explained)",
+      "channel": "The Internals",
+      "duration": "4m 14s",
       "start": 0,
-      "length": "76m",
-      "why": "Key focus timestamps: 12:00 B+Tree structure & invariants; 34:10 Leaf page splits; 52:30 Clustered vs Secondary indexes & pointer traversal"
+      "length": "4m",
+      "why": "Core video covering Hands-On Build: B+Tree Page Simulator & Automated Workload Index Advisor (build-btree-index-advisor): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "UzHl2VzyZS4",
-        "title": "B-tree vs B+ tree in Database Systems",
-        "channel": "Hussein Nasser",
-        "duration": "31m 50s",
-        "length": "32m",
+        "youtubeId": "aZjYr87r1b8",
+        "title": "10.2  B Trees and B+ Trees. How they are useful in Databases",
+        "channel": "Abdul Bari",
+        "duration": "39m 41s",
+        "length": "39m",
         "role": "deep-dive",
-        "why": "Pavlo teaches exact page splitting and fan-out mechanics; Hussein explains why DB engines store rows only at leaf nodes."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Hands-On Build: B+Tree Page Simulator & Automated Workload Index Advisor."
       }
     ],
     "intuition": "<p>In <strong>Hands-On Build: B+Tree Page Simulator & Automated Workload Index Advisor</strong> (<code>build-btree-index-advisor</code>), Build an interactive index advisor that inspects query predicates, ORDER BY clauses, and cardinality to recommend optimal composite covering indexes. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Hands-On Build: B+Tree Page Simulator & Automated Workload Index Advisor</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",

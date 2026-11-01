@@ -4,23 +4,23 @@ window.MODULE_CONTENT["m06"] = {
   "window-functions-mental-model": {
     "title": "The Window Function Mental Model: Preserving Row Identity + Context",
     "video": {
-      "youtubeId": "o666k19mZwE",
-      "title": "SQL Window Functions Basics (Visually Explained)",
-      "channel": "Data with Baraa",
-      "duration": "42m 15s",
+      "youtubeId": "rIcB4zMYMas",
+      "title": "SQL Window Functions | Clearly Explained | PARTITION BY, ORDER BY, ROW_NUMBER, RANK, DENSE_RANK",
+      "channel": "Maven Analytics",
+      "duration": "7m 52s",
       "start": 0,
-      "length": "42m",
-      "why": "Key focus timestamps: 08:15 PARTITION BY vs GROUP BY; 19:40 ROW_NUMBER vs RANK vs DENSE_RANK; 31:10 LEAD/LAG & Moving Frames"
+      "length": "7m",
+      "why": "Core video covering The Window Function Mental Model: Preserving Row Identity + Context (window-functions-mental-model): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "O5gU9NQjCAs",
-        "title": "#02 - Modern SQL: Window Execution (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 17m",
-        "length": "77m",
+        "youtubeId": "Ww71knvhQ-s",
+        "title": "SQL Window Function | How to write SQL Query using RANK, DENSE RANK, LEAD/LAG | SQL Queries Tutorial",
+        "channel": "techTFQ",
+        "duration": "24m 54s",
+        "length": "24m",
         "role": "deep-dive",
-        "why": "Teaches analytical framing (ROWS vs RANGE) clearly without double-counting row identity."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for The Window Function Mental Model: Preserving Row Identity + Context."
       }
     ],
     "intuition": "<p>In <strong>The Window Function Mental Model: Preserving Row Identity + Context</strong> (<code>window-functions-mental-model</code>), Why GROUP BY collapses rows while OVER (...) attaches an analytical sliding window to every tuple without losing row-level granularity. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>The Window Function Mental Model: Preserving Row Identity + Context</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -49,23 +49,23 @@ window.MODULE_CONTENT["m06"] = {
   "partition-by-order-by-mechanics": {
     "title": "PARTITION BY, ORDER BY & The Default RANGE Frame Trap",
     "video": {
-      "youtubeId": "o666k19mZwE",
-      "title": "SQL Window Functions Basics (Visually Explained)",
-      "channel": "Data with Baraa",
-      "duration": "42m 15s",
+      "youtubeId": "J07O7PEashg",
+      "title": "SQL FIRST_VALUE, LAST_VALUE and NTH_VALUE: the Default Frame Trap and IGNORE NULLS (PostgreSQL)",
+      "channel": "Prateek Goel | GrowAsEngineers",
+      "duration": "8m 21s",
       "start": 0,
-      "length": "42m",
-      "why": "Key focus timestamps: 08:15 PARTITION BY vs GROUP BY; 19:40 ROW_NUMBER vs RANK vs DENSE_RANK; 31:10 LEAD/LAG & Moving Frames"
+      "length": "8m",
+      "why": "Core video covering PARTITION BY, ORDER BY & The Default RANGE Frame Trap (partition-by-order-by-mechanics): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "O5gU9NQjCAs",
-        "title": "#02 - Modern SQL: Window Execution (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 17m",
-        "length": "77m",
+        "youtubeId": "-IOOF1FwSoM",
+        "title": "SQL window functions: rank, running totals and the ROWS vs RANGE trap",
+        "channel": "FDE Interviews",
+        "duration": "2m 58s",
+        "length": "2m",
         "role": "deep-dive",
-        "why": "Teaches analytical framing (ROWS vs RANGE) clearly without double-counting row identity."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for PARTITION BY, ORDER BY & The Default RANGE Frame Trap."
       }
     ],
     "intuition": "<p>In <strong>PARTITION BY, ORDER BY & The Default RANGE Frame Trap</strong> (<code>partition-by-order-by-mechanics</code>), How window partitioning and sorting work under the hood, and why adding ORDER BY silently changes the default frame to RANGE UNBOUNDED PRECEDING. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>PARTITION BY, ORDER BY & The Default RANGE Frame Trap</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -94,23 +94,23 @@ window.MODULE_CONTENT["m06"] = {
   "ranking-functions-row-number-rank": {
     "title": "Ranking Functions: ROW_NUMBER, RANK, DENSE_RANK, NTILE & CUME_DIST",
     "video": {
-      "youtubeId": "o666k19mZwE",
-      "title": "SQL Window Functions Basics (Visually Explained)",
+      "youtubeId": "cXhv4kmIzFw",
+      "title": "SQL Ranking Window Functions | ROW_NUMBER, RANK, DENSE_RANK, NTILE | #SQL Course 24",
       "channel": "Data with Baraa",
-      "duration": "42m 15s",
+      "duration": "1h 4m",
       "start": 0,
-      "length": "42m",
-      "why": "Key focus timestamps: 08:15 PARTITION BY vs GROUP BY; 19:40 ROW_NUMBER vs RANK vs DENSE_RANK; 31:10 LEAD/LAG & Moving Frames"
+      "length": "64m",
+      "why": "Core video covering Ranking Functions: ROW_NUMBER, RANK, DENSE_RANK, NTILE & CUME_DIST (ranking-functions-row-number-rank): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "O5gU9NQjCAs",
-        "title": "#02 - Modern SQL: Window Execution (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 17m",
-        "length": "77m",
+        "youtubeId": "Ww71knvhQ-s",
+        "title": "SQL Window Function | How to write SQL Query using RANK, DENSE RANK, LEAD/LAG | SQL Queries Tutorial",
+        "channel": "techTFQ",
+        "duration": "24m 54s",
+        "length": "24m",
         "role": "deep-dive",
-        "why": "Teaches analytical framing (ROWS vs RANGE) clearly without double-counting row identity."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Ranking Functions: ROW_NUMBER, RANK, DENSE_RANK, NTILE & CUME_DIST."
       }
     ],
     "intuition": "<p>In <strong>Ranking Functions: ROW_NUMBER, RANK, DENSE_RANK, NTILE & CUME_DIST</strong> (<code>ranking-functions-row-number-rank</code>), Exact tie-breaking semantics between ROW_NUMBER (1,2,3,4), RANK (1,2,2,4), and DENSE_RANK (1,2,2,3), plus equidepth bucketing with NTILE. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Ranking Functions: ROW_NUMBER, RANK, DENSE_RANK, NTILE & CUME_DIST</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -139,23 +139,23 @@ window.MODULE_CONTENT["m06"] = {
   "top-n-per-group-deduplication": {
     "title": "Canonical Top-N-Per-Group, Stream Deduplication & QUALIFY",
     "video": {
-      "youtubeId": "o666k19mZwE",
-      "title": "SQL Window Functions Basics (Visually Explained)",
-      "channel": "Data with Baraa",
-      "duration": "42m 15s",
+      "youtubeId": "uGEYx0TQHu4",
+      "title": "SQL Top-N Per Group: The Canonical Ranking Query | Ep. 26",
+      "channel": "Darshan Builds",
+      "duration": "14m 45s",
       "start": 0,
-      "length": "42m",
-      "why": "Key focus timestamps: 08:15 PARTITION BY vs GROUP BY; 19:40 ROW_NUMBER vs RANK vs DENSE_RANK; 31:10 LEAD/LAG & Moving Frames"
+      "length": "14m",
+      "why": "Core video covering Canonical Top-N-Per-Group, Stream Deduplication & QUALIFY (top-n-per-group-deduplication): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "O5gU9NQjCAs",
-        "title": "#02 - Modern SQL: Window Execution (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 17m",
-        "length": "77m",
+        "youtubeId": "5kskNInQGEs",
+        "title": "SQL Top N per Group and Latest Record per Entity: ROW_NUMBER, DISTINCT ON, LATERAL (PostgreSQL)",
+        "channel": "Prateek Goel | GrowAsEngineers",
+        "duration": "9m 35s",
+        "length": "9m",
         "role": "deep-dive",
-        "why": "Teaches analytical framing (ROWS vs RANGE) clearly without double-counting row identity."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Canonical Top-N-Per-Group, Stream Deduplication & QUALIFY."
       }
     ],
     "intuition": "<p>In <strong>Canonical Top-N-Per-Group, Stream Deduplication & QUALIFY</strong> (<code>top-n-per-group-deduplication</code>), Fetching the latest N events per user or top products per category using ROW_NUMBER() CTEs and DuckDB/Snowflake QUALIFY syntax. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Canonical Top-N-Per-Group, Stream Deduplication & QUALIFY</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -184,23 +184,23 @@ window.MODULE_CONTENT["m06"] = {
   "offset-functions-lag-lead-first-last": {
     "title": "Navigational Offset Functions: LAG, LEAD, FIRST_VALUE & The LAST_VALUE Trap",
     "video": {
-      "youtubeId": "o666k19mZwE",
-      "title": "SQL Window Functions Basics (Visually Explained)",
+      "youtubeId": "Jag6Eb2i-bQ",
+      "title": "SQL Value Window Functions | LEAD, LAG, FIRST_VALUE, LAST_VALUE | #SQL Course 25",
       "channel": "Data with Baraa",
-      "duration": "42m 15s",
+      "duration": "45m 1s",
       "start": 0,
-      "length": "42m",
-      "why": "Key focus timestamps: 08:15 PARTITION BY vs GROUP BY; 19:40 ROW_NUMBER vs RANK vs DENSE_RANK; 31:10 LEAD/LAG & Moving Frames"
+      "length": "45m",
+      "why": "Core video covering Navigational Offset Functions: LAG, LEAD, FIRST_VALUE & The LAST_VALUE Trap (offset-functions-lag-lead-first-last): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "O5gU9NQjCAs",
-        "title": "#02 - Modern SQL: Window Execution (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 17m",
-        "length": "77m",
+        "youtubeId": "fcoAFLnOF-g",
+        "title": "first_value and last_value SQL window functions MASTER CLASS | Advance SQL",
+        "channel": "Ankit Bansal",
+        "duration": "11m 14s",
+        "length": "11m",
         "role": "deep-dive",
-        "why": "Teaches analytical framing (ROWS vs RANGE) clearly without double-counting row identity."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Navigational Offset Functions: LAG, LEAD, FIRST_VALUE & The LAST_VALUE Trap."
       }
     ],
     "intuition": "<p>In <strong>Navigational Offset Functions: LAG, LEAD, FIRST_VALUE & The LAST_VALUE Trap</strong> (<code>offset-functions-lag-lead-first-last</code>), Peeking at preceding and succeeding rows without self-joins, period-over-period growth deltas, and why LAST_VALUE requires an explicit UNBOUNDED FOLLOWING frame. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Navigational Offset Functions: LAG, LEAD, FIRST_VALUE & The LAST_VALUE Trap</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -229,23 +229,23 @@ window.MODULE_CONTENT["m06"] = {
   "window-frames-rows-range-groups": {
     "title": "Window Frames Deep Dive: ROWS vs RANGE vs GROUPS & Moving Averages",
     "video": {
-      "youtubeId": "o666k19mZwE",
-      "title": "SQL Window Functions Basics (Visually Explained)",
-      "channel": "Data with Baraa",
-      "duration": "42m 15s",
+      "youtubeId": "Vq9H8_wMn0k",
+      "title": "Rows Between vs Range Between in SQL Window Functions | Real Difference Explained with Examples",
+      "channel": "Ankit Bansal",
+      "duration": "15m 6s",
       "start": 0,
-      "length": "42m",
-      "why": "Key focus timestamps: 08:15 PARTITION BY vs GROUP BY; 19:40 ROW_NUMBER vs RANK vs DENSE_RANK; 31:10 LEAD/LAG & Moving Frames"
+      "length": "15m",
+      "why": "Core video covering Window Frames Deep Dive: ROWS vs RANGE vs GROUPS & Moving Averages (window-frames-rows-range-groups): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "O5gU9NQjCAs",
-        "title": "#02 - Modern SQL: Window Execution (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 17m",
-        "length": "77m",
+        "youtubeId": "P6pVqmIzymI",
+        "title": "Window FRAMES in SQL | Difference in ROWS and RANGE | SQL Intermediate Level Interview Question",
+        "channel": "Select Star",
+        "duration": "5m 10s",
+        "length": "5m",
         "role": "deep-dive",
-        "why": "Teaches analytical framing (ROWS vs RANGE) clearly without double-counting row identity."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Window Frames Deep Dive: ROWS vs RANGE vs GROUPS & Moving Averages."
       }
     ],
     "intuition": "<p>In <strong>Window Frames Deep Dive: ROWS vs RANGE vs GROUPS & Moving Averages</strong> (<code>window-frames-rows-range-groups</code>), Physical row offsets (ROWS) vs logical value intervals (RANGE) vs peer tie groups (GROUPS) for accurate 7-day rolling averages. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Window Frames Deep Dive: ROWS vs RANGE vs GROUPS & Moving Averages</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -274,23 +274,23 @@ window.MODULE_CONTENT["m06"] = {
   "running-totals-cumulative-shares": {
     "title": "Running Totals, Pareto (80/20) Curves & Named WINDOW Clauses",
     "video": {
-      "youtubeId": "o666k19mZwE",
-      "title": "SQL Window Functions Basics (Visually Explained)",
-      "channel": "Data with Baraa",
-      "duration": "42m 15s",
+      "youtubeId": "OP2E3du_dGo",
+      "title": "SQL Pareto Analysis: Find the 20% Products Generating 80% of Total Revenue! 💡",
+      "channel": "Sneha Kulkarni",
+      "duration": "14m 9s",
       "start": 0,
-      "length": "42m",
-      "why": "Key focus timestamps: 08:15 PARTITION BY vs GROUP BY; 19:40 ROW_NUMBER vs RANK vs DENSE_RANK; 31:10 LEAD/LAG & Moving Frames"
+      "length": "14m",
+      "why": "Core video covering Running Totals, Pareto (80/20) Curves & Named WINDOW Clauses (running-totals-cumulative-shares): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "O5gU9NQjCAs",
-        "title": "#02 - Modern SQL: Window Execution (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 17m",
-        "length": "77m",
+        "youtubeId": "rIcB4zMYMas",
+        "title": "SQL Window Functions | Clearly Explained | PARTITION BY, ORDER BY, ROW_NUMBER, RANK, DENSE_RANK",
+        "channel": "Maven Analytics",
+        "duration": "7m 52s",
+        "length": "7m",
         "role": "deep-dive",
-        "why": "Teaches analytical framing (ROWS vs RANGE) clearly without double-counting row identity."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Running Totals, Pareto (80/20) Curves & Named WINDOW Clauses."
       }
     ],
     "intuition": "<p>In <strong>Running Totals, Pareto (80/20) Curves & Named WINDOW Clauses</strong> (<code>running-totals-cumulative-shares</code>), Computing monotonic cumulative sums, percentage-of-total shares, and reusing window specifications cleanly with the WINDOW w AS (...) clause. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Running Totals, Pareto (80/20) Curves & Named WINDOW Clauses</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -319,23 +319,23 @@ window.MODULE_CONTENT["m06"] = {
   "gaps-and-islands-sessionization": {
     "title": "Solving Classic Gaps and Islands, Streaks & Clickstream Sessionization",
     "video": {
-      "youtubeId": "o666k19mZwE",
-      "title": "SQL Window Functions Basics (Visually Explained)",
-      "channel": "Data with Baraa",
-      "duration": "42m 15s",
+      "youtubeId": "Hnd0TRogsoM",
+      "title": "#2 SQL Interview Question | Gaps and Islands Explained Step by Step",
+      "channel": "PrepWithSid",
+      "duration": "12m 22s",
       "start": 0,
-      "length": "42m",
-      "why": "Key focus timestamps: 08:15 PARTITION BY vs GROUP BY; 19:40 ROW_NUMBER vs RANK vs DENSE_RANK; 31:10 LEAD/LAG & Moving Frames"
+      "length": "12m",
+      "why": "Core video covering Solving Classic Gaps and Islands, Streaks & Clickstream Sessionization (gaps-and-islands-sessionization): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "O5gU9NQjCAs",
-        "title": "#02 - Modern SQL: Window Execution (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 17m",
-        "length": "77m",
+        "youtubeId": "U6dewWrKCY8",
+        "title": "Find Consecutive Login Streaks in SQL | SQL Gaps and Islands Tutorial (In Hindi)",
+        "channel": "SQLForge",
+        "duration": "9m 23s",
+        "length": "9m",
         "role": "deep-dive",
-        "why": "Teaches analytical framing (ROWS vs RANGE) clearly without double-counting row identity."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Solving Classic Gaps and Islands, Streaks & Clickstream Sessionization."
       }
     ],
     "intuition": "<p>In <strong>Solving Classic Gaps and Islands, Streaks & Clickstream Sessionization</strong> (<code>gaps-and-islands-sessionization</code>), Grouping contiguous sequences and splitting user activity streams into 30-minute sessions using the ROW_NUMBER difference trick and LAG step indicators. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Solving Classic Gaps and Islands, Streaks & Clickstream Sessionization</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -364,23 +364,23 @@ window.MODULE_CONTENT["m06"] = {
   "case-fintech-velocity-fraud-window": {
     "title": "Production Case Study: Real-Time Sliding-Window Card Velocity Fraud Detection",
     "video": {
-      "youtubeId": "o666k19mZwE",
-      "title": "SQL Window Functions Basics (Visually Explained)",
-      "channel": "Data with Baraa",
-      "duration": "42m 15s",
+      "youtubeId": "DkJakfYZZkY",
+      "title": "Fraud Detection with SQL 💳 | Catch Payment Scams in Real-Time!",
+      "channel": "Krishna Verma",
+      "duration": "16m 19s",
       "start": 0,
-      "length": "42m",
-      "why": "Key focus timestamps: 08:15 PARTITION BY vs GROUP BY; 19:40 ROW_NUMBER vs RANK vs DENSE_RANK; 31:10 LEAD/LAG & Moving Frames"
+      "length": "16m",
+      "why": "Core video covering Production Case Study: Real-Time Sliding-Window Card Velocity Fraud Detection (case-fintech-velocity-fraud-window): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "O5gU9NQjCAs",
-        "title": "#02 - Modern SQL: Window Execution (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 17m",
-        "length": "77m",
+        "youtubeId": "Pf1pB6etxEQ",
+        "title": "How to Detect Fraud in Real Time Using Kafka",
+        "channel": "SWE with Vivek Bharatha",
+        "duration": "31m 11s",
+        "length": "31m",
         "role": "deep-dive",
-        "why": "Teaches analytical framing (ROWS vs RANGE) clearly without double-counting row identity."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Production Case Study: Real-Time Sliding-Window Card Velocity Fraud Detection."
       }
     ],
     "intuition": "<p>In <strong>Production Case Study: Real-Time Sliding-Window Card Velocity Fraud Detection</strong> (<code>case-fintech-velocity-fraud-window</code>), Detecting rapid card-testing bursts and cross-country impossible travel in a single analytical window pass over merchant transaction streams. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Production Case Study: Real-Time Sliding-Window Card Velocity Fraud Detection</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -409,23 +409,23 @@ window.MODULE_CONTENT["m06"] = {
   "build-sessionization-retention-engine": {
     "title": "Hands-On Build: Clickstream Sessionizer, Streak Tracker & Rolling Window Analyzer",
     "video": {
-      "youtubeId": "o666k19mZwE",
-      "title": "SQL Window Functions Basics (Visually Explained)",
-      "channel": "Data with Baraa",
-      "duration": "42m 15s",
+      "youtubeId": "fkLUYZZcQZo",
+      "title": "End-to-End Clickstream Data Engineering Project Explained ( Spark + AWS + SQL)",
+      "channel": "BigData Factory",
+      "duration": "6m 44s",
       "start": 0,
-      "length": "42m",
-      "why": "Key focus timestamps: 08:15 PARTITION BY vs GROUP BY; 19:40 ROW_NUMBER vs RANK vs DENSE_RANK; 31:10 LEAD/LAG & Moving Frames"
+      "length": "6m",
+      "why": "Core video covering Hands-On Build: Clickstream Sessionizer, Streak Tracker & Rolling Window Analyzer (build-sessionization-retention-engine): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "O5gU9NQjCAs",
-        "title": "#02 - Modern SQL: Window Execution (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 17m",
-        "length": "77m",
+        "youtubeId": "7mz73uXD9DA",
+        "title": "SQL for Data Analytics - Learn SQL in 4 Hours",
+        "channel": "Luke Barousse",
+        "duration": "4h 8m",
+        "length": "248m",
         "role": "deep-dive",
-        "why": "Teaches analytical framing (ROWS vs RANGE) clearly without double-counting row identity."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Hands-On Build: Clickstream Sessionizer, Streak Tracker & Rolling Window Analyzer."
       }
     ],
     "intuition": "<p>In <strong>Hands-On Build: Clickstream Sessionizer, Streak Tracker & Rolling Window Analyzer</strong> (<code>build-sessionization-retention-engine</code>), Implement a complete analytical SQL pipeline that sessionizes raw user events, computes consecutive active streaks, and flags anomalous velocity spikes. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Hands-On Build: Clickstream Sessionizer, Streak Tracker & Rolling Window Analyzer</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",

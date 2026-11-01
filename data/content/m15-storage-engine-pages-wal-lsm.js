@@ -4,23 +4,23 @@ window.MODULE_CONTENT["m15"] = {
   "slotted-page-layout-8kb-anatomy": {
     "title": "Inside an 8KB Slotted Database Page: Header, Line Pointers, Tuples & TOAST",
     "video": {
-      "youtubeId": "PRLXdIMJhOg",
-      "title": "#03 - Database Storage Part 1: Files & Pages (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 16m",
+      "youtubeId": "haz2h7_xFDk",
+      "title": "How databases store data on disk?",
+      "channel": "Architecture Weekly",
+      "duration": "10m 36s",
       "start": 0,
-      "length": "76m",
-      "why": "Key focus timestamps: 18:40 Slotted-page architecture; 35:10 Record layouts & tuple headers; 52:00 Page-level fragmentation"
+      "length": "10m",
+      "why": "Core video covering Inside an 8KB Slotted Database Page: Header, Line Pointers, Tuples & TOAST (slotted-page-layout-8kb-anatomy): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "CedEy54pe3g",
-        "title": "#21 - Logging Protocols & Write-Ahead Log (WAL) (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 21m",
-        "length": "81m",
+        "youtubeId": "rYBqTl0w9lU",
+        "title": "Introduction to Slotted Pages in Database Systems",
+        "channel": "ankush",
+        "duration": "17m 37s",
+        "length": "17m",
         "role": "deep-dive",
-        "why": "Unpacks 8KB slotted pages and memory buffer pool management, paired with write-ahead logging (ARIES steal/no-force)."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Inside an 8KB Slotted Database Page: Header, Line Pointers, Tuples & TOAST."
       }
     ],
     "intuition": "<p>In <strong>Inside an 8KB Slotted Database Page: Header, Line Pointers, Tuples & TOAST</strong> (<code>slotted-page-layout-8kb-anatomy</code>), Why databases use slotted pages: line pointer arrays growing downward, tuple payloads growing upward, indirection for compaction, and out-of-line TOAST storage. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Inside an 8KB Slotted Database Page: Header, Line Pointers, Tuples & TOAST</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -49,23 +49,23 @@ window.MODULE_CONTENT["m15"] = {
   "heap-files-hot-updates-fillfactor": {
     "title": "Heap Files, Index Write Amplification, PostgreSQL HOT Updates & fillfactor",
     "video": {
-      "youtubeId": "PRLXdIMJhOg",
-      "title": "#03 - Database Storage Part 1: Files & Pages (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 16m",
+      "youtubeId": "DdltBjWVnz8",
+      "title": "HOT updates | Postgres.FM 020 | #PostgreSQL #Postgres podcast",
+      "channel": "PostgresTV",
+      "duration": "34m 41s",
       "start": 0,
-      "length": "76m",
-      "why": "Key focus timestamps: 18:40 Slotted-page architecture; 35:10 Record layouts & tuple headers; 52:00 Page-level fragmentation"
+      "length": "34m",
+      "why": "Core video covering Heap Files, Index Write Amplification, PostgreSQL HOT Updates & fillfactor (heap-files-hot-updates-fillfactor): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "CedEy54pe3g",
-        "title": "#21 - Logging Protocols & Write-Ahead Log (WAL) (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 21m",
-        "length": "81m",
+        "youtubeId": "r6rN8NMLgKY",
+        "title": "PostgreSQL Internals - Heap Only Tuple and Index-Only Scans",
+        "channel": "Landon Wilkins",
+        "duration": "13m 40s",
+        "length": "13m",
         "role": "deep-dive",
-        "why": "Unpacks 8KB slotted pages and memory buffer pool management, paired with write-ahead logging (ARIES steal/no-force)."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Heap Files, Index Write Amplification, PostgreSQL HOT Updates & fillfactor."
       }
     ],
     "intuition": "<p>In <strong>Heap Files, Index Write Amplification, PostgreSQL HOT Updates & fillfactor</strong> (<code>heap-files-hot-updates-fillfactor</code>), How updating a non-indexed column with enough free space on the same 8KB page creates a Heap-Only Tuple (HOT) chain, bypassing all secondary index writes. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Heap Files, Index Write Amplification, PostgreSQL HOT Updates & fillfactor</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -94,23 +94,23 @@ window.MODULE_CONTENT["m15"] = {
   "buffer-pool-clock-sweep-lru-k": {
     "title": "Buffer Pool Manager: Pin Counts, Dirty Pages, Clock-Sweep & LRU-K Eviction",
     "video": {
-      "youtubeId": "PRLXdIMJhOg",
-      "title": "#03 - Database Storage Part 1: Files & Pages (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 16m",
+      "youtubeId": "vRY5f6kWCmU",
+      "title": "PostgreSQL Buffer Pool Internals: Usage Counts, Clock Sweep, Dirty Pages and the OS Cache",
+      "channel": "Prateek Goel | GrowAsEngineers",
+      "duration": "8m 15s",
       "start": 0,
-      "length": "76m",
-      "why": "Key focus timestamps: 18:40 Slotted-page architecture; 35:10 Record layouts & tuple headers; 52:00 Page-level fragmentation"
+      "length": "8m",
+      "why": "Core video covering Buffer Pool Manager: Pin Counts, Dirty Pages, Clock-Sweep & LRU-K Eviction (buffer-pool-clock-sweep-lru-k): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "CedEy54pe3g",
-        "title": "#21 - Logging Protocols & Write-Ahead Log (WAL) (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 21m",
-        "length": "81m",
+        "youtubeId": "SQIVN1DT36Y",
+        "title": "Buffer Pool Management, Page Replacement Policies, and Modern Asynchronous I/O: Pin Counts, Scan ...",
+        "channel": "Sankalp Thakur",
+        "duration": "1h 5m",
+        "length": "65m",
         "role": "deep-dive",
-        "why": "Unpacks 8KB slotted pages and memory buffer pool management, paired with write-ahead logging (ARIES steal/no-force)."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Buffer Pool Manager: Pin Counts, Dirty Pages, Clock-Sweep & LRU-K Eviction."
       }
     ],
     "intuition": "<p>In <strong>Buffer Pool Manager: Pin Counts, Dirty Pages, Clock-Sweep & LRU-K Eviction</strong> (<code>buffer-pool-clock-sweep-lru-k</code>), Managing in-memory page frames, why sequential scans pollute naive LRU caches, and how Clock-Sweep / LRU-K + ring buffers protect the hot working set. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Buffer Pool Manager: Pin Counts, Dirty Pages, Clock-Sweep & LRU-K Eviction</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -139,23 +139,23 @@ window.MODULE_CONTENT["m15"] = {
   "write-ahead-logging-wal-lsn": {
     "title": "Write-Ahead Logging (WAL), Log Sequence Numbers (LSN) & Group Commit",
     "video": {
-      "youtubeId": "PRLXdIMJhOg",
-      "title": "#03 - Database Storage Part 1: Files & Pages (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 16m",
+      "youtubeId": "wI4hKwl1Cn4",
+      "title": "How does the database guarantee reliability using write-ahead logging?",
+      "channel": "Arpit Bhayani",
+      "duration": "22m 5s",
       "start": 0,
-      "length": "76m",
-      "why": "Key focus timestamps: 18:40 Slotted-page architecture; 35:10 Record layouts & tuple headers; 52:00 Page-level fragmentation"
+      "length": "22m",
+      "why": "Core video covering Write-Ahead Logging (WAL), Log Sequence Numbers (LSN) & Group Commit (write-ahead-logging-wal-lsn): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
         "youtubeId": "CedEy54pe3g",
-        "title": "#21 - Logging Protocols & Write-Ahead Log (WAL) (CMU Intro to Database Systems)",
+        "title": "#21 - Write-Ahead Logging + Shadow Paging (CMU Intro to Database Systems)",
         "channel": "CMU Database Group",
         "duration": "1h 21m",
         "length": "81m",
         "role": "deep-dive",
-        "why": "Unpacks 8KB slotted pages and memory buffer pool management, paired with write-ahead logging (ARIES steal/no-force)."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Write-Ahead Logging (WAL), Log Sequence Numbers (LSN) & Group Commit."
       }
     ],
     "intuition": "<p>In <strong>Write-Ahead Logging (WAL), Log Sequence Numbers (LSN) & Group Commit</strong> (<code>write-ahead-logging-wal-lsn</code>), The fundamental WAL invariant (log record must reach stable disk before dirty data page), page LSN tracking, and batching concurrent commits into one fsync. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Write-Ahead Logging (WAL), Log Sequence Numbers (LSN) & Group Commit</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -184,23 +184,23 @@ window.MODULE_CONTENT["m15"] = {
   "checkpoints-dirty-page-flushing": {
     "title": "Checkpoints, Dirty Page Flushing & Torn-Page Protection (Full Page Writes)",
     "video": {
-      "youtubeId": "PRLXdIMJhOg",
-      "title": "#03 - Database Storage Part 1: Files & Pages (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 16m",
+      "youtubeId": "Mz7lH4Vwsmk",
+      "title": "💡How SQL Server Writes Data: Dirty Pages, Checkpoints & 🎯Lazy Writer (Easy Explanation)🔥#sqlserver",
+      "channel": "AzureSQLChamp",
+      "duration": "1h 25m",
       "start": 0,
-      "length": "76m",
-      "why": "Key focus timestamps: 18:40 Slotted-page architecture; 35:10 Record layouts & tuple headers; 52:00 Page-level fragmentation"
+      "length": "85m",
+      "why": "Core video covering Checkpoints, Dirty Page Flushing & Torn-Page Protection (Full Page Writes) (checkpoints-dirty-page-flushing): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "CedEy54pe3g",
-        "title": "#21 - Logging Protocols & Write-Ahead Log (WAL) (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 21m",
-        "length": "81m",
+        "youtubeId": "Aa2mEkMUkNU",
+        "title": "🔥SQL Server Memory Secrets: Clean Pages, Dirty Pages, Checkpoints & Lazy Writer Explained #sqlserver",
+        "channel": "AzureSQLChamp",
+        "duration": "1h 53m",
+        "length": "113m",
         "role": "deep-dive",
-        "why": "Unpacks 8KB slotted pages and memory buffer pool management, paired with write-ahead logging (ARIES steal/no-force)."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Checkpoints, Dirty Page Flushing & Torn-Page Protection (Full Page Writes)."
       }
     ],
     "intuition": "<p>In <strong>Checkpoints, Dirty Page Flushing & Torn-Page Protection (Full Page Writes)</strong> (<code>checkpoints-dirty-page-flushing</code>), Bounding crash recovery time with spread checkpoints, and why the first modification to an 8KB page after a checkpoint logs a Full Page Image (FPI). When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Checkpoints, Dirty Page Flushing & Torn-Page Protection (Full Page Writes)</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -229,23 +229,23 @@ window.MODULE_CONTENT["m15"] = {
   "aries-crash-recovery-analysis-redo-undo": {
     "title": "ARIES Crash Recovery: Steal/No-Force Policy, Analysis, Redo & Undo Passes",
     "video": {
-      "youtubeId": "PRLXdIMJhOg",
-      "title": "#03 - Database Storage Part 1: Files & Pages (CMU Intro to Database Systems)",
+      "youtubeId": "yVpzHdAP0TY",
+      "title": "#21 - Database Recovery with ARIES (CMU Intro to Database Systems)",
       "channel": "CMU Database Group",
-      "duration": "1h 16m",
+      "duration": "1h 12m",
       "start": 0,
-      "length": "76m",
-      "why": "Key focus timestamps: 18:40 Slotted-page architecture; 35:10 Record layouts & tuple headers; 52:00 Page-level fragmentation"
+      "length": "72m",
+      "why": "Core video covering ARIES Crash Recovery: Steal/No-Force Policy, Analysis, Redo & Undo Passes (aries-crash-recovery-analysis-redo-undo): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "CedEy54pe3g",
-        "title": "#21 - Logging Protocols & Write-Ahead Log (WAL) (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 21m",
-        "length": "81m",
+        "youtubeId": "csWHS0SLTtM",
+        "title": "21: Database Recovery via ARIES",
+        "channel": "Immanuel Trummer",
+        "duration": "50m 36s",
+        "length": "50m",
         "role": "deep-dive",
-        "why": "Unpacks 8KB slotted pages and memory buffer pool management, paired with write-ahead logging (ARIES steal/no-force)."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for ARIES Crash Recovery: Steal/No-Force Policy, Analysis, Redo & Undo Passes."
       }
     ],
     "intuition": "<p>In <strong>ARIES Crash Recovery: Steal/No-Force Policy, Analysis, Redo & Undo Passes</strong> (<code>aries-crash-recovery-analysis-redo-undo</code>), Walking step-by-step through the three passes of ARIES recovery: reconstructing active transactions (Analysis), repeating history (Redo), and rolling back losers (Undo). When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>ARIES Crash Recovery: Steal/No-Force Policy, Analysis, Redo & Undo Passes</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -274,23 +274,23 @@ window.MODULE_CONTENT["m15"] = {
   "lsm-trees-memtable-sstable-compaction": {
     "title": "LSM-Trees (RocksDB / Cassandra): MemTable, Immutable SSTables, Bloom Filters & Compaction",
     "video": {
-      "youtubeId": "PRLXdIMJhOg",
-      "title": "#03 - Database Storage Part 1: Files & Pages (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 16m",
+      "youtubeId": "pMbwXa43Gxg",
+      "title": "SSTables & LSM Trees: The Secret Behind Fast Database Writes",
+      "channel": "Arpit Vaish",
+      "duration": "10m 10s",
       "start": 0,
-      "length": "76m",
-      "why": "Key focus timestamps: 18:40 Slotted-page architecture; 35:10 Record layouts & tuple headers; 52:00 Page-level fragmentation"
+      "length": "10m",
+      "why": "Core video covering LSM-Trees (RocksDB / Cassandra): MemTable, Immutable SSTables, Bloom Filters & Compaction (lsm-trees-memtable-sstable-compaction): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "CedEy54pe3g",
-        "title": "#21 - Logging Protocols & Write-Ahead Log (WAL) (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 21m",
-        "length": "81m",
+        "youtubeId": "hdk1Y9rsVxE",
+        "title": "LSM Trees: MemTable, SSTable, and Compaction EXPLAINED",
+        "channel": "CodingKernel",
+        "duration": "11m 34s",
+        "length": "11m",
         "role": "deep-dive",
-        "why": "Unpacks 8KB slotted pages and memory buffer pool management, paired with write-ahead logging (ARIES steal/no-force)."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for LSM-Trees (RocksDB / Cassandra): MemTable, Immutable SSTables, Bloom Filters & Compaction."
       }
     ],
     "intuition": "<p>In <strong>LSM-Trees (RocksDB / Cassandra): MemTable, Immutable SSTables, Bloom Filters & Compaction</strong> (<code>lsm-trees-memtable-sstable-compaction</code>), Turning random writes into sequential appends via an in-memory skip-list MemTable, immutable sorted SSTable runs, Bloom filters, and leveled/tiered compaction. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>LSM-Trees (RocksDB / Cassandra): MemTable, Immutable SSTables, Bloom Filters & Compaction</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -319,23 +319,23 @@ window.MODULE_CONTENT["m15"] = {
   "btree-vs-lsm-read-write-space-amplification": {
     "title": "The RUM Conjecture: B+Tree vs LSM-Tree Read, Write & Space Amplification",
     "video": {
-      "youtubeId": "PRLXdIMJhOg",
-      "title": "#03 - Database Storage Part 1: Files & Pages (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 16m",
+      "youtubeId": "a3T6N_kMs0k",
+      "title": "FAST '22 - Closing the B+-tree vs. LSM-tree Write Amplification Gap on Modern Storage Hardware...",
+      "channel": "USENIX",
+      "duration": "13m 4s",
       "start": 0,
-      "length": "76m",
-      "why": "Key focus timestamps: 18:40 Slotted-page architecture; 35:10 Record layouts & tuple headers; 52:00 Page-level fragmentation"
+      "length": "13m",
+      "why": "Core video covering The RUM Conjecture: B+Tree vs LSM-Tree Read, Write & Space Amplification (btree-vs-lsm-read-write-space-amplification): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "CedEy54pe3g",
-        "title": "#21 - Logging Protocols & Write-Ahead Log (WAL) (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 21m",
-        "length": "81m",
+        "youtubeId": "I6jB0nM9SKU",
+        "title": "The Secret Sauce Behind NoSQL: LSM Tree",
+        "channel": "ByteByteGo",
+        "duration": "7m 34s",
+        "length": "7m",
         "role": "deep-dive",
-        "why": "Unpacks 8KB slotted pages and memory buffer pool management, paired with write-ahead logging (ARIES steal/no-force)."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for The RUM Conjecture: B+Tree vs LSM-Tree Read, Write & Space Amplification."
       }
     ],
     "intuition": "<p>In <strong>The RUM Conjecture: B+Tree vs LSM-Tree Read, Write & Space Amplification</strong> (<code>btree-vs-lsm-read-write-space-amplification</code>), Quantifying the fundamental storage trade-off triangle: optimizing any two of Read Overhead, Update (Write) Overhead, and Memory/Space Overhead penalizes the third. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>The RUM Conjecture: B+Tree vs LSM-Tree Read, Write & Space Amplification</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -364,23 +364,23 @@ window.MODULE_CONTENT["m15"] = {
   "case-uber-postgres-to-mysql-storage": {
     "title": "Production Case Study: PostgreSQL Heap+ctid vs MySQL InnoDB Clustered Storage",
     "video": {
-      "youtubeId": "PRLXdIMJhOg",
-      "title": "#03 - Database Storage Part 1: Files & Pages (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 16m",
+      "youtubeId": "_E43l5EbNI4",
+      "title": "Opening Old Wounds - Why Uber Engineering Switched from Postgres to MySQL",
+      "channel": "Hussein Nasser",
+      "duration": "47m 14s",
       "start": 0,
-      "length": "76m",
-      "why": "Key focus timestamps: 18:40 Slotted-page architecture; 35:10 Record layouts & tuple headers; 52:00 Page-level fragmentation"
+      "length": "47m",
+      "why": "Core video covering Production Case Study: PostgreSQL Heap+ctid vs MySQL InnoDB Clustered Storage (case-uber-postgres-to-mysql-storage): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "CedEy54pe3g",
-        "title": "#21 - Logging Protocols & Write-Ahead Log (WAL) (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 21m",
-        "length": "81m",
+        "youtubeId": "vx5uT-8x0p4",
+        "title": "Why Uber Abandoned Postgres for MySQL (Here’s What Broke)",
+        "channel": "Yako Tech",
+        "duration": "3m 22s",
+        "length": "3m",
         "role": "deep-dive",
-        "why": "Unpacks 8KB slotted pages and memory buffer pool management, paired with write-ahead logging (ARIES steal/no-force)."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Production Case Study: PostgreSQL Heap+ctid vs MySQL InnoDB Clustered Storage."
       }
     ],
     "intuition": "<p>In <strong>Production Case Study: PostgreSQL Heap+ctid vs MySQL InnoDB Clustered Storage</strong> (<code>case-uber-postgres-to-mysql-storage</code>), Comparing secondary index write amplification, replica lag, and buffer pool semantics between heap-referenced ctids and primary-key-referenced clustered trees. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Production Case Study: PostgreSQL Heap+ctid vs MySQL InnoDB Clustered Storage</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -409,23 +409,23 @@ window.MODULE_CONTENT["m15"] = {
   "build-slotted-page-wal-engine": {
     "title": "Hands-On Build: 8KB Slotted Page + Write-Ahead Log Crash Recovery Simulator",
     "video": {
-      "youtubeId": "PRLXdIMJhOg",
-      "title": "#03 - Database Storage Part 1: Files & Pages (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 16m",
+      "youtubeId": "7R7Ex0YkaNw",
+      "title": "How to build a Durable Write Ahead Log in Go | Segmentation, Auto Recovery, Checksums",
+      "channel": "Jyotinder Singh",
+      "duration": "19m 7s",
       "start": 0,
-      "length": "76m",
-      "why": "Key focus timestamps: 18:40 Slotted-page architecture; 35:10 Record layouts & tuple headers; 52:00 Page-level fragmentation"
+      "length": "19m",
+      "why": "Core video covering Hands-On Build: 8KB Slotted Page + Write-Ahead Log Crash Recovery Simulator (build-slotted-page-wal-engine): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "CedEy54pe3g",
-        "title": "#21 - Logging Protocols & Write-Ahead Log (WAL) (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 21m",
-        "length": "81m",
+        "youtubeId": "MHAzvg3uEDA",
+        "title": "Write-Ahead Logging (WAL) Explained: The Key to Distributed Data Integrity",
+        "channel": "aloneguid",
+        "duration": "3m 2s",
+        "length": "3m",
         "role": "deep-dive",
-        "why": "Unpacks 8KB slotted pages and memory buffer pool management, paired with write-ahead logging (ARIES steal/no-force)."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Hands-On Build: 8KB Slotted Page + Write-Ahead Log Crash Recovery Simulator."
       }
     ],
     "intuition": "<p>In <strong>Hands-On Build: 8KB Slotted Page + Write-Ahead Log Crash Recovery Simulator</strong> (<code>build-slotted-page-wal-engine</code>), Implement an 8KB slotted page allocator and an ARIES-style Write-Ahead Log manager that replays Redo and rolls back uncommitted Undo records after a simulated crash. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Hands-On Build: 8KB Slotted Page + Write-Ahead Log Crash Recovery Simulator</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",

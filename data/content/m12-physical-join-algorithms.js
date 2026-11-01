@@ -4,23 +4,23 @@ window.MODULE_CONTENT["m12"] = {
   "nested-loop-join-indexed-nlj": {
     "title": "Nested Loop Join: Naive O(N×M) vs Block Nested Loop vs Indexed NLJ",
     "video": {
-      "youtubeId": "YIdIaPopfpk",
-      "title": "#12 - Join Algorithms (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 17m",
+      "youtubeId": "rT4eI3p3tVk",
+      "title": "Query Processing: Nested-Loop joins and Merge join",
+      "channel": "Fundamentals of database systems",
+      "duration": "16m 16s",
       "start": 0,
-      "length": "77m",
-      "why": "Key focus timestamps: 09:40 Nested Loop & Block Nested Loop; 27:15 Sort-Merge Join; 46:30 Grace Hash Join & partitioning"
+      "length": "16m",
+      "why": "Core video covering Nested Loop Join: Naive O(N×M) vs Block Nested Loop vs Indexed NLJ (nested-loop-join-indexed-nlj): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "E-UUd6cB57w",
-        "title": "#13 - Query Execution I: Processing Models (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 20m",
-        "length": "80m",
+        "youtubeId": "JGgwD05gM2A",
+        "title": "010 block nested loop join index based nexted loop join",
+        "channel": "dbislab",
+        "duration": "13m 6s",
+        "length": "13m",
         "role": "deep-dive",
-        "why": "Directly covers the physics and I/O cost formulas (M x N pages) of physical join execution."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Nested Loop Join: Naive O(N×M) vs Block Nested Loop vs Indexed NLJ."
       }
     ],
     "intuition": "<p>In <strong>Nested Loop Join: Naive O(N×M) vs Block Nested Loop vs Indexed NLJ</strong> (<code>nested-loop-join-indexed-nlj</code>), How Nested Loop Join streams outer tuples and why an index on the inner join key turns O(N×M) into fast O(N log B) point lookups for small outer sets. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Nested Loop Join: Naive O(N×M) vs Block Nested Loop vs Indexed NLJ</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -49,23 +49,23 @@ window.MODULE_CONTENT["m12"] = {
   "hash-join-build-probe-grace": {
     "title": "Hash Join Internals: In-Memory Build/Probe Phases, Skew & Grace Hash Disk Spills",
     "video": {
-      "youtubeId": "YIdIaPopfpk",
-      "title": "#12 - Join Algorithms (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 17m",
+      "youtubeId": "pJWCwfv983Q",
+      "title": "How do nested loop, hash, and merge joins work? Databases for Developers Performance #7",
+      "channel": "The Magic of SQL",
+      "duration": "15m 54s",
       "start": 0,
-      "length": "77m",
-      "why": "Key focus timestamps: 09:40 Nested Loop & Block Nested Loop; 27:15 Sort-Merge Join; 46:30 Grace Hash Join & partitioning"
+      "length": "15m",
+      "why": "Core video covering Hash Join Internals: In-Memory Build/Probe Phases, Skew & Grace Hash Disk Spills (hash-join-build-probe-grace): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "E-UUd6cB57w",
-        "title": "#13 - Query Execution I: Processing Models (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 20m",
-        "length": "80m",
+        "youtubeId": "GRONctC_Uh0",
+        "title": "Lecture 11 Part 10 Grace Hash Animation",
+        "channel": "CS186Berkeley",
+        "duration": "3m 40s",
+        "length": "3m",
         "role": "deep-dive",
-        "why": "Directly covers the physics and I/O cost formulas (M x N pages) of physical join execution."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Hash Join Internals: In-Memory Build/Probe Phases, Skew & Grace Hash Disk Spills."
       }
     ],
     "intuition": "<p>In <strong>Hash Join Internals: In-Memory Build/Probe Phases, Skew & Grace Hash Disk Spills</strong> (<code>hash-join-build-probe-grace</code>), Building an in-memory hash table on the smaller relation, probing with the larger relation in O(N+M), and partitioning into disk batches when memory overflows. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Hash Join Internals: In-Memory Build/Probe Phases, Skew & Grace Hash Disk Spills</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -94,23 +94,23 @@ window.MODULE_CONTENT["m12"] = {
   "sort-merge-join-zipper-mechanics": {
     "title": "Sort-Merge Join: Dual Sorted Streams, Zipper Merge & Duplicate Rewinding",
     "video": {
-      "youtubeId": "YIdIaPopfpk",
-      "title": "#12 - Join Algorithms (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 17m",
+      "youtubeId": "HyZtBGXLN00",
+      "title": "14.416 Sort-Merge Join, Co-Grouping",
+      "channel": "Prof. Dr. Jens Dittrich, Big Data Analytics",
+      "duration": "18m 31s",
       "start": 0,
-      "length": "77m",
-      "why": "Key focus timestamps: 09:40 Nested Loop & Block Nested Loop; 27:15 Sort-Merge Join; 46:30 Grace Hash Join & partitioning"
+      "length": "18m",
+      "why": "Core video covering Sort-Merge Join: Dual Sorted Streams, Zipper Merge & Duplicate Rewinding (sort-merge-join-zipper-mechanics): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "E-UUd6cB57w",
-        "title": "#13 - Query Execution I: Processing Models (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 20m",
-        "length": "80m",
+        "youtubeId": "5d9JuBX7kVA",
+        "title": "Spark Sort Merge Join: Efficient Data Joining : Spark SQL interview questions",
+        "channel": "Data Savvy",
+        "duration": "2m 40s",
+        "length": "2m",
         "role": "deep-dive",
-        "why": "Directly covers the physics and I/O cost formulas (M x N pages) of physical join execution."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Sort-Merge Join: Dual Sorted Streams, Zipper Merge & Duplicate Rewinding."
       }
     ],
     "intuition": "<p>In <strong>Sort-Merge Join: Dual Sorted Streams, Zipper Merge & Duplicate Rewinding</strong> (<code>sort-merge-join-zipper-mechanics</code>), Advancing two interleaved cursors in O(N+M) when inputs arrive pre-sorted from B+Tree indexes, and handling many-to-many duplicate key runs. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Sort-Merge Join: Dual Sorted Streams, Zipper Merge & Duplicate Rewinding</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -139,23 +139,23 @@ window.MODULE_CONTENT["m12"] = {
   "join-order-search-dynamic-programming": {
     "title": "Join Ordering Search Space (N!): Selinger Dynamic Programming & Left-Deep vs Bushy Trees",
     "video": {
-      "youtubeId": "YIdIaPopfpk",
-      "title": "#12 - Join Algorithms (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 17m",
+      "youtubeId": "52qpVS9yUVo",
+      "title": "SQL Joins & Set Operations | INNER, LEFT, SELF, UNION + Interview Questions",
+      "channel": "Sumit Mittal",
+      "duration": "5h 1m",
       "start": 0,
-      "length": "77m",
-      "why": "Key focus timestamps: 09:40 Nested Loop & Block Nested Loop; 27:15 Sort-Merge Join; 46:30 Grace Hash Join & partitioning"
+      "length": "301m",
+      "why": "Core video covering Join Ordering Search Space (N!): Selinger Dynamic Programming & Left-Deep vs Bushy Trees (join-order-search-dynamic-programming): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "E-UUd6cB57w",
-        "title": "#13 - Query Execution I: Processing Models (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 20m",
-        "length": "80m",
+        "youtubeId": "xFw_RVg6a94",
+        "title": "Adaptive Join Order Optimization using Search Space Linearization",
+        "channel": "University of Waterloo Data Systems Group",
+        "duration": "58m 3s",
+        "length": "58m",
         "role": "deep-dive",
-        "why": "Directly covers the physics and I/O cost formulas (M x N pages) of physical join execution."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Join Ordering Search Space (N!): Selinger Dynamic Programming & Left-Deep vs Bushy Trees."
       }
     ],
     "intuition": "<p>In <strong>Join Ordering Search Space (N!): Selinger Dynamic Programming & Left-Deep vs Bushy Trees</strong> (<code>join-order-search-dynamic-programming</code>), Why joining 10 tables has 3.6 million plan permutations and how Selinger bottom-up dynamic programming prunes dominated subplans. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Join Ordering Search Space (N!): Selinger Dynamic Programming & Left-Deep vs Bushy Trees</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -184,23 +184,23 @@ window.MODULE_CONTENT["m12"] = {
   "predicate-pushdown-projection-pruning": {
     "title": "Logical Plan Rewrites: Predicate Pushdown, Projection Pruning & Join Elimination",
     "video": {
-      "youtubeId": "YIdIaPopfpk",
-      "title": "#12 - Join Algorithms (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 17m",
+      "youtubeId": "oR9dgwHP6-Y",
+      "title": "Predicate Pushdown, Projection Pruning and Constant Folding in PostgreSQL Plans",
+      "channel": "Prateek Goel | GrowAsEngineers",
+      "duration": "7m 47s",
       "start": 0,
-      "length": "77m",
-      "why": "Key focus timestamps: 09:40 Nested Loop & Block Nested Loop; 27:15 Sort-Merge Join; 46:30 Grace Hash Join & partitioning"
+      "length": "7m",
+      "why": "Core video covering Logical Plan Rewrites: Predicate Pushdown, Projection Pruning & Join Elimination (predicate-pushdown-projection-pruning): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "E-UUd6cB57w",
-        "title": "#13 - Query Execution I: Processing Models (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 20m",
-        "length": "80m",
+        "youtubeId": "RzMC15RfeTw",
+        "title": "Predicate/Projection Pushdown || Static/Dynamic Partition Pruning",
+        "channel": "Data Engineering With Ram",
+        "duration": "20m 2s",
+        "length": "20m",
         "role": "deep-dive",
-        "why": "Directly covers the physics and I/O cost formulas (M x N pages) of physical join execution."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Logical Plan Rewrites: Predicate Pushdown, Projection Pruning & Join Elimination."
       }
     ],
     "intuition": "<p>In <strong>Logical Plan Rewrites: Predicate Pushdown, Projection Pruning & Join Elimination</strong> (<code>predicate-pushdown-projection-pruning</code>), Pushing WHERE filters below joins and views to shrink intermediate tuple counts as early as possible, and eliminating redundant foreign-key joins. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Logical Plan Rewrites: Predicate Pushdown, Projection Pruning & Join Elimination</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -229,23 +229,23 @@ window.MODULE_CONTENT["m12"] = {
   "subquery-unnesting-semi-anti-physical": {
     "title": "Subquery Unnesting: Physical Hash Semi-Join & Merge Anti-Join Operators",
     "video": {
-      "youtubeId": "YIdIaPopfpk",
-      "title": "#12 - Join Algorithms (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 17m",
+      "youtubeId": "zy89zKipsQg",
+      "title": "SQL SEMI and ANTI Joins",
+      "channel": "Bill Wallis",
+      "duration": "12m 23s",
       "start": 0,
-      "length": "77m",
-      "why": "Key focus timestamps: 09:40 Nested Loop & Block Nested Loop; 27:15 Sort-Merge Join; 46:30 Grace Hash Join & partitioning"
+      "length": "12m",
+      "why": "Core video covering Subquery Unnesting: Physical Hash Semi-Join & Merge Anti-Join Operators (subquery-unnesting-semi-anti-physical): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "E-UUd6cB57w",
-        "title": "#13 - Query Execution I: Processing Models (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 20m",
-        "length": "80m",
+        "youtubeId": "GWq-_R-pkzg",
+        "title": "SQL Semi Joins and Anti Joins: EXISTS, IN, NOT EXISTS, LEFT JOIN IS NULL and NOT IN (PostgreSQL)",
+        "channel": "Prateek Goel | GrowAsEngineers",
+        "duration": "10m 30s",
+        "length": "10m",
         "role": "deep-dive",
-        "why": "Directly covers the physics and I/O cost formulas (M x N pages) of physical join execution."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Subquery Unnesting: Physical Hash Semi-Join & Merge Anti-Join Operators."
       }
     ],
     "intuition": "<p>In <strong>Subquery Unnesting: Physical Hash Semi-Join & Merge Anti-Join Operators</strong> (<code>subquery-unnesting-semi-anti-physical</code>), How the query optimizer transforms declarative EXISTS and NOT EXISTS subqueries into physical Hash Semi-Join and Anti-Join execution nodes. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Subquery Unnesting: Physical Hash Semi-Join & Merge Anti-Join Operators</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -274,23 +274,23 @@ window.MODULE_CONTENT["m12"] = {
   "execution-models-volcano-vectorized": {
     "title": "Execution Models: Volcano Iterator (Next) vs Vectorized Batches vs LLVM JIT",
     "video": {
-      "youtubeId": "YIdIaPopfpk",
-      "title": "#12 - Join Algorithms (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 17m",
+      "youtubeId": "jKX4rDpGdmI",
+      "title": "Query Execution Engines: Volcano Iterator Model, Vectorized Batch Processing (MonetDB/X100, DuckD...",
+      "channel": "Sankalp Thakur",
+      "duration": "1h 9m",
       "start": 0,
-      "length": "77m",
-      "why": "Key focus timestamps: 09:40 Nested Loop & Block Nested Loop; 27:15 Sort-Merge Join; 46:30 Grace Hash Join & partitioning"
+      "length": "69m",
+      "why": "Core video covering Execution Models: Volcano Iterator (Next) vs Vectorized Batches vs LLVM JIT (execution-models-volcano-vectorized): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "E-UUd6cB57w",
-        "title": "#13 - Query Execution I: Processing Models (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 20m",
-        "length": "80m",
+        "youtubeId": "hGwa6_VXbZc",
+        "title": "DB2 — Chapter #13 — Video #76 — Volcano iterator model (open/next/close)",
+        "channel": "Database Systems Research Group at U Tübingen",
+        "duration": "31m 26s",
+        "length": "31m",
         "role": "deep-dive",
-        "why": "Directly covers the physics and I/O cost formulas (M x N pages) of physical join execution."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Execution Models: Volcano Iterator (Next) vs Vectorized Batches vs LLVM JIT."
       }
     ],
     "intuition": "<p>In <strong>Execution Models: Volcano Iterator (Next) vs Vectorized Batches vs LLVM JIT</strong> (<code>execution-models-volcano-vectorized</code>), Comparing classic pull-based Volcano tuple-at-a-time virtual calls against cache-resident 1024-tuple column vectors and LLVM JIT expression compilation. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Execution Models: Volcano Iterator (Next) vs Vectorized Batches vs LLVM JIT</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -319,23 +319,23 @@ window.MODULE_CONTENT["m12"] = {
   "parallel-query-execution-workers": {
     "title": "Parallel Query Execution: Parallel Seq Scan, Parallel Hash Join & Gather Nodes",
     "video": {
-      "youtubeId": "YIdIaPopfpk",
-      "title": "#12 - Join Algorithms (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 17m",
+      "youtubeId": "yzW5cqI0uZs",
+      "title": "SESSION: Parallel Query Execution (Paul White)",
+      "channel": "PASS Data Community Summit",
+      "duration": "1h 14m",
       "start": 0,
-      "length": "77m",
-      "why": "Key focus timestamps: 09:40 Nested Loop & Block Nested Loop; 27:15 Sort-Merge Join; 46:30 Grace Hash Join & partitioning"
+      "length": "74m",
+      "why": "Core video covering Parallel Query Execution: Parallel Seq Scan, Parallel Hash Join & Gather Nodes (parallel-query-execution-workers): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "E-UUd6cB57w",
-        "title": "#13 - Query Execution I: Processing Models (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 20m",
-        "length": "80m",
+        "youtubeId": "pJWCwfv983Q",
+        "title": "How do nested loop, hash, and merge joins work? Databases for Developers Performance #7",
+        "channel": "The Magic of SQL",
+        "duration": "15m 54s",
+        "length": "15m",
         "role": "deep-dive",
-        "why": "Directly covers the physics and I/O cost formulas (M x N pages) of physical join execution."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Parallel Query Execution: Parallel Seq Scan, Parallel Hash Join & Gather Nodes."
       }
     ],
     "intuition": "<p>In <strong>Parallel Query Execution: Parallel Seq Scan, Parallel Hash Join & Gather Nodes</strong> (<code>parallel-query-execution-workers</code>), Coordinating multiple background worker processes to scan shared heap blocks concurrently and build shared-memory hash tables. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Parallel Query Execution: Parallel Seq Scan, Parallel Hash Join & Gather Nodes</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -364,23 +364,23 @@ window.MODULE_CONTENT["m12"] = {
   "case-hash-join-oom-work-mem-spill": {
     "title": "Production Case Study: Diagnosing Multi-Gigabyte Hash Join Temp File Spills",
     "video": {
-      "youtubeId": "YIdIaPopfpk",
-      "title": "#12 - Join Algorithms (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 17m",
+      "youtubeId": "pJWCwfv983Q",
+      "title": "How do nested loop, hash, and merge joins work? Databases for Developers Performance #7",
+      "channel": "The Magic of SQL",
+      "duration": "15m 54s",
       "start": 0,
-      "length": "77m",
-      "why": "Key focus timestamps: 09:40 Nested Loop & Block Nested Loop; 27:15 Sort-Merge Join; 46:30 Grace Hash Join & partitioning"
+      "length": "15m",
+      "why": "Core video covering Production Case Study: Diagnosing Multi-Gigabyte Hash Join Temp File Spills (case-hash-join-oom-work-mem-spill): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "E-UUd6cB57w",
-        "title": "#13 - Query Execution I: Processing Models (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 20m",
-        "length": "80m",
+        "youtubeId": "59C8c7p_hII",
+        "title": "Hash Match Join Internals in SQL Server",
+        "channel": "Bert Wagner",
+        "duration": "5m 37s",
+        "length": "5m",
         "role": "deep-dive",
-        "why": "Directly covers the physics and I/O cost formulas (M x N pages) of physical join execution."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Production Case Study: Diagnosing Multi-Gigabyte Hash Join Temp File Spills."
       }
     ],
     "intuition": "<p>In <strong>Production Case Study: Diagnosing Multi-Gigabyte Hash Join Temp File Spills</strong> (<code>case-hash-join-oom-work-mem-spill</code>), Investigating a slow reporting query that spilled 18 GB of temporary hash batch files to disk due to underestimated cardinality and low work_mem. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Production Case Study: Diagnosing Multi-Gigabyte Hash Join Temp File Spills</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -409,23 +409,23 @@ window.MODULE_CONTENT["m12"] = {
   "build-physical-join-execution-engine": {
     "title": "Hands-On Build: Implement & Benchmark Nested Loop, Hash Join & Sort-Merge Join",
     "video": {
-      "youtubeId": "YIdIaPopfpk",
-      "title": "#12 - Join Algorithms (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 17m",
+      "youtubeId": "pJWCwfv983Q",
+      "title": "How do nested loop, hash, and merge joins work? Databases for Developers Performance #7",
+      "channel": "The Magic of SQL",
+      "duration": "15m 54s",
       "start": 0,
-      "length": "77m",
-      "why": "Key focus timestamps: 09:40 Nested Loop & Block Nested Loop; 27:15 Sort-Merge Join; 46:30 Grace Hash Join & partitioning"
+      "length": "15m",
+      "why": "Core video covering Hands-On Build: Implement & Benchmark Nested Loop, Hash Join & Sort-Merge Join (build-physical-join-execution-engine): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "E-UUd6cB57w",
-        "title": "#13 - Query Execution I: Processing Models (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 20m",
-        "length": "80m",
+        "youtubeId": "-htbah3eCYg",
+        "title": "How nested loop, hash, and merge joins work.",
+        "channel": "Arpit Bhayani",
+        "duration": "11m 7s",
+        "length": "11m",
         "role": "deep-dive",
-        "why": "Directly covers the physics and I/O cost formulas (M x N pages) of physical join execution."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Hands-On Build: Implement & Benchmark Nested Loop, Hash Join & Sort-Merge Join."
       }
     ],
     "intuition": "<p>In <strong>Hands-On Build: Implement & Benchmark Nested Loop, Hash Join & Sort-Merge Join</strong> (<code>build-physical-join-execution-engine</code>), Implement physical Nested Loop, Hash Join, and Sort-Merge Join operators and verify their tuple comparisons and memory budgets across skewed datasets. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Hands-On Build: Implement & Benchmark Nested Loop, Hash Join & Sort-Merge Join</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",

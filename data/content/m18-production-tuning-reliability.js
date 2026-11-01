@@ -4,23 +4,23 @@ window.MODULE_CONTENT["m18"] = {
   "keyset-cursor-pagination-vs-offset": {
     "title": "Keyset (Seek) Cursor Pagination vs Why OFFSET 100000 Destroys Latency",
     "video": {
-      "youtubeId": "C1Y6P6vDFts",
-      "title": "How Database Cursors Help in Fetching Large Result sets from your SQL",
-      "channel": "Hussein Nasser",
-      "duration": "18m 45s",
+      "youtubeId": "XHQ8QhslXS0",
+      "title": "Pagination Optimization: Keyset vs Offset",
+      "channel": "ByteDistrict",
+      "duration": "5m 4s",
       "start": 0,
-      "length": "19m",
-      "why": "Key focus timestamps: Full video: Keyset vs offset pagination, cursor state, memory footprints, and high-volume row extraction"
+      "length": "5m",
+      "why": "Core video covering Keyset (Seek) Cursor Pagination vs Why OFFSET 100000 Destroys Latency (keyset-cursor-pagination-vs-offset): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "wj7KEMEkMUE",
-        "title": "Best Practices Working with Billion-row Tables in Databases",
-        "channel": "Hussein Nasser",
-        "duration": "13m 41s",
-        "length": "14m",
+        "youtubeId": "SRZ1GD0Cf4g",
+        "title": "Keyset Seeking vs. Offset Pagination: B-Trees to Relay | KaaS-84",
+        "channel": "Last Mile Developer",
+        "duration": "8m 47s",
+        "length": "8m",
         "role": "deep-dive",
-        "why": "03:55 Indexing billion-row tables; 05:30 Declarative table partitioning; 07:30 Sharding & maintenance"
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Keyset (Seek) Cursor Pagination vs Why OFFSET 100000 Destroys Latency."
       }
     ],
     "intuition": "<p>In <strong>Keyset (Seek) Cursor Pagination vs Why OFFSET 100000 Destroys Latency</strong> (<code>keyset-cursor-pagination-vs-offset</code>), Why OFFSET 100000 forces the engine to fetch and discard 100,000 rows, and how row-value seek predicates WHERE (created_at, id) < (?, ?) run in O(1) constant time. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Keyset (Seek) Cursor Pagination vs Why OFFSET 100000 Destroys Latency</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -49,23 +49,23 @@ window.MODULE_CONTENT["m18"] = {
   "solving-n-plus-one-orm-queries": {
     "title": "Eliminating ORM N+1 Query Storms: Batching, Eager Joins & JSON Aggregation",
     "video": {
-      "youtubeId": "C1Y6P6vDFts",
-      "title": "How Database Cursors Help in Fetching Large Result sets from your SQL",
-      "channel": "Hussein Nasser",
-      "duration": "18m 45s",
+      "youtubeId": "zwF5ADW6eKs",
+      "title": "Interview Q&A | Hibernate N+1 Problem & Fix - The Bug You Didn’t Know You Had @Javatechie",
+      "channel": "Java Techie",
+      "duration": "14m 30s",
       "start": 0,
-      "length": "19m",
-      "why": "Key focus timestamps: Full video: Keyset vs offset pagination, cursor state, memory footprints, and high-volume row extraction"
+      "length": "14m",
+      "why": "Core video covering Eliminating ORM N+1 Query Storms: Batching, Eager Joins & JSON Aggregation (solving-n-plus-one-orm-queries): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "wj7KEMEkMUE",
-        "title": "Best Practices Working with Billion-row Tables in Databases",
-        "channel": "Hussein Nasser",
-        "duration": "13m 41s",
-        "length": "14m",
+        "youtubeId": "Kx8-gSnNbnw",
+        "title": "🔴 N+1 Query Problem | Fix this in your backend Project | Backend Challenge Series",
+        "channel": "Learn Code With Durgesh",
+        "duration": "33m 47s",
+        "length": "33m",
         "role": "deep-dive",
-        "why": "03:55 Indexing billion-row tables; 05:30 Declarative table partitioning; 07:30 Sharding & maintenance"
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Eliminating ORM N+1 Query Storms: Batching, Eager Joins & JSON Aggregation."
       }
     ],
     "intuition": "<p>In <strong>Eliminating ORM N+1 Query Storms: Batching, Eager Joins & JSON Aggregation</strong> (<code>solving-n-plus-one-orm-queries</code>), Detecting 1+N chatty query loops in application traces and collapsing 501 round-trips into 1 or 2 indexed queries using IN batching or lateral JSON aggregation. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Eliminating ORM N+1 Query Storms: Batching, Eager Joins & JSON Aggregation</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -94,23 +94,23 @@ window.MODULE_CONTENT["m18"] = {
   "full-text-search-trigrams-inverted-index": {
     "title": "Full-Text & Fuzzy Search: Why LIKE '%term%' Fails vs Trigrams (pg_trgm) & BM25",
     "video": {
-      "youtubeId": "C1Y6P6vDFts",
-      "title": "How Database Cursors Help in Fetching Large Result sets from your SQL",
-      "channel": "Hussein Nasser",
-      "duration": "18m 45s",
+      "youtubeId": "8-XfXuvplpg",
+      "title": "Postgres Fuzzy Search in Python with pg_trgm: Fix Typos and Name Matching",
+      "channel": "Professor Py: Information Retrieval with Python",
+      "duration": "7m 51s",
       "start": 0,
-      "length": "19m",
-      "why": "Key focus timestamps: Full video: Keyset vs offset pagination, cursor state, memory footprints, and high-volume row extraction"
+      "length": "7m",
+      "why": "Core video covering Full-Text & Fuzzy Search: Why LIKE '%term%' Fails vs Trigrams (pg_trgm) & BM25 (full-text-search-trigrams-inverted-index): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "wj7KEMEkMUE",
-        "title": "Best Practices Working with Billion-row Tables in Databases",
-        "channel": "Hussein Nasser",
-        "duration": "13m 41s",
-        "length": "14m",
+        "youtubeId": "JtXHTQUKPLM",
+        "title": "5mins of Postgres E6: Optimizing Postgres Text Search with Trigrams and GiST indexes",
+        "channel": "pganalyze",
+        "duration": "5m 22s",
+        "length": "5m",
         "role": "deep-dive",
-        "why": "03:55 Indexing billion-row tables; 05:30 Declarative table partitioning; 07:30 Sharding & maintenance"
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Full-Text & Fuzzy Search: Why LIKE '%term%' Fails vs Trigrams (pg_trgm) & BM25."
       }
     ],
     "intuition": "<p>In <strong>Full-Text & Fuzzy Search: Why LIKE '%term%' Fails vs Trigrams (pg_trgm) & BM25</strong> (<code>full-text-search-trigrams-inverted-index</code>), Why leading-wildcard LIKE cannot use a B+Tree index, and how 3-character trigram GIN indexes and tokenized tsvector inverted indexes deliver sub-10ms search. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Full-Text & Fuzzy Search: Why LIKE '%term%' Fails vs Trigrams (pg_trgm) & BM25</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -139,23 +139,23 @@ window.MODULE_CONTENT["m18"] = {
   "queue-processing-skip-locked-patterns": {
     "title": "High-Throughput Transactional Job Queues in SQL with FOR UPDATE SKIP LOCKED",
     "video": {
-      "youtubeId": "C1Y6P6vDFts",
-      "title": "How Database Cursors Help in Fetching Large Result sets from your SQL",
-      "channel": "Hussein Nasser",
-      "duration": "18m 45s",
+      "youtubeId": "Ab_fHdtyE8E",
+      "title": "SQL Locks and Deadlocks: FOR UPDATE, SKIP LOCKED, NOWAIT, Optimistic vs Pessimistic (PostgreSQL)",
+      "channel": "Prateek Goel | GrowAsEngineers",
+      "duration": "8m 31s",
       "start": 0,
-      "length": "19m",
-      "why": "Key focus timestamps: Full video: Keyset vs offset pagination, cursor state, memory footprints, and high-volume row extraction"
+      "length": "8m",
+      "why": "Core video covering High-Throughput Transactional Job Queues in SQL with FOR UPDATE SKIP LOCKED (queue-processing-skip-locked-patterns): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "wj7KEMEkMUE",
-        "title": "Best Practices Working with Billion-row Tables in Databases",
-        "channel": "Hussein Nasser",
-        "duration": "13m 41s",
-        "length": "14m",
+        "youtubeId": "m6-63kpttQk",
+        "title": "The Skip Locked feature in Postgres 9.5",
+        "channel": "PG Casts by Hashrocket",
+        "duration": "3m 37s",
+        "length": "3m",
         "role": "deep-dive",
-        "why": "03:55 Indexing billion-row tables; 05:30 Declarative table partitioning; 07:30 Sharding & maintenance"
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for High-Throughput Transactional Job Queues in SQL with FOR UPDATE SKIP LOCKED."
       }
     ],
     "intuition": "<p>In <strong>High-Throughput Transactional Job Queues in SQL with FOR UPDATE SKIP LOCKED</strong> (<code>queue-processing-skip-locked-patterns</code>), Building a durable, exactly-once background task queue inside SQL without external brokers using partial indexes, SKIP LOCKED, and lease heartbeats. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>High-Throughput Transactional Job Queues in SQL with FOR UPDATE SKIP LOCKED</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -184,23 +184,23 @@ window.MODULE_CONTENT["m18"] = {
   "bulk-ingestion-batching-unlogged-tables": {
     "title": "High-Speed Bulk Ingestion: Multi-Row Batches, Index Drop/Rebuild, UNLOGGED & COPY",
     "video": {
-      "youtubeId": "C1Y6P6vDFts",
-      "title": "How Database Cursors Help in Fetching Large Result sets from your SQL",
-      "channel": "Hussein Nasser",
-      "duration": "18m 45s",
+      "youtubeId": "-2G1e56onYo",
+      "title": "Batch insert millions of rows in PostgreSQL fast",
+      "channel": "ByteDistrict",
+      "duration": "6m 44s",
       "start": 0,
-      "length": "19m",
-      "why": "Key focus timestamps: Full video: Keyset vs offset pagination, cursor state, memory footprints, and high-volume row extraction"
+      "length": "6m",
+      "why": "Core video covering High-Speed Bulk Ingestion: Multi-Row Batches, Index Drop/Rebuild, UNLOGGED & COPY (bulk-ingestion-batching-unlogged-tables): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "wj7KEMEkMUE",
-        "title": "Best Practices Working with Billion-row Tables in Databases",
-        "channel": "Hussein Nasser",
-        "duration": "13m 41s",
-        "length": "14m",
+        "youtubeId": "v-KzKa0g7js",
+        "title": "Optimizing bulk loads in Postgres, and how COPY helps with cache performance",
+        "channel": "pganalyze",
+        "duration": "6m 32s",
+        "length": "6m",
         "role": "deep-dive",
-        "why": "03:55 Indexing billion-row tables; 05:30 Declarative table partitioning; 07:30 Sharding & maintenance"
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for High-Speed Bulk Ingestion: Multi-Row Batches, Index Drop/Rebuild, UNLOGGED & COPY."
       }
     ],
     "intuition": "<p>In <strong>High-Speed Bulk Ingestion: Multi-Row Batches, Index Drop/Rebuild, UNLOGGED & COPY</strong> (<code>bulk-ingestion-batching-unlogged-tables</code>), Ingesting 100 million rows 20x faster by streaming binary COPY into staging tables, deferring B+Tree index builds, and tuning synchronous_commit. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>High-Speed Bulk Ingestion: Multi-Row Batches, Index Drop/Rebuild, UNLOGGED & COPY</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -229,23 +229,23 @@ window.MODULE_CONTENT["m18"] = {
   "pg-stat-statements-slow-query-triage": {
     "title": "Production Query Telemetry: pg_stat_statements, Total vs Mean Time & Buffer Hit Ratio",
     "video": {
-      "youtubeId": "C1Y6P6vDFts",
-      "title": "How Database Cursors Help in Fetching Large Result sets from your SQL",
-      "channel": "Hussein Nasser",
-      "duration": "18m 45s",
+      "youtubeId": "U8UGTyJp-K4",
+      "title": "Postgres In Production | Special Series | Deep Dive into pg_stat_statements (Part 1)",
+      "channel": "pganalyze",
+      "duration": "10m 39s",
       "start": 0,
-      "length": "19m",
-      "why": "Key focus timestamps: Full video: Keyset vs offset pagination, cursor state, memory footprints, and high-volume row extraction"
+      "length": "10m",
+      "why": "Core video covering Production Query Telemetry: pg_stat_statements, Total vs Mean Time & Buffer Hit Ratio (pg-stat-statements-slow-query-triage): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "wj7KEMEkMUE",
-        "title": "Best Practices Working with Billion-row Tables in Databases",
-        "channel": "Hussein Nasser",
-        "duration": "13m 41s",
-        "length": "14m",
+        "youtubeId": "uTzqhkiYHFw",
+        "title": "Configuring PostgreSQL for Logging & Query Optimization Ft Ryan Booz  | January 13th 2026 |",
+        "channel": "Prairie Postgres",
+        "duration": "1h 33m",
+        "length": "93m",
         "role": "deep-dive",
-        "why": "03:55 Indexing billion-row tables; 05:30 Declarative table partitioning; 07:30 Sharding & maintenance"
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Production Query Telemetry: pg_stat_statements, Total vs Mean Time & Buffer Hit Ratio."
       }
     ],
     "intuition": "<p>In <strong>Production Query Telemetry: pg_stat_statements, Total vs Mean Time & Buffer Hit Ratio</strong> (<code>pg-stat-statements-slow-query-triage</code>), Triaging database CPU saturation using normalized query digests: ranking by total_exec_time, shared_blks_read I/O pressure, and temp_blks_written spills. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Production Query Telemetry: pg_stat_statements, Total vs Mean Time & Buffer Hit Ratio</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -274,23 +274,23 @@ window.MODULE_CONTENT["m18"] = {
   "lock-contention-zero-downtime-ddl": {
     "title": "Zero-Downtime Production DDL: CREATE INDEX CONCURRENTLY, lock_timeout & NOT VALID",
     "video": {
-      "youtubeId": "C1Y6P6vDFts",
-      "title": "How Database Cursors Help in Fetching Large Result sets from your SQL",
-      "channel": "Hussein Nasser",
-      "duration": "18m 45s",
+      "youtubeId": "mr_J5v398Qo",
+      "title": "Zero-downtime migrations | Postgres.FM 048 | #PostgreSQL #Postgres podcast",
+      "channel": "PostgresTV",
+      "duration": "31m 32s",
       "start": 0,
-      "length": "19m",
-      "why": "Key focus timestamps: Full video: Keyset vs offset pagination, cursor state, memory footprints, and high-volume row extraction"
+      "length": "31m",
+      "why": "Core video covering Zero-Downtime Production DDL: CREATE INDEX CONCURRENTLY, lock_timeout & NOT VALID (lock-contention-zero-downtime-ddl): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "wj7KEMEkMUE",
-        "title": "Best Practices Working with Billion-row Tables in Databases",
-        "channel": "Hussein Nasser",
-        "duration": "13m 41s",
-        "length": "14m",
+        "youtubeId": "5Z1WyxnlUa0",
+        "title": "The One-Line Migration That Took Down Production for Six Hours",
+        "channel": "The Merge Log",
+        "duration": "8m 8s",
+        "length": "8m",
         "role": "deep-dive",
-        "why": "03:55 Indexing billion-row tables; 05:30 Declarative table partitioning; 07:30 Sharding & maintenance"
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Zero-Downtime Production DDL: CREATE INDEX CONCURRENTLY, lock_timeout & NOT VALID."
       }
     ],
     "intuition": "<p>In <strong>Zero-Downtime Production DDL: CREATE INDEX CONCURRENTLY, lock_timeout & NOT VALID</strong> (<code>lock-contention-zero-downtime-ddl</code>), Protecting production OLTP availability with mandatory lock_timeout guards, online index builds, and two-step NOT VALID + VALIDATE CONSTRAINT foreign keys. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Zero-Downtime Production DDL: CREATE INDEX CONCURRENTLY, lock_timeout & NOT VALID</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -319,23 +319,23 @@ window.MODULE_CONTENT["m18"] = {
   "backup-pitr-wal-archiving-drills": {
     "title": "Backups & Point-in-Time Recovery (PITR): Logical Dumps vs Base Backup + WAL Replay",
     "video": {
-      "youtubeId": "C1Y6P6vDFts",
-      "title": "How Database Cursors Help in Fetching Large Result sets from your SQL",
-      "channel": "Hussein Nasser",
-      "duration": "18m 45s",
+      "youtubeId": "_-mUpfQRwp0",
+      "title": "PostgreSQL 18 Point-in-Time Recovery (PITR) Setup | Physical Backup & WAL Archiving on Two Servers",
+      "channel": "Chirag Mahto",
+      "duration": "26m 57s",
       "start": 0,
-      "length": "19m",
-      "why": "Key focus timestamps: Full video: Keyset vs offset pagination, cursor state, memory footprints, and high-volume row extraction"
+      "length": "26m",
+      "why": "Core video covering Backups & Point-in-Time Recovery (PITR): Logical Dumps vs Base Backup + WAL Replay (backup-pitr-wal-archiving-drills): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "wj7KEMEkMUE",
-        "title": "Best Practices Working with Billion-row Tables in Databases",
-        "channel": "Hussein Nasser",
-        "duration": "13m 41s",
-        "length": "14m",
+        "youtubeId": "TX-o5NbR3gE",
+        "title": "Point-in-Time Recovery (PITR) guide using Physical Backup and WAL archiving in PostgreSQL Two Server",
+        "channel": "Chirag Mahto",
+        "duration": "21m 22s",
+        "length": "21m",
         "role": "deep-dive",
-        "why": "03:55 Indexing billion-row tables; 05:30 Declarative table partitioning; 07:30 Sharding & maintenance"
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Backups & Point-in-Time Recovery (PITR): Logical Dumps vs Base Backup + WAL Replay."
       }
     ],
     "intuition": "<p>In <strong>Backups & Point-in-Time Recovery (PITR): Logical Dumps vs Base Backup + WAL Replay</strong> (<code>backup-pitr-wal-archiving-drills</code>), Why pg_dump cannot restore a 5 TB database to 14:02:59 right before an accidental DROP TABLE, and how physical base backups + continuous WAL archiving achieve PITR. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Backups & Point-in-Time Recovery (PITR): Logical Dumps vs Base Backup + WAL Replay</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -364,23 +364,23 @@ window.MODULE_CONTENT["m18"] = {
   "case-gitlab-database-incident-postmortem": {
     "title": "Production Case Study: Lessons from High-Severity Database Outages & Recovery Drills",
     "video": {
-      "youtubeId": "C1Y6P6vDFts",
-      "title": "How Database Cursors Help in Fetching Large Result sets from your SQL",
-      "channel": "Hussein Nasser",
-      "duration": "18m 45s",
+      "youtubeId": "tLdRBsuvVKc",
+      "title": "Dev Deletes Entire Production Database, Chaos Ensues",
+      "channel": "Kevin Fang",
+      "duration": "10m 20s",
       "start": 0,
-      "length": "19m",
-      "why": "Key focus timestamps: Full video: Keyset vs offset pagination, cursor state, memory footprints, and high-volume row extraction"
+      "length": "10m",
+      "why": "Core video covering Production Case Study: Lessons from High-Severity Database Outages & Recovery Drills (case-gitlab-database-incident-postmortem): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "wj7KEMEkMUE",
-        "title": "Best Practices Working with Billion-row Tables in Databases",
-        "channel": "Hussein Nasser",
-        "duration": "13m 41s",
-        "length": "14m",
+        "youtubeId": "_ULKoZJil0M",
+        "title": "GitLab Deleted Its Database. The Backups Were Nobody's Job.",
+        "channel": "Root Cause",
+        "duration": "10m 27s",
+        "length": "10m",
         "role": "deep-dive",
-        "why": "03:55 Indexing billion-row tables; 05:30 Declarative table partitioning; 07:30 Sharding & maintenance"
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Production Case Study: Lessons from High-Severity Database Outages & Recovery Drills."
       }
     ],
     "intuition": "<p>In <strong>Production Case Study: Lessons from High-Severity Database Outages & Recovery Drills</strong> (<code>case-gitlab-database-incident-postmortem</code>), Analyzing real-world production database emergencies, replication lag cascades, backup verification failures, and automated chaos recovery testing. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Production Case Study: Lessons from High-Severity Database Outages & Recovery Drills</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -409,23 +409,23 @@ window.MODULE_CONTENT["m18"] = {
   "build-production-sql-tuning-clinic": {
     "title": "Hands-On Build: End-to-End Slow Query Diagnostic & Optimization Clinic (100x Speedup)",
     "video": {
-      "youtubeId": "C1Y6P6vDFts",
-      "title": "How Database Cursors Help in Fetching Large Result sets from your SQL",
-      "channel": "Hussein Nasser",
-      "duration": "18m 45s",
+      "youtubeId": "FoTMJFZ4wwg",
+      "title": "6 Query Tuning Techniques - Solve 75% SQL Server Performance Problems (by Amit Bansal)",
+      "channel": "SQLMaestros",
+      "duration": "1h 37m",
       "start": 0,
-      "length": "19m",
-      "why": "Key focus timestamps: Full video: Keyset vs offset pagination, cursor state, memory footprints, and high-volume row extraction"
+      "length": "97m",
+      "why": "Core video covering Hands-On Build: End-to-End Slow Query Diagnostic & Optimization Clinic (100x Speedup) (build-production-sql-tuning-clinic): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "wj7KEMEkMUE",
-        "title": "Best Practices Working with Billion-row Tables in Databases",
-        "channel": "Hussein Nasser",
-        "duration": "13m 41s",
-        "length": "14m",
+        "youtubeId": "xuxgxdbCPnY",
+        "title": "SQL Query Optimization and performance tuning tips | SQL Tutorial for Beginners | SQL Interview tips",
+        "channel": "The Engineer's Desk",
+        "duration": "8m 21s",
+        "length": "8m",
         "role": "deep-dive",
-        "why": "03:55 Indexing billion-row tables; 05:30 Declarative table partitioning; 07:30 Sharding & maintenance"
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Hands-On Build: End-to-End Slow Query Diagnostic & Optimization Clinic (100x Speedup)."
       }
     ],
     "intuition": "<p>In <strong>Hands-On Build: End-to-End Slow Query Diagnostic & Optimization Clinic (100x Speedup)</strong> (<code>build-production-sql-tuning-clinic</code>), Diagnose and rewrite a suite of pathological production SQL queries (non-SARGable filters, N+1 loops, OFFSET pagination, and missing composite indexes) for 100x speedups. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Hands-On Build: End-to-End Slow Query Diagnostic & Optimization Clinic (100x Speedup)</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",

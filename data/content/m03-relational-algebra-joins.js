@@ -4,23 +4,23 @@ window.MODULE_CONTENT["m03"] = {
   "relational-algebra-set-theory": {
     "title": "Relational Algebra: Selection (σ), Projection (π), Product (×) & Rename (ρ)",
     "video": {
-      "youtubeId": "2HVMiPPuPIM",
-      "title": "SQL Joins Tutorial for Beginners",
-      "channel": "Joey Blue",
-      "duration": "12m 20s",
+      "youtubeId": "emOw5lZFv5w",
+      "title": "Select Operation in Relational Algebra || Examples || Queries || DBMS",
+      "channel": "Sudhakar Atchala",
+      "duration": "7m 33s",
       "start": 0,
-      "length": "12m",
-      "why": "Key focus timestamps: Full runtime; especially 08:15 (difference between filtering in ON vs WHERE clause in OUTER JOINs)"
+      "length": "7m",
+      "why": "Core video covering Relational Algebra: Selection (σ), Projection (π), Product (×) & Rename (ρ) (relational-algebra-set-theory): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "7NPIENPr-zk",
-        "title": "#01 - Relational Model & Relational Algebra (CMU Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 14m",
-        "length": "74m",
+        "youtubeId": "ryeGFOMZhK4",
+        "title": "relational algebra complete topic in dbms, various operations, various operators, relational algebra",
+        "channel": "NS lectures",
+        "duration": "28m 43s",
+        "length": "28m",
         "role": "deep-dive",
-        "why": "Joey Blue covers the visual join mechanics and the ON vs WHERE outer-join filter trap; Pavlo grounds it in relational algebra (σ, π, ⨝)."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Relational Algebra: Selection (σ), Projection (π), Product (×) & Rename (ρ)."
       }
     ],
     "intuition": "<p>In <strong>Relational Algebra: Selection (σ), Projection (π), Product (×) & Rename (ρ)</strong> (<code>relational-algebra-set-theory</code>), Translating SQL queries into algebraic operator trees and proving why relational algebra closure enables algebraic query optimization. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Relational Algebra: Selection (σ), Projection (π), Product (×) & Rename (ρ)</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -50,22 +50,22 @@ window.MODULE_CONTENT["m03"] = {
     "title": "INNER JOIN, Equi-Joins, ON vs USING & Foreign-Key Graph Traversal",
     "video": {
       "youtubeId": "2HVMiPPuPIM",
-      "title": "SQL Joins Tutorial for Beginners",
+      "title": "SQL Joins Tutorial for Beginners - Inner Join, Left Join, Right Join, Full Outer Join",
       "channel": "Joey Blue",
-      "duration": "12m 20s",
+      "duration": "18m 4s",
       "start": 0,
-      "length": "12m",
-      "why": "Key focus timestamps: Full runtime; especially 08:15 (difference between filtering in ON vs WHERE clause in OUTER JOINs)"
+      "length": "18m",
+      "why": "Core video covering INNER JOIN, Equi-Joins, ON vs USING & Foreign-Key Graph Traversal (inner-join-equi-joins): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "7NPIENPr-zk",
-        "title": "#01 - Relational Model & Relational Algebra (CMU Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 14m",
-        "length": "74m",
+        "youtubeId": "yMOmuFiw__Y",
+        "title": "SQL Inner Join - SQL Training Online - Quick Tips Ep29",
+        "channel": "Joey Blue",
+        "duration": "4m 48s",
+        "length": "4m",
         "role": "deep-dive",
-        "why": "Joey Blue covers the visual join mechanics and the ON vs WHERE outer-join filter trap; Pavlo grounds it in relational algebra (σ, π, ⨝)."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for INNER JOIN, Equi-Joins, ON vs USING & Foreign-Key Graph Traversal."
       }
     ],
     "intuition": "<p>In <strong>INNER JOIN, Equi-Joins, ON vs USING & Foreign-Key Graph Traversal</strong> (<code>inner-join-equi-joins</code>), How INNER JOIN pairs matching tuples across tables, why explicit ANSI JOIN syntax replaced comma joins, and multi-hop table traversal. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>INNER JOIN, Equi-Joins, ON vs USING & Foreign-Key Graph Traversal</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -94,23 +94,23 @@ window.MODULE_CONTENT["m03"] = {
   "left-right-full-outer-joins": {
     "title": "Outer Joins: LEFT, RIGHT & FULL OUTER JOIN with NULL Extension",
     "video": {
-      "youtubeId": "2HVMiPPuPIM",
-      "title": "SQL Joins Tutorial for Beginners",
-      "channel": "Joey Blue",
-      "duration": "12m 20s",
+      "youtubeId": "aY7z4HcHm5M",
+      "title": "SQL Joins Basics (Visually Explained) | INNER, LEFT, RIGHT, FULL | #SQL Course 8",
+      "channel": "Data with Baraa",
+      "duration": "40m 18s",
       "start": 0,
-      "length": "12m",
-      "why": "Key focus timestamps: Full runtime; especially 08:15 (difference between filtering in ON vs WHERE clause in OUTER JOINs)"
+      "length": "40m",
+      "why": "Core video covering Outer Joins: LEFT, RIGHT & FULL OUTER JOIN with NULL Extension (left-right-full-outer-joins): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "7NPIENPr-zk",
-        "title": "#01 - Relational Model & Relational Algebra (CMU Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 14m",
-        "length": "74m",
+        "youtubeId": "zGSv0VaOtR0",
+        "title": "SQL Joins: Difference Between Inner/Left/Right/Outer Joins",
+        "channel": "JomaClass",
+        "duration": "10m 51s",
+        "length": "10m",
         "role": "deep-dive",
-        "why": "Joey Blue covers the visual join mechanics and the ON vs WHERE outer-join filter trap; Pavlo grounds it in relational algebra (σ, π, ⨝)."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Outer Joins: LEFT, RIGHT & FULL OUTER JOIN with NULL Extension."
       }
     ],
     "intuition": "<p>In <strong>Outer Joins: LEFT, RIGHT & FULL OUTER JOIN with NULL Extension</strong> (<code>left-right-full-outer-joins</code>), Preserving unmatched rows from the outer relation, understanding the preserved vs null-supplying table sides, and emulating FULL OUTER JOIN. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Outer Joins: LEFT, RIGHT & FULL OUTER JOIN with NULL Extension</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -139,23 +139,23 @@ window.MODULE_CONTENT["m03"] = {
   "join-where-vs-on-filter-trap": {
     "title": "The Classic Outer Join Trap: Filtering in ON vs Filtering in WHERE",
     "video": {
-      "youtubeId": "2HVMiPPuPIM",
-      "title": "SQL Joins Tutorial for Beginners",
-      "channel": "Joey Blue",
-      "duration": "12m 20s",
+      "youtubeId": "f9lbm7HA7pw",
+      "title": "SQL JOIN: Condition in “ON” vs. “WHERE\"",
+      "channel": "VigyanInc Tutorials - Making the Complex Simple!",
+      "duration": "8m 55s",
       "start": 0,
-      "length": "12m",
-      "why": "Key focus timestamps: Full runtime; especially 08:15 (difference between filtering in ON vs WHERE clause in OUTER JOINs)"
+      "length": "8m",
+      "why": "Core video covering The Classic Outer Join Trap: Filtering in ON vs Filtering in WHERE (join-where-vs-on-filter-trap): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "7NPIENPr-zk",
-        "title": "#01 - Relational Model & Relational Algebra (CMU Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 14m",
-        "length": "74m",
+        "youtubeId": "Gvpw0qWl4bw",
+        "title": "#sql - difference between WHERE & AND clause with LEFT/RIGHT join | INNER join+WHERE=LEFT join+WHERE",
+        "channel": "Daily life of a Data Engineer",
+        "duration": "6m 21s",
+        "length": "6m",
         "role": "deep-dive",
-        "why": "Joey Blue covers the visual join mechanics and the ON vs WHERE outer-join filter trap; Pavlo grounds it in relational algebra (σ, π, ⨝)."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for The Classic Outer Join Trap: Filtering in ON vs Filtering in WHERE."
       }
     ],
     "intuition": "<p>In <strong>The Classic Outer Join Trap: Filtering in ON vs Filtering in WHERE</strong> (<code>join-where-vs-on-filter-trap</code>), Why placing a predicate on the right-hand table inside WHERE silently converts a LEFT JOIN into an INNER JOIN by rejecting NULL-extended rows. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>The Classic Outer Join Trap: Filtering in ON vs Filtering in WHERE</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -184,23 +184,23 @@ window.MODULE_CONTENT["m03"] = {
   "self-joins-non-equi-joins": {
     "title": "Self-Joins, Hierarchical Pairs & Non-Equi Range Joins (<, >, BETWEEN)",
     "video": {
-      "youtubeId": "2HVMiPPuPIM",
-      "title": "SQL Joins Tutorial for Beginners",
-      "channel": "Joey Blue",
-      "duration": "12m 20s",
+      "youtubeId": "V3xjmBi1QQE",
+      "title": "SQL SELF JOIN | UNION & UNION ALL in SQL | SQL Tutorial in Hindi 12",
+      "channel": "Rishabh Mishra",
+      "duration": "8m 19s",
       "start": 0,
-      "length": "12m",
-      "why": "Key focus timestamps: Full runtime; especially 08:15 (difference between filtering in ON vs WHERE clause in OUTER JOINs)"
+      "length": "8m",
+      "why": "Core video covering Self-Joins, Hierarchical Pairs & Non-Equi Range Joins (<, >, BETWEEN) (self-joins-non-equi-joins): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "7NPIENPr-zk",
-        "title": "#01 - Relational Model & Relational Algebra (CMU Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 14m",
-        "length": "74m",
+        "youtubeId": "lUiPjkOQG9w",
+        "title": "Lec-46: Equi Join operation with Example | Database Management System",
+        "channel": "Gate Smashers",
+        "duration": "14m 14s",
+        "length": "14m",
         "role": "deep-dive",
-        "why": "Joey Blue covers the visual join mechanics and the ON vs WHERE outer-join filter trap; Pavlo grounds it in relational algebra (σ, π, ⨝)."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Self-Joins, Hierarchical Pairs & Non-Equi Range Joins (<, >, BETWEEN)."
       }
     ],
     "intuition": "<p>In <strong>Self-Joins, Hierarchical Pairs & Non-Equi Range Joins (<, >, BETWEEN)</strong> (<code>self-joins-non-equi-joins</code>), Joining a table to itself with mandatory table aliases for manager-employee lookups, pairwise event comparisons, and temporal range overlaps. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Self-Joins, Hierarchical Pairs & Non-Equi Range Joins (<, >, BETWEEN)</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -229,23 +229,23 @@ window.MODULE_CONTENT["m03"] = {
   "cross-join-cartesian-products": {
     "title": "CROSS JOIN, Combinatorial Grids & Accidental Cartesian Explosions",
     "video": {
-      "youtubeId": "2HVMiPPuPIM",
-      "title": "SQL Joins Tutorial for Beginners",
-      "channel": "Joey Blue",
-      "duration": "12m 20s",
+      "youtubeId": "0-P0zJfMipE",
+      "title": "SQL Lesson 13: Stop Joining Tables Like This (Cartesian Products Explained)",
+      "channel": "Fun with Learning Technology",
+      "duration": "3m 32s",
       "start": 0,
-      "length": "12m",
-      "why": "Key focus timestamps: Full runtime; especially 08:15 (difference between filtering in ON vs WHERE clause in OUTER JOINs)"
+      "length": "3m",
+      "why": "Core video covering CROSS JOIN, Combinatorial Grids & Accidental Cartesian Explosions (cross-join-cartesian-products): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "7NPIENPr-zk",
-        "title": "#01 - Relational Model & Relational Algebra (CMU Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 14m",
-        "length": "74m",
+        "youtubeId": "_yDadvbnIJk",
+        "title": "Session 5:SQL JOINS & UNION Explained With Real Data (Beginner to Interview‑Ready)",
+        "channel": "TnS_AiDa_Tech",
+        "duration": "27m 59s",
+        "length": "27m",
         "role": "deep-dive",
-        "why": "Joey Blue covers the visual join mechanics and the ON vs WHERE outer-join filter trap; Pavlo grounds it in relational algebra (σ, π, ⨝)."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for CROSS JOIN, Combinatorial Grids & Accidental Cartesian Explosions."
       }
     ],
     "intuition": "<p>In <strong>CROSS JOIN, Combinatorial Grids & Accidental Cartesian Explosions</strong> (<code>cross-join-cartesian-products</code>), Intentional Cartesian products for date-product spine generation vs catastrophic N×M row explosions caused by missing join predicates. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>CROSS JOIN, Combinatorial Grids & Accidental Cartesian Explosions</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -274,23 +274,23 @@ window.MODULE_CONTENT["m03"] = {
   "semi-joins-anti-joins": {
     "title": "Relational Semi-Join (EXISTS / IN) & Anti-Join (NOT EXISTS / LEFT JOIN IS NULL)",
     "video": {
-      "youtubeId": "2HVMiPPuPIM",
-      "title": "SQL Joins Tutorial for Beginners",
-      "channel": "Joey Blue",
-      "duration": "12m 20s",
+      "youtubeId": "GWq-_R-pkzg",
+      "title": "SQL Semi Joins and Anti Joins: EXISTS, IN, NOT EXISTS, LEFT JOIN IS NULL and NOT IN (PostgreSQL)",
+      "channel": "Prateek Goel | GrowAsEngineers",
+      "duration": "10m 30s",
       "start": 0,
-      "length": "12m",
-      "why": "Key focus timestamps: Full runtime; especially 08:15 (difference between filtering in ON vs WHERE clause in OUTER JOINs)"
+      "length": "10m",
+      "why": "Core video covering Relational Semi-Join (EXISTS / IN) & Anti-Join (NOT EXISTS / LEFT JOIN IS NULL) (semi-joins-anti-joins): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "7NPIENPr-zk",
-        "title": "#01 - Relational Model & Relational Algebra (CMU Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 14m",
-        "length": "74m",
+        "youtubeId": "FkydxUCwJlY",
+        "title": "Sellers with No Listings | SQL Interview Question (NOT EXISTS, Anti-Join) | GrowAsEngineers",
+        "channel": "Prateek Goel | GrowAsEngineers",
+        "duration": "7m 49s",
+        "length": "7m",
         "role": "deep-dive",
-        "why": "Joey Blue covers the visual join mechanics and the ON vs WHERE outer-join filter trap; Pavlo grounds it in relational algebra (σ, π, ⨝)."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Relational Semi-Join (EXISTS / IN) & Anti-Join (NOT EXISTS / LEFT JOIN IS NULL)."
       }
     ],
     "intuition": "<p>In <strong>Relational Semi-Join (EXISTS / IN) & Anti-Join (NOT EXISTS / LEFT JOIN IS NULL)</strong> (<code>semi-joins-anti-joins</code>), Checking existence without duplicating left-hand rows when multiple right-hand matches exist, and finding orphan records with anti-joins. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Relational Semi-Join (EXISTS / IN) & Anti-Join (NOT EXISTS / LEFT JOIN IS NULL)</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -319,23 +319,23 @@ window.MODULE_CONTENT["m03"] = {
   "set-operations-union-intersect-except": {
     "title": "Set Operations: UNION vs UNION ALL, INTERSECT & EXCEPT",
     "video": {
-      "youtubeId": "2HVMiPPuPIM",
-      "title": "SQL Joins Tutorial for Beginners",
-      "channel": "Joey Blue",
-      "duration": "12m 20s",
+      "youtubeId": "LUSPRn2zxSo",
+      "title": "SQL SET Operators (Visually Explained) | UNION, UNION ALL, EXCEPT, INTERSECT | #SQL Course 11",
+      "channel": "Data with Baraa",
+      "duration": "48m 38s",
       "start": 0,
-      "length": "12m",
-      "why": "Key focus timestamps: Full runtime; especially 08:15 (difference between filtering in ON vs WHERE clause in OUTER JOINs)"
+      "length": "48m",
+      "why": "Core video covering Set Operations: UNION vs UNION ALL, INTERSECT & EXCEPT (set-operations-union-intersect-except): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "7NPIENPr-zk",
-        "title": "#01 - Relational Model & Relational Algebra (CMU Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 14m",
-        "length": "74m",
+        "youtubeId": "Uu4GfSHy3_4",
+        "title": "29-SET Operators in SQL | Union | Union All | Intersect | Except or Minus | Examples | SQL Tutorial",
+        "channel": "CodeEra",
+        "duration": "8m 30s",
+        "length": "8m",
         "role": "deep-dive",
-        "why": "Joey Blue covers the visual join mechanics and the ON vs WHERE outer-join filter trap; Pavlo grounds it in relational algebra (σ, π, ⨝)."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Set Operations: UNION vs UNION ALL, INTERSECT & EXCEPT."
       }
     ],
     "intuition": "<p>In <strong>Set Operations: UNION vs UNION ALL, INTERSECT & EXCEPT</strong> (<code>set-operations-union-intersect-except</code>), Combining vertical result sets, why UNION ALL avoids an expensive sort/hash deduplication pass, and set difference via EXCEPT. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Set Operations: UNION vs UNION ALL, INTERSECT & EXCEPT</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -364,23 +364,23 @@ window.MODULE_CONTENT["m03"] = {
   "case-missing-null-notin-outage": {
     "title": "Production Case Study: How a Single NULL in NOT IN Returned Zero Rows",
     "video": {
-      "youtubeId": "2HVMiPPuPIM",
-      "title": "SQL Joins Tutorial for Beginners",
-      "channel": "Joey Blue",
-      "duration": "12m 20s",
+      "youtubeId": "9dyRl9TIxrQ",
+      "title": "SQL IS NULL and IS NOT NULL: Why = NULL Never Matches (PostgreSQL)",
+      "channel": "Prateek Goel | GrowAsEngineers",
+      "duration": "8m 3s",
       "start": 0,
-      "length": "12m",
-      "why": "Key focus timestamps: Full runtime; especially 08:15 (difference between filtering in ON vs WHERE clause in OUTER JOINs)"
+      "length": "8m",
+      "why": "Core video covering Production Case Study: How a Single NULL in NOT IN Returned Zero Rows (case-missing-null-notin-outage): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "7NPIENPr-zk",
-        "title": "#01 - Relational Model & Relational Algebra (CMU Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 14m",
-        "length": "74m",
+        "youtubeId": "Bn0_QPF-AjQ",
+        "title": "Don't fall for this NULL trap!!",
+        "channel": "Ulhas Bansod",
+        "duration": "7m 38s",
+        "length": "7m",
         "role": "deep-dive",
-        "why": "Joey Blue covers the visual join mechanics and the ON vs WHERE outer-join filter trap; Pavlo grounds it in relational algebra (σ, π, ⨝)."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Production Case Study: How a Single NULL in NOT IN Returned Zero Rows."
       }
     ],
     "intuition": "<p>In <strong>Production Case Study: How a Single NULL in NOT IN Returned Zero Rows</strong> (<code>case-missing-null-notin-outage</code>), Dissecting a classic production outage where x NOT IN (SELECT nullable_col ...) evaluated to UNKNOWN for every row, and fixing it with NOT EXISTS. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Production Case Study: How a Single NULL in NOT IN Returned Zero Rows</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -409,23 +409,23 @@ window.MODULE_CONTENT["m03"] = {
   "build-multi-table-order-reconciler": {
     "title": "Hands-On Build: Multi-Table Order, Payment & Shipment Reconciliation Engine",
     "video": {
-      "youtubeId": "2HVMiPPuPIM",
-      "title": "SQL Joins Tutorial for Beginners",
-      "channel": "Joey Blue",
-      "duration": "12m 20s",
+      "youtubeId": "AijmQ5uuwGw",
+      "title": "Automate reconciliations with Power Query | Excel Off The Grid",
+      "channel": "Excel Off The Grid",
+      "duration": "9m 37s",
       "start": 0,
-      "length": "12m",
-      "why": "Key focus timestamps: Full runtime; especially 08:15 (difference between filtering in ON vs WHERE clause in OUTER JOINs)"
+      "length": "9m",
+      "why": "Core video covering Hands-On Build: Multi-Table Order, Payment & Shipment Reconciliation Engine (build-multi-table-order-reconciler): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "7NPIENPr-zk",
-        "title": "#01 - Relational Model & Relational Algebra (CMU Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 14m",
-        "length": "74m",
+        "youtubeId": "CjbVRqWLfiU",
+        "title": "Bank Reconciliation Using SQL | SQL Queries for Financial Data",
+        "channel": "Fintech by CandiMentor",
+        "duration": "13m 10s",
+        "length": "13m",
         "role": "deep-dive",
-        "why": "Joey Blue covers the visual join mechanics and the ON vs WHERE outer-join filter trap; Pavlo grounds it in relational algebra (σ, π, ⨝)."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Hands-On Build: Multi-Table Order, Payment & Shipment Reconciliation Engine."
       }
     ],
     "intuition": "<p>In <strong>Hands-On Build: Multi-Table Order, Payment & Shipment Reconciliation Engine</strong> (<code>build-multi-table-order-reconciler</code>), Build an audit query suite using LEFT JOIN, FULL OUTER reconciliation, and anti-joins to detect unshipped paid orders and settlement mismatches. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Hands-On Build: Multi-Table Order, Payment & Shipment Reconciliation Engine</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",

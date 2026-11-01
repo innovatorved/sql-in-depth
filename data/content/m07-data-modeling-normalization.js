@@ -4,23 +4,23 @@ window.MODULE_CONTENT["m07"] = {
   "entity-relationship-modeling": {
     "title": "Entity-Relationship Modeling: Cardinality (1:1, 1:N, M:N) & Junction Tables",
     "video": {
-      "youtubeId": "GFQaEYEc8_8",
-      "title": "Learn Database Normalization - 1NF, 2NF, 3NF, 4NF, 5NF",
-      "channel": "Decomplexify",
-      "duration": "28m 42s",
+      "youtubeId": "xsg9BDiwiJE",
+      "title": "Entity Relationship Diagram (ERD) Tutorial - Part 1",
+      "channel": "Lucid Software",
+      "duration": "6m 10s",
       "start": 0,
-      "length": "29m",
-      "why": "Key focus timestamps: 04:10 1NF repeating groups; 12:40 2NF partial dependencies; 21:15 3NF transitive dependencies; 25:30 BCNF, 4NF & 5NF"
+      "length": "6m",
+      "why": "Core video covering Entity-Relationship Modeling: Cardinality (1:1, 1:N, M:N) & Junction Tables (entity-relationship-modeling): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "ztHopE5Wnpc",
-        "title": "Database Design Course - How to Design a Relational Database",
-        "channel": "freeCodeCamp.org",
-        "duration": "8h 7m",
-        "length": "487m",
+        "youtubeId": "PpT3Hh66nAM",
+        "title": "ER Model in DBMS || Entity || Attribute || Entity Set || Types of Attributes || Relationship || Degr",
+        "channel": "Sudhakar Atchala",
+        "duration": "32m 45s",
+        "length": "32m",
         "role": "deep-dive",
-        "why": "Decomplexify provides one of the cleanest visual walkthroughs from 1NF all the way to 5NF with practical business examples."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Entity-Relationship Modeling: Cardinality (1:1, 1:N, M:N) & Junction Tables."
       }
     ],
     "intuition": "<p>In <strong>Entity-Relationship Modeling: Cardinality (1:1, 1:N, M:N) & Junction Tables</strong> (<code>entity-relationship-modeling</code>), Translating domain entities into physical tables, resolving many-to-many relationships with associative junction tables, and reading Crow's Foot ERDs. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Entity-Relationship Modeling: Cardinality (1:1, 1:N, M:N) & Junction Tables</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -49,23 +49,23 @@ window.MODULE_CONTENT["m07"] = {
   "functional-dependencies-keys": {
     "title": "Functional Dependencies (X → Y), Superkeys, Candidate Keys & Closure",
     "video": {
-      "youtubeId": "GFQaEYEc8_8",
-      "title": "Learn Database Normalization - 1NF, 2NF, 3NF, 4NF, 5NF",
-      "channel": "Decomplexify",
-      "duration": "28m 42s",
+      "youtubeId": "YQt_kz3JgXI",
+      "title": "Finding Candidate Key | Database Management System",
+      "channel": "Edredo for Learners",
+      "duration": "4m 0s",
       "start": 0,
-      "length": "29m",
-      "why": "Key focus timestamps: 04:10 1NF repeating groups; 12:40 2NF partial dependencies; 21:15 3NF transitive dependencies; 25:30 BCNF, 4NF & 5NF"
+      "length": "4m",
+      "why": "Core video covering Functional Dependencies (X → Y), Superkeys, Candidate Keys & Closure (functional-dependencies-keys): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "ztHopE5Wnpc",
-        "title": "Database Design Course - How to Design a Relational Database",
-        "channel": "freeCodeCamp.org",
-        "duration": "8h 7m",
-        "length": "487m",
+        "youtubeId": "W3TZAIY-CyA",
+        "title": "HOW TO FIND SUPERKEYS AND CANDIDATE KEYS WITH EXAMPLE IN DBMS || FINDING CANDIDATE KEYS || DBMS",
+        "channel": "Sundeep Saradhi Kanthety",
+        "duration": "33m 59s",
+        "length": "33m",
         "role": "deep-dive",
-        "why": "Decomplexify provides one of the cleanest visual walkthroughs from 1NF all the way to 5NF with practical business examples."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Functional Dependencies (X → Y), Superkeys, Candidate Keys & Closure."
       }
     ],
     "intuition": "<p>In <strong>Functional Dependencies (X → Y), Superkeys, Candidate Keys & Closure</strong> (<code>functional-dependencies-keys</code>), Formalizing data invariants with functional dependencies, computing attribute closure X+, and proving whether a decomposition is lossless-join. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Functional Dependencies (X → Y), Superkeys, Candidate Keys & Closure</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -94,23 +94,23 @@ window.MODULE_CONTENT["m07"] = {
   "first-normal-form-atomicity": {
     "title": "First Normal Form (1NF): Atomic Domains & Repeating Group Anti-Patterns",
     "video": {
-      "youtubeId": "GFQaEYEc8_8",
-      "title": "Learn Database Normalization - 1NF, 2NF, 3NF, 4NF, 5NF",
-      "channel": "Decomplexify",
-      "duration": "28m 42s",
+      "youtubeId": "MjzKOIydCP8",
+      "title": "First Normal Form in DBMS || 1 NF in DBMS",
+      "channel": "Sudhakar Atchala",
+      "duration": "3m 45s",
       "start": 0,
-      "length": "29m",
-      "why": "Key focus timestamps: 04:10 1NF repeating groups; 12:40 2NF partial dependencies; 21:15 3NF transitive dependencies; 25:30 BCNF, 4NF & 5NF"
+      "length": "3m",
+      "why": "Core video covering First Normal Form (1NF): Atomic Domains & Repeating Group Anti-Patterns (first-normal-form-atomicity): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "ztHopE5Wnpc",
-        "title": "Database Design Course - How to Design a Relational Database",
-        "channel": "freeCodeCamp.org",
-        "duration": "8h 7m",
-        "length": "487m",
+        "youtubeId": "IBEuwmYsMKI",
+        "title": "normalization in dbms | normal forms | 1nf, 2nf, 3nf, bcnf, 4nf, 5nf normal forms with examples",
+        "channel": "NS lectures",
+        "duration": "20m 54s",
+        "length": "20m",
         "role": "deep-dive",
-        "why": "Decomplexify provides one of the cleanest visual walkthroughs from 1NF all the way to 5NF with practical business examples."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for First Normal Form (1NF): Atomic Domains & Repeating Group Anti-Patterns."
       }
     ],
     "intuition": "<p>In <strong>First Normal Form (1NF): Atomic Domains & Repeating Group Anti-Patterns</strong> (<code>first-normal-form-atomicity</code>), Why storing comma-separated IDs or numbered columns (tag1, tag2, tag3) breaks indexing, referential integrity, and relational querying. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>First Normal Form (1NF): Atomic Domains & Repeating Group Anti-Patterns</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -139,23 +139,23 @@ window.MODULE_CONTENT["m07"] = {
   "second-third-normal-form": {
     "title": "Second & Third Normal Form (2NF & 3NF): Eliminating Partial & Transitive Dependencies",
     "video": {
-      "youtubeId": "GFQaEYEc8_8",
-      "title": "Learn Database Normalization - 1NF, 2NF, 3NF, 4NF, 5NF",
-      "channel": "Decomplexify",
-      "duration": "28m 42s",
+      "youtubeId": "O16btnzfuYU",
+      "title": "Lec 11: Second Normal Form in DBMS | 2NF in DBMS | Normalization in DBMS",
+      "channel": "Jenny's Lectures CS IT",
+      "duration": "21m 38s",
       "start": 0,
-      "length": "29m",
-      "why": "Key focus timestamps: 04:10 1NF repeating groups; 12:40 2NF partial dependencies; 21:15 3NF transitive dependencies; 25:30 BCNF, 4NF & 5NF"
+      "length": "21m",
+      "why": "Core video covering Second & Third Normal Form (2NF & 3NF): Eliminating Partial & Transitive Dependencies (second-third-normal-form): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "ztHopE5Wnpc",
-        "title": "Database Design Course - How to Design a Relational Database",
-        "channel": "freeCodeCamp.org",
-        "duration": "8h 7m",
-        "length": "487m",
+        "youtubeId": "IBEuwmYsMKI",
+        "title": "normalization in dbms | normal forms | 1nf, 2nf, 3nf, bcnf, 4nf, 5nf normal forms with examples",
+        "channel": "NS lectures",
+        "duration": "20m 54s",
+        "length": "20m",
         "role": "deep-dive",
-        "why": "Decomplexify provides one of the cleanest visual walkthroughs from 1NF all the way to 5NF with practical business examples."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Second & Third Normal Form (2NF & 3NF): Eliminating Partial & Transitive Dependencies."
       }
     ],
     "intuition": "<p>In <strong>Second & Third Normal Form (2NF & 3NF): Eliminating Partial & Transitive Dependencies</strong> (<code>second-third-normal-form</code>), Removing partial dependencies on composite keys (2NF) and transitive non-key dependencies (3NF: \"the key, the whole key, and nothing but the key\"). When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Second & Third Normal Form (2NF & 3NF): Eliminating Partial & Transitive Dependencies</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -184,23 +184,23 @@ window.MODULE_CONTENT["m07"] = {
   "boyce-codd-fourth-fifth-normal-form": {
     "title": "Boyce-Codd Normal Form (BCNF), Multi-Valued (4NF) & Join Dependencies (5NF)",
     "video": {
-      "youtubeId": "GFQaEYEc8_8",
-      "title": "Learn Database Normalization - 1NF, 2NF, 3NF, 4NF, 5NF",
-      "channel": "Decomplexify",
-      "duration": "28m 42s",
+      "youtubeId": "mf_PbWPo7VM",
+      "title": "Lec-30: Boyce Codd Normal Form #BCNF #DBMS #Normalization with best examples",
+      "channel": "Gate Smashers",
+      "duration": "6m 47s",
       "start": 0,
-      "length": "29m",
-      "why": "Key focus timestamps: 04:10 1NF repeating groups; 12:40 2NF partial dependencies; 21:15 3NF transitive dependencies; 25:30 BCNF, 4NF & 5NF"
+      "length": "6m",
+      "why": "Core video covering Boyce-Codd Normal Form (BCNF), Multi-Valued (4NF) & Join Dependencies (5NF) (boyce-codd-fourth-fifth-normal-form): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "ztHopE5Wnpc",
-        "title": "Database Design Course - How to Design a Relational Database",
-        "channel": "freeCodeCamp.org",
-        "duration": "8h 7m",
-        "length": "487m",
+        "youtubeId": "IBEuwmYsMKI",
+        "title": "normalization in dbms | normal forms | 1nf, 2nf, 3nf, bcnf, 4nf, 5nf normal forms with examples",
+        "channel": "NS lectures",
+        "duration": "20m 54s",
+        "length": "20m",
         "role": "deep-dive",
-        "why": "Decomplexify provides one of the cleanest visual walkthroughs from 1NF all the way to 5NF with practical business examples."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Boyce-Codd Normal Form (BCNF), Multi-Valued (4NF) & Join Dependencies (5NF)."
       }
     ],
     "intuition": "<p>In <strong>Boyce-Codd Normal Form (BCNF), Multi-Valued (4NF) & Join Dependencies (5NF)</strong> (<code>boyce-codd-fourth-fifth-normal-form</code>), When 3NF is still vulnerable to overlapping candidate key anomalies (BCNF) and how 4NF eliminates independent multi-valued fact cross-products. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Boyce-Codd Normal Form (BCNF), Multi-Valued (4NF) & Join Dependencies (5NF)</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -229,23 +229,23 @@ window.MODULE_CONTENT["m07"] = {
   "update-insertion-deletion-anomalies": {
     "title": "Visualizing Update, Insertion & Deletion Anomalies in Unnormalized Schemas",
     "video": {
-      "youtubeId": "GFQaEYEc8_8",
-      "title": "Learn Database Normalization - 1NF, 2NF, 3NF, 4NF, 5NF",
-      "channel": "Decomplexify",
-      "duration": "28m 42s",
+      "youtubeId": "bJMyDzYOofw",
+      "title": "ANOMALIES IN DBMS || TYPES OF ANOMALIES || INSERT , DELETE , UPDATE ANOMALIES || DBMS || SQL",
+      "channel": "Sundeep Saradhi Kanthety",
+      "duration": "14m 41s",
       "start": 0,
-      "length": "29m",
-      "why": "Key focus timestamps: 04:10 1NF repeating groups; 12:40 2NF partial dependencies; 21:15 3NF transitive dependencies; 25:30 BCNF, 4NF & 5NF"
+      "length": "14m",
+      "why": "Core video covering Visualizing Update, Insertion & Deletion Anomalies in Unnormalized Schemas (update-insertion-deletion-anomalies): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "ztHopE5Wnpc",
-        "title": "Database Design Course - How to Design a Relational Database",
-        "channel": "freeCodeCamp.org",
-        "duration": "8h 7m",
-        "length": "487m",
+        "youtubeId": "5GDTIUVlHB8",
+        "title": "Lec-24: Introduction to Normalization | Insertion, Deletion & Updation Anomaly",
+        "channel": "Gate Smashers",
+        "duration": "12m 50s",
+        "length": "12m",
         "role": "deep-dive",
-        "why": "Decomplexify provides one of the cleanest visual walkthroughs from 1NF all the way to 5NF with practical business examples."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Visualizing Update, Insertion & Deletion Anomalies in Unnormalized Schemas."
       }
     ],
     "intuition": "<p>In <strong>Visualizing Update, Insertion & Deletion Anomalies in Unnormalized Schemas</strong> (<code>update-insertion-deletion-anomalies</code>), Tracing concrete SQL mutations that corrupt customer addresses, prevent inserting catalog items without orders, or erase facts on delete. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Visualizing Update, Insertion & Deletion Anomalies in Unnormalized Schemas</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -274,23 +274,23 @@ window.MODULE_CONTENT["m07"] = {
   "strategic-denormalization-tradeoffs": {
     "title": "Strategic Denormalization: Read vs Write Amplification & Cached Counters",
     "video": {
-      "youtubeId": "GFQaEYEc8_8",
-      "title": "Learn Database Normalization - 1NF, 2NF, 3NF, 4NF, 5NF",
-      "channel": "Decomplexify",
-      "duration": "28m 42s",
+      "youtubeId": "o8HgXxqsYBc",
+      "title": "What is denormalization in RDBMS in Hindi",
+      "channel": "Engineering Digest",
+      "duration": "4m 43s",
       "start": 0,
-      "length": "29m",
-      "why": "Key focus timestamps: 04:10 1NF repeating groups; 12:40 2NF partial dependencies; 21:15 3NF transitive dependencies; 25:30 BCNF, 4NF & 5NF"
+      "length": "4m",
+      "why": "Core video covering Strategic Denormalization: Read vs Write Amplification & Cached Counters (strategic-denormalization-tradeoffs): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "ztHopE5Wnpc",
-        "title": "Database Design Course - How to Design a Relational Database",
-        "channel": "freeCodeCamp.org",
-        "duration": "8h 7m",
-        "length": "487m",
+        "youtubeId": "4bTq0GdSeQs",
+        "title": "Learn Database Denormalization",
+        "channel": "Decomplexify",
+        "duration": "19m 7s",
+        "length": "19m",
         "role": "deep-dive",
-        "why": "Decomplexify provides one of the cleanest visual walkthroughs from 1NF all the way to 5NF with practical business examples."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Strategic Denormalization: Read vs Write Amplification & Cached Counters."
       }
     ],
     "intuition": "<p>In <strong>Strategic Denormalization: Read vs Write Amplification & Cached Counters</strong> (<code>strategic-denormalization-tradeoffs</code>), Knowing when to break strict normalization in high-read OLTP systems using trigger-maintained summary columns, snapshot fields, and read models. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Strategic Denormalization: Read vs Write Amplification & Cached Counters</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -319,23 +319,23 @@ window.MODULE_CONTENT["m07"] = {
   "schema-anti-patterns-eav-god-tables": {
     "title": "Schema Anti-Patterns: Entity-Attribute-Value (EAV), Polymorphic FKs & God Tables",
     "video": {
-      "youtubeId": "GFQaEYEc8_8",
-      "title": "Learn Database Normalization - 1NF, 2NF, 3NF, 4NF, 5NF",
-      "channel": "Decomplexify",
-      "duration": "28m 42s",
+      "youtubeId": "VeYs1t3qSvA",
+      "title": "Avoid This Type of Database Design",
+      "channel": "Database Star",
+      "duration": "8m 58s",
       "start": 0,
-      "length": "29m",
-      "why": "Key focus timestamps: 04:10 1NF repeating groups; 12:40 2NF partial dependencies; 21:15 3NF transitive dependencies; 25:30 BCNF, 4NF & 5NF"
+      "length": "8m",
+      "why": "Core video covering Schema Anti-Patterns: Entity-Attribute-Value (EAV), Polymorphic FKs & God Tables (schema-anti-patterns-eav-god-tables): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "ztHopE5Wnpc",
-        "title": "Database Design Course - How to Design a Relational Database",
-        "channel": "freeCodeCamp.org",
-        "duration": "8h 7m",
-        "length": "487m",
+        "youtubeId": "fTt91rxsdrU",
+        "title": "Is the \"Entity Attribute Value\" (EAV) Model bad?",
+        "channel": "Tom Gillies (Duhallow Grey Geek)",
+        "duration": "3m 6s",
+        "length": "3m",
         "role": "deep-dive",
-        "why": "Decomplexify provides one of the cleanest visual walkthroughs from 1NF all the way to 5NF with practical business examples."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Schema Anti-Patterns: Entity-Attribute-Value (EAV), Polymorphic FKs & God Tables."
       }
     ],
     "intuition": "<p>In <strong>Schema Anti-Patterns: Entity-Attribute-Value (EAV), Polymorphic FKs & God Tables</strong> (<code>schema-anti-patterns-eav-god-tables</code>), Why EAV tables destroy type safety and require 10-way self-joins, why polymorphic foreign keys cannot enforce integrity, and clean relational alternatives. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Schema Anti-Patterns: Entity-Attribute-Value (EAV), Polymorphic FKs & God Tables</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -364,23 +364,23 @@ window.MODULE_CONTENT["m07"] = {
   "case-shopify-multi-tenant-schema": {
     "title": "Production Case Study: Multi-Tenant Schema Architecture at Scale",
     "video": {
-      "youtubeId": "GFQaEYEc8_8",
-      "title": "Learn Database Normalization - 1NF, 2NF, 3NF, 4NF, 5NF",
-      "channel": "Decomplexify",
-      "duration": "28m 42s",
+      "youtubeId": "YaSPB2uNLYg",
+      "title": "Multi-Tenant: Database Per Tenant or Shared?",
+      "channel": "CodeOpinion",
+      "duration": "8m 54s",
       "start": 0,
-      "length": "29m",
-      "why": "Key focus timestamps: 04:10 1NF repeating groups; 12:40 2NF partial dependencies; 21:15 3NF transitive dependencies; 25:30 BCNF, 4NF & 5NF"
+      "length": "8m",
+      "why": "Core video covering Production Case Study: Multi-Tenant Schema Architecture at Scale (case-shopify-multi-tenant-schema): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "ztHopE5Wnpc",
-        "title": "Database Design Course - How to Design a Relational Database",
-        "channel": "freeCodeCamp.org",
-        "duration": "8h 7m",
-        "length": "487m",
+        "youtubeId": "FrEP0dvAfCQ",
+        "title": "Salesforce Platform Multitenant Architecture",
+        "channel": "Salesforce Architects",
+        "duration": "2m 39s",
+        "length": "2m",
         "role": "deep-dive",
-        "why": "Decomplexify provides one of the cleanest visual walkthroughs from 1NF all the way to 5NF with practical business examples."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Production Case Study: Multi-Tenant Schema Architecture at Scale."
       }
     ],
     "intuition": "<p>In <strong>Production Case Study: Multi-Tenant Schema Architecture at Scale</strong> (<code>case-shopify-multi-tenant-schema</code>), Comparing Pool (shared table + tenant_id), Bridge (schema-per-tenant), and Silo (database-per-tenant) isolation models for B2B SaaS platforms. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Production Case Study: Multi-Tenant Schema Architecture at Scale</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -409,23 +409,23 @@ window.MODULE_CONTENT["m07"] = {
   "build-normalized-booking-schema": {
     "title": "Hands-On Build: Normalize a Legacy Flat Spreadsheet into a 3NF/BCNF System",
     "video": {
-      "youtubeId": "GFQaEYEc8_8",
-      "title": "Learn Database Normalization - 1NF, 2NF, 3NF, 4NF, 5NF",
-      "channel": "Decomplexify",
-      "duration": "28m 42s",
+      "youtubeId": "ABwD8IYByfk",
+      "title": "What is Normalization in SQL? | Database Normalization Forms - 1NF, 2NF, 3NF, BCNF | Edureka",
+      "channel": "edureka!",
+      "duration": "12m 44s",
       "start": 0,
-      "length": "29m",
-      "why": "Key focus timestamps: 04:10 1NF repeating groups; 12:40 2NF partial dependencies; 21:15 3NF transitive dependencies; 25:30 BCNF, 4NF & 5NF"
+      "length": "12m",
+      "why": "Core video covering Hands-On Build: Normalize a Legacy Flat Spreadsheet into a 3NF/BCNF System (build-normalized-booking-schema): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "ztHopE5Wnpc",
-        "title": "Database Design Course - How to Design a Relational Database",
-        "channel": "freeCodeCamp.org",
-        "duration": "8h 7m",
-        "length": "487m",
+        "youtubeId": "IBEuwmYsMKI",
+        "title": "normalization in dbms | normal forms | 1nf, 2nf, 3nf, bcnf, 4nf, 5nf normal forms with examples",
+        "channel": "NS lectures",
+        "duration": "20m 54s",
+        "length": "20m",
         "role": "deep-dive",
-        "why": "Decomplexify provides one of the cleanest visual walkthroughs from 1NF all the way to 5NF with practical business examples."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Hands-On Build: Normalize a Legacy Flat Spreadsheet into a 3NF/BCNF System."
       }
     ],
     "intuition": "<p>In <strong>Hands-On Build: Normalize a Legacy Flat Spreadsheet into a 3NF/BCNF System</strong> (<code>build-normalized-booking-schema</code>), Decompose a denormalized, anomaly-ridden booking table into a lossless 3NF/BCNF relational schema and verify zero data loss via join reconstruction. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Hands-On Build: Normalize a Legacy Flat Spreadsheet into a 3NF/BCNF System</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",

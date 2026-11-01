@@ -4,23 +4,23 @@ window.MODULE_CONTENT["m14"] = {
   "multi-version-concurrency-control-mvcc": {
     "title": "MVCC Architecture: Why Readers Never Block Writers and Writers Never Block Readers",
     "video": {
-      "youtubeId": "tUFha9-DuSk",
-      "title": "#20 - Multi-Version Concurrency Control (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 19m",
+      "youtubeId": "5Sy97Uzvj90",
+      "title": "TOP-4 databases MVCC architectures explained",
+      "channel": "PAVLOG",
+      "duration": "5m 10s",
       "start": 0,
-      "length": "79m",
-      "why": "Key focus timestamps: 14:30 Version storage (append-only vs rollback segment); 36:20 Garbage collection & Vacuuming; 54:00 Snapshot isolation"
+      "length": "5m",
+      "why": "Core video covering MVCC Architecture: Why Readers Never Block Writers and Writers Never Block Readers (multi-version-concurrency-control-mvcc): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "drStlhNbfHI",
-        "title": "#18 - Two-Phase Locking Concurrency Control (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 23m",
-        "length": "83m",
+        "youtubeId": "CzUG2AUIPuo",
+        "title": "How Can Thousands of People Read the Same Database Row at Once?",
+        "channel": "System Internals",
+        "duration": "11m 27s",
+        "length": "11m",
         "role": "deep-dive",
-        "why": "Contrasts pessimistic 2PL locking with Postgres-style optimistic MVCC tuple version chains and vacuum freeze mechanics."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for MVCC Architecture: Why Readers Never Block Writers and Writers Never Block Readers."
       }
     ],
     "intuition": "<p>In <strong>MVCC Architecture: Why Readers Never Block Writers and Writers Never Block Readers</strong> (<code>multi-version-concurrency-control-mvcc</code>), Comparing append-version heap MVCC (PostgreSQL) against in-place clustered update + rollback segment undo logs (MySQL InnoDB & Oracle). When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>MVCC Architecture: Why Readers Never Block Writers and Writers Never Block Readers</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -49,23 +49,23 @@ window.MODULE_CONTENT["m14"] = {
   "tuple-headers-xmin-xmax-visibility": {
     "title": "Tuple Headers Under the Microscope: xmin, xmax, ctid & Infomask Hint Bits",
     "video": {
-      "youtubeId": "tUFha9-DuSk",
-      "title": "#20 - Multi-Version Concurrency Control (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 19m",
+      "youtubeId": "AveRgUrC7FM",
+      "title": "Postgres System Columns Explained (ctid, xmin,xmax)",
+      "channel": "Hussein Nasser",
+      "duration": "26m 28s",
       "start": 0,
-      "length": "79m",
-      "why": "Key focus timestamps: 14:30 Version storage (append-only vs rollback segment); 36:20 Garbage collection & Vacuuming; 54:00 Snapshot isolation"
+      "length": "26m",
+      "why": "Core video covering Tuple Headers Under the Microscope: xmin, xmax, ctid & Infomask Hint Bits (tuple-headers-xmin-xmax-visibility): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "drStlhNbfHI",
-        "title": "#18 - Two-Phase Locking Concurrency Control (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 23m",
-        "length": "83m",
+        "youtubeId": "-cDSR229tM4",
+        "title": "MVCC Explained: Row Versions, xmin/xmax, Snapshots, Dead Tuples and VACUUM (PostgreSQL)",
+        "channel": "Prateek Goel | GrowAsEngineers",
+        "duration": "8m 2s",
+        "length": "8m",
         "role": "deep-dive",
-        "why": "Contrasts pessimistic 2PL locking with Postgres-style optimistic MVCC tuple version chains and vacuum freeze mechanics."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Tuple Headers Under the Microscope: xmin, xmax, ctid & Infomask Hint Bits."
       }
     ],
     "intuition": "<p>In <strong>Tuple Headers Under the Microscope: xmin, xmax, ctid & Infomask Hint Bits</strong> (<code>tuple-headers-xmin-xmax-visibility</code>), Inspecting the 23-byte PostgreSQL HeapTupleHeaderData structure: how INSERT sets xmin, DELETE sets xmax, and UPDATE writes a brand-new tuple version. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Tuple Headers Under the Microscope: xmin, xmax, ctid & Infomask Hint Bits</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -94,23 +94,23 @@ window.MODULE_CONTENT["m14"] = {
   "transaction-snapshots-visibility-rules": {
     "title": "Transaction Snapshots (xmin:xmax:xip_list) & Tuple Visibility Resolution",
     "video": {
-      "youtubeId": "tUFha9-DuSk",
-      "title": "#20 - Multi-Version Concurrency Control (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 19m",
+      "youtubeId": "qDAiFqIw0fc",
+      "title": "PostgreSQL MVCC Snapshots: xmin, xmax, pg_current_snapshot and Version Visibility",
+      "channel": "Prateek Goel | GrowAsEngineers",
+      "duration": "8m 40s",
       "start": 0,
-      "length": "79m",
-      "why": "Key focus timestamps: 14:30 Version storage (append-only vs rollback segment); 36:20 Garbage collection & Vacuuming; 54:00 Snapshot isolation"
+      "length": "8m",
+      "why": "Core video covering Transaction Snapshots (xmin:xmax:xip_list) & Tuple Visibility Resolution (transaction-snapshots-visibility-rules): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "drStlhNbfHI",
-        "title": "#18 - Two-Phase Locking Concurrency Control (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 23m",
-        "length": "83m",
+        "youtubeId": "s6TlDvFXJpY",
+        "title": "PostgreSQL Tuple Visibility Rules",
+        "channel": "Praveen Somisetty",
+        "duration": "47m 54s",
+        "length": "47m",
         "role": "deep-dive",
-        "why": "Contrasts pessimistic 2PL locking with Postgres-style optimistic MVCC tuple version chains and vacuum freeze mechanics."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Transaction Snapshots (xmin:xmax:xip_list) & Tuple Visibility Resolution."
       }
     ],
     "intuition": "<p>In <strong>Transaction Snapshots (xmin:xmax:xip_list) & Tuple Visibility Resolution</strong> (<code>transaction-snapshots-visibility-rules</code>), Evaluating the exact visibility algorithm that decides whether tuple version V is visible to transaction T based on committed status and active XID list. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Transaction Snapshots (xmin:xmax:xip_list) & Tuple Visibility Resolution</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -139,23 +139,23 @@ window.MODULE_CONTENT["m14"] = {
   "row-level-locks-for-update-skip-locked": {
     "title": "Row-Level Locks: FOR UPDATE, FOR NO KEY UPDATE, FOR SHARE, NOWAIT & SKIP LOCKED",
     "video": {
-      "youtubeId": "tUFha9-DuSk",
-      "title": "#20 - Multi-Version Concurrency Control (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 19m",
+      "youtubeId": "Ab_fHdtyE8E",
+      "title": "SQL Locks and Deadlocks: FOR UPDATE, SKIP LOCKED, NOWAIT, Optimistic vs Pessimistic (PostgreSQL)",
+      "channel": "Prateek Goel | GrowAsEngineers",
+      "duration": "8m 31s",
       "start": 0,
-      "length": "79m",
-      "why": "Key focus timestamps: 14:30 Version storage (append-only vs rollback segment); 36:20 Garbage collection & Vacuuming; 54:00 Snapshot isolation"
+      "length": "8m",
+      "why": "Core video covering Row-Level Locks: FOR UPDATE, FOR NO KEY UPDATE, FOR SHARE, NOWAIT & SKIP LOCKED (row-level-locks-for-update-skip-locked): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "drStlhNbfHI",
-        "title": "#18 - Two-Phase Locking Concurrency Control (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 23m",
-        "length": "83m",
+        "youtubeId": "m6-63kpttQk",
+        "title": "The Skip Locked feature in Postgres 9.5",
+        "channel": "PG Casts by Hashrocket",
+        "duration": "3m 37s",
+        "length": "3m",
         "role": "deep-dive",
-        "why": "Contrasts pessimistic 2PL locking with Postgres-style optimistic MVCC tuple version chains and vacuum freeze mechanics."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Row-Level Locks: FOR UPDATE, FOR NO KEY UPDATE, FOR SHARE, NOWAIT & SKIP LOCKED."
       }
     ],
     "intuition": "<p>In <strong>Row-Level Locks: FOR UPDATE, FOR NO KEY UPDATE, FOR SHARE, NOWAIT & SKIP LOCKED</strong> (<code>row-level-locks-for-update-skip-locked</code>), Why FOR NO KEY UPDATE avoids blocking child foreign-key inserts, and how FOR UPDATE SKIP LOCKED powers lock-free concurrent worker queues. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Row-Level Locks: FOR UPDATE, FOR NO KEY UPDATE, FOR SHARE, NOWAIT & SKIP LOCKED</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -184,23 +184,23 @@ window.MODULE_CONTENT["m14"] = {
   "table-locks-intention-locks-ddl-hazards": {
     "title": "Table Lock Hierarchy, Intention Locks & Why ALTER TABLE Stalls Traffic",
     "video": {
-      "youtubeId": "tUFha9-DuSk",
-      "title": "#20 - Multi-Version Concurrency Control (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 19m",
+      "youtubeId": "tBocTKQhx60",
+      "title": "Lock Escalation in SQL SERVER | By SQL Training | By SQL",
+      "channel": "Sql Training Sessions",
+      "duration": "12m 49s",
       "start": 0,
-      "length": "79m",
-      "why": "Key focus timestamps: 14:30 Version storage (append-only vs rollback segment); 36:20 Garbage collection & Vacuuming; 54:00 Snapshot isolation"
+      "length": "12m",
+      "why": "Core video covering Table Lock Hierarchy, Intention Locks & Why ALTER TABLE Stalls Traffic (table-locks-intention-locks-ddl-hazards): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "drStlhNbfHI",
-        "title": "#18 - Two-Phase Locking Concurrency Control (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 23m",
-        "length": "83m",
+        "youtubeId": "9lmPOTv-pDc",
+        "title": "What are the different locking modes present in SQL | SQL Server Locking modes | SQL interview Q&A",
+        "channel": "Right to Learn @BK",
+        "duration": "20m 43s",
+        "length": "20m",
         "role": "deep-dive",
-        "why": "Contrasts pessimistic 2PL locking with Postgres-style optimistic MVCC tuple version chains and vacuum freeze mechanics."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Table Lock Hierarchy, Intention Locks & Why ALTER TABLE Stalls Traffic."
       }
     ],
     "intuition": "<p>In <strong>Table Lock Hierarchy, Intention Locks & Why ALTER TABLE Stalls Traffic</strong> (<code>table-locks-intention-locks-ddl-hazards</code>), How AccessExclusive DDL locks queue behind one long-running SELECT and then block every subsequent incoming read and write across the entire table. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Table Lock Hierarchy, Intention Locks & Why ALTER TABLE Stalls Traffic</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -229,23 +229,23 @@ window.MODULE_CONTENT["m14"] = {
   "gap-locks-next-key-locks-innodb": {
     "title": "Preventing Phantoms with Locks: Record Locks, Gap Locks & Next-Key Locks",
     "video": {
-      "youtubeId": "tUFha9-DuSk",
-      "title": "#20 - Multi-Version Concurrency Control (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 19m",
+      "youtubeId": "CFNEF-Rc9T8",
+      "title": "Master MySQL Locks: Record Lock, Next-Key Lock, Gap Lock, and More Explained",
+      "channel": "Stockoverflow",
+      "duration": "7m 23s",
       "start": 0,
-      "length": "79m",
-      "why": "Key focus timestamps: 14:30 Version storage (append-only vs rollback segment); 36:20 Garbage collection & Vacuuming; 54:00 Snapshot isolation"
+      "length": "7m",
+      "why": "Core video covering Preventing Phantoms with Locks: Record Locks, Gap Locks & Next-Key Locks (gap-locks-next-key-locks-innodb): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "drStlhNbfHI",
-        "title": "#18 - Two-Phase Locking Concurrency Control (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 23m",
-        "length": "83m",
+        "youtubeId": "94C0V7f2zm4",
+        "title": "Lec-100:Shared Exclusive Locking Protocol with Example | Concurrency Control | DBMS | Part-1",
+        "channel": "Gate Smashers",
+        "duration": "6m 43s",
+        "length": "6m",
         "role": "deep-dive",
-        "why": "Contrasts pessimistic 2PL locking with Postgres-style optimistic MVCC tuple version chains and vacuum freeze mechanics."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Preventing Phantoms with Locks: Record Locks, Gap Locks & Next-Key Locks."
       }
     ],
     "intuition": "<p>In <strong>Preventing Phantoms with Locks: Record Locks, Gap Locks & Next-Key Locks</strong> (<code>gap-locks-next-key-locks-innodb</code>), How InnoDB locks the open key intervals between existing B+Tree index records so concurrent transactions cannot insert phantom rows into a range. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Preventing Phantoms with Locks: Record Locks, Gap Locks & Next-Key Locks</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -274,23 +274,23 @@ window.MODULE_CONTENT["m14"] = {
   "deadlocks-wait-for-graphs-detection": {
     "title": "Deadlocks: Wait-For Graph Cycles, Lock Ordering & Deadlock Detection",
     "video": {
-      "youtubeId": "tUFha9-DuSk",
-      "title": "#20 - Multi-Version Concurrency Control (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 19m",
+      "youtubeId": "AGZr5LaiyMg",
+      "title": "deadlock detection  part 1 |  wait for graph | Resource allocation graph",
+      "channel": "Sudhakar Atchala",
+      "duration": "3m 56s",
       "start": 0,
-      "length": "79m",
-      "why": "Key focus timestamps: 14:30 Version storage (append-only vs rollback segment); 36:20 Garbage collection & Vacuuming; 54:00 Snapshot isolation"
+      "length": "3m",
+      "why": "Core video covering Deadlocks: Wait-For Graph Cycles, Lock Ordering & Deadlock Detection (deadlocks-wait-for-graphs-detection): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "drStlhNbfHI",
-        "title": "#18 - Two-Phase Locking Concurrency Control (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 23m",
-        "length": "83m",
+        "youtubeId": "Nt5dZIlK_ms",
+        "title": "deadlock detection with out a cycle in wait for graph",
+        "channel": "Thaduri Suneetha",
+        "duration": "2m 36s",
+        "length": "2m",
         "role": "deep-dive",
-        "why": "Contrasts pessimistic 2PL locking with Postgres-style optimistic MVCC tuple version chains and vacuum freeze mechanics."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Deadlocks: Wait-For Graph Cycles, Lock Ordering & Deadlock Detection."
       }
     ],
     "intuition": "<p>In <strong>Deadlocks: Wait-For Graph Cycles, Lock Ordering & Deadlock Detection</strong> (<code>deadlocks-wait-for-graphs-detection</code>), Tracing how T1 locking row A→B and T2 locking row B→A creates a Wait-For Graph cycle, how the engine aborts a victim, and canonical lock ordering fixes. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Deadlocks: Wait-For Graph Cycles, Lock Ordering & Deadlock Detection</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -319,23 +319,23 @@ window.MODULE_CONTENT["m14"] = {
   "dead-tuples-bloat-autovacuum-txid-wraparound": {
     "title": "Dead Tuples, Table Bloat, Autovacuum, Free Space Map & XID Wraparound",
     "video": {
-      "youtubeId": "tUFha9-DuSk",
-      "title": "#20 - Multi-Version Concurrency Control (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 19m",
+      "youtubeId": "HmkyvSfdM0o",
+      "title": "PostgreSQL VACUUM explained: MVCC, dead tuples, table bloat and autovacuum",
+      "channel": "Prepare-sh",
+      "duration": "11m 7s",
       "start": 0,
-      "length": "79m",
-      "why": "Key focus timestamps: 14:30 Version storage (append-only vs rollback segment); 36:20 Garbage collection & Vacuuming; 54:00 Snapshot isolation"
+      "length": "11m",
+      "why": "Core video covering Dead Tuples, Table Bloat, Autovacuum, Free Space Map & XID Wraparound (dead-tuples-bloat-autovacuum-txid-wraparound): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "drStlhNbfHI",
-        "title": "#18 - Two-Phase Locking Concurrency Control (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 23m",
-        "length": "83m",
+        "youtubeId": "JuqsyiLOv8o",
+        "title": "PostgreSQL VACUUM FULL vs pg_repack vs Autovacuum | Stop Table Bloat #vacuum #postgresql",
+        "channel": "Knowledge with Satish",
+        "duration": "17m 4s",
+        "length": "17m",
         "role": "deep-dive",
-        "why": "Contrasts pessimistic 2PL locking with Postgres-style optimistic MVCC tuple version chains and vacuum freeze mechanics."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Dead Tuples, Table Bloat, Autovacuum, Free Space Map & XID Wraparound."
       }
     ],
     "intuition": "<p>In <strong>Dead Tuples, Table Bloat, Autovacuum, Free Space Map & XID Wraparound</strong> (<code>dead-tuples-bloat-autovacuum-txid-wraparound</code>), Why MVCC leaves dead tuples behind, how VACUUM reclaims space into the Free Space Map without locking reads, and how 32-bit Transaction ID wraparound freezes tables. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Dead Tuples, Table Bloat, Autovacuum, Free Space Map & XID Wraparound</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -364,23 +364,23 @@ window.MODULE_CONTENT["m14"] = {
   "case-sentry-transaction-id-wraparound": {
     "title": "Production Case Study: Anatomy of a Transaction ID (XID) Wraparound Outage",
     "video": {
-      "youtubeId": "tUFha9-DuSk",
-      "title": "#20 - Multi-Version Concurrency Control (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 19m",
+      "youtubeId": "wnXWXyBfKTc",
+      "title": "Postgres Transaction ID Wraparound: The Real Scaling Killer",
+      "channel": "Exploded View",
+      "duration": "8m 51s",
       "start": 0,
-      "length": "79m",
-      "why": "Key focus timestamps: 14:30 Version storage (append-only vs rollback segment); 36:20 Garbage collection & Vacuuming; 54:00 Snapshot isolation"
+      "length": "8m",
+      "why": "Core video covering Production Case Study: Anatomy of a Transaction ID (XID) Wraparound Outage (case-sentry-transaction-id-wraparound): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "drStlhNbfHI",
-        "title": "#18 - Two-Phase Locking Concurrency Control (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 23m",
-        "length": "83m",
+        "youtubeId": "kScMl-9LiSQ",
+        "title": "pg_stat_statements, Transaction ID Wraparound, Consultant Knowledge, CitusCon | Scaling Postgres 265",
+        "channel": "Scaling Postgres",
+        "duration": "16m 48s",
+        "length": "16m",
         "role": "deep-dive",
-        "why": "Contrasts pessimistic 2PL locking with Postgres-style optimistic MVCC tuple version chains and vacuum freeze mechanics."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Production Case Study: Anatomy of a Transaction ID (XID) Wraparound Outage."
       }
     ],
     "intuition": "<p>In <strong>Production Case Study: Anatomy of a Transaction ID (XID) Wraparound Outage</strong> (<code>case-sentry-transaction-id-wraparound</code>), Dissecting how unvacuumed 32-bit transaction IDs approach the 2-billion horizon, forcing PostgreSQL into emergency read-only shutdown to prevent data loss. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Production Case Study: Anatomy of a Transaction ID (XID) Wraparound Outage</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -409,23 +409,23 @@ window.MODULE_CONTENT["m14"] = {
   "build-mvcc-snapshot-storage-engine": {
     "title": "Hands-On Build: Multi-Version Tuple Store with Snapshot Isolation & Vacuum GC",
     "video": {
-      "youtubeId": "tUFha9-DuSk",
-      "title": "#20 - Multi-Version Concurrency Control (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 19m",
+      "youtubeId": "-cDSR229tM4",
+      "title": "MVCC Explained: Row Versions, xmin/xmax, Snapshots, Dead Tuples and VACUUM (PostgreSQL)",
+      "channel": "Prateek Goel | GrowAsEngineers",
+      "duration": "8m 2s",
       "start": 0,
-      "length": "79m",
-      "why": "Key focus timestamps: 14:30 Version storage (append-only vs rollback segment); 36:20 Garbage collection & Vacuuming; 54:00 Snapshot isolation"
+      "length": "8m",
+      "why": "Core video covering Hands-On Build: Multi-Version Tuple Store with Snapshot Isolation & Vacuum GC (build-mvcc-snapshot-storage-engine): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "drStlhNbfHI",
-        "title": "#18 - Two-Phase Locking Concurrency Control (CMU Intro to Database Systems)",
-        "channel": "CMU Database Group",
-        "duration": "1h 23m",
-        "length": "83m",
+        "youtubeId": "9NVu17LjPSA",
+        "title": "Snapshot isolation level in sql server",
+        "channel": "kudvenkat",
+        "duration": "9m 15s",
+        "length": "9m",
         "role": "deep-dive",
-        "why": "Contrasts pessimistic 2PL locking with Postgres-style optimistic MVCC tuple version chains and vacuum freeze mechanics."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Hands-On Build: Multi-Version Tuple Store with Snapshot Isolation & Vacuum GC."
       }
     ],
     "intuition": "<p>In <strong>Hands-On Build: Multi-Version Tuple Store with Snapshot Isolation & Vacuum GC</strong> (<code>build-mvcc-snapshot-storage-engine</code>), Implement an MVCC storage engine supporting versioned tuple chains (xmin/xmax), point-in-time snapshot visibility reads, and dead-tuple vacuum garbage collection. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Hands-On Build: Multi-Version Tuple Store with Snapshot Isolation & Vacuum GC</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",

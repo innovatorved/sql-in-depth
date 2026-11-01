@@ -4,23 +4,23 @@ window.MODULE_CONTENT["m08"] = {
   "oltp-vs-olap-workload-physics": {
     "title": "OLTP vs OLAP Workload Physics: Point Lookups vs Billion-Row Scans",
     "video": {
-      "youtubeId": "gRE3E7VUzRU",
-      "title": "Data Modeling Tutorial: Star Schema (aka Kimball Approach)",
-      "channel": "Kahan Data Solutions",
-      "duration": "24m 50s",
+      "youtubeId": "rPayGxtAbG0",
+      "title": "OLTP vs OLAP Explained: Transactional vs Analytical Database Workloads",
+      "channel": "Prateek Goel | GrowAsEngineers",
+      "duration": "9m 11s",
       "start": 0,
-      "length": "25m",
-      "why": "Key focus timestamps: 03:15 Fact vs Dimension; 09:30 Grain definition; 15:10 Surrogate keys; 19:45 Snowflake vs Star tradeoffs"
+      "length": "9m",
+      "why": "Core video covering OLTP vs OLAP Workload Physics: Point Lookups vs Billion-Row Scans (oltp-vs-olap-workload-physics): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "fsZA4K0E3kQ",
-        "title": "Slowly Changing Dimensions (SCD Type 0, 1, 2, 3, 4, 6) Explained",
-        "channel": "Seattle Data Guy",
-        "duration": "19m 55s",
-        "length": "20m",
+        "youtubeId": "DeL3dgiy6vk",
+        "title": "Lec -8 : OLAP vs OLTP | Difference between OLAP vs OLTP with Real Life Examples",
+        "channel": "Gate Smashers",
+        "duration": "7m 39s",
+        "length": "7m",
         "role": "deep-dive",
-        "why": "Upgrades the companion from PrepWithSid (294 views) to an industry-standard authority covering enterprise SCD Type 2 pipelines."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for OLTP vs OLAP Workload Physics: Point Lookups vs Billion-Row Scans."
       }
     ],
     "intuition": "<p>In <strong>OLTP vs OLAP Workload Physics: Point Lookups vs Billion-Row Scans</strong> (<code>oltp-vs-olap-workload-physics</code>), Contrasting high-concurrency transactional point mutations against wide analytical aggregations and why they demand different schema topologies. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>OLTP vs OLAP Workload Physics: Point Lookups vs Billion-Row Scans</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -52,20 +52,20 @@ window.MODULE_CONTENT["m08"] = {
       "youtubeId": "gRE3E7VUzRU",
       "title": "Data Modeling Tutorial: Star Schema (aka Kimball Approach)",
       "channel": "Kahan Data Solutions",
-      "duration": "24m 50s",
+      "duration": "16m 33s",
       "start": 0,
-      "length": "25m",
-      "why": "Key focus timestamps: 03:15 Fact vs Dimension; 09:30 Grain definition; 15:10 Surrogate keys; 19:45 Snowflake vs Star tradeoffs"
+      "length": "16m",
+      "why": "Core video covering Kimball Star Schema: Fact Table Grain, Additive Measures & Conformed Dimensions (star-schema-facts-dimensions): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "fsZA4K0E3kQ",
-        "title": "Slowly Changing Dimensions (SCD Type 0, 1, 2, 3, 4, 6) Explained",
-        "channel": "Seattle Data Guy",
-        "duration": "19m 55s",
-        "length": "20m",
+        "youtubeId": "hQvCOBv_-LE",
+        "title": "What is STAR schema | Star vs Snowflake Schema | Fact vs Dimension Table",
+        "channel": "codebasics",
+        "duration": "6m 59s",
+        "length": "6m",
         "role": "deep-dive",
-        "why": "Upgrades the companion from PrepWithSid (294 views) to an industry-standard authority covering enterprise SCD Type 2 pipelines."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Kimball Star Schema: Fact Table Grain, Additive Measures & Conformed Dimensions."
       }
     ],
     "intuition": "<p>In <strong>Kimball Star Schema: Fact Table Grain, Additive Measures & Conformed Dimensions</strong> (<code>star-schema-facts-dimensions</code>), Declaring an unambiguous fact grain, classifying additive, semi-additive (account balances), and non-additive measures, and surrogate dimension keys. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Kimball Star Schema: Fact Table Grain, Additive Measures & Conformed Dimensions</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -94,23 +94,23 @@ window.MODULE_CONTENT["m08"] = {
   "snowflake-vs-star-vs-obt": {
     "title": "Snowflake Schema vs Star Schema vs One Big Table (OBT) in Cloud Warehouses",
     "video": {
-      "youtubeId": "gRE3E7VUzRU",
-      "title": "Data Modeling Tutorial: Star Schema (aka Kimball Approach)",
-      "channel": "Kahan Data Solutions",
-      "duration": "24m 50s",
+      "youtubeId": "hQvCOBv_-LE",
+      "title": "What is STAR schema | Star vs Snowflake Schema | Fact vs Dimension Table",
+      "channel": "codebasics",
+      "duration": "6m 59s",
       "start": 0,
-      "length": "25m",
-      "why": "Key focus timestamps: 03:15 Fact vs Dimension; 09:30 Grain definition; 15:10 Surrogate keys; 19:45 Snowflake vs Star tradeoffs"
+      "length": "6m",
+      "why": "Core video covering Snowflake Schema vs Star Schema vs One Big Table (OBT) in Cloud Warehouses (snowflake-vs-star-vs-obt): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "fsZA4K0E3kQ",
-        "title": "Slowly Changing Dimensions (SCD Type 0, 1, 2, 3, 4, 6) Explained",
-        "channel": "Seattle Data Guy",
-        "duration": "19m 55s",
-        "length": "20m",
+        "youtubeId": "kLpGBy6Q5BA",
+        "title": "Lec -15 : Star vs Snowflake Schema | Data Warehouse",
+        "channel": "Gate Smashers",
+        "duration": "9m 15s",
+        "length": "9m",
         "role": "deep-dive",
-        "why": "Upgrades the companion from PrepWithSid (294 views) to an industry-standard authority covering enterprise SCD Type 2 pipelines."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Snowflake Schema vs Star Schema vs One Big Table (OBT) in Cloud Warehouses."
       }
     ],
     "intuition": "<p>In <strong>Snowflake Schema vs Star Schema vs One Big Table (OBT) in Cloud Warehouses</strong> (<code>snowflake-vs-star-vs-obt</code>), Benchmarking join cost vs storage compression across normalized Snowflake dimensions, classic Star schemas, and wide columnar One Big Tables. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Snowflake Schema vs Star Schema vs One Big Table (OBT) in Cloud Warehouses</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -139,23 +139,23 @@ window.MODULE_CONTENT["m08"] = {
   "slowly-changing-dimensions-scd": {
     "title": "Slowly Changing Dimensions: SCD Type 0, 1, 2 (Effective Dates), 3 & 6",
     "video": {
-      "youtubeId": "gRE3E7VUzRU",
-      "title": "Data Modeling Tutorial: Star Schema (aka Kimball Approach)",
-      "channel": "Kahan Data Solutions",
-      "duration": "24m 50s",
+      "youtubeId": "1JswR_4XUdU",
+      "title": "Slowly Changing Dimensions (SCD)  | Types 0, 1, 2, 3, 4 Explained with Real Examples",
+      "channel": "SleekData",
+      "duration": "6m 46s",
       "start": 0,
-      "length": "25m",
-      "why": "Key focus timestamps: 03:15 Fact vs Dimension; 09:30 Grain definition; 15:10 Surrogate keys; 19:45 Snowflake vs Star tradeoffs"
+      "length": "6m",
+      "why": "Core video covering Slowly Changing Dimensions: SCD Type 0, 1, 2 (Effective Dates), 3 & 6 (slowly-changing-dimensions-scd): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "fsZA4K0E3kQ",
-        "title": "Slowly Changing Dimensions (SCD Type 0, 1, 2, 3, 4, 6) Explained",
-        "channel": "Seattle Data Guy",
-        "duration": "19m 55s",
-        "length": "20m",
+        "youtubeId": "ejdIgYPfcV4",
+        "title": "Slowly Changing Dimensions In Data warehousing with iPhone 11 Example | SCD 1/2/3",
+        "channel": "Ankit Bansal",
+        "duration": "12m 34s",
+        "length": "12m",
         "role": "deep-dive",
-        "why": "Upgrades the companion from PrepWithSid (294 views) to an industry-standard authority covering enterprise SCD Type 2 pipelines."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Slowly Changing Dimensions: SCD Type 0, 1, 2 (Effective Dates), 3 & 6."
       }
     ],
     "intuition": "<p>In <strong>Slowly Changing Dimensions: SCD Type 0, 1, 2 (Effective Dates), 3 & 6</strong> (<code>slowly-changing-dimensions-scd</code>), Preserving point-in-time historical truth when customer tiers or territories change using SCD Type 2 (valid_from, valid_to, is_current) rows. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Slowly Changing Dimensions: SCD Type 0, 1, 2 (Effective Dates), 3 & 6</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -184,23 +184,23 @@ window.MODULE_CONTENT["m08"] = {
   "bridge-tables-junk-role-dimensions": {
     "title": "Role-Playing Dimensions, Junk Dimensions & Many-to-Many Bridge Tables",
     "video": {
-      "youtubeId": "gRE3E7VUzRU",
-      "title": "Data Modeling Tutorial: Star Schema (aka Kimball Approach)",
-      "channel": "Kahan Data Solutions",
-      "duration": "24m 50s",
+      "youtubeId": "P7tAvLfiD_8",
+      "title": "How to Create a Bridge Table for Many to Many Relationships",
+      "channel": "Goodly",
+      "duration": "2m 17s",
       "start": 0,
-      "length": "25m",
-      "why": "Key focus timestamps: 03:15 Fact vs Dimension; 09:30 Grain definition; 15:10 Surrogate keys; 19:45 Snowflake vs Star tradeoffs"
+      "length": "2m",
+      "why": "Core video covering Role-Playing Dimensions, Junk Dimensions & Many-to-Many Bridge Tables (bridge-tables-junk-role-dimensions): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "fsZA4K0E3kQ",
-        "title": "Slowly Changing Dimensions (SCD Type 0, 1, 2, 3, 4, 6) Explained",
-        "channel": "Seattle Data Guy",
-        "duration": "19m 55s",
-        "length": "20m",
+        "youtubeId": "fqrLYhkF39A",
+        "title": "How to Connect Two Fact Tables (Many-to-Many) | #Power BI Course 24",
+        "channel": "Data with Baraa",
+        "duration": "27m 33s",
+        "length": "27m",
         "role": "deep-dive",
-        "why": "Upgrades the companion from PrepWithSid (294 views) to an industry-standard authority covering enterprise SCD Type 2 pipelines."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Role-Playing Dimensions, Junk Dimensions & Many-to-Many Bridge Tables."
       }
     ],
     "intuition": "<p>In <strong>Role-Playing Dimensions, Junk Dimensions & Many-to-Many Bridge Tables</strong> (<code>bridge-tables-junk-role-dimensions</code>), Joining a single date dimension multiple times (Order Date, Ship Date), consolidating low-cardinality flags into Junk Dimensions, and weighting bridge tables. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Role-Playing Dimensions, Junk Dimensions & Many-to-Many Bridge Tables</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -229,23 +229,23 @@ window.MODULE_CONTENT["m08"] = {
   "temporal-tables-bitemporal-sql": {
     "title": "Temporal & Bitemporal SQL: System Time vs Valid Application Time",
     "video": {
-      "youtubeId": "gRE3E7VUzRU",
-      "title": "Data Modeling Tutorial: Star Schema (aka Kimball Approach)",
-      "channel": "Kahan Data Solutions",
-      "duration": "24m 50s",
+      "youtubeId": "91uIXGomwKs",
+      "title": "Temporal Databases Explained: Managing Time-Varying Data",
+      "channel": "CodeLucky",
+      "duration": "6m 23s",
       "start": 0,
-      "length": "25m",
-      "why": "Key focus timestamps: 03:15 Fact vs Dimension; 09:30 Grain definition; 15:10 Surrogate keys; 19:45 Snowflake vs Star tradeoffs"
+      "length": "6m",
+      "why": "Core video covering Temporal & Bitemporal SQL: System Time vs Valid Application Time (temporal-tables-bitemporal-sql): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "fsZA4K0E3kQ",
-        "title": "Slowly Changing Dimensions (SCD Type 0, 1, 2, 3, 4, 6) Explained",
-        "channel": "Seattle Data Guy",
-        "duration": "19m 55s",
-        "length": "20m",
+        "youtubeId": "ZjsH_V5EkSk",
+        "title": "How to Use Temporal Tables in SQL Server 2016",
+        "channel": "Bert Wagner",
+        "duration": "10m 18s",
+        "length": "10m",
         "role": "deep-dive",
-        "why": "Upgrades the companion from PrepWithSid (294 views) to an industry-standard authority covering enterprise SCD Type 2 pipelines."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Temporal & Bitemporal SQL: System Time vs Valid Application Time."
       }
     ],
     "intuition": "<p>In <strong>Temporal & Bitemporal SQL: System Time vs Valid Application Time</strong> (<code>temporal-tables-bitemporal-sql</code>), Tracking both when a fact was true in reality (valid time) and when it was recorded in the database (transaction time) for audit-grade time travel. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Temporal & Bitemporal SQL: System Time vs Valid Application Time</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -274,23 +274,23 @@ window.MODULE_CONTENT["m08"] = {
   "json-semi-structured-hybrid-schemas": {
     "title": "Hybrid Relational + JSONB Schemas, Generated Columns & Schema Evolution",
     "video": {
-      "youtubeId": "gRE3E7VUzRU",
-      "title": "Data Modeling Tutorial: Star Schema (aka Kimball Approach)",
-      "channel": "Kahan Data Solutions",
-      "duration": "24m 50s",
+      "youtubeId": "LXa_UfdVpPc",
+      "title": "Databricks Schema Evolution Explained (Telugu) | Add Column Without Rewriting Data? 😲 | Ep 10",
+      "channel": "Data Dharma by Srikanth",
+      "duration": "8m 36s",
       "start": 0,
-      "length": "25m",
-      "why": "Key focus timestamps: 03:15 Fact vs Dimension; 09:30 Grain definition; 15:10 Surrogate keys; 19:45 Snowflake vs Star tradeoffs"
+      "length": "8m",
+      "why": "Core video covering Hybrid Relational + JSONB Schemas, Generated Columns & Schema Evolution (json-semi-structured-hybrid-schemas): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "fsZA4K0E3kQ",
-        "title": "Slowly Changing Dimensions (SCD Type 0, 1, 2, 3, 4, 6) Explained",
-        "channel": "Seattle Data Guy",
-        "duration": "19m 55s",
-        "length": "20m",
+        "youtubeId": "NOYL0yRoUeo",
+        "title": "67. Databricks | Pypark | Delta: Schema Evolution - MergeSchema",
+        "channel": "Raja's Data Engineering",
+        "duration": "7m 53s",
+        "length": "7m",
         "role": "deep-dive",
-        "why": "Upgrades the companion from PrepWithSid (294 views) to an industry-standard authority covering enterprise SCD Type 2 pipelines."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Hybrid Relational + JSONB Schemas, Generated Columns & Schema Evolution."
       }
     ],
     "intuition": "<p>In <strong>Hybrid Relational + JSONB Schemas, Generated Columns & Schema Evolution</strong> (<code>json-semi-structured-hybrid-schemas</code>), Combining strict relational columns for core entities with flexible JSON attributes and indexing hot JSON paths via virtual/stored generated columns. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Hybrid Relational + JSONB Schemas, Generated Columns & Schema Evolution</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -319,23 +319,23 @@ window.MODULE_CONTENT["m08"] = {
   "idempotency-audit-logs-event-tables": {
     "title": "Immutable Ledger Tables, Append-Only Audit Logs & Transactional Outbox",
     "video": {
-      "youtubeId": "gRE3E7VUzRU",
-      "title": "Data Modeling Tutorial: Star Schema (aka Kimball Approach)",
-      "channel": "Kahan Data Solutions",
-      "duration": "24m 50s",
+      "youtubeId": "V81Smc6xrBY",
+      "title": "SQL Triggers (Visually Explained) | Audit Logs Use Case | #SQL Course 34",
+      "channel": "Data with Baraa",
+      "duration": "11m 13s",
       "start": 0,
-      "length": "25m",
-      "why": "Key focus timestamps: 03:15 Fact vs Dimension; 09:30 Grain definition; 15:10 Surrogate keys; 19:45 Snowflake vs Star tradeoffs"
+      "length": "11m",
+      "why": "Core video covering Immutable Ledger Tables, Append-Only Audit Logs & Transactional Outbox (idempotency-audit-logs-event-tables): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "fsZA4K0E3kQ",
-        "title": "Slowly Changing Dimensions (SCD Type 0, 1, 2, 3, 4, 6) Explained",
-        "channel": "Seattle Data Guy",
-        "duration": "19m 55s",
-        "length": "20m",
+        "youtubeId": "Nsqu2isTwBE",
+        "title": "Oracle LogMiner: Auditing SQL REDO/UNDO & Table Access Statistics – Step-by-Step Tutorial",
+        "channel": "HowToVelan",
+        "duration": "1h 1m",
+        "length": "61m",
         "role": "deep-dive",
-        "why": "Upgrades the companion from PrepWithSid (294 views) to an industry-standard authority covering enterprise SCD Type 2 pipelines."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Immutable Ledger Tables, Append-Only Audit Logs & Transactional Outbox."
       }
     ],
     "intuition": "<p>In <strong>Immutable Ledger Tables, Append-Only Audit Logs & Transactional Outbox</strong> (<code>idempotency-audit-logs-event-tables</code>), Designing tamper-evident append-only event tables and guaranteeing reliable microservice event publishing via the Transactional Outbox pattern. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Immutable Ledger Tables, Append-Only Audit Logs & Transactional Outbox</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -364,23 +364,23 @@ window.MODULE_CONTENT["m08"] = {
   "case-airbnb-minerva-metric-layer": {
     "title": "Production Case Study: Designing a Canonical Metric Store at Petabyte Scale",
     "video": {
-      "youtubeId": "gRE3E7VUzRU",
-      "title": "Data Modeling Tutorial: Star Schema (aka Kimball Approach)",
-      "channel": "Kahan Data Solutions",
-      "duration": "24m 50s",
+      "youtubeId": "z0NXIRsG5Og",
+      "title": "Data Analysis using SQL | Food Manufacturing Case Study | SQL Industry Project | Sauradeep Poddar",
+      "channel": "IvyProSchool",
+      "duration": "3m 46s",
       "start": 0,
-      "length": "25m",
-      "why": "Key focus timestamps: 03:15 Fact vs Dimension; 09:30 Grain definition; 15:10 Surrogate keys; 19:45 Snowflake vs Star tradeoffs"
+      "length": "3m",
+      "why": "Core video covering Production Case Study: Designing a Canonical Metric Store at Petabyte Scale (case-airbnb-minerva-metric-layer): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "fsZA4K0E3kQ",
-        "title": "Slowly Changing Dimensions (SCD Type 0, 1, 2, 3, 4, 6) Explained",
-        "channel": "Seattle Data Guy",
-        "duration": "19m 55s",
-        "length": "20m",
+        "youtubeId": "9TSB1o4NxwQ",
+        "title": "YoY Sales Growth Calculation in SQL | Real Business Case Study",
+        "channel": "DecodeWithRatan",
+        "duration": "11m 57s",
+        "length": "11m",
         "role": "deep-dive",
-        "why": "Upgrades the companion from PrepWithSid (294 views) to an industry-standard authority covering enterprise SCD Type 2 pipelines."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Production Case Study: Designing a Canonical Metric Store at Petabyte Scale."
       }
     ],
     "intuition": "<p>In <strong>Production Case Study: Designing a Canonical Metric Store at Petabyte Scale</strong> (<code>case-airbnb-minerva-metric-layer</code>), How standardized dimensional star schemas and certified metric definitions eliminate conflicting KPI numbers across hundreds of product teams. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Production Case Study: Designing a Canonical Metric Store at Petabyte Scale</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
@@ -409,23 +409,23 @@ window.MODULE_CONTENT["m08"] = {
   "build-scd-type2-warehouse-pipeline": {
     "title": "Hands-On Build: Star Schema with Automated SCD Type 2 Dimension Pipeline",
     "video": {
-      "youtubeId": "gRE3E7VUzRU",
-      "title": "Data Modeling Tutorial: Star Schema (aka Kimball Approach)",
-      "channel": "Kahan Data Solutions",
-      "duration": "24m 50s",
+      "youtubeId": "hQvCOBv_-LE",
+      "title": "What is STAR schema | Star vs Snowflake Schema | Fact vs Dimension Table",
+      "channel": "codebasics",
+      "duration": "6m 59s",
       "start": 0,
-      "length": "25m",
-      "why": "Key focus timestamps: 03:15 Fact vs Dimension; 09:30 Grain definition; 15:10 Surrogate keys; 19:45 Snowflake vs Star tradeoffs"
+      "length": "6m",
+      "why": "Core video covering Hands-On Build: Star Schema with Automated SCD Type 2 Dimension Pipeline (build-scd-type2-warehouse-pipeline): focuses directly on practical mechanics, real-world examples, and implementation details."
     },
     "videos": [
       {
-        "youtubeId": "fsZA4K0E3kQ",
-        "title": "Slowly Changing Dimensions (SCD Type 0, 1, 2, 3, 4, 6) Explained",
-        "channel": "Seattle Data Guy",
-        "duration": "19m 55s",
-        "length": "20m",
+        "youtubeId": "kii_Kukh4po",
+        "title": "SCD Type 1 and Type 2 using SQL | Implementation of Slowly Changing Dimensions",
+        "channel": "Ankit Bansal",
+        "duration": "28m 55s",
+        "length": "28m",
         "role": "deep-dive",
-        "why": "Upgrades the companion from PrepWithSid (294 views) to an industry-standard authority covering enterprise SCD Type 2 pipelines."
+        "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Hands-On Build: Star Schema with Automated SCD Type 2 Dimension Pipeline."
       }
     ],
     "intuition": "<p>In <strong>Hands-On Build: Star Schema with Automated SCD Type 2 Dimension Pipeline</strong> (<code>build-scd-type2-warehouse-pipeline</code>), Build a Kimball star schema and write the idempotent SCD Type 2 merge pipeline that expires old dimension versions and inserts new historical rows. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Hands-On Build: Star Schema with Automated SCD Type 2 Dimension Pipeline</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p>",
