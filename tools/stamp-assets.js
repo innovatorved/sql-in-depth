@@ -62,7 +62,40 @@ function generateManifest() {
       vm.runInNewContext(buf.toString('utf8'), { window: win });
     }
   }
-  for (const extra of ['data/implementations_code.js', 'data/guided_labs.js', 'data/topic_guided_labs.js']) {
+  const extraLazyFiles = [
+    'data/datasets.js',
+    'data/roadmap.js',
+    'data/challenges.js',
+    'data/srs-cards.js',
+    'data/whiteboard-blueprints.js',
+    'data/implementations_code.js',
+    'data/guided_labs.js',
+    'data/topic_guided_labs.js',
+    'data/projects.js',
+    'data/glossary.js',
+    'js/vendor/sql-wasm.js',
+    'js/vendor/cm6-sql.js',
+    'js/vendor/katex/katex.min.js',
+    'js/vendor/katex/auto-render.min.js',
+    'js/sql-engine.js',
+    'js/sql-worker.js',
+    'js/table-visualizer.js',
+    'js/simulators.js',
+    'js/simulators-relational.js',
+    'js/simulators-analytical.js',
+    'js/simulators-modeling.js',
+    'js/simulators-indexing.js',
+    'js/simulators-transactions.js',
+    'js/simulators-olap-ops.js',
+    'js/quiz.js',
+    'js/exercises.js',
+    'js/roadmap.js',
+    'js/challenges.js',
+    'js/dashboard.js',
+    'js/sandbox.js',
+    'js/topic-codelab.js'
+  ];
+  for (const extra of extraLazyFiles) {
     const abs = path.join(root, extra);
     if (fs.existsSync(abs)) {
       manifest[extra] = hashOf(fs.readFileSync(abs));

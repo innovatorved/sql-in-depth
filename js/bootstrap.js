@@ -1,13 +1,19 @@
 /**
- * System Design In Depth — Client Bootstrap & Deferred Asset Loader
- * Fetches application scripts after first paint, initializes Mermaid on demand,
- * and manages user consent for privacy regulations (GDPR / DPDP).
+ * SQL In Depth — Client Bootstrap & Route-Aware Deferred Asset Loader
+ * Schedules core shell scripts during idle time after first paint (or immediately on
+ * user interaction), keeping TBT near zero and avoiding unsolicited analytics modals.
  */
 (() => {
-  // 1. Deferred App Scripts & GA4 Basic Consent Mode Loader
   let started = false;
+
+  const isLocalHost = () => {
+    const h = window.location && window.location.hostname;
+    return !h || h === 'localhost' || h === '127.0.0.1' || h.endsWith('.local');
+  };
+
   const loadGA4 = () => {
-    if (!window.GA_MEASUREMENT_ID || window._ga4Loaded) return;
+    if (!window.GA_MEASUREMENT_ID || window._ga4Loaded || isLocalHost()) return;
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) return;
     window._ga4Loaded = true;
     const ga = document.createElement('script');
     ga.async = true;
@@ -20,7 +26,8 @@
     if (started) return;
     started = true;
 
-    // Load data & application scripts in strict DOM order
+    // Load core shell scripts (`data-defer`) in strict DOM order.
+    // Heavy route-scoped bundles (`data-lazy`) stay dormant until requested by `window.Lazy`.
     document.querySelectorAll('script[data-defer]').forEach(old => {
       const s = document.createElement('script');
       s.src = old.getAttribute('src');
@@ -28,38 +35,41 @@
       document.body.appendChild(s);
     });
 
-    // Load GA4 library by default unless user explicitly opted out
-    let consentGranted = true;
+    // Respect privacy by default: only load GA4 when explicitly granted in storage
     try {
-      if (localStorage.getItem('sd-consent') === 'denied') consentGranted = false;
+      if (localStorage.getItem('sd-consent') === 'granted') {
+        loadGA4();
+      }
     } catch {}
-    if (consentGranted) {
-      loadGA4();
-    }
   };
 
-  // Trigger loading on early user interaction
-  ['pointerdown', 'keydown', 'scroll', 'touchstart'].forEach(evt => {
+  // Trigger immediately on first user interaction
+  ['pointerdown', 'keydown', 'touchstart'].forEach(evt => {
     window.addEventListener(evt, startDeferredScripts, { once: true, passive: true });
   });
 
-  // Or trigger after Largest Contentful Paint (LCP)
-  if (window.PerformanceObserver && PerformanceObserver.supportedEntryTypes?.includes('largest-contentful-paint')) {
-    new PerformanceObserver((_, obs) => {
-      obs.disconnect();
-      setTimeout(startDeferredScripts, 0);
-    }).observe({ type: 'largest-contentful-paint', buffered: true });
+  // Schedule cleanly in idle time after paint so LCP and TBT stay fast
+  const scheduleIdleBoot = () => {
+    if (typeof window.requestIdleCallback === 'function') {
+      window.requestIdleCallback(startDeferredScripts, { timeout: 900 });
+    } else {
+      setTimeout(startDeferredScripts, 120);
+    }
+  };
+
+  if (document.readyState === 'complete') {
+    scheduleIdleBoot();
   } else {
-    const afterPaint = () => requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(startDeferredScripts, 0)));
-    if (document.readyState === 'complete') afterPaint();
-    else addEventListener('load', afterPaint, { once: true });
+    window.addEventListener('load', () => {
+      requestAnimationFrame(scheduleIdleBoot);
+    }, { once: true });
   }
 
   // Safety fallback for background tabs
-  setTimeout(startDeferredScripts, 4000);
+  setTimeout(startDeferredScripts, 2500);
 
-  // 2. On-demand Mermaid Diagram Loader (Pinned version 10.9.8 with SRI integrity hash)
-  window.loadMermaid = function() {
+  // On-demand Mermaid Diagram Loader (Pinned version 10.9.8 with SRI integrity hash)
+  window.loadMermaid = function () {
     if (window.mermaid) return Promise.resolve();
     if (window._mermaidPromise) return window._mermaidPromise;
 
@@ -76,27 +86,27 @@
           theme: 'base',
           themeVariables: {
             darkMode: isDark,
-            background: isDark ? '#0a0a0a' : '#ffffff',
-            primaryColor: isDark ? '#171717' : '#fafafa',
-            primaryTextColor: isDark ? '#ffffff' : '#0a0a0a',
-            primaryBorderColor: isDark ? '#404040' : '#d4d4d4',
-            lineColor: isDark ? '#737373' : '#a1a1a1',
-            secondaryColor: isDark ? '#0a0a0a' : '#f5f5f5',
-            tertiaryColor: isDark ? '#262626' : '#e5e5e5',
-            mainBkg: isDark ? '#171717' : '#fafafa',
-            nodeBorder: isDark ? '#404040' : '#d4d4d4',
-            clusterBkg: isDark ? '#0a0a0a' : '#ffffff',
-            clusterBorder: isDark ? '#262626' : '#e5e5e5',
-            textColor: isDark ? '#e5e5e5' : '#262626',
-            edgeLabelBackground: isDark ? '#0a0a0a' : '#ffffff',
-            actorBkg: isDark ? '#171717' : '#fafafa',
-            actorBorder: isDark ? '#404040' : '#d4d4d4',
-            actorTextColor: isDark ? '#ffffff' : '#0a0a0a',
-            signalColor: isDark ? '#a1a1a1' : '#525252',
-            signalTextColor: isDark ? '#e5e5e5' : '#262626',
-            noteBkgColor: isDark ? '#262626' : '#f5f5f5',
-            noteBorderColor: isDark ? '#404040' : '#d4d4d4',
-            noteTextColor: isDark ? '#e5e5e5' : '#262626',
+            background: isDark ? '#0b0e14' : '#ffffff',
+            primaryColor: isDark ? '#131924' : '#f7f8fa',
+            primaryTextColor: isDark ? '#e6edf3' : '#111827',
+            primaryBorderColor: isDark ? '#334155' : '#cbd5e1',
+            lineColor: isDark ? '#8b98ad' : '#64748b',
+            secondaryColor: isDark ? '#0b0e14' : '#f0f3f7',
+            tertiaryColor: isDark ? '#1b2332' : '#e2e6ed',
+            mainBkg: isDark ? '#131924' : '#f7f8fa',
+            nodeBorder: isDark ? '#334155' : '#cbd5e1',
+            clusterBkg: isDark ? '#0b0e14' : '#ffffff',
+            clusterBorder: isDark ? '#232c3d' : '#e2e6ed',
+            textColor: isDark ? '#e6edf3' : '#111827',
+            edgeLabelBackground: isDark ? '#0b0e14' : '#ffffff',
+            actorBkg: isDark ? '#131924' : '#f7f8fa',
+            actorBorder: isDark ? '#334155' : '#cbd5e1',
+            actorTextColor: isDark ? '#e6edf3' : '#111827',
+            signalColor: isDark ? '#8b98ad' : '#4b5563',
+            signalTextColor: isDark ? '#e6edf3' : '#111827',
+            noteBkgColor: isDark ? '#1b2332' : '#f0f3f7',
+            noteBorderColor: isDark ? '#334155' : '#cbd5e1',
+            noteTextColor: isDark ? '#e6edf3' : '#111827',
             fontFamily: '"Geist", -apple-system, sans-serif',
             fontSize: '13px'
           }
@@ -112,71 +122,4 @@
 
     return window._mermaidPromise;
   };
-
-  // 3. Privacy & Cookie Consent Banner (GDPR / DPDP)
-  function initConsentBanner() {
-    try {
-      if (localStorage.getItem('sd-consent') !== null) {
-        return; // User has already chosen
-      }
-    } catch {
-      return;
-    }
-
-    const banner = document.createElement('div');
-    banner.className = 'consent-banner';
-    banner.id = 'consent-banner';
-    banner.setAttribute('role', 'dialog');
-    banner.setAttribute('aria-label', 'Analytics & privacy choices');
-    banner.innerHTML = `
-      <div class="consent-banner__inner">
-        <p class="consent-banner__text">
-          We use anonymous analytics to refine lessons and interactive simulators. Respecting your privacy is our default. Enable Google Analytics?
-        </p>
-        <div class="consent-banner__actions">
-          <button type="button" class="btn btn--sm btn--primary consent-banner__btn" id="consent-btn-accept">Accept</button>
-          <button type="button" class="btn btn--sm btn--outline consent-banner__btn" id="consent-btn-decline">Decline</button>
-        </div>
-      </div>
-    `;
-
-    const closeBanner = () => {
-      banner.style.opacity = '0';
-      banner.style.transform = 'translateY(12px)';
-      setTimeout(() => banner.remove(), 250);
-    };
-
-    banner.addEventListener('click', (e) => {
-      const target = e.target;
-      if (target.id === 'consent-btn-accept') {
-        try { localStorage.setItem('sd-consent', 'granted'); } catch {}
-        if (typeof window.gtag === 'function') {
-          window.gtag('consent', 'update', {
-            'analytics_storage': 'granted'
-          });
-        }
-        loadGA4();
-        if (window.Analytics && typeof window.Analytics.trackPageView === 'function') {
-          window.Analytics.trackPageView(location.pathname);
-        }
-        closeBanner();
-      } else if (target.id === 'consent-btn-decline') {
-        try { localStorage.setItem('sd-consent', 'denied'); } catch {}
-        if (typeof window.gtag === 'function') {
-          window.gtag('consent', 'update', {
-            'analytics_storage': 'denied'
-          });
-        }
-        closeBanner();
-      }
-    });
-
-    document.body.appendChild(banner);
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => setTimeout(initConsentBanner, 800));
-  } else {
-    setTimeout(initConsentBanner, 800);
-  }
 })();

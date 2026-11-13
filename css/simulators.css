@@ -93,25 +93,24 @@
   border-bottom: none;
 }
 
-/* Invariant & Hardware Reality Callout Boxes */
+/* Invariant & Hardware Reality Callout Boxes (1px Full Border) */
 .invariant-box,
 .hardware-box {
   margin: 1.5rem 0;
   padding: 1rem 1.25rem;
   border-radius: 10px;
-  background: var(--bg-secondary, #121215);
-  border: 1px solid var(--border-subtle, #26262a);
-  border-left-width: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
 }
 
 .invariant-box {
-  border-left-color: #6366f1;
-  background: linear-gradient(90deg, rgba(99, 102, 241, 0.08) 0%, rgba(18, 18, 21, 0.4) 100%);
+  background: var(--info-bg);
+  border-color: var(--info-border);
 }
 
 .hardware-box {
-  border-left-color: #10b981;
-  background: linear-gradient(90deg, rgba(16, 185, 129, 0.08) 0%, rgba(18, 18, 21, 0.4) 100%);
+  background: var(--success-bg);
+  border-color: var(--success-border);
 }
 
 .invariant-box h4,
@@ -358,8 +357,8 @@
 
 .dsa-sim__scrubber {
   flex: 1;
-  height: 6px;
-  accent-color: #6366f1;
+  height: 28px;
+  accent-color: var(--accent, #0F62FE);
   cursor: pointer;
 }
 
@@ -367,7 +366,8 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 4px 8px;
+  min-height: 32px;
+  padding: 5px 10px;
   font-size: 11.5px;
   font-family: var(--font-mono, monospace);
   border-radius: 6px;
@@ -1878,20 +1878,19 @@
 [data-theme="light"] .sql-explain-node {
   background: #ffffff;
   color: #1e293b;
-  border: 1px solid #e2e8f0;
-  border-left: 3px solid #4f46e5;
+  border: 1px solid #cbd5e1;
 }
 
 [data-theme="light"] .sql-explain-node.is-index {
   background: #ecfdf5;
   color: #065f46;
-  border-left-color: #10b981;
+  border-color: #10b981;
 }
 
 [data-theme="light"] .sql-explain-node.is-scan {
   background: #fffbeb;
   color: #92400e;
-  border-left-color: #f59e0b;
+  border-color: #f59e0b;
 }
 
 [data-theme="light"] .sql-num-val {
@@ -1916,20 +1915,18 @@
 }
 
 [data-theme="light"] .invariant-box {
-  background: linear-gradient(90deg, rgba(99, 102, 241, 0.1) 0%, rgba(248, 250, 252, 0.95) 100%);
-  border-color: var(--border, #cbd5e1);
-  border-left-color: #4f46e5;
+  background: var(--info-bg);
+  border-color: var(--info-border);
   color: var(--fg, #0f172a);
 }
 
 [data-theme="light"] .invariant-box h4 {
-  color: #4338ca;
+  color: var(--info);
 }
 
 [data-theme="light"] .hardware-box {
-  background: linear-gradient(90deg, rgba(16, 185, 129, 0.1) 0%, rgba(248, 250, 252, 0.95) 100%);
-  border-color: var(--border, #cbd5e1);
-  border-left-color: #059669;
+  background: var(--success-bg);
+  border-color: var(--success-border);
   color: var(--fg, #0f172a);
 }
 
