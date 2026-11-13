@@ -1,26 +1,26 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light" class="no-shell">
+<html lang="en" data-product="sql" data-theme="light" class="no-shell">
 <head>
   <meta charset="UTF-8">
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpivoting Patterns — SQL In Depth</title>
-  <meta name="description" content="In Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpivoting Patterns pivoting-unpivoting-cross-tabs , Transforming normalized tall tables into wide report.">
+  <meta name="description" content="Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpivoting Patterns pivoting-unpivoting-cross-tabs transforms normalized tall tables into wide report matrices.">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#ffffff">
+  <meta name="theme-color" content="#f7f8fa">
   
   <!-- Open Graph -->
   <meta property="og:type" content="article">
   <meta property="og:title" content="Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpivoting Patterns — SQL In Depth">
-  <meta property="og:description" content="In Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpivoting Patterns pivoting-unpivoting-cross-tabs , Transforming normalized tall tables into wide report.">
+  <meta property="og:description" content="Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpivoting Patterns pivoting-unpivoting-cross-tabs transforms normalized tall tables into wide report matrices.">
   <meta property="og:url" content="https://sql-in-depth.vedgupta.in/topic/pivoting-unpivoting-cross-tabs/">
-  <meta property="og:image" content="https://sql-in-depth.vedgupta.in/assets/og-image.png">
+  <meta property="og:image" content="https://sql-in-depth.vedgupta.in/assets/og/pivoting-unpivoting-cross-tabs.png">
   
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpivoting Patterns — SQL In Depth">
-  <meta name="twitter:description" content="In Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpivoting Patterns pivoting-unpivoting-cross-tabs , Transforming normalized tall tables into wide report.">
-  <meta name="twitter:image" content="https://sql-in-depth.vedgupta.in/assets/og-image.png">
+  <meta name="twitter:description" content="Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpivoting Patterns pivoting-unpivoting-cross-tabs transforms normalized tall tables into wide report matrices.">
+  <meta name="twitter:image" content="https://sql-in-depth.vedgupta.in/assets/og/pivoting-unpivoting-cross-tabs.png">
   
   <!-- Canonical -->
   <link rel="canonical" href="https://sql-in-depth.vedgupta.in/topic/pivoting-unpivoting-cross-tabs/">
@@ -28,14 +28,17 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
   <link rel="preload" href="fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/geist-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
 
-  <!-- Stylesheets -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+  <!-- Stylesheets: Shared Design System + Self-Hosted KaTeX + Product Styles -->
+  <link rel="stylesheet" href="design-system/tokens.css?v=51fcdc77d9">
+  <link rel="stylesheet" href="design-system/components.css?v=596f4164bb">
+  <link rel="stylesheet" href="css/vendor/katex/katex.min.css?v=83121916c0">
   <link rel="stylesheet" href="css/variables.css?v=a80f2ff051">
   <link rel="stylesheet" href="css/layout.css?v=cd1fac68d6">
   <link rel="stylesheet" href="css/components.css?v=794db81dd6">
   <link rel="stylesheet" href="css/content.css?v=9fbc099df8">
-  <link rel="stylesheet" href="css/landing.css?v=08887e1059">
+  <link rel="stylesheet" href="css/landing.css?v=c2378509cf">
   <link rel="stylesheet" href="css/simulators.css?v=12c0ddb1fa">
 
   <!-- Core scripts: head initializer & asset manifest -->
@@ -47,7 +50,8 @@
   "@context": "https://schema.org",
   "@type": "TechArticle",
   "headline": "Rows to Columns & Back: Cross-Tab Pivoting and Unpivoting Patterns",
-  "description": "In Rows to Columns & Back: Cross-Tab Pivoting and Unpivoting Patterns pivoting-unpivoting-cross-tabs , Transforming normalized tall tables into wide report.",
+  "description": "Rows to Columns & Back: Cross-Tab Pivoting and Unpivoting Patterns pivoting-unpivoting-cross-tabs transforms normalized tall tables into wide report matrices.",
+  "image": "https://sql-in-depth.vedgupta.in/assets/og/pivoting-unpivoting-cross-tabs.png",
   "url": "https://sql-in-depth.vedgupta.in/topic/pivoting-unpivoting-cross-tabs/",
   "author": {
     "@type": "Person",
@@ -116,11 +120,13 @@
 
   <!-- Sidebar -->
   <aside class="sidebar" id="sidebar" aria-label="Course navigation">
-    <nav class="sidebar__tabs" role="tablist">
-      <button class="sidebar__tab active" data-tab="curriculum" role="tab" aria-selected="true">Curriculum</button>
-      <button type="button" id="sidebar-collapse-modules-btn" title="Collapse all modules" aria-label="Collapse all modules" style="margin-left:auto;padding:6px 8px;font-size:11px;font-weight:500;color:var(--fg-muted);background:none;border:none;cursor:pointer;"><span id="sidebar-collapse-modules-label">Collapse</span></button>
-      <button type="button" id="sidebar-collapse-btn" title="Collapse sidebar" aria-label="Collapse sidebar" aria-expanded="true" style="padding:6px 6px;font-size:11px;color:var(--fg-muted);background:none;border:none;cursor:pointer;">⟨</button>
-    </nav>
+    <div class="sidebar__tabs">
+      <div role="tablist" aria-label="Sidebar sections" style="display:flex;align-items:center;">
+        <button class="sidebar__tab active" data-tab="curriculum" role="tab" aria-selected="true">Curriculum</button>
+      </div>
+      <button type="button" id="sidebar-collapse-modules-btn" title="Collapse all modules" aria-label="Collapse all modules" style="margin-left:auto;min-height:32px;padding:6px 8px;font-size:11px;font-weight:500;color:var(--fg-muted);background:none;border:none;cursor:pointer;"><span id="sidebar-collapse-modules-label">Collapse</span></button>
+      <button type="button" id="sidebar-collapse-btn" title="Collapse sidebar" aria-label="Collapse sidebar" aria-expanded="true" style="min-width:32px;min-height:32px;padding:6px 8px;font-size:11px;color:var(--fg-muted);background:none;border:none;cursor:pointer;">⟨</button>
+    </div>
     <div class="sidebar__content" id="sidebar-content">
 <div style="padding:4px 16px 4px;font-size:11px;font-weight:600;color:var(--fg-faint);text-transform:uppercase;letter-spacing:0.05em;">Relational Foundations &amp; Core Querying</div><div class="module-group" data-module="m01">
         <div class="module-group__header">
@@ -799,6 +805,8 @@
   <main class="main" id="main-content">
     <div class="main__content" id="reader" data-prerendered="pivoting-unpivoting-cross-tabs">
 
+      <div class="ds-lesson-shell ds-lesson-shell--with-toc">
+        <div class="ds-lesson-article">
       <nav class="breadcrumbs" aria-label="Breadcrumb">
         <a href="/" data-nav="home">Home</a>
         <span class="breadcrumbs__sep"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></span>
@@ -807,18 +815,19 @@
         <span class="breadcrumbs__current">Rows to Columns & Back: Cross-Tab Pivoting and Unpivoting Patterns</span>
       </nav>
 
-      <div class="lesson-header">
+      <div class="lesson-header ds-lesson-hero">
         <div class="lesson-header__badge">
           <span class="lesson-header__kind lesson-header__kind--lesson">lesson</span>
            <span class="tag">pivot</span> <span class="tag">unpivot</span> <span class="tag">cross-tab</span>
         </div>
         <h1 class="lesson-header__title">Rows to Columns & Back: Cross-Tab Pivoting and Unpivoting Patterns</h1>
+        <div class="ds-lesson-hero__promise">Transform normalized tall tables into wide report matrices and unpivoting wide spreadsheet imports using UNION ALL or LATERAL values with predictable I/O cost and zero silent NULL traps.</div>
         <div class="lesson-header__meta">
           <span class="lesson-header__meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 7 min read</span>
           <span class="lesson-header__meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Module 3.3: Advanced SQL Patterns, Temporal Queries & Programmability</span>
           <span class="lesson-header__meta-item" title="Content curriculum review date"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Updated Oct 26, 2026</span>
         </div>
-        <div class="lesson-header__actions" style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
+        <div class="lesson-header__actions ds-lesson-hero__toolbar" style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
           <button class="completion-toggle" data-action="toggle-complete" data-slug="pivoting-unpivoting-cross-tabs">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/></svg> Mark Complete
           </button>
@@ -826,46 +835,17 @@
             ▶ Run SQL Studio
           </button>
           <a href="#cheatsheet/m09" class="btn btn--secondary btn--sm" data-action="navigate-cheatsheet" data-module="m09" title="View printable cheat sheet for this module">
-            📄 Cheat Sheet
+            Cheat Sheet
           </a>
+          <button type="button" class="ds-share-btn" data-action="share-page" data-share-url="https://sql-in-depth.vedgupta.in/topic/pivoting-unpivoting-cross-tabs/" data-share-title="Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpivoting Patterns — SQL In Depth" title="Share runnable link to this lesson">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            <span class="ds-share-btn__label">Share</span>
+          </button>
         </div>
-      </div><div class="video-main" data-video="{&quot;youtubeId&quot;:&quot;O6mDdUIvx9k&quot;,&quot;title&quot;:&quot;SQL Convert Rows to Columns and Columns to Rows without using Pivot Functions&quot;,&quot;channel&quot;:&quot;Ankit Bansal&quot;,&quot;duration&quot;:&quot;8m 54s&quot;,&quot;start&quot;:0,&quot;length&quot;:&quot;8m&quot;,&quot;why&quot;:&quot;Core video covering Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpivoting Patterns (pivoting-unpivoting-cross-tabs): focuses directly on practical mechanics, real-world examples, and implementation details.&quot;}">
-      <div class="video-embed" id="video-O6mDdUIvx9k"><div class="video-embed__placeholder" data-action="load-youtube" data-video-id="O6mDdUIvx9k">
-          <img class="video-embed__thumb" src="https://img.youtube.com/vi/O6mDdUIvx9k/hqdefault.jpg"
-               alt="SQL Convert Rows to Columns and Columns to Rows without using Pivot Functions"
-               loading="lazy">
-          <div class="video-embed__play-btn"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
-        </div></div>
-      <div class="video-embed__info">
-        <span class="video-embed__channel">Ankit Bansal</span>
-        <span class="video-embed__title">SQL Convert Rows to Columns and Columns to Rows without using Pivot Functions</span>
-        <a href="https://www.youtube.com/watch?v=O6mDdUIvx9k" target="_blank" rel="noopener noreferrer" style="margin-left:auto; font-size:11px; color:var(--accent,#6366f1); text-decoration:none; display:flex; align-items:center; gap:2px;">
-          Watch on YouTube ↗
-        </a>
-      </div>
-      <p class="video-embed__why">Core video covering Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpivoting Patterns (pivoting-unpivoting-cross-tabs): focuses directly on practical mechanics, real-world examples, and implementation details.</p></div>
-      <div class="video-more">
-        <h2 class="video-more__heading">More videos on this topic</h2>
-        <div class="video-more__list">
-      <a class="video-more__card" href="https://www.youtube.com/watch?v=XN77aowTGsw" target="_blank" rel="noopener noreferrer"
-         data-action="play-in-main-video" data-video="{&quot;youtubeId&quot;:&quot;XN77aowTGsw&quot;,&quot;title&quot;:&quot;SQL Unpivot Simplified (Turn Columns into Rows)&quot;,&quot;channel&quot;:&quot;Ryan &amp; Matt Data Science&quot;,&quot;duration&quot;:&quot;8m 24s&quot;,&quot;length&quot;:&quot;8m&quot;,&quot;role&quot;:&quot;deep-dive&quot;,&quot;why&quot;:&quot;Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpivoting Patterns.&quot;}"
-         title="Play here (Ctrl/⌘-click to open on YouTube)">
-        <span class="video-more__thumb">
-          <img src="https://img.youtube.com/vi/XN77aowTGsw/mqdefault.jpg" alt="" loading="lazy">
-          <span class="video-more__play"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></span>
-          <span class="video-more__len">8m</span>
-        </span>
-        <span class="video-more__meta">
-          <span class="video-more__role">Deep dive</span>
-          <span class="video-more__title">SQL Unpivot Simplified (Turn Columns into Rows)</span>
-          <span class="video-more__channel">Ryan &amp; Matt Data Science</span>
-          <span class="video-more__why">Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpivoting Patterns.</span>
-        </span>
-      </a></div>
       </div>
         <aside class="intuition">
-          <h3 class="intuition__title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>Intuition first</h3>
-          <div class="intuition__body"><p><p>In <strong>Rows to Columns & Back: Cross-Tab Pivoting and Unpivoting Patterns</strong> (<code>pivoting-unpivoting-cross-tabs</code>), Transforming normalized tall tables into wide report matrices and unpivoting wide spreadsheet imports using UNION ALL or LATERAL values. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Rows to Columns & Back: Cross-Tab Pivoting and Unpivoting Patterns</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p></p></div>
+          <h2 class="intuition__title" id="sec-why-it-matters"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>Why It Matters</h2>
+          <div class="intuition__body"><p><p><strong>Rows to Columns & Back: Cross-Tab Pivoting and Unpivoting Patterns</strong> (<code>pivoting-unpivoting-cross-tabs</code>) transforms normalized tall tables into wide report matrices and unpivoting wide spreadsheet imports using UNION ALL or LATERAL values. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Rows to Columns & Back: Cross-Tab Pivoting and Unpivoting Patterns</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p></p></div>
         </aside>
       <div class="audio-player" id="audio-player-pivoting-unpivoting-cross-tabs">
         <button class="audio-player__play-btn" id="audio-btn-pivoting-unpivoting-cross-tabs" data-action="toggle-audio" data-slug="pivoting-unpivoting-cross-tabs" aria-label="Play audio" title="Play audio">
@@ -918,45 +898,45 @@
             
               <a class="topic-quick-jump__sec-link" href="#topic-sec-1" data-action="quick-jump" data-target="topic-sec-1">
                 <span class="topic-quick-jump__sec-num">01</span>
-                <span>First-Principles Mental Model &amp; Relational Mechanics</span>
+                <span>Core Idea &amp; First-Principles Mechanics</span>
               </a>
             
               <a class="topic-quick-jump__sec-link" href="#topic-sec-2" data-action="quick-jump" data-target="topic-sec-2">
                 <span class="topic-quick-jump__sec-num">02</span>
-                <span>Database Table Schema, Execution Pipeline &amp; Visual Architecture</span>
+                <span>Visual Architecture &amp; Execution Pipeline</span>
               </a>
             
               <a class="topic-quick-jump__sec-link" href="#topic-sec-3" data-action="quick-jump" data-target="topic-sec-3">
                 <span class="topic-quick-jump__sec-num">03</span>
-                <span>Interactive Table-Level &amp; Storage Engine Simulator</span>
+                <span>Interactive Tuple &amp; Storage Simulator</span>
               </a>
             
               <a class="topic-quick-jump__sec-link" href="#topic-sec-4" data-action="quick-jump" data-target="topic-sec-4">
                 <span class="topic-quick-jump__sec-num">04</span>
-                <span>Live WASM SQL Lab, Clause-by-Clause Visualizer &amp; Automated Test Checker</span>
+                <span>Worked Runnable Example</span>
               </a>
             
               <a class="topic-quick-jump__sec-link" href="#topic-sec-5" data-action="quick-jump" data-target="topic-sec-5">
                 <span class="topic-quick-jump__sec-num">05</span>
-                <span>Cross-Engine Dialect &amp; Cost Comparison Matrix</span>
+                <span>Cross-Engine Tradeoffs</span>
               </a>
             
               <a class="topic-quick-jump__sec-link" href="#topic-sec-6" data-action="quick-jump" data-target="topic-sec-6">
                 <span class="topic-quick-jump__sec-num">06</span>
-                <span>Live Verification, Catalog Introspection &amp; Execution Plan Lab (SQL)</span>
+                <span>Edge-Case Verification Query</span>
               </a>
             
               <a class="topic-quick-jump__sec-link" href="#topic-sec-7" data-action="quick-jump" data-target="topic-sec-7">
                 <span class="topic-quick-jump__sec-num">07</span>
-                <span>Production Failure Modes, Anti-Patterns &amp; Staff Tuning Checklist</span>
+                <span>Common Mistakes &amp; Production Checklist</span>
               </a>
             
           </div>
         
       </nav>
     <article class="prose"><div class="lesson-content">
-<h2 id="topic-sec-1">1. First-Principles Mental Model &amp; Relational Mechanics</h2>
-<p>Every SQL statement in <strong>Rows to Columns & Back: Cross-Tab Pivoting and Unpivoting Patterns</strong> compiles down to a deterministic tree of relational algebra operators acting on physical pages in the buffer pool. At the logical layer, Transforming normalized tall tables into wide report matrices and unpivoting wide spreadsheet imports using UNION ALL or LATERAL values. Rather than mutating global variables imperatively, declarative SQL specifies the mathematical properties of the desired output relation while delegating physical access path selection to the cost-based query optimizer.</p>
+<h2 id="topic-sec-1">Core Idea &amp; First-Principles Mechanics</h2>
+<p>Every SQL statement in <strong>Rows to Columns & Back: Cross-Tab Pivoting and Unpivoting Patterns</strong> compiles down to a deterministic tree of relational algebra operators acting on physical pages in the buffer pool. At the execution boundary, this mechanism transforms normalized tall tables into wide report matrices and unpivoting wide spreadsheet imports using UNION ALL or LATERAL values. Rather than mutating global variables imperatively, declarative SQL specifies the mathematical properties of the desired output relation while delegating physical access path selection to the cost-based query optimizer.</p>
 <p>When the database engine processes <code>pivoting-unpivoting-cross-tabs</code> within <strong>Advanced SQL Patterns, Temporal Queries & Programmability</strong>, it enforces strict invariants over tuple domains, attribute visibility, and I/O page budgets. Understanding the boundary between logical relational semantics (what rows qualify) and physical execution (whether the engine performs a sequential heap scan, a B+Tree range seek, or an in-memory hash probe) is the defining skill of a Staff Database Engineer.</p>
 
 <div class="invariant-box">
@@ -966,7 +946,7 @@
   <p>Where <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mo>≈</mo><mn>250</mn><mtext>–</mtext><mn>500</mn></mrow><annotation encoding="application/x-tex">F \approx 250\text{--}500</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">250</span><span class="mord text"><span class="mord">–</span></span><span class="mord">500</span></span></span></span> is the B+Tree page fanout, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>σ</mi><mi>θ</mi></msub></mrow><annotation encoding="application/x-tex">\sigma_{\theta}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">θ</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> denotes Three-Valued Logic predicate selection over <code>pivot</code>, and <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>π</mi><mi>A</mi></msub></mrow><annotation encoding="application/x-tex">\pi_{A}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">A</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> projects the target attribute schema without violating domain constraints.</p>
 </div>
 
-<h2 id="topic-sec-2">2. Database Table Schema, Execution Pipeline &amp; Visual Architecture</h2>
+<h2 id="topic-sec-2">Visual Architecture &amp; Execution Pipeline</h2>
 <p>Tracing how <strong>Rows to Columns & Back: Cross-Tab Pivoting and Unpivoting Patterns</strong> flows through the parser, catalog binder, cost-based optimizer, and physical executor reveals exactly where latency and cardinality bugs originate:</p>
 <ul>
   <li><strong>Stage 1 — Lexical Parsing &amp; Catalog Binding (<code>pivot</code>):</strong> The SQL parser builds an Abstract Syntax Tree (AST) and resolves every relation, column identifier, and data type against system catalog tables (such as <code>pg_class</code>, <code>pg_attribute</code>, or <code>sqlite_master</code>).</li>
@@ -974,20 +954,20 @@
   <li><strong>Stage 3 — Cost Estimation &amp; Physical Operator Selection (<code>cross-tab</code>):</strong> Using histogram boundaries, Most Common Values (MCV), and Number of Distinct Values (NDV), the optimizer selects the minimum-cost physical plan and streams tuples through the execution pipeline.</li>
 </ul>
 
-<svg class="concept-diagram" viewBox="0 0 760 250" width="100%" height="250" role="img" aria-label="Window Partition and Group Bucket Table Diagram for Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpi..." style="background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:10px;margin:1.25rem 0;">
-  <text x="20" y="26" fill="var(--fg-primary)" font-family="var(--font-mono)" font-size="12" font-weight="700">Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpi... — Partitioned Table &amp; Sliding Window Frame</text>
+<svg class="concept-diagram" viewBox="0 0 760 250" width="100%" height="250" role="img" aria-label="Window Partition and Group Bucket Table Diagram for Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpi..." style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin:1.25rem 0;">
+  <text x="20" y="26" fill="var(--fg)" font-family="var(--font-mono)" font-size="12" font-weight="700">Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpi... — Partitioned Table &amp; Sliding Window Frame</text>
   <text x="20" y="42" fill="var(--fg-muted)" font-family="var(--font-mono)" font-size="10">Module M09 · PARTITION BY dept_id ORDER BY salary_usd DESC · Frame Overlay (pivot)</text>
 
   <!-- Partition Table Box -->
-  <rect x="20" y="56" width="465" height="174" rx="6" fill="#09090b" stroke="#6366f1" stroke-width="1.5"/>
+  <rect x="20" y="56" width="465" height="174" rx="6" fill="var(--bg-subtle)" stroke="var(--accent)" stroke-width="1.5"/>
   <rect x="20" y="56" width="465" height="26" rx="6" fill="rgba(99,102,241,0.18)"/>
-  <text x="32" y="73" fill="#c7d2fe" font-family="var(--font-mono)" font-size="11" font-weight="700">TABLE employees (Partitioned Tuple Stream)</text>
-  <text x="32" y="96" fill="#fbbf24" font-family="var(--font-mono)" font-size="9.5" font-weight="700">PK emp_id</text>
-  <text x="105" y="96" fill="#60a5fa" font-family="var(--font-mono)" font-size="9.5" font-weight="700">dept_id</text>
-  <text x="170" y="96" fill="#a1a1aa" font-family="var(--font-mono)" font-size="9.5">name</text>
-  <text x="295" y="96" fill="#a1a1aa" font-family="var(--font-mono)" font-size="9.5">salary_usd</text>
+  <text x="32" y="73" fill="var(--accent)" font-family="var(--font-mono)" font-size="11" font-weight="700">TABLE employees (Partitioned Tuple Stream)</text>
+  <text x="32" y="96" fill="var(--warning)" font-family="var(--font-mono)" font-size="9.5" font-weight="700">PK emp_id</text>
+  <text x="105" y="96" fill="var(--accent)" font-family="var(--font-mono)" font-size="9.5" font-weight="700">dept_id</text>
+  <text x="170" y="96" fill="var(--fg-muted)" font-family="var(--font-mono)" font-size="9.5">name</text>
+  <text x="295" y="96" fill="var(--fg-muted)" font-family="var(--font-mono)" font-size="9.5">salary_usd</text>
   <text x="385" y="96" fill="#34d399" font-family="var(--font-mono)" font-size="9.5" font-weight="700">RANK / SUM OVER</text>
-  <line x1="20" y1="103" x2="485" y2="103" stroke="#27272a" stroke-width="1"/>
+  <line x1="20" y1="103" x2="485" y2="103" stroke="var(--border)" stroke-width="1"/>
 
   <!-- Partition 2 Rows + Sliding Window Frame Box -->
   <rect x="26" y="108" width="453" height="74" rx="4" fill="rgba(99,102,241,0.08)" stroke="#818cf8" stroke-dasharray="4 2" stroke-width="1.2"/>
@@ -997,18 +977,18 @@
   <text x="34" y="170" fill="#e0e7ff" font-family="var(--font-mono)" font-size="10">5         2 (Storage)  Aisha Patel     $198,000     #3 · $668k</text>
 
   <!-- Partition 3 Row -->
-  <rect x="26" y="188" width="453" height="28" rx="4" fill="rgba(16,185,129,0.10)" stroke="#10b981" stroke-width="1"/>
-  <text x="34" y="206" fill="#d1fae5" font-family="var(--font-mono)" font-size="10">3         3 (Planner)  Hannah L.       $250,000     #1 · $250k (New Partition)</text>
+  <rect x="26" y="188" width="453" height="28" rx="4" fill="rgba(16,185,129,0.10)" stroke="var(--success)" stroke-width="1"/>
+  <text x="34" y="206" fill="var(--fg)" font-family="var(--font-mono)" font-size="10">3         3 (Planner)  Hannah L.       $250,000     #1 · $250k (New Partition)</text>
 
   <!-- Right Frame State Explanation Box -->
-  <rect x="505" y="56" width="235" height="174" rx="6" fill="#09090b" stroke="#10b981" stroke-width="1.5"/>
+  <rect x="505" y="56" width="235" height="174" rx="6" fill="var(--bg-subtle)" stroke="var(--success)" stroke-width="1.5"/>
   <rect x="505" y="56" width="235" height="26" rx="6" fill="rgba(16,185,129,0.18)"/>
-  <text x="517" y="73" fill="#6ee7b7" font-family="var(--font-mono)" font-size="11" font-weight="700">WINDOW FRAME INVARIANTS</text>
-  <text x="517" y="102" fill="#e4e4e7" font-family="var(--font-mono)" font-size="10">• Preserves all N input tuples</text>
-  <text x="517" y="124" fill="#fbbf24" font-family="var(--font-mono)" font-size="10">• Frame: UNBOUNDED PRECEDING</text>
-  <text x="517" y="142" fill="#fbbf24" font-family="var(--font-mono)" font-size="10">  AND CURRENT ROW</text>
-  <text x="517" y="166" fill="#93c5fd" font-family="var(--font-mono)" font-size="10">• Peer ties handled by</text>
-  <text x="517" y="184" fill="#93c5fd" font-family="var(--font-mono)" font-size="10">  ROWS vs RANGE vs GROUPS</text>
+  <text x="517" y="73" fill="var(--success)" font-family="var(--font-mono)" font-size="11" font-weight="700">WINDOW FRAME INVARIANTS</text>
+  <text x="517" y="102" fill="var(--fg)" font-family="var(--font-mono)" font-size="10">• Preserves all N input tuples</text>
+  <text x="517" y="124" fill="var(--warning)" font-family="var(--font-mono)" font-size="10">• Frame: UNBOUNDED PRECEDING</text>
+  <text x="517" y="142" fill="var(--warning)" font-family="var(--font-mono)" font-size="10">  AND CURRENT ROW</text>
+  <text x="517" y="166" fill="var(--accent)" font-family="var(--font-mono)" font-size="10">• Peer ties handled by</text>
+  <text x="517" y="184" fill="var(--accent)" font-family="var(--font-mono)" font-size="10">  ROWS vs RANGE vs GROUPS</text>
   <text x="517" y="212" fill="#34d399" font-family="var(--font-mono)" font-size="10">• Evaluated at Step 5 (pre-SELECT)</text>
 </svg>
 
@@ -1019,7 +999,7 @@ flowchart LR
   C --> D["4. SELECT Projection & ORDER BY (cross-tab)"]
 </div>
 
-<h2 id="topic-sec-3">3. Interactive Table-Level &amp; Storage Engine Simulator</h2>
+<h2 id="topic-sec-3">Interactive Tuple &amp; Storage Simulator</h2>
 <p>Use the interactive simulator below to step through <strong>Rows to Columns & Back: Cross-Tab Pivoting and Unpivoting Patterns</strong> at the tuple and page level. Observe how input rows, intermediate filter/join states, <code>NULL</code> badges, and physical page reads evolve at each step:</p>
 <div class="simulator-mount" id="topic-simulator-pivoting-unpivoting-cross-tabs" data-sim="sim-pivoting-unpivoting-cross-tabs">
           <div class="dsa-sim simulator-card" id="sim-cohort-funnel-allen-intervals" data-sim-id="sim-cohort-funnel-allen-intervals">
@@ -1183,7 +1163,7 @@ flowchart LR
           </div>
         </div>
 
-<h2 id="topic-sec-4">4. Live WASM SQL Lab, Clause-by-Clause Visualizer &amp; Automated Test Checker</h2>
+<h2 id="topic-sec-4">Worked Runnable Example</h2>
 <p>Execute, edit, and test the production SQL query below directly in your browser using the embedded WebAssembly SQLite 3 engine. Click <strong>▶ Run Query</strong> to execute, <strong>🔍 Step Clauses</strong> to inspect the live intermediate table after <code>FROM/JOIN</code>, <code>WHERE</code>, <code>GROUP BY</code>, <code>HAVING</code>, <code>WINDOW</code>, <code>SELECT</code>, and <code>ORDER BY</code>, or <strong>✓ Check SQL Tests</strong> to run automated relational assertions against the reference result:</p>
 <div class="code-block code-block--collapsible"><div class="code-block__header" data-action="toggle-code-header"><div style="display:flex;align-items:center;gap:8px;"><span class="code-block__lang">SQL · WASM</span><span class="code-block__lines-chip">23 lines</span></div><div style="display:flex;align-items:center;gap:6px;"><button type="button" class="code-block__copy" data-action="copy-code" title="Copy code to clipboard">Copy</button><button type="button" class="code-block__copy code-block__toggle-btn" data-action="toggle-code" aria-expanded="true" title="Expand or collapse code block">
       <span class="code-block__toggle-text">Collapse</span>
@@ -1212,7 +1192,7 @@ flowchart LR
 <span class="tok-kw">GROUP</span> <span class="tok-kw">BY</span> u<span class="tok-op">.</span>plan_tier
 <span class="tok-kw">ORDER</span> <span class="tok-kw">BY</span> cohort_orgs <span class="tok-kw">DESC</span><span class="tok-op">;</span></code></pre></div>
 
-<h2 id="topic-sec-5">5. Cross-Engine Dialect &amp; Cost Comparison Matrix</h2>
+<h2 id="topic-sec-5">Cross-Engine Tradeoffs</h2>
 <p>While the SQL ISO standard defines the logical behavior of <strong>Rows to Columns & Back: Cross-Tab Pivoting and Unpivoting Patterns</strong>, production storage engines differ in how they execute, lock, and index the underlying tuples:</p>
 <table class="complexity-matrix">
   <thead>
@@ -1251,7 +1231,7 @@ flowchart LR
   </tbody>
 </table>
 
-<h2 id="topic-sec-6">6. Live Verification, Catalog Introspection &amp; Execution Plan Lab (SQL)</h2>
+<h2 id="topic-sec-6">Edge-Case Verification Query</h2>
 <p>To verify how a production database engine executes <strong>Rows to Columns & Back: Cross-Tab Pivoting and Unpivoting Patterns</strong> across edge-case rows, run or modify the second live SQL verification query below. Inspect how <code>GROUP BY</code> buckets, window partitions, and Three-Valued <code>NULL</code> guards behave in real time:</p>
 <div class="code-block code-block--collapsible"><div class="code-block__header" data-action="toggle-code-header"><div style="display:flex;align-items:center;gap:8px;"><span class="code-block__lang">SQL · WASM</span><span class="code-block__lines-chip">16 lines</span></div><div style="display:flex;align-items:center;gap:6px;"><button type="button" class="code-block__copy" data-action="copy-code" title="Copy code to clipboard">Copy</button><button type="button" class="code-block__copy code-block__toggle-btn" data-action="toggle-code" aria-expanded="true" title="Expand or collapse code block">
       <span class="code-block__toggle-text">Collapse</span>
@@ -1273,8 +1253,8 @@ flowchart LR
 <span class="tok-kw">GROUP</span> <span class="tok-kw">BY</span> u<span class="tok-op">.</span>user_id<span class="tok-op">,</span> u<span class="tok-op">.</span>org_name<span class="tok-op">,</span> u<span class="tok-op">.</span>plan_tier<span class="tok-op">,</span> s<span class="tok-op">.</span>mrr_usd
 <span class="tok-kw">ORDER</span> <span class="tok-kw">BY</span> active_mrr_usd <span class="tok-kw">DESC</span><span class="tok-op">,</span> total_events <span class="tok-kw">DESC</span><span class="tok-op">;</span></code></pre></div>
 
-<h2 id="topic-sec-7">7. Production Failure Modes, Anti-Patterns &amp; Staff Tuning Checklist</h2>
-<div class="callout callout-warning">
+<h2 id="topic-sec-7">Common Mistakes &amp; Production Checklist</h2>
+<div class="callout callout--warn">
   <div class="callout__title">Production Pitfall &amp; SEV-1 Outage Pattern</div>
   <p>The most common production failure in <strong>Rows to Columns & Back: Cross-Tab Pivoting and Unpivoting Patterns</strong> occurs when a query passes functional unit tests on a 50-row local fixture but degrades into an <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>N</mi><mn>2</mn></msup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(N^2)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> loop, an unindexed full-table scan, or a silent <code>NULL</code> data-drop once table cardinality crosses <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>10</mn><mn>7</mn></msup></mrow><annotation encoding="application/x-tex">10^7</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">7</span></span></span></span></span></span></span></span></span></span></span> rows. Always verify both <code>NULL</code> boundary rows and physical buffer reads before deploying to production.</p>
 </div>
@@ -1284,7 +1264,168 @@ flowchart LR
   <li><strong>Keep Predicates SARGable:</strong> Never wrap an indexed column in a function, arithmetic expression, or implicit type cast on the left-hand side of a comparison operator.</li>
   <li><strong>Bound Memory &amp; Lock Scope:</strong> Ensure sorting, hashing, and batch mutations operate within bounded memory budgets (<code>work_mem</code>) and hold row/table locks for the shortest possible duration.</li>
 </ul>
-</div></article><div id="check-slider-pivoting-unpivoting-cross-tabs">
+</div></article>
+      <section class="build-lab-card topic-codelab-hero" id="guided-coding-practice-pivoting-unpivoting-cross-tabs" aria-label="Guided SQL & Relational Execution Lab">
+        <div class="build-lab-card__top">
+          <div class="build-lab-card__intro">
+            <div class="build-lab-card__eyebrow">
+              <span>Interactive 3-Step Guided SQL Lab &amp; Step-by-Step Table Visualizer (PostgreSQL 18 WASM &amp; SQLite 3 WASM)</span>
+              <span class="build-lab-card__progress">3 Guided Steps + Progressive Hints</span>
+              
+                <button type="button" class="build-lab-card__collapse-btn" data-action="toggle-lab-steps" aria-expanded="true" title="Collapse or expand guided coding steps">
+                  <span class="build-lab-card__collapse-text">Collapse Steps</span>
+                  <span class="build-lab-card__collapse-chevron">▲</span>
+                </button>
+              
+            </div>
+            <h2 class="build-lab-card__title">Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpivoting Patterns — Interactive Guided SQL Lab</h2>
+            <p class="build-lab-card__desc">Transforming normalized tall tables into wide report matrices and unpivoting wide spreadsheet imports using UNION ALL or LATERAL values.</p>
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;">
+              <span class="badge">⏱ Target Time: <code>O(N) sequential/index scan</code></span>
+              <span class="badge">💾 Auxiliary Space: <code>O(1) tuple projection state</code></span>
+              <span class="badge">🧭 Pattern: Advanced SQL Patterns, Temporal Queries &amp; Programmability · unpivot</span>
+              <span class="badge">🗄️ Dataset: <code>ecommerce</code></span>
+            </div>
+          </div>
+          <div class="build-lab-card__cta-col">
+            <button type="button" class="btn btn--primary build-lab-card__launch-btn" data-action="open-topic-codelab" data-slug="pivoting-unpivoting-cross-tabs" data-mode="verify">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+              <span>Run SQL Lab &amp; Verify</span>
+            </button>
+            <button type="button" class="btn btn--outline build-lab-card__launch-btn" data-action="open-topic-codelab" data-slug="pivoting-unpivoting-cross-tabs" data-mode="solution">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <span>View Reference Solution</span>
+            </button>
+            <button type="button" class="btn btn--outline build-lab-card__launch-btn" data-action="open-topic-codelab" data-slug="pivoting-unpivoting-cross-tabs" data-mode="modal">
+              <span>⤢ Full-Screen Studio</span>
+            </button>
+          </div>
+        </div>
+
+        
+          <div class="build-lab-steps-grid">
+            
+              <div class="build-lab-step-card is-active" data-step="0" data-step-index="0">
+                <div class="build-lab-step-card__body">
+                  <div class="build-lab-step-card__header">
+                    <span class="build-lab-step-card__num">01</span>
+                    <span class="build-lab-step-card__target">Phase 1 · Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpivoting Patterns: Three-Valued Logic &amp; NULL Inspection</span>
+                  </div>
+                  <div class="build-lab-step-card__title">Inspect Nullable Promo Codes in Orders (pivoting-unpivoting-cross-tabs)</div>
+                  <div class="build-lab-step-card__invariant">Observe how <code>discount_code</code> contains <code>NULL</code> markers where direct equality (<code>=</code> or <code>&lt;&gt;</code>) evaluates to <code>UNKNOWN</code> under SQL Three-Valued Logic.</div>
+                  <div class="build-lab-step-card__concept">Enhance the starter query in <code>query.sql</code> with <code>COALESCE(discount_code, &#039;NO_PROMO&#039;)</code> and an explicit <code>IS NULL</code> / <code>IS NOT NULL</code> classification.</div>
+                  
+                    <details class="quiz-hint-details">
+                      <summary>💡 Progressive SQL Hint (Step 1)</summary>
+                      <pre><code>-- Step 1 Solution (pivoting-unpivoting-cross-tabs): Explicit 3VL NULL guard and promo normalization
+SELECT
+  order_id,
+  customer_id,
+  status,
+  COALESCE(discount_code, &#039;NO_PROMO&#039;) AS promo_code,
+  CASE
+    WHEN discount_code IS NULL THEN &#039;ORGANIC_CHECKOUT&#039;
+    ELSE &#039;PROMO_APPLIED&#039;
+  END AS promo_state,
+  ROUND(total_cents / 100.0, 2) AS order_usd
+FROM orders
+ORDER BY total_cents DESC, order_id ASC;</code></pre>
+                    </details>
+                  
+                </div>
+                <div class="build-lab-step-card__footer">
+                  <span>Step 1 of 3 · <code>query.sql</code></span>
+                  <button type="button" class="btn btn--sm btn--outline" data-action="open-topic-codelab" data-slug="pivoting-unpivoting-cross-tabs" data-mode="guided" data-step="0" data-step-index="0">
+                    Load Step 1 SQL →
+                  </button>
+                </div>
+              </div>
+            
+              <div class="build-lab-step-card " data-step="1" data-step-index="1">
+                <div class="build-lab-step-card__body">
+                  <div class="build-lab-step-card__header">
+                    <span class="build-lab-step-card__num">02</span>
+                    <span class="build-lab-step-card__target">Phase 2 · Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpivoting Patterns: Payment &amp; Shipment Fulfillment Join</span>
+                  </div>
+                  <div class="build-lab-step-card__title">Reconcile Orders with Payments &amp; Shipments (Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpivoting Patterns)</div>
+                  <div class="build-lab-step-card__invariant">Correlate <code>orders</code> against <code>payments</code> and <code>shipments</code> using <code>LEFT JOIN</code> so unpaid or unshipped orders remain visible.</div>
+                  <div class="build-lab-step-card__concept">Add the <code>LEFT JOIN shipments</code> clause and normalize missing payment/carrier attributes with <code>COALESCE</code>.</div>
+                  
+                    <details class="quiz-hint-details">
+                      <summary>💡 Progressive SQL Hint (Step 2)</summary>
+                      <pre><code>-- Step 2 Solution (pivoting-unpivoting-cross-tabs): Full order-to-payment-to-shipment reconciliation
+SELECT
+  o.order_id,
+  o.status AS order_status,
+  ROUND(o.total_cents / 100.0, 2) AS billed_usd,
+  COALESCE(pay.method, &#039;UNPAID&#039;) AS payment_method,
+  COALESCE(pay.status, &#039;PENDING&#039;) AS payment_status,
+  COALESCE(s.carrier, &#039;NOT_SHIPPED&#039;) AS carrier_status
+FROM orders AS o
+LEFT JOIN payments AS pay
+  ON pay.order_id = o.order_id
+LEFT JOIN shipments AS s
+  ON s.order_id = o.order_id
+ORDER BY o.order_id ASC;</code></pre>
+                    </details>
+                  
+                </div>
+                <div class="build-lab-step-card__footer">
+                  <span>Step 2 of 3 · <code>query.sql</code></span>
+                  <button type="button" class="btn btn--sm btn--outline" data-action="open-topic-codelab" data-slug="pivoting-unpivoting-cross-tabs" data-mode="guided" data-step="1" data-step-index="1">
+                    Load Step 2 SQL →
+                  </button>
+                </div>
+              </div>
+            
+              <div class="build-lab-step-card " data-step="2" data-step-index="2">
+                <div class="build-lab-step-card__body">
+                  <div class="build-lab-step-card__header">
+                    <span class="build-lab-step-card__num">03</span>
+                    <span class="build-lab-step-card__target">Phase 3 · Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpivoting Patterns: End-to-End Order Settlement Audit</span>
+                  </div>
+                  <div class="build-lab-step-card__title">Production Settlement &amp; Promo Attribution Query (Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpivoting Patterns)</div>
+                  <div class="build-lab-step-card__invariant">Produce the complete customer, promo, payment, and fulfillment audit relation with strict 3VL NULL guards.</div>
+                  <div class="build-lab-step-card__concept">Run the complete multi-table settlement audit in <code>query.sql</code> and verify each clause in the Table Visualizer.</div>
+                  
+                    <details class="quiz-hint-details">
+                      <summary>💡 Progressive SQL Hint (Step 3)</summary>
+                      <pre><code>-- Dataset: ecommerce | Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpivoting Patterns (pivoting-unpivoting-cross-tabs) — End-to-End Settlement &amp; 3VL Audit
+SELECT
+  o.order_id,
+  c.name AS customer_name,
+  c.tier,
+  o.status AS order_status,
+  COALESCE(o.discount_code, &#039;NO_PROMO&#039;) AS promo_code,
+  ROUND(o.total_cents / 100.0, 2) AS billed_usd,
+  COALESCE(pay.method, &#039;UNPAID&#039;) AS payment_method,
+  COALESCE(pay.status, &#039;AWAITING_SETTLEMENT&#039;) AS payment_status,
+  COALESCE(s.carrier, &#039;UNFULFILLED&#039;) AS shipping_carrier
+FROM orders AS o
+INNER JOIN customers AS c
+  ON c.customer_id = o.customer_id
+LEFT JOIN payments AS pay
+  ON pay.order_id = o.order_id
+LEFT JOIN shipments AS s
+  ON s.order_id = o.order_id
+ORDER BY o.total_cents DESC, o.order_id ASC;</code></pre>
+                    </details>
+                  
+                </div>
+                <div class="build-lab-step-card__footer">
+                  <span>Step 3 of 3 · <code>query.sql</code></span>
+                  <button type="button" class="btn btn--sm btn--outline" data-action="open-topic-codelab" data-slug="pivoting-unpivoting-cross-tabs" data-mode="guided" data-step="2" data-step-index="2">
+                    Load Step 3 SQL →
+                  </button>
+                </div>
+              </div>
+            
+          </div>
+        
+
+        <div class="sql-guided-lab-host" id="sql-guided-lab-pivoting-unpivoting-cross-tabs" data-sql-lab-slug="pivoting-unpivoting-cross-tabs"></div>
+      </section>
+    <div id="check-slider-pivoting-unpivoting-cross-tabs">
       <section class="check-slider" data-slug="pivoting-unpivoting-cross-tabs" data-total="4" aria-label="Check yourself">
         <div class="check-slider__head">
           <span class="check-slider__label">Check yourself</span>
@@ -1462,175 +1603,14 @@ flowchart LR
           <button type="button" class="btn btn--sm btn--outline check-slider__retry">Try again</button>
         </div>
       </section></div>
-      <section class="build-lab-card topic-codelab-hero" id="guided-coding-practice-pivoting-unpivoting-cross-tabs" aria-label="Guided SQL & Relational Execution Lab">
-        <div class="build-lab-card__top">
-          <div class="build-lab-card__intro">
-            <div class="build-lab-card__eyebrow">
-              <span>Interactive 3-Step Guided SQL Lab &amp; Step-by-Step Table Visualizer (PostgreSQL 18 WASM &amp; SQLite 3 WASM)</span>
-              <span class="build-lab-card__progress">3 Guided Steps + Progressive Hints</span>
-              
-                <button type="button" class="build-lab-card__collapse-btn" data-action="toggle-lab-steps" aria-expanded="true" title="Collapse or expand guided coding steps">
-                  <span class="build-lab-card__collapse-text">Collapse Steps</span>
-                  <span class="build-lab-card__collapse-chevron">▲</span>
-                </button>
-              
-            </div>
-            <h2 class="build-lab-card__title">Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpivoting Patterns — Interactive Guided SQL Lab</h2>
-            <p class="build-lab-card__desc">Transforming normalized tall tables into wide report matrices and unpivoting wide spreadsheet imports using UNION ALL or LATERAL values.</p>
-            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;">
-              <span class="badge">⏱ Target Time: <code>O(N) sequential/index scan</code></span>
-              <span class="badge">💾 Auxiliary Space: <code>O(1) tuple projection state</code></span>
-              <span class="badge">🧭 Pattern: Advanced SQL Patterns, Temporal Queries &amp; Programmability · unpivot</span>
-              <span class="badge">🗄️ Dataset: <code>ecommerce</code></span>
-            </div>
-          </div>
-          <div class="build-lab-card__cta-col">
-            <button type="button" class="btn btn--primary build-lab-card__launch-btn" data-action="open-topic-codelab" data-slug="pivoting-unpivoting-cross-tabs" data-mode="verify">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
-              <span>Run SQL Lab &amp; Verify</span>
-            </button>
-            <button type="button" class="btn btn--outline build-lab-card__launch-btn" data-action="open-topic-codelab" data-slug="pivoting-unpivoting-cross-tabs" data-mode="solution">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-              <span>View Reference Solution</span>
-            </button>
-            <button type="button" class="btn btn--outline build-lab-card__launch-btn" data-action="open-topic-codelab" data-slug="pivoting-unpivoting-cross-tabs" data-mode="modal">
-              <span>⤢ Full-Screen Studio</span>
-            </button>
-          </div>
-        </div>
-
-        
-          <div class="build-lab-steps-grid">
-            
-              <div class="build-lab-step-card is-active" data-step="0" data-step-index="0">
-                <div class="build-lab-step-card__body">
-                  <div class="build-lab-step-card__header">
-                    <span class="build-lab-step-card__num">01</span>
-                    <span class="build-lab-step-card__target">Phase 1 · Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpivoting Patterns: Three-Valued Logic &amp; NULL Inspection</span>
-                  </div>
-                  <div class="build-lab-step-card__title">Inspect Nullable Promo Codes in Orders (pivoting-unpivoting-cross-tabs)</div>
-                  <div class="build-lab-step-card__invariant">Observe how <code>discount_code</code> contains <code>NULL</code> markers where direct equality (<code>=</code> or <code>&lt;&gt;</code>) evaluates to <code>UNKNOWN</code> under SQL Three-Valued Logic.</div>
-                  <div class="build-lab-step-card__concept">Enhance the starter query in <code>query.sql</code> with <code>COALESCE(discount_code, &#039;NO_PROMO&#039;)</code> and an explicit <code>IS NULL</code> / <code>IS NOT NULL</code> classification.</div>
-                  
-                    <details class="quiz-hint-details">
-                      <summary>💡 Progressive SQL Hint (Step 1)</summary>
-                      <pre><code>-- Step 1 Solution (pivoting-unpivoting-cross-tabs): Explicit 3VL NULL guard and promo normalization
-SELECT
-  order_id,
-  customer_id,
-  status,
-  COALESCE(discount_code, &#039;NO_PROMO&#039;) AS promo_code,
-  CASE
-    WHEN discount_code IS NULL THEN &#039;ORGANIC_CHECKOUT&#039;
-    ELSE &#039;PROMO_APPLIED&#039;
-  END AS promo_state,
-  ROUND(total_cents / 100.0, 2) AS order_usd
-FROM orders
-ORDER BY total_cents DESC, order_id ASC;</code></pre>
-                    </details>
-                  
-                </div>
-                <div class="build-lab-step-card__footer">
-                  <span>Step 1 of 3 · <code>query.sql</code></span>
-                  <button type="button" class="btn btn--sm btn--outline" data-action="open-topic-codelab" data-slug="pivoting-unpivoting-cross-tabs" data-mode="guided" data-step="0" data-step-index="0">
-                    Load Step 1 SQL →
-                  </button>
-                </div>
-              </div>
-            
-              <div class="build-lab-step-card " data-step="1" data-step-index="1">
-                <div class="build-lab-step-card__body">
-                  <div class="build-lab-step-card__header">
-                    <span class="build-lab-step-card__num">02</span>
-                    <span class="build-lab-step-card__target">Phase 2 · Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpivoting Patterns: Payment &amp; Shipment Fulfillment Join</span>
-                  </div>
-                  <div class="build-lab-step-card__title">Reconcile Orders with Payments &amp; Shipments (Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpivoting Patterns)</div>
-                  <div class="build-lab-step-card__invariant">Correlate <code>orders</code> against <code>payments</code> and <code>shipments</code> using <code>LEFT JOIN</code> so unpaid or unshipped orders remain visible.</div>
-                  <div class="build-lab-step-card__concept">Add the <code>LEFT JOIN shipments</code> clause and normalize missing payment/carrier attributes with <code>COALESCE</code>.</div>
-                  
-                    <details class="quiz-hint-details">
-                      <summary>💡 Progressive SQL Hint (Step 2)</summary>
-                      <pre><code>-- Step 2 Solution (pivoting-unpivoting-cross-tabs): Full order-to-payment-to-shipment reconciliation
-SELECT
-  o.order_id,
-  o.status AS order_status,
-  ROUND(o.total_cents / 100.0, 2) AS billed_usd,
-  COALESCE(pay.method, &#039;UNPAID&#039;) AS payment_method,
-  COALESCE(pay.status, &#039;PENDING&#039;) AS payment_status,
-  COALESCE(s.carrier, &#039;NOT_SHIPPED&#039;) AS carrier_status
-FROM orders AS o
-LEFT JOIN payments AS pay
-  ON pay.order_id = o.order_id
-LEFT JOIN shipments AS s
-  ON s.order_id = o.order_id
-ORDER BY o.order_id ASC;</code></pre>
-                    </details>
-                  
-                </div>
-                <div class="build-lab-step-card__footer">
-                  <span>Step 2 of 3 · <code>query.sql</code></span>
-                  <button type="button" class="btn btn--sm btn--outline" data-action="open-topic-codelab" data-slug="pivoting-unpivoting-cross-tabs" data-mode="guided" data-step="1" data-step-index="1">
-                    Load Step 2 SQL →
-                  </button>
-                </div>
-              </div>
-            
-              <div class="build-lab-step-card " data-step="2" data-step-index="2">
-                <div class="build-lab-step-card__body">
-                  <div class="build-lab-step-card__header">
-                    <span class="build-lab-step-card__num">03</span>
-                    <span class="build-lab-step-card__target">Phase 3 · Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpivoting Patterns: End-to-End Order Settlement Audit</span>
-                  </div>
-                  <div class="build-lab-step-card__title">Production Settlement &amp; Promo Attribution Query (Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpivoting Patterns)</div>
-                  <div class="build-lab-step-card__invariant">Produce the complete customer, promo, payment, and fulfillment audit relation with strict 3VL NULL guards.</div>
-                  <div class="build-lab-step-card__concept">Run the complete multi-table settlement audit in <code>query.sql</code> and verify each clause in the Table Visualizer.</div>
-                  
-                    <details class="quiz-hint-details">
-                      <summary>💡 Progressive SQL Hint (Step 3)</summary>
-                      <pre><code>-- Dataset: ecommerce | Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpivoting Patterns (pivoting-unpivoting-cross-tabs) — End-to-End Settlement &amp; 3VL Audit
-SELECT
-  o.order_id,
-  c.name AS customer_name,
-  c.tier,
-  o.status AS order_status,
-  COALESCE(o.discount_code, &#039;NO_PROMO&#039;) AS promo_code,
-  ROUND(o.total_cents / 100.0, 2) AS billed_usd,
-  COALESCE(pay.method, &#039;UNPAID&#039;) AS payment_method,
-  COALESCE(pay.status, &#039;AWAITING_SETTLEMENT&#039;) AS payment_status,
-  COALESCE(s.carrier, &#039;UNFULFILLED&#039;) AS shipping_carrier
-FROM orders AS o
-INNER JOIN customers AS c
-  ON c.customer_id = o.customer_id
-LEFT JOIN payments AS pay
-  ON pay.order_id = o.order_id
-LEFT JOIN shipments AS s
-  ON s.order_id = o.order_id
-ORDER BY o.total_cents DESC, o.order_id ASC;</code></pre>
-                    </details>
-                  
-                </div>
-                <div class="build-lab-step-card__footer">
-                  <span>Step 3 of 3 · <code>query.sql</code></span>
-                  <button type="button" class="btn btn--sm btn--outline" data-action="open-topic-codelab" data-slug="pivoting-unpivoting-cross-tabs" data-mode="guided" data-step="2" data-step-index="2">
-                    Load Step 3 SQL →
-                  </button>
-                </div>
-              </div>
-            
-          </div>
-        
-
-        <div class="sql-guided-lab-host" id="sql-guided-lab-pivoting-unpivoting-cross-tabs" data-sql-lab-slug="pivoting-unpivoting-cross-tabs"></div>
-      </section>
-    
         <div class="takeaways" id="topic-takeaways-pivoting-unpivoting-cross-tabs">
-          <h3 class="takeaways__title">Key Takeaways</h3>
+          <h2 class="takeaways__title">Recap &amp; Key Takeaways</h2>
           <div class="takeaways__list">
-            <div class="takeaways__item">Rows to Columns & Back: Cross-Tab Pivoting and Unpivoting Patterns (pivoting-unpivoting-cross-tabs): Transforming normalized tall tables into wide report matrices and unpivoting wide spreadsheet imports using UNION ALL or LATERAL values.</div><div class="takeaways__item">Always separate logical SQL semantics (FROM -> WHERE -> GROUP BY -> HAVING -> WINDOW -> SELECT -> ORDER BY -> LIMIT) from the physical execution plan chosen by the cost-based optimizer.</div><div class="takeaways__item">Audit every predicate and join condition for Three-Valued Logic (NULL -> UNKNOWN) edge cases and verify SARGability so B+Tree indexes can perform O(log_B N) range seeks.</div><div class="takeaways__item">Use EXPLAIN QUERY PLAN / EXPLAIN (ANALYZE, BUFFERS) to inspect physical scan operators, join algorithms, and temporary sort/hash spills before shipping queries to production.</div>
+            <div class="takeaways__item">Rows to Columns & Back: Cross-Tab Pivoting and Unpivoting Patterns: Transforming normalized tall tables into wide report matrices and unpivoting wide spreadsheet imports using UNION ALL or LATERAL values.</div><div class="takeaways__item">Always separate logical SQL semantics (FROM -> WHERE -> GROUP BY -> HAVING -> WINDOW -> SELECT -> ORDER BY -> LIMIT) from the physical execution plan chosen by the cost-based optimizer.</div><div class="takeaways__item">Audit every predicate and join condition for Three-Valued Logic (NULL -> UNKNOWN) edge cases and verify SARGability so B+Tree indexes can perform O(log_B N) range seeks.</div><div class="takeaways__item">Use EXPLAIN QUERY PLAN / EXPLAIN (ANALYZE, BUFFERS) to inspect physical scan operators, join algorithms, and temporary sort/hash spills before shipping queries to production.</div>
           </div>
         </div>
       <div class="lesson-builds">
-        <h3 class="lesson-builds__title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Multi-File Capstone SQL & Storage Engine Lab — Guided Implementation</h3>
+        <h2 class="lesson-builds__title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Multi-File Capstone SQL & Storage Engine Lab — Guided Implementation</h2>
         
           <a class="lesson-builds__item" href="/build/build-saas-cohort-funnel-workbench/" data-action="navigate-build" data-build-id="build-saas-cohort-funnel-workbench">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
@@ -1642,7 +1622,7 @@ ORDER BY o.total_cents DESC, o.order_id ASC;</code></pre>
           </a>
       </div>
         <div class="further-reading">
-          <h3 class="further-reading__title">Further Reading</h3>
+          <h2 class="further-reading__title">Primary Sources &amp; Further Reading</h2>
           <div class="further-reading__list">
             <a class="further-reading__link" href="https://duckdb.org/docs/sql/introduction" target="_blank" rel="noopener"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> DuckDB Official Documentation — Vectorized Analytical SQL (Rows to Columns & Back: Cross-Tab Pivoting and Unpivoting Patterns)</a><a class="further-reading__link" href="https://www.postgresql.org/docs/current/mvcc.html" target="_blank" rel="noopener"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> PostgreSQL Internals — Concurrency Control, MVCC & Snapshot Isolation — Access Paths & Execution</a><a class="further-reading__link" href="https://www.sqlite.org/queryplanner-ng.html" target="_blank" rel="noopener"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> SQLite 3 Architecture & Next-Generation Query Planner — Systems Reference</a>
           </div>
@@ -1671,9 +1651,97 @@ ORDER BY o.total_cents DESC, o.order_id ASC;</code></pre>
       </a><a class="lesson-nav__link lesson-nav__link--next" href="/topic/triggers-stored-procedures-udfs/" data-nav="topic" data-slug="triggers-stored-procedures-udfs">
         <span class="lesson-nav__label">Next →</span>
         <span class="lesson-nav__title">Database Programmability: Triggers (OLD/NEW), Stored Procedures & UDF Overhead</span>
-      </a></div>
+      </a></div></div>
+        
+      <aside class="ds-toc" aria-label="On this page">
+        <div class="ds-toc__heading">On this page</div>
+        <ul class="ds-toc__list">
+          
+            <li>
+              <a class="ds-toc__link is-active" href="#sec-why-it-matters">Why It Matters</a>
+            </li>
+          
+            <li>
+              <a class="ds-toc__link" href="#topic-sec-1">Core Idea &amp; First-Principles Mechanics</a>
+            </li>
+          
+            <li>
+              <a class="ds-toc__link" href="#topic-sec-2">Visual Architecture &amp; Execution Pipeline</a>
+            </li>
+          
+            <li>
+              <a class="ds-toc__link" href="#topic-sec-3">Interactive Tuple &amp; Storage Simulator</a>
+            </li>
+          
+            <li>
+              <a class="ds-toc__link" href="#topic-sec-4">Worked Runnable Example</a>
+            </li>
+          
+            <li>
+              <a class="ds-toc__link" href="#topic-sec-5">Cross-Engine Tradeoffs</a>
+            </li>
+          
+            <li>
+              <a class="ds-toc__link" href="#topic-sec-6">Edge-Case Verification Query</a>
+            </li>
+          
+            <li>
+              <a class="ds-toc__link" href="#topic-sec-7">Common Mistakes &amp; Production Checklist</a>
+            </li>
+          
+            <li>
+              <a class="ds-toc__link" href="#guided-coding-practice-pivoting-unpivoting-cross-tabs">3-Step SQL Practice</a>
+            </li>
+          
+            <li>
+              <a class="ds-toc__link" href="#check-slider-pivoting-unpivoting-cross-tabs">Self-Check Quiz</a>
+            </li>
+          
+            <li>
+              <a class="ds-toc__link" href="#topic-takeaways-pivoting-unpivoting-cross-tabs">Recap &amp; Takeaways</a>
+            </li>
+          
+        </ul>
+        <div class="ds-toc__progress-card">
+          <div class="ds-toc__progress-row">
+            <span>Module 3.3</span>
+            <span>0/0 done</span>
+          </div>
+          <div class="ds-toc__progress-bar" aria-hidden="true">
+            <div class="ds-toc__progress-fill" style="width:0%"></div>
+          </div>
+          <button type="button" class="ds-share-btn" style="width:100%;justify-content:center;margin-top:4px;" data-action="share-page" data-share-url="https://sql-in-depth.vedgupta.in/topic/pivoting-unpivoting-cross-tabs/" data-share-title="Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpivoting Patterns — SQL In Depth">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            <span class="ds-share-btn__label">Copy lesson link</span>
+          </button>
+        </div>
+      </aside>
+      </div>
     </div>
+    <footer class="ds-footer" aria-label="Site footer">
+      <div class="ds-footer__inner">
+        <div class="ds-footer__family">
+          <span class="ds-footer__label">In Depth Learning Family</span>
+          <a href="https://sql-in-depth.vedgupta.in/" class="ds-footer__product is-current">SQL In Depth</a>
+          <a href="https://system-design-in-depth.vedgupta.in/" class="ds-footer__product" target="_blank" rel="noopener">System Design In Depth</a>
+          <a href="https://dsa-in-depth.vedgupta.in/" class="ds-footer__product" target="_blank" rel="noopener">Algorithms &amp; Data Structures</a>
+        </div>
+        <div class="ds-footer__links">
+          <a href="/sandbox" data-nav="sandbox">SQL Studio</a>
+          <a href="/roadmap" data-nav="roadmap">Roadmap</a>
+          <a href="/challenges" data-nav="challenges">Challenges</a>
+          <a href="/glossary/" data-nav="glossary">Glossary</a>
+          <a href="/projects">Projects</a>
+          <a href="https://github.com/innovatorved/sql-in-depth" target="_blank" rel="noopener">GitHub</a>
+        </div>
+        <div class="ds-footer__meta">
+          <span>Free &amp; open-source first-principles SQL &amp; database internals textbook by <a href="https://vedgupta.in" target="_blank" rel="noopener">Ved Gupta</a>. Code MIT · Prose CC-BY-4.0.</span>
+        </div>
+      </div>
+    </footer>
   </main>
+
+  <div class="ds-toast" id="ds-toast" role="status" aria-live="polite" hidden></div>
 
   <!-- Search Modal -->
   <div class="search-modal" id="search-modal" role="dialog" aria-label="Search topics" aria-modal="true">
@@ -1681,7 +1749,7 @@ ORDER BY o.total_cents DESC, o.order_id ASC;</code></pre>
     <div class="search-modal__dialog">
       <div class="search-modal__input-wrap">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input class="search-modal__input" id="search-input" type="text" placeholder="Search 180 SQL topics, clauses, and build labs…" autocomplete="off" spellcheck="false">
+        <input class="search-modal__input" id="search-input" type="text" aria-label="Search 180 SQL topics, clauses, and build labs" placeholder="Search 180 SQL topics, clauses, and build labs…" autocomplete="off" spellcheck="false">
       </div>
       <div class="search-modal__results" id="search-results"></div>
       <div class="search-modal__footer">
@@ -1729,47 +1797,46 @@ ORDER BY o.total_cents DESC, o.order_id ASC;</code></pre>
     </div>
   </div>
 
-  <!-- Data Scripts -->
+  <!-- Core Shell Scripts (deferred to idle after first paint) -->
   <script type="text/plain" data-defer src="data/curriculum.js?v=4f53b5646e"></script>
-  <script type="text/plain" data-defer src="data/datasets.js?v=259e5934af"></script>
-  <script type="text/plain" data-defer src="data/roadmap.js?v=584992226a"></script>
-  <script type="text/plain" data-defer src="data/challenges.js?v=784587e93a"></script>
-  <script type="text/plain" data-defer src="data/srs-cards.js?v=fabc47dd9c"></script>
-  <script type="text/plain" data-defer src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
-  <script type="text/plain" data-defer src="data/implementations_code.js?v=fce884f8a8"></script>
-  <script type="text/plain" data-defer src="data/topic_guided_labs.js?v=2a57d85494"></script>
-  <script type="text/plain" data-defer src="data/projects.js?v=2280ac085f"></script>
-  <script type="text/plain" data-defer src="data/glossary.js?v=4f6c79a4e0"></script>
-
-  <!-- App Scripts -->
   <script type="text/plain" data-defer src="js/lazy.js?v=683e461abe"></script>
   <script type="text/plain" data-defer src="js/analytics.js?v=a1ffee77a9"></script>
   <script type="text/plain" data-defer src="js/progress.js?v=20e4822556"></script>
   <script type="text/plain" data-defer src="js/search.js?v=e12e67ca89"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
-  <script type="text/plain" data-defer src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>
-  <script type="text/plain" data-defer src="js/sql-engine.js?v=ef30cfbffa"></script>
-  <script type="text/plain" data-defer src="js/table-visualizer.js?v=0e6dff7e2e"></script>
-  <script type="text/plain" data-defer src="js/simulators.js?v=2b7aaefb27"></script>
-  <script type="text/plain" data-defer src="js/simulators-relational.js?v=32c1358d02"></script>
-  <script type="text/plain" data-defer src="js/simulators-analytical.js?v=50d950f3b6"></script>
-  <script type="text/plain" data-defer src="js/simulators-modeling.js?v=1962947dcb"></script>
-  <script type="text/plain" data-defer src="js/simulators-indexing.js?v=ad1fbfd866"></script>
-  <script type="text/plain" data-defer src="js/simulators-transactions.js?v=b7f1c4e891"></script>
-  <script type="text/plain" data-defer src="js/simulators-olap-ops.js?v=11bb8afed3"></script>
-  <script type="text/plain" data-defer src="js/vendor/katex/katex.min.js?v=6d481709e3"></script>
-  <script type="text/plain" data-defer src="js/vendor/katex/auto-render.min.js?v=82dca94048"></script>
   <script type="text/plain" data-defer src="js/renderer.js?v=21f1ddcad7"></script>
-  <script type="text/plain" data-defer src="js/landing.js?v=8b7ad0bc41"></script>
-  
+  <script type="text/plain" data-defer src="js/landing.js?v=731f096a3c"></script>
   <script type="text/plain" data-defer src="js/quiz.js?v=5b300d9b3d"></script>
-  <script type="text/plain" data-defer src="js/roadmap.js?v=cebfb7e32c"></script>
-  <script type="text/plain" data-defer src="js/challenges.js?v=b7d29d3d83"></script>
-  <script type="text/plain" data-defer src="js/dashboard.js?v=d411d5a9bb"></script>
-  <script type="text/plain" data-defer src="js/sandbox.js?v=f757a170b3"></script>
-  <script type="text/plain" data-defer src="js/topic-codelab.js?v=49fccccd99"></script>
-  
   <script type="text/plain" data-defer src="js/app.js?v=f19abab945"></script>
+
+  <!-- Route-Scoped Lazy Scripts (stamped & loaded on demand via window.Lazy) -->
+  <script type="text/plain" data-lazy src="data/datasets.js?v=259e5934af"></script>
+  <script type="text/plain" data-lazy src="data/roadmap.js?v=584992226a"></script>
+  <script type="text/plain" data-lazy src="data/challenges.js?v=784587e93a"></script>
+  <script type="text/plain" data-lazy src="data/srs-cards.js?v=fabc47dd9c"></script>
+  <script type="text/plain" data-lazy src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
+  <script type="text/plain" data-lazy src="data/implementations_code.js?v=fce884f8a8"></script>
+  <script type="text/plain" data-lazy src="data/topic_guided_labs.js?v=2a57d85494"></script>
+  <script type="text/plain" data-lazy src="data/projects.js?v=2280ac085f"></script>
+  <script type="text/plain" data-lazy src="data/glossary.js?v=4f6c79a4e0"></script>
+  <script type="text/plain" data-lazy src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>
+  <script type="text/plain" data-lazy src="js/sql-engine.js?v=ef30cfbffa"></script>
+  <script type="text/plain" data-lazy src="js/vendor/cm6-sql.js?v=74bd776b7d"></script>
+  <script type="text/plain" data-lazy src="js/table-visualizer.js?v=0e6dff7e2e"></script>
+  <script type="text/plain" data-lazy src="js/simulators.js?v=2b7aaefb27"></script>
+  <script type="text/plain" data-lazy src="js/simulators-relational.js?v=32c1358d02"></script>
+  <script type="text/plain" data-lazy src="js/simulators-analytical.js?v=50d950f3b6"></script>
+  <script type="text/plain" data-lazy src="js/simulators-modeling.js?v=1962947dcb"></script>
+  <script type="text/plain" data-lazy src="js/simulators-indexing.js?v=ad1fbfd866"></script>
+  <script type="text/plain" data-lazy src="js/simulators-transactions.js?v=b7f1c4e891"></script>
+  <script type="text/plain" data-lazy src="js/simulators-olap-ops.js?v=11bb8afed3"></script>
+  <script type="text/plain" data-lazy src="js/vendor/katex/katex.min.js?v=6d481709e3"></script>
+  <script type="text/plain" data-lazy src="js/vendor/katex/auto-render.min.js?v=82dca94048"></script>
+  <script type="text/plain" data-lazy src="js/roadmap.js?v=cebfb7e32c"></script>
+  <script type="text/plain" data-lazy src="js/challenges.js?v=b7d29d3d83"></script>
+  <script type="text/plain" data-lazy src="js/dashboard.js?v=d411d5a9bb"></script>
+  <script type="text/plain" data-lazy src="js/sandbox.js?v=f757a170b3"></script>
+  <script type="text/plain" data-lazy src="js/topic-codelab.js?v=49fccccd99"></script>
 
   <!-- App bootstrap & deferred script loader -->
   <script src="js/bootstrap.js?v=c0171d8e5a"></script>
