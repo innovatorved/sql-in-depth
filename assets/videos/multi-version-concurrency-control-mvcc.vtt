@@ -1,0 +1,17 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:12.320
+If a dashboard query locked an entire orders table while computing revenue, checkout writes would grind to a halt. Multi-Version Concurrency Control solves this by keeping multiple timestamped versions of a row.
+
+2
+00:00:12.320 --> 00:00:26.394
+In PostgreSQL, updating a balance from one hundred to eighty dollars does not overwrite bytes in place. Transaction five-oh-two stamps xmax equal to five-oh-two on the old tuple and appends a fresh tuple with xmin five-oh-two.
+
+3
+00:00:26.394 --> 00:00:38.766
+When transaction five-oh-one started before five-oh-two committed, its snapshot treats five-oh-two as still in flight. Five-oh-one cleanly reads Version One at one hundred dollars, with zero lock contention.
+
+4
+00:00:38.766 --> 00:00:51.198
+Version chains are not free. Once every transaction older than five-oh-two finishes, Version One becomes a dead tuple. Background autovacuum workers reclaim those dead slots so heap pages do not bloat.

@@ -1,0 +1,17 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:14.015
+A balanced binary tree over ten million rows is twenty-four levels deep, costing twenty-four slow random disk seeks. A B-plus-tree packs five hundred routing keys into each eight kilobyte internal page, shrinking height to just three!
+
+2
+00:00:14.015 --> 00:00:26.892
+Unlike a classic B-tree, a B-plus-tree never stores bulky row payloads in internal nodes. Internal pages hold only compact separator keys and child page IDs, maximizing fanout on every upper level.
+
+3
+00:00:26.892 --> 00:00:39.804
+Every leaf page stores forward and backward sibling page pointers. To evaluate a range predicate like created-at between January and March, the engine descends from the root once and glides horizontally across sorted leaves.
+
+4
+00:00:39.804 --> 00:00:53.221
+When a leaf page fills up, inserting a random UUIDv4 splits the page fifty-fifty and dirties buffers across the entire tree. Time-ordered BIGINT or UUIDv7 keys append cleanly to the rightmost leaf page.

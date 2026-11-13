@@ -1,0 +1,17 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:11.542
+An inner equi-join pairs rows from two tables wherever their join keys test equal. Unmatched parent rows and NULL join keys evaluate to unknown under three-valued logic and are excluded from the output.
+
+2
+00:00:11.542 --> 00:00:23.391
+For large unindexed joins, the engine builds an in-memory hash table on the smaller relation in O of M time, then streams the larger table through in O of N time, probing each key in constant time.
+
+3
+00:00:23.391 --> 00:00:35.693
+Watch out for join fan-out! If an order has three line items and two payment attempts, joining both child tables directly produces six rows for one order, silently doubling or tripling your SUM totals.
+
+4
+00:00:35.693 --> 00:00:47.676
+Eliminate fan-out by grouping each child table to the shared parent key inside a CTE before joining. When both sides have one row per order ID, every aggregate stays one hundred percent exact.

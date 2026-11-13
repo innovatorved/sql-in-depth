@@ -1,0 +1,17 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:13.034
+Why not store application data in a CSV or JSON file? Every lookup parses the entire file in linear O of N time, and two concurrent writers overwrite each other or leave torn lines if the process crashes.
+
+2
+00:00:13.034 --> 00:00:26.016
+A relational storage engine organizes files into fixed eight kilobyte slotted pages. Line pointers at the front grow forward while tuple bytes pack from the back, enabling direct slot addressing without rewriting the file.
+
+3
+00:00:26.016 --> 00:00:40.236
+Before mutating any data page, the engine flushes an append-only Write-Ahead Log record to disk. Readers inspect consistent MVCC tuple snapshots while writers commit atomically, guaranteeing durability across power loss.
+
+4
+00:00:40.236 --> 00:00:54.437
+Edgar Codd separated logical relations from physical storage. You write declarative SQL describing what rows you want, and the cost-based optimizer automatically chooses B-plus-tree seeks, hash joins, or parallel scans.

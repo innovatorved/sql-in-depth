@@ -104,6 +104,44 @@ window.Lazy = (() => {
     return _katexPromise;
   }
 
+  // Progressive-enhancement fallback for <video loading="lazy"> / <audio loading="lazy" controls>
+  function observeLazyMedia(root) {
+    if (typeof window === 'undefined' || typeof HTMLMediaElement === 'undefined') return;
+    if (Object.hasOwn(HTMLMediaElement.prototype, 'loading')) return;
+    if (typeof IntersectionObserver !== 'function') return;
+    const scope = root || document;
+    const els = scope.querySelectorAll('video[loading="lazy"]:not([data-lazy-observed]), audio[loading="lazy"][controls]:not([data-lazy-observed])');
+    if (!els.length) return;
+    const mediaObserver = new IntersectionObserver((entries, obs) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        const media = entry.target;
+        if (media.dataset.poster) {
+          media.poster = media.dataset.poster;
+          delete media.dataset.poster;
+        }
+        if (media.dataset.preload) {
+          media.preload = media.dataset.preload;
+          delete media.dataset.preload;
+        }
+        obs.unobserve(media);
+      }
+    }, { rootMargin: '200px 0px' });
+
+    for (const media of els) {
+      media.setAttribute('data-lazy-observed', '1');
+      if (media.hasAttribute('poster')) {
+        media.dataset.poster = media.getAttribute('poster');
+        media.removeAttribute('poster');
+      }
+      if (media.hasAttribute('preload') && media.getAttribute('preload') !== 'none') {
+        media.dataset.preload = media.getAttribute('preload');
+      }
+      media.preload = 'none';
+      mediaObserver.observe(media);
+    }
+  }
+
   // Content (mNN-*.js) and questions (qNN-*.js) for a module number like "05"
   function module(number) {
     const prefixes = [`data/content/m${number}-`, `data/questions/q${number}-`];
@@ -112,5 +150,5 @@ window.Lazy = (() => {
   }
 
   window.loadScript = load;
-  return { load, loadAll, ensureSqlStack, ensureKatex, module };
+  return { load, loadAll, ensureSqlStack, ensureKatex, observeLazyMedia, module };
 })();

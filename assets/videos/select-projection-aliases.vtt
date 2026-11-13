@@ -1,0 +1,17 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:12.413
+Every SQL query begins with the word SELECT, tricking engineers into thinking column aliases exist right away. In reality, the database binder evaluates FROM and WHERE long before SELECT ever runs.
+
+2
+00:00:12.413 --> 00:00:24.993
+First, FROM and JOIN assemble candidate rows. Second, WHERE discards rows where predicates are false or unknown. Third, GROUP BY buckets surviving rows, and fourth, HAVING filters whole buckets.
+
+3
+00:00:24.993 --> 00:00:36.889
+Window functions execute after HAVING, right alongside SELECT projection where output aliases are finally bound. That is why ORDER BY can sort by a SELECT alias, while WHERE and HAVING cannot.
+
+4
+00:00:36.889 --> 00:00:48.845
+Logical order defines exact query meaning, while the physical planner takes safe shortcuts—like pushing a WHERE predicate into a B-plus-tree index seek before joining, without ever changing your answer.
