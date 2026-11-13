@@ -114,11 +114,11 @@
   --ds-shadow-overlay:  0 12px 32px -4px rgba(15, 23, 42, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.06);
   --ds-shadow-pop:      0 4px 14px rgba(15, 23, 42, 0.08);
 
-  /* Default Product Accent: SQL In Depth — Precision Cobalt */
-  --brand-accent:        #0F62FE;
+  /* Default Product Accent: SQL In Depth — Precision Cobalt (WCAG AA >= 5.4:1 on #E9F1FF & #FFFFFF) */
+  --brand-accent:        #0B53D6;
   --brand-accent-hover:  #0043CE;
-  --brand-accent-soft:   rgba(15, 98, 254, 0.09);
-  --brand-accent-border: rgba(15, 98, 254, 0.28);
+  --brand-accent-soft:   rgba(11, 83, 214, 0.09);
+  --brand-accent-border: rgba(11, 83, 214, 0.28);
   --brand-accent-ink:    #FFFFFF;
 }
 

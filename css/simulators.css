@@ -20,39 +20,39 @@
 }
 
 .badge-o1 {
-  background: rgba(16, 185, 129, 0.14);
-  color: #10b981;
-  border: 1px solid rgba(16, 185, 129, 0.35);
+  background: var(--success-muted);
+  color: var(--success);
+  border: 1px solid var(--success-border);
 }
 
 .badge-ologn {
-  background: rgba(59, 130, 246, 0.14);
-  color: #60a5fa;
-  border: 1px solid rgba(59, 130, 246, 0.35);
+  background: var(--accent-muted);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
 }
 
 .badge-on {
-  background: rgba(139, 92, 246, 0.14);
-  color: #a78bfa;
-  border: 1px solid rgba(139, 92, 246, 0.35);
+  background: var(--accent-muted);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
 }
 
 .badge-onlogn {
-  background: rgba(245, 158, 11, 0.14);
-  color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.35);
+  background: var(--warning-muted);
+  color: var(--warning);
+  border: 1px solid var(--warning-border);
 }
 
 .badge-on2 {
-  background: rgba(249, 115, 22, 0.14);
-  color: #fb923c;
-  border: 1px solid rgba(249, 115, 22, 0.35);
+  background: var(--warning-muted);
+  color: var(--warning);
+  border: 1px solid var(--warning-border);
 }
 
 .badge-oexp {
-  background: rgba(239, 68, 68, 0.14);
-  color: #f87171;
-  border: 1px solid rgba(239, 68, 68, 0.35);
+  background: var(--error-muted);
+  color: var(--error);
+  border: 1px solid var(--error-border);
 }
 
 /* Complexity Matrix Table */
@@ -379,9 +379,9 @@
 }
 
 .dsa-sim__audio-btn.is-on {
-  background: rgba(16, 185, 129, 0.14);
-  border-color: rgba(16, 185, 129, 0.45);
-  color: #34d399;
+  background: var(--success-muted);
+  border-color: var(--success-border);
+  color: var(--success);
 }
 
 .dsa-sim__audio-btn:hover {
@@ -763,7 +763,7 @@
   margin: 0 0 0.5rem 0;
   font-size: 13.5px;
   font-weight: 700;
-  color: #818cf8;
+  color: var(--accent);
   letter-spacing: 0.01em;
 }
 
@@ -1973,6 +1973,10 @@
   background: #eef2ff;
   border-color: #4f46e5;
   color: #312e81;
+}
+
+[data-theme="light"] .dsa-sim__cell-tag {
+  color: var(--accent, #0B53D6);
 }
 
 [data-theme="light"] .dsa-sim__cell.is-match,

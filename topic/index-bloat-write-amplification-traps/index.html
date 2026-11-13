@@ -31,19 +31,19 @@
   <link rel="preload" href="fonts/geist-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
 
   <!-- Stylesheets: Shared Design System + Self-Hosted KaTeX + Product Styles -->
-  <link rel="stylesheet" href="design-system/tokens.css?v=51fcdc77d9">
+  <link rel="stylesheet" href="design-system/tokens.css?v=2f31ca69aa">
   <link rel="stylesheet" href="design-system/components.css?v=596f4164bb">
-  <link rel="stylesheet" href="css/vendor/katex/katex.min.css?v=83121916c0">
-  <link rel="stylesheet" href="css/variables.css?v=a80f2ff051">
+  <link rel="stylesheet" href="css/vendor/katex/katex.min.css?v=83121916c0" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/variables.css?v=a60c606220">
   <link rel="stylesheet" href="css/layout.css?v=cd1fac68d6">
-  <link rel="stylesheet" href="css/components.css?v=794db81dd6">
+  <link rel="stylesheet" href="css/components.css?v=3d5f050e72">
   <link rel="stylesheet" href="css/content.css?v=9fbc099df8">
-  <link rel="stylesheet" href="css/landing.css?v=c2378509cf">
-  <link rel="stylesheet" href="css/simulators.css?v=12c0ddb1fa">
+  <link rel="stylesheet" href="css/landing.css?v=c2378509cf" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/simulators.css?v=e91c9ced2a" media="print" onload="this.media='all'">
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=f6a6002f60"></script>
-  <script src="js/manifest.js?v=fd86c38675"></script>
+  <script src="js/manifest.js?v=2637bb7d63"></script>
 
   <script type="application/ld+json">
 {
@@ -1069,7 +1069,7 @@ flowchart LR
             </div>
 
             <div class="invariant-box" style="margin:0 0 0.75rem 0;padding:0.6rem 0.9rem;">
-              <h4 style="margin:0 0 0.25rem 0;font-size:12px;">Invariant &amp; State</h4>
+              <div style="margin:0 0 0.25rem 0;font-size:12px;font-weight:600;color:var(--fg);">Invariant &amp; State</div>
               <div data-role="invariant" style="font-size:12.5px;font-family:var(--font-mono,monospace);color:var(--fg-primary);">Relation initialized with 4 tuples across schema (page_id, page_level, keys_in_page, high_key, right_sibling) — preset: Insert Key 42 Triggering Leaf Split & Parent Separator Push.</div>
             </div>
             <div class="dsa-sim__stage" data-role="stage">
@@ -1677,7 +1677,7 @@ ORDER BY avg_rating DESC, order_appearances DESC, p.product_id ASC;</code></pre>
         <div class="ds-toc__progress-card">
           <div class="ds-toc__progress-row">
             <span>Module 4.1</span>
-            <span>0/0 done</span>
+            <span>0/10 done</span>
           </div>
           <div class="ds-toc__progress-bar" aria-hidden="true">
             <div class="ds-toc__progress-fill" style="width:0%"></div>
@@ -1774,12 +1774,12 @@ ORDER BY avg_rating DESC, order_appearances DESC, p.product_id ASC;</code></pre>
   <script type="text/plain" data-defer src="js/lazy.js?v=683e461abe"></script>
   <script type="text/plain" data-defer src="js/analytics.js?v=a1ffee77a9"></script>
   <script type="text/plain" data-defer src="js/progress.js?v=20e4822556"></script>
-  <script type="text/plain" data-defer src="js/search.js?v=e12e67ca89"></script>
+  <script type="text/plain" data-defer src="js/search.js?v=dcc9d6ddf1"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
-  <script type="text/plain" data-defer src="js/renderer.js?v=21f1ddcad7"></script>
-  <script type="text/plain" data-defer src="js/landing.js?v=731f096a3c"></script>
+  <script type="text/plain" data-defer src="js/renderer.js?v=5dc09229eb"></script>
+  <script type="text/plain" data-defer src="js/landing.js?v=df71db4b82"></script>
   <script type="text/plain" data-defer src="js/quiz.js?v=5b300d9b3d"></script>
-  <script type="text/plain" data-defer src="js/app.js?v=f19abab945"></script>
+  <script type="text/plain" data-defer src="js/app.js?v=87520d0da2"></script>
 
   <!-- Route-Scoped Lazy Scripts (stamped & loaded on demand via window.Lazy) -->
   <script type="text/plain" data-lazy src="data/datasets.js?v=259e5934af"></script>
@@ -1795,7 +1795,7 @@ ORDER BY avg_rating DESC, order_appearances DESC, p.product_id ASC;</code></pre>
   <script type="text/plain" data-lazy src="js/sql-engine.js?v=ef30cfbffa"></script>
   <script type="text/plain" data-lazy src="js/vendor/cm6-sql.js?v=74bd776b7d"></script>
   <script type="text/plain" data-lazy src="js/table-visualizer.js?v=0e6dff7e2e"></script>
-  <script type="text/plain" data-lazy src="js/simulators.js?v=2b7aaefb27"></script>
+  <script type="text/plain" data-lazy src="js/simulators.js?v=246783bcbb"></script>
   <script type="text/plain" data-lazy src="js/simulators-relational.js?v=32c1358d02"></script>
   <script type="text/plain" data-lazy src="js/simulators-analytical.js?v=50d950f3b6"></script>
   <script type="text/plain" data-lazy src="js/simulators-modeling.js?v=1962947dcb"></script>

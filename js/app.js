@@ -1185,10 +1185,9 @@ window.App = (() => {
     loadedModules.add(mod.id);
     const num = mod.legacyNumber || mod.number;
     const tasks = [window.Lazy.module(num)];
-    if (window.loadScript) {
-      if (!window.IMPLEMENTATIONS_DATA) tasks.push(window.loadScript('data/implementations_code.js').catch(() => {}));
-      if (!window.CHALLENGES_DATA) tasks.push(window.loadScript('data/challenges.js').catch(() => {}));
-      if (!window.WHITEBOARD_DATA) tasks.push(window.loadScript('data/whiteboard-blueprints.js').catch(() => {}));
+    const needsBuildData = currentView === 'build' || (currentSlug && currentSlug.startsWith('build-'));
+    if (needsBuildData && window.loadScript && !window.IMPLEMENTATIONS_DATA) {
+      tasks.push(window.loadScript('data/implementations_code.js').catch(() => {}));
     }
     Promise.all(tasks).then(() => {
       // Re-render if the learner is still on a view that needs this module
@@ -1411,23 +1410,20 @@ window.App = (() => {
     }
   }
 
-  // ── Mermaid ───────────────────────────────────────────────
-  function initMermaid() {
-    const diagrams = document.querySelectorAll('.mermaid:not([data-processed])');
-    if (diagrams.length === 0) {
-      attachMermaidZoomControls();
-      return;
-    }
-
+  // ── Mermaid (Viewport-Lazy via IntersectionObserver) ──────
+  let _mermaidIo = null;
+  function renderMermaidNodes(nodes) {
+    const pending = Array.from(nodes).filter(el => el && el.isConnected && !el.hasAttribute('data-processed'));
+    if (!pending.length) return;
     window.loadMermaid().then(() => {
-      // Store original source on each element before rendering
-      diagrams.forEach(el => {
+      const active = pending.filter(el => el.isConnected && !el.hasAttribute('data-processed'));
+      if (!active.length) return;
+      active.forEach(el => {
         if (!el.getAttribute('data-original-src')) {
           el.setAttribute('data-original-src', el.textContent.trim());
         }
       });
-      // Call mermaid.run directly on the nodes (mermaid manages data-processed internally)
-      window.mermaid.run({ nodes: Array.from(diagrams) }).then(() => {
+      window.mermaid.run({ nodes: active }).then(() => {
         attachMermaidZoomControls();
       }).catch(err => {
         console.warn('Mermaid render warning:', err);
@@ -1436,6 +1432,30 @@ window.App = (() => {
     }).catch(err => {
       console.warn('Failed to load Mermaid:', err);
     });
+  }
+
+  function initMermaid() {
+    if (_mermaidIo) {
+      _mermaidIo.disconnect();
+      _mermaidIo = null;
+    }
+    const diagrams = document.querySelectorAll('.mermaid:not([data-processed])');
+    if (diagrams.length === 0) {
+      attachMermaidZoomControls();
+      return;
+    }
+    if (typeof IntersectionObserver === 'function') {
+      _mermaidIo = new IntersectionObserver(entries => {
+        if (entries.some(e => e.isIntersecting)) {
+          _mermaidIo.disconnect();
+          _mermaidIo = null;
+          renderMermaidNodes(document.querySelectorAll('.mermaid:not([data-processed])'));
+        }
+      }, { rootMargin: '280px 0px' });
+      diagrams.forEach(el => _mermaidIo.observe(el));
+    } else {
+      renderMermaidNodes(diagrams);
+    }
   }
 
   // ── Diagram Lightbox & Zoom ───────────────────────────────

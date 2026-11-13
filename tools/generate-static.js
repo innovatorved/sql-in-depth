@@ -401,6 +401,10 @@ if (fs.existsSync(projectsHtmlPath)) {
 console.log(`Starting SSG generation for ${units.length} curriculum units...`);
 
 let template = baseHtml.replace(/\s*<script type="application\/ld\+json">[\s\S]*?<\/script>/gi, '');
+// On lesson & build pages, content.css is critical while landing.css is deferred
+template = template
+  .replace(/(<link\s+rel="stylesheet"\s+href="css\/content\.css[^"]*?")\s+media="print"\s+onload="this\.media='all'"/i, '$1')
+  .replace(/(<link\s+rel="stylesheet"\s+href="css\/landing\.css[^"]*?")>/i, '$1 media="print" onload="this.media=\'all\'">');
 if (!template.includes('<base href="/">')) {
   template = template.replace('<head>', '<head>\n  <base href="/">');
 }
