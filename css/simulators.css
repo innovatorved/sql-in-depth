@@ -220,9 +220,9 @@
 }
 
 .dsa-sim__cell.is-active {
-  background: rgba(99, 102, 241, 0.22);
-  border-color: #6366f1;
-  color: #c7d2fe;
+  background: var(--accent-muted);
+  border-color: var(--accent);
+  color: var(--fg);
   transform: translateY(-3px);
 }
 
@@ -343,8 +343,8 @@
 }
 
 .dsa-sim__custom-input:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-muted);
 }
 
 .dsa-sim__scrubber-row {
@@ -358,7 +358,7 @@
 .dsa-sim__scrubber {
   flex: 1;
   height: 28px;
-  accent-color: var(--accent, #0F62FE);
+  accent-color: var(--accent, #C2410C);
   cursor: pointer;
 }
 
@@ -385,7 +385,7 @@
 }
 
 .dsa-sim__audio-btn:hover {
-  border-color: #6366f1;
+  border-color: var(--accent);
   color: var(--fg-primary, #f4f4f5);
 }
 
@@ -393,9 +393,9 @@
   width: 100%;
   overflow-x: auto;
   margin-bottom: 8px;
-  border: 1px solid rgba(99, 102, 241, 0.2);
+  border: 1px solid var(--border);
   border-radius: 8px;
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.55) 0%, rgba(9, 9, 11, 0.75) 100%);
+  background: var(--bg);
   padding: 8px 10px;
 }
 
@@ -503,15 +503,15 @@
 }
 
 .sql-clause-step:hover {
-  border-color: #6366f1;
+  border-color: var(--accent);
   color: var(--fg-primary, #f4f4f5);
 }
 
 .sql-clause-step.is-active {
-  background: rgba(99, 102, 241, 0.22);
-  border-color: #6366f1;
-  color: #e0e7ff;
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.18);
+  background: var(--accent-muted);
+  border-color: var(--accent);
+  color: var(--fg);
+  box-shadow: 0 0 0 2px var(--accent-muted);
 }
 
 .sql-clause-step.is-done {
@@ -1185,38 +1185,39 @@
 }
 
 .sql-exec-btn.is-primary {
-  background: linear-gradient(135deg, #4f46e5, #2563eb);
-  border-color: rgba(99, 102, 241, 0.65);
-  color: #ffffff;
-  box-shadow: 0 3px 10px rgba(79, 70, 229, 0.32);
+  background: var(--fg);
+  border-color: var(--fg);
+  color: var(--bg);
 }
 
 .sql-exec-btn.is-primary:hover {
-  background: linear-gradient(135deg, #6366f1, #3b82f6);
-  box-shadow: 0 5px 14px rgba(79, 70, 229, 0.48);
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
 }
 
 .sql-exec-btn.is-secondary {
-  background: rgba(15, 23, 42, 0.8);
-  border-color: rgba(148, 163, 184, 0.28);
-  color: #cbd5e1;
+  background: var(--surface);
+  border-color: var(--border-strong);
+  color: var(--fg);
 }
 
 .sql-exec-btn.is-secondary:hover {
-  background: rgba(30, 41, 59, 0.95);
-  border-color: #38bdf8;
-  color: #f8fafc;
+  background: var(--surface-hover);
+  border-color: var(--fg-muted);
+  color: var(--fg);
 }
 
 .sql-exec-btn.is-studio {
-  background: rgba(56, 189, 248, 0.13);
-  border-color: rgba(56, 189, 248, 0.4);
-  color: #38bdf8;
+  background: var(--accent-muted);
+  border-color: var(--accent-border);
+  color: var(--accent);
 }
 
 .sql-exec-btn.is-studio:hover {
-  background: rgba(56, 189, 248, 0.24);
-  color: #bae6fd;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
 }
 
 .sql-exec-btn.is-verify {
@@ -1903,13 +1904,13 @@
 }
 
 [data-theme="light"] .dsa-sim__cell.is-active {
-  background: #eef2ff;
-  border-color: #4f46e5;
-  color: #312e81;
+  background: var(--accent-muted);
+  border-color: var(--accent);
+  color: var(--fg);
 }
 
 [data-theme="light"] .dsa-sim__cell-tag {
-  color: var(--accent, #0B53D6);
+  color: var(--accent, #C2410C);
 }
 
 [data-theme="light"] .dsa-sim__cell.is-match,

@@ -4,9 +4,9 @@
 ## Product Family & Platform
 - **Platform**: `web` (static-first multi-page + SPA progressive enhancement, browser-native WebAssembly SQL runtime, responsive desktop and mobile).
 - **Product Family**: **In-Depth Engineering Series** (`github.com/innovatorved`):
-  1. `sql-in-depth` — Relational Algebra, Query Execution, B+Tree Storage, MVCC Concurrency & Production Database Internals (**Brand Accent**: Precision Cobalt `#0F62FE` light / `#58A6FF` dark).
+  1. `sql-in-depth` — Relational Algebra, Query Execution, B+Tree Storage, MVCC Concurrency & Production Database Internals (**Brand Accent**: Relational Ember `#C2410C` light / `#FB923C` dark).
   2. `system-design-in-depth` — Distributed Systems, Consensus, Caching, Replication & Large-Scale Architecture (**Brand Accent**: Distributed Teal `#0D9488` light / `#2DD4BF` dark).
-  3. `dsa-in-depth` — Data Structures, Algorithmic Complexity & Pattern Visualizers (**Brand Accent**: Algorithmic Amber-Indigo `#6D28D9` light / `#A78BFA` dark).
+  3. `dsa-in-depth` — Data Structures, Algorithmic Complexity & Pattern Visualizers (**Brand Accent**: Algorithmic Violet `#6D28D9` light / `#A78BFA` dark).
 
 ## Audience & Core Job-to-be-Done
 - **Who It Is For**: Backend, data, and full-stack software engineers moving from "queries that happen to return rows" to staff-level mastery of how relational engines parse, plan, index, lock, and persist data.
@@ -14,6 +14,6 @@
 
 ## Aesthetic & Craft Principles
 - **Tone**: Editorial technical clarity — calm, high-trust, diagrammatic, tactile ("database internals you can touch").
-- **Surfaces**: Warm-cool daylight paper (`#F8F9FB` canvas, `#FFFFFF` elevated cards, `1px` crisp hairlines) in light mode; deep slate ink (`#0B0E14` canvas, `#11161F` elevated surfaces — never harsh `#000000` glare) in dark mode.
-- **Typography**: Self-hosted `Geist` (`16px` / `1rem` prose, `68ch` reading measure, `1.68` line-height) paired with `Geist Mono` (`tabular-nums` on every result grid, execution timer, and page offset).
+- **Surfaces**: Warm Neutral Paper (`#F7F7F5` canvas, `#FFFFFF` elevated cards, `1px` crisp hairlines `#E5E4DF`) as default light mode; Neutral Charcoal (`#0F0F10` canvas, `#18181A` elevated surfaces — never harsh `#000000` glare or saturated navy) in dark mode.
+- **Typography**: Self-hosted `Geist` (`15px` / `0.9375rem` prose, `68ch` reading measure, `1.68` line-height, `28px` lesson `h1`, `20px` section `h2`) paired with `Geist Mono` (`tabular-nums` on every result grid, execution timer, and page offset).
 - **Zero-Noise Discipline**: No pop-up consent modals blocking content, no clickbait thumbnails dominating the first viewport, no decorative left-border callout stripes, no gradient text, and sub-second page readiness with heavy WASM engines isolated inside Web Workers.

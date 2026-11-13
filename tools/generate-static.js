@@ -164,6 +164,12 @@ if (fs.existsSync(path.join(root, 'data/topic_guided_labs.js'))) {
 if (fs.existsSync(path.join(root, 'data/challenges.js'))) {
   vm.runInNewContext(fs.readFileSync(path.join(root, 'data/challenges.js'), 'utf8'), context);
 }
+if (fs.existsSync(path.join(root, 'data/roadmap.js'))) {
+  vm.runInNewContext(fs.readFileSync(path.join(root, 'data/roadmap.js'), 'utf8'), context);
+}
+if (fs.existsSync(path.join(root, 'data/glossary.js'))) {
+  vm.runInNewContext(fs.readFileSync(path.join(root, 'data/glossary.js'), 'utf8'), context);
+}
 if (fs.existsSync(path.join(root, 'data/whiteboard-blueprints.js'))) {
   vm.runInNewContext(fs.readFileSync(path.join(root, 'data/whiteboard-blueprints.js'), 'utf8'), context);
 }
@@ -693,6 +699,141 @@ for (const [buildId, build] of buildEntries) {
   generatedBuildsCount++;
 }
 
+// 4c. Generate Static Hub & Challenge Entry Pages (/roadmap/, /challenges/, /challenges/<id>/, /sandbox/, /dashboard/, /glossary/)
+function writeHubPage({ routeDir, title, desc, ogSlug, h1, bodyHtml, schemaType = 'CollectionPage' }) {
+  const canonicalUrl = `${baseUrl}/${routeDir}/`;
+  const ogUrl = `${baseUrl}/assets/og/${ogSlug}.png`;
+  let page = template;
+
+  page = page.replace(/<title>.*?<\/title>/i, () => `<title>${escapeHtml(title)}</title>`);
+  page = page.replace(
+    /<meta\s+name="description"\s+content="[^"]*">/i,
+    () => `<meta name="description" content="${escapeAttr(desc)}">`
+  );
+  page = page.replace(
+    /<link\s+rel="canonical"\s+href="[^"]*">/i,
+    () => `<link rel="canonical" href="${canonicalUrl}">`
+  );
+  page = page.replace(/<meta\s+property="og:type"\s+content="[^"]*">/i, '<meta property="og:type" content="website">');
+  page = page.replace(
+    /<meta\s+property="og:title"\s+content="[^"]*">/i,
+    () => `<meta property="og:title" content="${escapeAttr(title)}">`
+  );
+  page = page.replace(
+    /<meta\s+property="og:description"\s+content="[^"]*">/i,
+    () => `<meta property="og:description" content="${escapeAttr(desc)}">`
+  );
+  page = page.replace(
+    /<meta\s+property="og:url"\s+content="[^"]*">/i,
+    () => `<meta property="og:url" content="${canonicalUrl}">`
+  );
+  page = page.replace(
+    /<meta\s+property="og:image"\s+content="[^"]*">/i,
+    () => `<meta property="og:image" content="${ogUrl}">`
+  );
+  page = page.replace(
+    /<meta\s+name="twitter:title"\s+content="[^"]*">/i,
+    () => `<meta name="twitter:title" content="${escapeAttr(title)}">`
+  );
+  page = page.replace(
+    /<meta\s+name="twitter:description"\s+content="[^"]*">/i,
+    () => `<meta name="twitter:description" content="${escapeAttr(desc)}">`
+  );
+  page = page.replace(
+    /<meta\s+name="twitter:image"\s+content="[^"]*">/i,
+    () => `<meta name="twitter:image" content="${ogUrl}">`
+  );
+
+  page = setJsonLd(page, {
+    '@context': 'https://schema.org',
+    '@type': schemaType,
+    'name': title,
+    'description': desc,
+    'image': ogUrl,
+    'url': canonicalUrl,
+    'author': { '@type': 'Person', 'name': 'Ved Gupta', 'url': 'https://vedgupta.in' }
+  });
+
+  page = replaceSidebarContent(page, homeSidebarHtml);
+
+  if (routeDir !== 'glossary') {
+    page = page.replace(/<body>/i, '<body class="view-ecosystem">');
+  }
+
+  const innerHtml = bodyHtml || `<div class="view-canvas" data-ssg-hub="${escapeAttr(routeDir)}" style="min-height:120vh;"><div class="view-header"><h1 class="view-title">${escapeHtml(h1)}</h1><p class="view-subtitle">${escapeHtml(desc)}</p></div></div>`;
+  page = page.replace(
+    /<div class="main__content" id="reader">[\s\S]*?<\/div>(\s*(?:<footer\b[\s\S]*?<\/footer>\s*)?<\/main>)/i,
+    (_, closingMain) => `<div class="main__content" id="reader">\n${innerHtml}\n    </div>${closingMain}`
+  );
+
+  const outDir = path.join(root, ...routeDir.split('/'));
+  fs.mkdirSync(outDir, { recursive: true });
+  fs.writeFileSync(path.join(outDir, 'index.html'), page, 'utf8');
+}
+
+const glossaryHtml = context.window.Renderer && typeof context.window.Renderer.renderGlossary === 'function'
+  ? context.window.Renderer.renderGlossary()
+  : '';
+
+const hubDefs = [
+  {
+    routeDir: 'roadmap',
+    title: 'Interactive SQL & Database Internals Roadmap | SQL In Depth',
+    desc: 'Visual 6-track dependency DAG, role-based career tracks, and weekly study planner across 180 SQL and storage engine topics.',
+    ogSlug: 'roadmap',
+    h1: 'SQL & Database Internals Roadmap'
+  },
+  {
+    routeDir: 'challenges',
+    title: 'SQL & Production Database Challenges | SQL In Depth',
+    desc: 'Hands-on SQL query debugging, Three-Valued NULL traps, SARGable indexing, window analytics, and MVCC concurrency scenarios.',
+    ogSlug: 'challenges',
+    h1: 'SQL & Database Challenges'
+  },
+  {
+    routeDir: 'sandbox',
+    title: 'SQL Studio — Browser SQLite & PostgreSQL 18 WASM Playground | SQL In Depth',
+    desc: 'Run live SQLite 3 and PostgreSQL 18 WASM queries in your browser with clause-by-clause visualizers, EXPLAIN plans, and schema explorer.',
+    ogSlug: 'sandbox',
+    h1: 'SQL Studio & Query Playground'
+  },
+  {
+    routeDir: 'dashboard',
+    title: 'Your Learning Progress, Flashcards & Study Notes | SQL In Depth',
+    desc: 'Track completed SQL modules, review spaced-repetition flashcards, and export or restore your local study notes.',
+    ogSlug: 'dashboard',
+    h1: 'Your Learning Progress'
+  },
+  {
+    routeDir: 'glossary',
+    title: 'SQL & Database Internals Glossary (180 Terms) | SQL In Depth',
+    desc: 'Concise first-principles definitions for 180 relational algebra, B+Tree indexing, query planning, MVCC, and WAL concepts.',
+    ogSlug: 'glossary',
+    h1: 'SQL & Database Internals Glossary',
+    bodyHtml: glossaryHtml
+  }
+];
+
+for (const hub of hubDefs) {
+  writeHubPage(hub);
+}
+
+let generatedChallengesCount = 0;
+for (const ch of challengesData) {
+  if (!ch || !ch.id) continue;
+  const rawDesc = cleanText(`${ch.title}: ${ch.context || 'Debug and verify production SQL scenarios in an interactive browser playground.'}`);
+  const desc = rawDesc.length > 158 ? rawDesc.slice(0, 155).replace(/\s+\S*$/, '') + '...' : rawDesc;
+  writeHubPage({
+    routeDir: `challenges/${ch.id}`,
+    title: `${ch.title} — SQL Challenge | SQL In Depth`,
+    desc,
+    ogSlug: ch.id,
+    h1: ch.title,
+    schemaType: 'TechArticle'
+  });
+  generatedChallengesCount++;
+}
+
 // 5. Generate sitemap.xml
 let sitemapXml = '<?xml version="1.0" encoding="UTF-8"?>\n';
 sitemapXml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
@@ -709,7 +850,7 @@ sitemapXml += '</urlset>\n';
 fs.writeFileSync(path.join(root, 'sitemap.xml'), sitemapXml, 'utf8');
 console.log(`✓ Generated sitemap.xml with ${sitemapUrls.length} entries`);
 
-console.log(`\nSSG Completed: ${generatedCount} units and ${generatedBuildsCount} build labs generated successfully.`);
+console.log(`\nSSG Completed: ${generatedCount} units, ${generatedBuildsCount} build labs, ${hubDefs.length} hub pages, and ${generatedChallengesCount} challenge pages generated successfully.`);
 
 // 6. Stamp all generated HTML files & js/manifest.js with content hashes
 require('child_process').execFileSync(process.execPath, [path.join(__dirname, 'stamp-assets.js')], { stdio: 'inherit' });

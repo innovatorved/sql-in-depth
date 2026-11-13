@@ -472,8 +472,8 @@ window.App = (() => {
 
   function navigateToProject(projectId, event) {
     if (event && event.preventDefault) event.preventDefault();
-    const targetUrl = '/projects' + (projectId ? ('#project-' + projectId) : '');
-    if (window.location.pathname !== '/projects' || window.location.hash !== (projectId ? ('#project-' + projectId) : '')) {
+    const targetUrl = '/projects/' + (projectId ? ('#project-' + projectId) : '');
+    if (window.location.pathname !== '/projects/' || window.location.hash !== (projectId ? ('#project-' + projectId) : '')) {
       history.pushState(null, '', targetUrl);
     }
     currentView = 'projects';
@@ -520,7 +520,7 @@ window.App = (() => {
   function navigateToRoadmap(tab, event) {
     if (event && (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0)) return;
     if (event) event.preventDefault();
-    const targetPath = tab && tab !== 'graph' ? `/roadmap/${tab}` : '/roadmap';
+    const targetPath = tab && tab !== 'graph' ? `/roadmap/${tab}/` : '/roadmap/';
     if (window.location.pathname !== targetPath || window.location.hash) {
       history.pushState(null, '', targetPath);
     }
@@ -534,7 +534,7 @@ window.App = (() => {
   function navigateToChallenges(challengeId, event) {
     if (event && (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0)) return;
     if (event) event.preventDefault();
-    const targetPath = challengeId ? `/challenges/${challengeId}` : '/challenges';
+    const targetPath = challengeId ? `/challenges/${challengeId}/` : '/challenges/';
     if (window.location.pathname !== targetPath || window.location.hash) {
       history.pushState(null, '', targetPath);
     }
@@ -548,7 +548,7 @@ window.App = (() => {
   function navigateToDashboard(tab, event) {
     if (event && (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0)) return;
     if (event) event.preventDefault();
-    const targetPath = tab && tab !== 'overview' ? `/dashboard/${tab}` : '/dashboard';
+    const targetPath = tab && tab !== 'overview' ? `/dashboard/${tab}/` : '/dashboard/';
     if (window.location.pathname !== targetPath || window.location.hash) {
       history.pushState(null, '', targetPath);
     }
@@ -562,7 +562,7 @@ window.App = (() => {
   function navigateToSandbox(blueprintId, event, search) {
     if (event && (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0)) return;
     if (event) event.preventDefault();
-    const targetPath = blueprintId ? `/sandbox/${blueprintId}` : '/sandbox';
+    const targetPath = blueprintId ? `/sandbox/${blueprintId}/` : '/sandbox/';
     const targetSearch = typeof search === 'string' ? search : '';
     if (window.location.pathname !== targetPath || window.location.search !== targetSearch || window.location.hash) {
       history.pushState(null, '', targetPath + targetSearch);
@@ -591,6 +591,16 @@ window.App = (() => {
   function renderCurrentView() {
     const reader = document.getElementById('reader');
     if (!reader) return;
+
+    // Close any open modal / lightbox overlays when navigating between routes
+    closeGlobalCodeLab();
+    if (typeof closeDiagramLightbox === 'function') closeDiagramLightbox();
+    const openBuildOverlay = document.getElementById('build-lab-overlay');
+    if (openBuildOverlay && openBuildOverlay.classList.contains('is-open')) {
+      openBuildOverlay.classList.remove('is-open');
+      openBuildOverlay.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('codelab-fullscreen-lock');
+    }
 
     // Pause any active audio from previous view
     document.querySelectorAll('audio').forEach(a => a.pause());
@@ -655,7 +665,9 @@ window.App = (() => {
 
       case 'roadmap':
         if (!window.RoadmapController && window.Lazy) {
-          reader.innerHTML = '<div class="prose"><p style="padding:2rem 0;color:var(--fg-muted);">Loading Interactive SQL Roadmap…</p></div>';
+          if (!reader.querySelector('[data-ssg-hub]')) {
+            reader.innerHTML = '<div class="prose" style="min-height:120vh;"><p style="padding:2rem 0;color:var(--fg-muted);">Loading Interactive SQL Roadmap…</p></div>';
+          }
           window.Lazy.loadAll(['data/roadmap.js', 'js/roadmap.js']).then(() => {
             if (currentView === 'roadmap') renderCurrentView();
           });
@@ -672,12 +684,15 @@ window.App = (() => {
 
       case 'challenges':
         if ((!window.ChallengesController || !window.SqlEngine || !window.CHALLENGES_DATA) && window.Lazy) {
-          reader.innerHTML = '<div class="prose"><p style="padding:2rem 0;color:var(--fg-muted);">Loading SQL Incident Challenges &amp; WASM Engine…</p></div>';
-          window.Lazy.ensureSqlStack()
-            .then(() => window.Lazy.loadAll(['data/challenges.js', 'js/challenges.js']))
-            .then(() => {
-              if (currentView === 'challenges') renderCurrentView();
-            });
+          if (!reader.querySelector('[data-ssg-hub]')) {
+            reader.innerHTML = '<div class="prose" style="min-height:120vh;"><p style="padding:2rem 0;color:var(--fg-muted);">Loading SQL Incident Challenges &amp; WASM Engine…</p></div>';
+          }
+          Promise.all([
+            window.Lazy.ensureSqlStack(),
+            window.Lazy.loadAll(['data/challenges.js', 'js/challenges.js'])
+          ]).then(() => {
+            if (currentView === 'challenges') renderCurrentView();
+          });
           break;
         }
         if (window.ChallengesController) {
@@ -691,7 +706,9 @@ window.App = (() => {
 
       case 'dashboard':
         if ((!window.DashboardController || !window.SRS_CARDS_DATA) && window.Lazy) {
-          reader.innerHTML = '<div class="prose"><p style="padding:2rem 0;color:var(--fg-muted);">Loading your progress…</p></div>';
+          if (!reader.querySelector('[data-ssg-hub]')) {
+            reader.innerHTML = '<div class="prose" style="min-height:120vh;"><p style="padding:2rem 0;color:var(--fg-muted);">Loading your progress…</p></div>';
+          }
           window.Lazy.loadAll(['data/srs-cards.js', 'data/challenges.js', 'js/dashboard.js']).then(() => {
             if (currentView === 'dashboard') renderCurrentView();
           });
@@ -708,12 +725,15 @@ window.App = (() => {
 
       case 'sandbox':
         if ((!window.SandboxController || !window.SqlEngine || !window.TableVisualizer) && window.Lazy) {
-          reader.innerHTML = '<div class="prose"><p style="padding:2rem 0;color:var(--fg-muted);">Booting Client-Side SQL Studio…</p></div>';
-          window.Lazy.ensureSqlStack()
-            .then(() => window.Lazy.loadAll(['data/whiteboard-blueprints.js', 'data/challenges.js', 'js/sandbox.js']))
-            .then(() => {
-              if (currentView === 'sandbox') renderCurrentView();
-            });
+          if (!reader.querySelector('[data-ssg-hub]')) {
+            reader.innerHTML = '<div class="prose" style="min-height:120vh;"><p style="padding:2rem 0;color:var(--fg-muted);">Booting Client-Side SQL Studio…</p></div>';
+          }
+          Promise.all([
+            window.Lazy.ensureSqlStack(),
+            window.Lazy.loadAll(['data/whiteboard-blueprints.js', 'data/challenges.js', 'js/sandbox.js'])
+          ]).then(() => {
+            if (currentView === 'sandbox') renderCurrentView();
+          });
           break;
         }
         if (window.SandboxController) {
@@ -1351,7 +1371,7 @@ window.App = (() => {
 
     // Update theme-color meta
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', next === 'dark' ? '#000000' : '#ffffff');
+    if (meta) meta.setAttribute('content', next === 'dark' ? '#0f0f10' : '#f7f7f5');
 
     // Re-init mermaid with correct theme
     if (window.mermaid) {
@@ -2592,7 +2612,7 @@ window.App = (() => {
               <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:16px;">
                 ${fileNames.map(fn => `
                   <button type="button" class="cl-file-tab ${fn === activeFile ? 'is-active' : ''}" data-cl-file="${escapeHtml(fn)}" style="text-align:left;padding:6px 10px;border-radius:6px;border:1px solid ${fn === activeFile ? 'var(--info)' : 'var(--border)'};background:${fn === activeFile ? 'var(--info-bg)' : 'var(--surface)'};color:var(--fg);font-family:var(--font-mono,monospace);font-size:0.8rem;cursor:pointer;">
-                    📄 ${escapeHtml(fn)}
+                    ${escapeHtml(fn)}
                   </button>
                 `).join('')}
               </div>
@@ -2850,15 +2870,15 @@ window.App = (() => {
               <button type="button" class="btn btn--secondary btn--sm" data-sql-lab-nav="next" ${activeStepIdx >= steps.length - 1 ? 'disabled' : ''}>Next Step →</button>
             ` : ''}
             <button type="button" class="btn btn--secondary btn--sm" data-sql-lab-action="verify" style="border-color:var(--success-border);color:var(--success);">✓ Check SQL Assertions</button>
-            <button type="button" class="btn btn--secondary btn--sm" data-sql-lab-action="hint">💡 Hint</button>
-            <button type="button" class="btn btn--secondary btn--sm" data-sql-lab-action="solution">★ Load Solution SQL</button>
+            <button type="button" class="btn btn--secondary btn--sm" data-sql-lab-action="hint">Hint</button>
+            <button type="button" class="btn btn--secondary btn--sm" data-sql-lab-action="solution">Load Solution SQL</button>
             <button type="button" class="btn btn--primary btn--sm" data-sql-lab-action="fullscreen">⤢ Full-Screen Studio</button>
           </div>
         </div>
         ${dsTables.length > 0 ? `
           <details class="sql-inline-schema-drawer" style="border-left:1px solid var(--border);border-right:1px solid var(--border);">
             <summary>
-              <span>🗄️ <strong>Dataset Schema &amp; PK/FK Relationship Explorer</strong> (${escapeHtml(dsObj ? dsObj.title : datasetId)} · ${dsTables.length} tables — click any table to preview rows)</span>
+              <span><strong>Dataset Schema &amp; PK/FK Relationship Explorer</strong> (${escapeHtml(dsObj ? dsObj.title : datasetId)} · ${dsTables.length} tables — click any table to preview rows)</span>
               <span class="badge badge--secondary">Expand Schema ▾</span>
             </summary>
             <div class="sql-inline-schema-grid">${schemaCardsHtml}</div>
@@ -3160,16 +3180,16 @@ window.App = (() => {
     function buildQueryPresetOptionsHtml() {
       const dsObj = datasets[activeDatasetId] || {};
       const sampleList = Array.isArray(dsObj.sampleQueries) ? dsObj.sampleQueries : (Array.isArray(dsObj.defaultQueries) ? dsObj.defaultQueries : []);
-      let html = `<option value="custom">✎ Custom Query (Current Editor)</option>`;
+      let html = `<option value="custom">Custom Query (Current Editor)</option>`;
       if (steps.length > 0) {
         steps.forEach((s, idx) => {
-          const sTitle = s.title || `Step ${idx + 1}`;
+          const sTitle = (s.title || `Step ${idx + 1}`).replace(/\s*\([a-z0-9-]+\)\s*$/i, '');
           html += `<option value="step-${idx}-starter">Step ${idx + 1} Starter — ${escapeHtml(sTitle)}</option>`;
-          html += `<option value="step-${idx}-solution">★ Step ${idx + 1} Solution — ${escapeHtml(sTitle)}</option>`;
+          html += `<option value="step-${idx}-solution">Step ${idx + 1} Solution — ${escapeHtml(sTitle)}</option>`;
         });
       }
       if ((spec && spec.referenceSql) || opts.referenceSql) {
-        html += `<option value="reference">★ Reference Solution SQL</option>`;
+        html += `<option value="reference">Reference Solution SQL</option>`;
       }
       sampleList.forEach((sq, idx) => {
         const label = typeof sq === 'string' ? `Sample Query ${idx + 1}` : (sq.title || sq.label || `Sample Query ${idx + 1}`);
@@ -3185,53 +3205,52 @@ window.App = (() => {
             <button class="btn btn--secondary btn--sm global-codelab-back-btn" id="global-codelab-close-btn">
               ← ${escapeHtml(opts.backLabel || 'Back to Lesson')}
             </button>
-            <div>
-              <div style="display:flex;align-items:center;gap:8px;">
-                <span class="global-codelab-badge" style="background:var(--info-muted);color:var(--info);padding:2px 8px;border-radius:999px;font-size:12px;font-weight:700;">SQL STUDIO</span>
-                <strong style="font-size:15px;color:var(--fg);">${escapeHtml(title)}</strong>
+              <div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span class="global-codelab-badge" style="background:var(--accent-muted);color:var(--accent);padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;">SQL STUDIO</span>
+                  <strong style="font-size:15px;color:var(--fg);">${escapeHtml(title)}</strong>
+                </div>
+                <div style="font-size:12px;color:var(--fg-muted);margin-top:2px;">${escapeHtml(summary)}</div>
               </div>
-              <div style="font-size:12px;color:var(--fg-muted);margin-top:2px;">${escapeHtml(summary)}</div>
+            </div>
+            <div class="global-codelab-topbar-right" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+              <label style="font-size:12px;color:var(--fg-muted);display:flex;align-items:center;gap:6px;">
+                Preset:
+                <select id="sql-studio-modal-query-select" data-role="modal-query-select" aria-label="Load Topic Query / Solution" style="background:var(--bg);color:var(--fg);border:1px solid var(--border-strong);border-radius:6px;padding:4px 8px;font-size:12px;max-width:240px;">
+                  ${buildQueryPresetOptionsHtml()}
+                </select>
+              </label>
+              <label style="font-size:12px;color:var(--fg-muted);display:flex;align-items:center;gap:6px;">
+                Dataset:
+                <select id="sql-studio-modal-dataset" data-role="modal-dataset" style="background:var(--bg);color:var(--fg);border:1px solid var(--border-strong);border-radius:6px;padding:4px 8px;font-size:12px;">
+                  <option value="__unified__" ${activeDatasetId === '__unified__' ? 'selected' : ''}>All 5 Datasets</option>
+                  ${datasetKeys.map(k => {
+                    const ds = datasets[k] || { title: k };
+                    return `<option value="${escapeHtml(k)}" ${k === activeDatasetId ? 'selected' : ''}>${escapeHtml(ds.title || ds.label || k)}</option>`;
+                  }).join('')}
+                </select>
+              </label>
+              <label style="font-size:12px;color:var(--fg-muted);display:flex;align-items:center;gap:6px;">
+                Engine:
+                <select id="sql-studio-modal-engine" data-role="modal-engine" style="background:var(--bg);color:var(--fg);border:1px solid var(--border-strong);border-radius:6px;padding:4px 8px;font-size:12px;">
+                  <option value="sqlite" ${activeEngine === 'sqlite' ? 'selected' : ''}>SQLite 3 (WASM)</option>
+                  <option value="postgres" ${activeEngine === 'postgres' ? 'selected' : ''}>PostgreSQL 18 (PGlite)</option>
+                </select>
+              </label>
+              <button class="btn btn--secondary btn--sm" id="sql-studio-modal-reset-btn">Reset Dataset</button>
             </div>
           </div>
-          <div class="global-codelab-topbar-right" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-            <label style="font-size:12px;color:var(--fg-muted);display:flex;align-items:center;gap:6px;">
-              Query / Solution:
-              <select id="sql-studio-modal-query-select" data-role="modal-query-select" aria-label="Load Topic Query / Solution" style="background:var(--bg);color:var(--fg);border:1px solid var(--border-strong);border-radius:6px;padding:4px 8px;font-size:0.8rem;max-width:240px;">
-                ${buildQueryPresetOptionsHtml()}
-              </select>
-            </label>
-            <label style="font-size:12px;color:var(--fg-muted);display:flex;align-items:center;gap:6px;">
-              Dataset:
-              <select id="sql-studio-modal-dataset" data-role="modal-dataset" style="background:var(--bg);color:var(--fg);border:1px solid var(--border-strong);border-radius:6px;padding:4px 8px;font-size:0.8rem;">
-                <option value="__unified__" ${activeDatasetId === '__unified__' ? 'selected' : ''}>All 5 Datasets (Unified Sandbox)</option>
-                ${datasetKeys.map(k => {
-                  const ds = datasets[k] || { title: k };
-                  return `<option value="${escapeHtml(k)}" ${k === activeDatasetId ? 'selected' : ''}>${escapeHtml(ds.title || ds.label || k)}</option>`;
-                }).join('')}
-              </select>
-            </label>
-            <label style="font-size:12px;color:var(--fg-muted);display:flex;align-items:center;gap:6px;">
-              Engine:
-              <select id="sql-studio-modal-engine" data-role="modal-engine" style="background:var(--bg);color:var(--fg);border:1px solid var(--border-strong);border-radius:6px;padding:4px 8px;font-size:0.8rem;">
-                <option value="sqlite" ${activeEngine === 'sqlite' ? 'selected' : ''}>SQLite 3 (WASM)</option>
-                <option value="postgres" ${activeEngine === 'postgres' ? 'selected' : ''}>PostgreSQL 18 (PGlite WASM)</option>
-              </select>
-            </label>
-            <button class="btn btn--primary btn--sm" id="sql-studio-modal-run-btn" data-role="modal-run">▶ Run Query</button>
-            <button class="btn btn--secondary btn--sm" id="sql-studio-modal-reset-btn">↺ Reset Dataset</button>
+
+          <div style="display:grid;grid-template-columns:280px 1fr;flex:1;min-height:0;overflow:hidden;">
+            <aside id="sql-studio-modal-schema" style="border-right:1px solid var(--border);background:var(--bg-alt);padding:14px;overflow-y:auto;">
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--fg-muted);margin-bottom:10px;">Schema &amp; PK/FK Explorer</div>
+              <div id="sql-studio-modal-schema-list" style="font-size:13px;color:var(--fg);"></div>
+            </aside>
+
+            <div style="display:flex;flex-direction:column;min-height:0;overflow-y:auto;padding:16px;gap:14px;">
+              <div id="sql-studio-modal-visualizer-host" style="flex:1;min-height:420px;"></div>
+            </div>
           </div>
-        </div>
-
-        <div style="display:grid;grid-template-columns:280px 1fr;flex:1;min-height:0;overflow:hidden;">
-          <aside id="sql-studio-modal-schema" style="border-right:1px solid var(--border);background:var(--bg-alt);padding:14px;overflow-y:auto;">
-            <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--fg-muted);margin-bottom:10px;">Schema &amp; PK/FK Explorer</div>
-            <div id="sql-studio-modal-schema-list" style="font-size:13px;color:var(--fg);"></div>
-          </aside>
-
-          <main style="display:flex;flex-direction:column;min-height:0;overflow-y:auto;padding:16px;gap:14px;">
-            <div id="sql-studio-modal-visualizer-host" style="flex:1;min-height:420px;"></div>
-          </main>
-        </div>
       </div>
     `;
 
@@ -3348,6 +3367,7 @@ window.App = (() => {
             referenceSql: refSql,
             buggyCode: resolvedBuggyCode,
             autoVerify: Boolean(mountOpts.autoVerify),
+            compactHeader: true,
             title,
             onVerify: (vRes) => {
               if (vRes && vRes.passed) {

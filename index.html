@@ -7,7 +7,7 @@
   <title>SQL In Depth — Relational Databases, Query Optimization &amp; Storage Internals</title>
   <meta name="description" content="A free, interactive, first-principles curriculum for SQL &amp; Database Internals — 6 tracks, 180 topics, browser WASM SQLite &amp; PostgreSQL playground, visual EXPLAIN plans, and from-scratch builds.">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#f7f8fa">
+  <meta name="theme-color" content="#f7f7f5">
   
   <!-- Open Graph -->
   <meta property="og:type" content="website">
@@ -34,16 +34,16 @@
   <link rel="stylesheet" href="design-system/tokens.css?v=3bc26075fb">
   <link rel="stylesheet" href="design-system/components.css?v=606a179125">
   <link rel="stylesheet" href="css/vendor/katex/katex.min.css?v=83121916c0" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/variables.css?v=b32198442b">
+  <link rel="stylesheet" href="css/variables.css?v=98985bd48f">
   <link rel="stylesheet" href="css/layout.css?v=0dc598dfac">
-  <link rel="stylesheet" href="css/components.css?v=4450289dec">
-  <link rel="stylesheet" href="css/content.css?v=f28f40e024" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/components.css?v=5ff1bbfde1">
+  <link rel="stylesheet" href="css/content.css?v=c40a7aea42" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="css/landing.css?v=8c43435edd">
-  <link rel="stylesheet" href="css/simulators.css?v=283a35f45b" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/simulators.css?v=0ad47327a0" media="print" onload="this.media='all'">
 
   <!-- Core scripts: head initializer & asset manifest -->
-  <script src="js/init.js?v=f6a6002f60"></script>
-  <script src="js/manifest.js?v=ec151c5627"></script>
+  <script src="js/init.js?v=d98d79ab7a"></script>
+  <script src="js/manifest.js?v=cd330e015c"></script>
 
   <script type="application/ld+json">
 {
@@ -102,13 +102,13 @@
 
     <div class="topbar__actions">
       <nav class="topbar__nav" aria-label="Primary navigation">
-        <a href="/roadmap" class="topbar__nav-link" data-nav="roadmap">Roadmap</a>
-        <a href="/challenges" class="topbar__nav-link" data-nav="challenges">Challenges</a>
-        <a href="/sandbox" class="topbar__nav-link" data-nav="sandbox">SQL Studio</a>
+        <a href="/roadmap/" class="topbar__nav-link" data-nav="roadmap">Roadmap</a>
+        <a href="/challenges/" class="topbar__nav-link" data-nav="challenges">Challenges</a>
+        <a href="/sandbox/" class="topbar__nav-link" data-nav="sandbox">SQL Studio</a>
         <a href="/glossary/" class="topbar__nav-link" data-nav="glossary">Glossary</a>
       </nav>
 
-      <a href="/dashboard" class="topbar__progress-pill" id="progress-pill" data-nav="dashboard" title="Your learning progress" aria-label="Your learning progress">
+      <a href="/dashboard/" class="topbar__progress-pill" id="progress-pill" data-nav="dashboard" title="Your learning progress" aria-label="Your learning progress">
         <svg class="topbar__progress-ring" viewBox="0 0 20 20">
           <circle class="track" cx="10" cy="10" r="8"/>
           <circle class="fill" cx="10" cy="10" r="8" stroke-dasharray="50.27" stroke-dashoffset="50.27" id="progress-ring-fill"/>
@@ -831,7 +831,7 @@
 
             <div class="landing-hero__actions">
               <a class="btn btn--primary landing-btn" id="landing-primary-cta" href="/topic/why-databases-exist/">Start learning →</a>
-              <a class="btn btn--outline landing-btn" href="/sandbox" data-nav="sandbox">Open SQL Studio</a>
+              <a class="btn btn--outline landing-btn" href="/sandbox/" data-nav="sandbox">Open SQL Studio</a>
               <button class="landing-search" type="button" data-landing-search>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                 Search 180 topics <kbd>⌘K</kbd>
@@ -868,7 +868,7 @@ LIMIT 5;</textarea>
               <span class="landing-pg__status" id="landing-sql-meta" role="status" aria-live="polite">5 rows · Instant preview</span>
               <div class="landing-pg__links">
                 <button type="button" class="landing-pg__link-btn" id="landing-sql-copy" title="Copy shareable runnable query link">Share query</button>
-                <a class="landing-pg__open" id="landing-sql-open" href="/sandbox">Full Studio ↗</a>
+                <a class="landing-pg__open" id="landing-sql-open" href="/sandbox/">Full Studio ↗</a>
               </div>
             </div>
 
@@ -976,7 +976,7 @@ LIMIT 5;</textarea>
               <button type="button" class="btn btn--sm" data-role="reset" title="Reset">↺ Reset</button>
               <label style="font-size:12px;color:var(--fg-muted);display:inline-flex;align-items:center;gap:4px;margin-left:auto;">
                 Speed
-                <select class="simulator-card__input sim-select" data-role="speed" style="padding:3px 6px;font-size:11.5px;">
+                <select class="simulator-card__input sim-select" data-role="speed" style="padding:3px 6px;font-size:12px;">
                   <option value="1200">0.5×</option>
                   <option value="750" selected>1×</option>
                   <option value="380">2×</option>
@@ -1005,14 +1005,14 @@ LIMIT 5;</textarea>
 
             <div class="invariant-box" style="margin:0 0 0.75rem 0;padding:0.6rem 0.9rem;">
               <div style="margin:0 0 0.25rem 0;font-size:12px;font-weight:600;color:var(--fg);">Invariant &amp; State</div>
-              <div data-role="invariant" style="font-size:12.5px;font-family:var(--font-mono,monospace);color:var(--fg-primary);">Relation initialized with 6 tuples across schema (order_id, customer, status, total_cents, created_at) — preset: Paid Orders ≥ $120 Ordered by Total DESC LIMIT 3.</div>
+              <div data-role="invariant" style="font-size:13px;font-family:var(--font-mono,monospace);color:var(--fg-primary);">Relation initialized with 6 tuples across schema (order_id, customer, status, total_cents, created_at) — preset: Paid Orders ≥ $120 Ordered by Total DESC LIMIT 3.</div>
             </div>
             <div class="dsa-sim__stage" data-role="stage">
       <div class="dsa-sim__visual-canvas">
         <div class="dsa-sim__visual-label">
           <span>State graph · Logical Query Execution Pipeline (FROM → WHERE → SELECT → ORDER BY → LIMIT)</span>
           <span class="dsa-sim__legend">
-            <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:#3b82f6"></span>Active Pointer</span>
+            <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:var(--accent)"></span>Active Pointer</span>
             <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:#8b5cf6"></span>Jump/Transition</span>
             <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:#10b981"></span>Matched/Optimal</span>
           </span>
@@ -1048,11 +1048,11 @@ LIMIT 5;</textarea>
           
         <g>
           <g transform="translate(36, 62)">
-             <rect x="-24" y="-10" width="48" height="15" rx="4" fill="#3b82f6" opacity="0.16" stroke="#3b82f6" stroke-width="1"/>
-             <text x="0" y="1" text-anchor="middle" font-size="9.5" font-weight="700" fill="#3b82f6" font-family="var(--font-mono, monospace)">Tuple #</text>
+             <rect x="-24" y="-10" width="48" height="15" rx="4" fill="var(--accent)" opacity="0.16" stroke="var(--accent)" stroke-width="1"/>
+             <text x="0" y="1" text-anchor="middle" font-size="9.5" font-weight="700" fill="var(--accent)" font-family="var(--font-mono, monospace)">Tuple #</text>
            </g>
-          <rect x="14" y="76" width="44" height="40" rx="8" fill="rgba(59, 130, 246, 0.26)" stroke="#3b82f6" stroke-width="2.4" />
-          <text x="36" y="100" text-anchor="middle" font-size="11" font-weight="700" fill="#3b82f6" font-family="var(--font-mono, monospace)">101:p…</text>
+          <rect x="14" y="76" width="44" height="40" rx="8" fill="var(--accent-muted)" stroke="var(--accent)" stroke-width="2.4" />
+          <text x="36" y="100" text-anchor="middle" font-size="11" font-weight="700" fill="var(--accent)" font-family="var(--font-mono, monospace)">101:p…</text>
           <text x="36" y="130" text-anchor="middle" font-size="9.5" fill="var(--fg-muted, #64748b)" font-family="var(--font-mono, monospace)">[0]</text>
         </g>
       
@@ -1095,14 +1095,14 @@ LIMIT 5;</textarea>
       </div>
     
       <div style="border:1px solid var(--border-color,#27272a);border-radius:8px;overflow:hidden;margin:6px 0;background:var(--bg-secondary,rgba(24,24,27,0.45));">
-        <div style="padding:5px 10px;background:var(--bg-tertiary,rgba(39,39,42,0.6));border-bottom:1px solid var(--border-color,#27272a);font-size:11.5px;font-weight:700;font-family:var(--font-mono,monospace);display:flex;justify-content:space-between;align-items:center;">
+        <div style="padding:5px 10px;background:var(--bg-tertiary,rgba(39,39,42,0.6));border-bottom:1px solid var(--border-color,#27272a);font-size:12px;font-weight:700;font-family:var(--font-mono,monospace);display:flex;justify-content:space-between;align-items:center;">
           <span>Logical Query Execution Pipeline (FROM → WHERE → SELECT → ORDER BY → LIMIT) — Initial Relation State</span>
-          <span style="font-size:10.5px;color:var(--fg-muted);font-weight:500;">6 row(s)</span>
+          <span style="font-size:11px;color:var(--fg-muted);font-weight:500;">6 row(s)</span>
         </div>
         <div style="overflow-x:auto;">
           <table style="width:100%;border-collapse:collapse;">
             <thead><tr><th style="padding:5px 8px;text-align:left;border-bottom:1px solid var(--border-color,#27272a);font-size:11px;color:var(--fg-muted);font-family:var(--font-mono,monospace);">order_id</th><th style="padding:5px 8px;text-align:left;border-bottom:1px solid var(--border-color,#27272a);font-size:11px;color:var(--fg-muted);font-family:var(--font-mono,monospace);">customer</th><th style="padding:5px 8px;text-align:left;border-bottom:1px solid var(--border-color,#27272a);font-size:11px;color:var(--fg-muted);font-family:var(--font-mono,monospace);">status</th><th style="padding:5px 8px;text-align:left;border-bottom:1px solid var(--border-color,#27272a);font-size:11px;color:var(--fg-muted);font-family:var(--font-mono,monospace);">total_cents</th><th style="padding:5px 8px;text-align:left;border-bottom:1px solid var(--border-color,#27272a);font-size:11px;color:var(--fg-muted);font-family:var(--font-mono,monospace);">created_at</th><th style="padding:5px 8px;text-align:left;border-bottom:1px solid var(--border-color,#27272a);font-size:11px;color:var(--fg-muted);font-family:var(--font-mono,monospace);">State</th></tr></thead>
-            <tbody><tr style="background:rgba(59,130,246,0.12);border-left:3px solid #3b82f6;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">101</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">Ada Lovelace</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">paid</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">18500</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">2026-03-01</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:10.5px;font-weight:700;font-family:var(--font-mono,monospace);color:#3b82f6;">CURSOR START</td></tr><tr style="background:transparent;border-left:3px solid transparent;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">102</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">Alan Turing</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">pending</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">9200</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">2026-03-02</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);"></td></tr><tr style="background:transparent;border-left:3px solid transparent;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">103</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">Grace Hopper</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">paid</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">34000</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">2026-03-02</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);"></td></tr><tr style="background:transparent;border-left:3px solid transparent;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">104</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">Edsger Dijkstra</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">refunded</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">21000</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">2026-03-03</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);"></td></tr><tr style="background:transparent;border-left:3px solid transparent;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">105</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">Barbara Liskov</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">paid</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">27500</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">2026-03-04</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);"></td></tr><tr style="background:transparent;border-left:3px solid transparent;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">106</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">Donald Knuth</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">paid</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">12900</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">2026-03-05</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);"></td></tr></tbody>
+            <tbody><tr style="background:var(--accent-muted);border-left:3px solid var(--accent);"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">101</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">Ada Lovelace</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">paid</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">18500</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">2026-03-01</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11px;font-weight:700;font-family:var(--font-mono,monospace);color:var(--accent);">CURSOR START</td></tr><tr style="background:transparent;border-left:3px solid transparent;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">102</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">Alan Turing</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">pending</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">9200</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">2026-03-02</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);"></td></tr><tr style="background:transparent;border-left:3px solid transparent;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">103</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">Grace Hopper</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">paid</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">34000</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">2026-03-02</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);"></td></tr><tr style="background:transparent;border-left:3px solid transparent;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">104</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">Edsger Dijkstra</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">refunded</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">21000</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">2026-03-03</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);"></td></tr><tr style="background:transparent;border-left:3px solid transparent;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">105</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">Barbara Liskov</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">paid</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">27500</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">2026-03-04</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);"></td></tr><tr style="background:transparent;border-left:3px solid transparent;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">106</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">Donald Knuth</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">paid</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">12900</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">2026-03-05</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);"></td></tr></tbody>
           </table>
         </div>
       </div>
@@ -1262,7 +1262,7 @@ LIMIT 5;</textarea>
         <p class="landing-closing__desc">Start at Module 01 with zero setup, or jump straight to the interactive topic roadmap.</p>
         <div class="landing-closing__actions">
           <a class="btn btn--primary landing-btn" href="/topic/why-databases-exist/">Start Module 01 →</a>
-          <a class="btn btn--outline landing-btn" href="/roadmap" data-nav="roadmap">View Topic Roadmap</a>
+          <a class="btn btn--outline landing-btn" href="/roadmap/" data-nav="roadmap">View Topic Roadmap</a>
         </div>
       </section></div>      <!-- landing:end -->
     </div>
@@ -1275,11 +1275,11 @@ LIMIT 5;</textarea>
           <a href="https://dsa-in-depth.vedgupta.in/" class="ds-footer__product" target="_blank" rel="noopener">Algorithms &amp; Data Structures</a>
         </div>
         <div class="ds-footer__links">
-          <a href="/sandbox" data-nav="sandbox">SQL Studio</a>
-          <a href="/roadmap" data-nav="roadmap">Roadmap</a>
-          <a href="/challenges" data-nav="challenges">Challenges</a>
+          <a href="/sandbox/" data-nav="sandbox">SQL Studio</a>
+          <a href="/roadmap/" data-nav="roadmap">Roadmap</a>
+          <a href="/challenges/" data-nav="challenges">Challenges</a>
           <a href="/glossary/" data-nav="glossary">Glossary</a>
-          <a href="/projects">Projects</a>
+          <a href="/projects/">Projects</a>
           <a href="https://github.com/innovatorved/sql-in-depth" target="_blank" rel="noopener">GitHub</a>
         </div>
         <div class="ds-footer__meta">
@@ -1352,10 +1352,10 @@ LIMIT 5;</textarea>
   <script type="text/plain" data-defer src="js/progress.js?v=20e4822556"></script>
   <script type="text/plain" data-defer src="js/search.js?v=cfb7464ca7"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
-  <script type="text/plain" data-defer src="js/renderer.js?v=d4cbd1df69"></script>
-  <script type="text/plain" data-defer src="js/landing.js?v=df71db4b82"></script>
+  <script type="text/plain" data-defer src="js/renderer.js?v=fd623be208"></script>
+  <script type="text/plain" data-defer src="js/landing.js?v=ab352e39f9"></script>
   <script type="text/plain" data-defer src="js/quiz.js?v=5b300d9b3d"></script>
-  <script type="text/plain" data-defer src="js/app.js?v=690ab491f1"></script>
+  <script type="text/plain" data-defer src="js/app.js?v=d7a48f58f9"></script>
 
   <!-- Route-Scoped Lazy Scripts (stamped & loaded on demand via window.Lazy) -->
   <script type="text/plain" data-lazy src="data/datasets.js?v=259e5934af"></script>
@@ -1365,14 +1365,14 @@ LIMIT 5;</textarea>
   <script type="text/plain" data-lazy src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
   <script type="text/plain" data-lazy src="data/implementations_code.js?v=fce884f8a8"></script>
   <script type="text/plain" data-lazy src="data/guided_labs.js?v=3bd996e9dc"></script>
-  <script type="text/plain" data-lazy src="data/topic_guided_labs.js?v=2a57d85494"></script>
+  <script type="text/plain" data-lazy src="data/topic_guided_labs.js?v=5b7d013daa"></script>
   <script type="text/plain" data-lazy src="data/projects.js?v=2280ac085f"></script>
-  <script type="text/plain" data-lazy src="data/glossary.js?v=4f6c79a4e0"></script>
+  <script type="text/plain" data-lazy src="data/glossary.js?v=cbce13b203"></script>
   <script type="text/plain" data-lazy src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>
   <script type="text/plain" data-lazy src="js/sql-engine.js?v=ef30cfbffa"></script>
-  <script type="text/plain" data-lazy src="js/vendor/cm6-sql.js?v=74bd776b7d"></script>
-  <script type="text/plain" data-lazy src="js/table-visualizer.js?v=984a25ac84"></script>
-  <script type="text/plain" data-lazy src="js/simulators.js?v=da56d0b088"></script>
+  <script type="text/plain" data-lazy src="js/vendor/cm6-sql.js?v=acc5cb4445"></script>
+  <script type="text/plain" data-lazy src="js/table-visualizer.js?v=abf76f2092"></script>
+  <script type="text/plain" data-lazy src="js/simulators.js?v=4cf0ceeb96"></script>
   <script type="text/plain" data-lazy src="js/simulators-relational.js?v=32c1358d02"></script>
   <script type="text/plain" data-lazy src="js/simulators-analytical.js?v=50d950f3b6"></script>
   <script type="text/plain" data-lazy src="js/simulators-modeling.js?v=1962947dcb"></script>
@@ -1381,10 +1381,10 @@ LIMIT 5;</textarea>
   <script type="text/plain" data-lazy src="js/simulators-olap-ops.js?v=11bb8afed3"></script>
   <script type="text/plain" data-lazy src="js/vendor/katex/katex.min.js?v=6d481709e3"></script>
   <script type="text/plain" data-lazy src="js/vendor/katex/auto-render.min.js?v=82dca94048"></script>
-  <script type="text/plain" data-lazy src="js/roadmap.js?v=cebfb7e32c"></script>
-  <script type="text/plain" data-lazy src="js/challenges.js?v=ca25055a91"></script>
-  <script type="text/plain" data-lazy src="js/dashboard.js?v=fcb1621a2e"></script>
-  <script type="text/plain" data-lazy src="js/sandbox.js?v=facac2594d"></script>
+  <script type="text/plain" data-lazy src="js/roadmap.js?v=687d490300"></script>
+  <script type="text/plain" data-lazy src="js/challenges.js?v=438d35cd1b"></script>
+  <script type="text/plain" data-lazy src="js/dashboard.js?v=3fd8d6f60d"></script>
+  <script type="text/plain" data-lazy src="js/sandbox.js?v=775e2f00c1"></script>
   <script type="text/plain" data-lazy src="js/topic-codelab.js?v=49fccccd99"></script>
 
   <!-- App bootstrap & deferred script loader -->

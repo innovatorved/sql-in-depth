@@ -687,7 +687,13 @@ if (!fs.existsSync(ogImagePath)) {
 const allHtmlFiles = [
   'index.html',
   '404.html',
+  'roadmap/index.html',
+  'challenges/index.html',
+  'sandbox/index.html',
+  'dashboard/index.html',
+  'glossary/index.html',
   'projects/index.html',
+  ...Array.from(allChallengeIds).map(c => `challenges/${c}/index.html`),
   ...Array.from(allSlugs).map(s => `topic/${s}/index.html`),
   ...Array.from(allBuildIds).map(b => `build/${b}/index.html`)
 ];

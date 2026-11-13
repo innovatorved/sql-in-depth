@@ -32,7 +32,7 @@
     const stored = localStorage.getItem('sd-theme');
     const dark = stored === 'dark';
     document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#000000' : '#ffffff');
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#0f0f10' : '#f7f7f5');
   } catch {}
 
   // 4. Google Analytics 4 & Consent Mode v2 (GDPR / DPDP compliant)

@@ -1903,7 +1903,8 @@
         }
 
         if (!step || !step.columns || step.columns.length === 0) {
-            return '<div class="sql-viz-empty">Statement executed successfully (0 columns returned).</div>';
+            var isReadQuery = /^\s*(?:--[^\n]*\n|\s|\/\*[\s\S]*?\*\/)*(SELECT|WITH|VALUES)\b/i.test(String((step && step.code) || ''));
+            return '<div class="sql-viz-empty">' + (isReadQuery ? '0 rows returned — query matched no rows.' : 'Statement executed successfully (0 columns returned).') + '</div>';
         }
 
         var activeTables = [];
@@ -2180,15 +2181,15 @@
         options = options || {};
 
         if (options.showEditor) {
-            var editorOpts = Object.assign({}, options, { showEditor: false });
-            var refSql = options.referenceSql || options.solutionSql || sql;
             var isInsideModal = Boolean(container && typeof container.closest === 'function' && container.closest('#global-codelab-overlay'));
+            var editorOpts = Object.assign({}, options, { showEditor: false, compactHeader: isInsideModal ? true : Boolean(options.compactHeader) });
+            var refSql = options.referenceSql || options.solutionSql || sql;
             container.innerHTML =
                 '<div class="sql-studio-inline-workbench" style="display:flex;flex-direction:column;gap:10px;padding:12px;background:var(--bg-elevated);">' +
                     '<div class="sql-lab-editor-box" style="display:flex;flex-direction:column;gap:8px;">' +
                         '<div class="sql-ide-header-bar" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--fg-muted);padding:0 2px;">' +
                             '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
-                                '<span style="font-family:var(--font-mono,monospace);color:var(--accent,#38bdf8);font-weight:700;">query.sql · Live SQL IDE</span>' +
+                                '<span style="font-family:var(--font-mono,monospace);color:var(--accent);font-weight:700;">query.sql · Live SQL IDE</span>' +
                                 '<span>Shortcut: Cmd/Ctrl + Enter to Run · Tab to Indent</span>' +
                             '</div>' +
                             '<div class="sql-studio-saved-panel" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">' +

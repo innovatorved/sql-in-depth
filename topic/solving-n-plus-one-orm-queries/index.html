@@ -5,21 +5,21 @@
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Eliminating ORM N+1 Query Storms: Batching, Eager Joins &amp; JSON Aggregation — SQL In Depth</title>
-  <meta name="description" content="Eliminating ORM N1 Query Storms: Batching, Eager Joins &amp; JSON Aggregation solving-n-plus-one-orm-queries detects 1N chatty query loops in application traces.">
+  <meta name="description" content="Eliminating ORM N1 Query Storms: Batching, Eager Joins &amp;amp; JSON Aggregation addresses a core problem in Production Query Tuning, Observability &amp;amp.">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#f7f8fa">
+  <meta name="theme-color" content="#f7f7f5">
   
   <!-- Open Graph -->
   <meta property="og:type" content="article">
   <meta property="og:title" content="Eliminating ORM N+1 Query Storms: Batching, Eager Joins &amp; JSON Aggregation — SQL In Depth">
-  <meta property="og:description" content="Eliminating ORM N1 Query Storms: Batching, Eager Joins &amp; JSON Aggregation solving-n-plus-one-orm-queries detects 1N chatty query loops in application traces.">
+  <meta property="og:description" content="Eliminating ORM N1 Query Storms: Batching, Eager Joins &amp;amp; JSON Aggregation addresses a core problem in Production Query Tuning, Observability &amp;amp.">
   <meta property="og:url" content="https://sql-in-depth.vedgupta.in/topic/solving-n-plus-one-orm-queries/">
   <meta property="og:image" content="https://sql-in-depth.vedgupta.in/assets/og/solving-n-plus-one-orm-queries.png">
   
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Eliminating ORM N+1 Query Storms: Batching, Eager Joins &amp; JSON Aggregation — SQL In Depth">
-  <meta name="twitter:description" content="Eliminating ORM N1 Query Storms: Batching, Eager Joins &amp; JSON Aggregation solving-n-plus-one-orm-queries detects 1N chatty query loops in application traces.">
+  <meta name="twitter:description" content="Eliminating ORM N1 Query Storms: Batching, Eager Joins &amp;amp; JSON Aggregation addresses a core problem in Production Query Tuning, Observability &amp;amp.">
   <meta name="twitter:image" content="https://sql-in-depth.vedgupta.in/assets/og/solving-n-plus-one-orm-queries.png">
   
   <!-- Canonical -->
@@ -34,23 +34,23 @@
   <link rel="stylesheet" href="design-system/tokens.css?v=3bc26075fb">
   <link rel="stylesheet" href="design-system/components.css?v=606a179125">
   <link rel="stylesheet" href="css/vendor/katex/katex.min.css?v=83121916c0" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/variables.css?v=b32198442b">
+  <link rel="stylesheet" href="css/variables.css?v=98985bd48f">
   <link rel="stylesheet" href="css/layout.css?v=0dc598dfac">
-  <link rel="stylesheet" href="css/components.css?v=4450289dec">
-  <link rel="stylesheet" href="css/content.css?v=f28f40e024">
+  <link rel="stylesheet" href="css/components.css?v=5ff1bbfde1">
+  <link rel="stylesheet" href="css/content.css?v=c40a7aea42">
   <link rel="stylesheet" href="css/landing.css?v=8c43435edd" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/simulators.css?v=283a35f45b" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/simulators.css?v=0ad47327a0" media="print" onload="this.media='all'">
 
   <!-- Core scripts: head initializer & asset manifest -->
-  <script src="js/init.js?v=f6a6002f60"></script>
-  <script src="js/manifest.js?v=ec151c5627"></script>
+  <script src="js/init.js?v=d98d79ab7a"></script>
+  <script src="js/manifest.js?v=cd330e015c"></script>
 
   <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "TechArticle",
   "headline": "Eliminating ORM N+1 Query Storms: Batching, Eager Joins & JSON Aggregation",
-  "description": "Eliminating ORM N1 Query Storms: Batching, Eager Joins & JSON Aggregation solving-n-plus-one-orm-queries detects 1N chatty query loops in application traces.",
+  "description": "Eliminating ORM N1 Query Storms: Batching, Eager Joins &amp; JSON Aggregation addresses a core problem in Production Query Tuning, Observability &amp.",
   "image": "https://sql-in-depth.vedgupta.in/assets/og/solving-n-plus-one-orm-queries.png",
   "url": "https://sql-in-depth.vedgupta.in/topic/solving-n-plus-one-orm-queries/",
   "author": {
@@ -92,13 +92,13 @@
 
     <div class="topbar__actions">
       <nav class="topbar__nav" aria-label="Primary navigation">
-        <a href="/roadmap" class="topbar__nav-link" data-nav="roadmap">Roadmap</a>
-        <a href="/challenges" class="topbar__nav-link" data-nav="challenges">Challenges</a>
-        <a href="/sandbox" class="topbar__nav-link" data-nav="sandbox">SQL Studio</a>
+        <a href="/roadmap/" class="topbar__nav-link" data-nav="roadmap">Roadmap</a>
+        <a href="/challenges/" class="topbar__nav-link" data-nav="challenges">Challenges</a>
+        <a href="/sandbox/" class="topbar__nav-link" data-nav="sandbox">SQL Studio</a>
         <a href="/glossary/" class="topbar__nav-link" data-nav="glossary">Glossary</a>
       </nav>
 
-      <a href="/dashboard" class="topbar__progress-pill" id="progress-pill" data-nav="dashboard" title="Your learning progress" aria-label="Your learning progress">
+      <a href="/dashboard/" class="topbar__progress-pill" id="progress-pill" data-nav="dashboard" title="Your learning progress" aria-label="Your learning progress">
         <svg class="topbar__progress-ring" viewBox="0 0 20 20">
           <circle class="track" cx="10" cy="10" r="8"/>
           <circle class="fill" cx="10" cy="10" r="8" stroke-dasharray="50.27" stroke-dashoffset="50.27" id="progress-ring-fill"/>
@@ -820,7 +820,7 @@
            <span class="tag">n-plus-one</span> <span class="tag">orm-tuning</span> <span class="tag">query-batching</span>
         </div>
         <h1 class="lesson-header__title">Eliminating ORM N+1 Query Storms: Batching, Eager Joins & JSON Aggregation</h1>
-        <div class="ds-lesson-hero__promise">Detect 1+N chatty query loops in application traces and collapsing 501 round-trips into 1 or 2 indexed queries using IN batching or lateral JSON aggregation with predictable I/O cost and zero silent NULL traps.</div>
+        <div class="ds-lesson-hero__promise">Detect 1+N chatty query loops in application traces and collapse 501 round-trips into 1 or 2 indexed queries using IN batching or lateral JSON aggregation with predictable I/O cost and zero silent NULL traps.</div>
         <div class="lesson-header__meta">
           <span class="lesson-header__meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 7 min read</span>
           <span class="lesson-header__meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Module 6.3: Production Query Tuning, Observability & Database Reliability</span>
@@ -844,7 +844,7 @@
       </div>
         <aside class="intuition">
           <h2 class="intuition__title" id="sec-why-it-matters"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>Why It Matters</h2>
-          <div class="intuition__body"><p><p><strong>Eliminating ORM N+1 Query Storms: Batching, Eager Joins & JSON Aggregation</strong> (<code>solving-n-plus-one-orm-queries</code>) detects 1+N chatty query loops in application traces and collapsing 501 round-trips into 1 or 2 indexed queries using IN batching or lateral JSON aggregation. When application engineers treat SQL as an opaque string generator rather than a formal relational algebra and physical storage contract, subtle edge cases—such as Three-Valued <code>NULL</code> semantics, non-SARGable predicates, join fanouts, or unindexed heap scans—turn millisecond queries into multi-minute production outages.</p><p>By grounding <strong>Eliminating ORM N+1 Query Storms: Batching, Eager Joins & JSON Aggregation</strong> in both Codd's relational calculus and physical 8KB page mechanics, you can predict exact row cardinalities, inspect <code>EXPLAIN QUERY PLAN</code> operator trees before shipping, and guarantee correctness under high-concurrency production workloads.</p></p></div>
+          <div class="intuition__body"><p><p><strong>Eliminating ORM N+1 Query Storms: Batching, Eager Joins &amp; JSON Aggregation</strong> addresses a core problem in Production Query Tuning, Observability &amp; Database Reliability: detecting 1+N chatty query loops in application traces and collapsing 501 round-trips into 1 or 2 indexed queries using IN batching or lateral JSON aggregation.</p><p>Production database reliability comes down to keyset pagination, eliminating N+1 query storms, lock-free SKIP LOCKED queues, pg_stat_statements triage, and rehearsed PITR recovery drills.</p></p></div>
         </aside>
       <div class="audio-player" id="audio-player-solving-n-plus-one-orm-queries">
         <button class="audio-player__play-btn" id="audio-btn-solving-n-plus-one-orm-queries" data-action="toggle-audio" data-slug="solving-n-plus-one-orm-queries" aria-label="Play audio" title="Play audio">
@@ -936,7 +936,7 @@
     <article class="prose"><div class="lesson-content">
 <h2 id="topic-sec-1">Core Idea &amp; First-Principles Mechanics</h2>
 <p>Every SQL statement in <strong>Eliminating ORM N+1 Query Storms: Batching, Eager Joins & JSON Aggregation</strong> compiles down to a deterministic tree of relational algebra operators acting on physical pages in the buffer pool. At the execution boundary, this mechanism detects 1+N chatty query loops in application traces and collapsing 501 round-trips into 1 or 2 indexed queries using IN batching or lateral JSON aggregation. Rather than mutating global variables imperatively, declarative SQL specifies the mathematical properties of the desired output relation while delegating physical access path selection to the cost-based query optimizer.</p>
-<p>When the database engine processes <code>solving-n-plus-one-orm-queries</code> within <strong>Production Query Tuning, Observability & Database Reliability</strong>, it enforces strict invariants over tuple domains, attribute visibility, and I/O page budgets. Understanding the boundary between logical relational semantics (what rows qualify) and physical execution (whether the engine performs a sequential heap scan, a B+Tree range seek, or an in-memory hash probe) is the defining skill of a Staff Database Engineer.</p>
+<p>When the database engine evaluates queries in <strong>Production Query Tuning, Observability & Database Reliability</strong>, it enforces strict invariants over tuple domains, attribute visibility, and I/O page budgets. Understanding the boundary between logical relational semantics (what rows qualify) and physical execution (whether the engine performs a sequential heap scan, a B+Tree range seek, or an in-memory hash probe) is the defining skill of a Staff Database Engineer.</p>
 
 <div class="invariant-box">
   <div class="invariant-box__title">Formal Relational &amp; Cost Invariant — Eliminating ORM N+1 Query Storms: Batching, Eager Joins & JSON Aggregation</div>
@@ -1076,7 +1076,7 @@ flowchart LR
         <div class="dsa-sim__visual-label">
           <span>Tree view · Keyset Cursor Seek vs OFFSET Scan, N+1 Batching &amp; GIN Inverted Index / Skip-Locked Queue</span>
           <span class="dsa-sim__legend">
-            <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:#3b82f6"></span>Visited/Active</span>
+            <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:var(--accent)"></span>Visited/Active</span>
             <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:#8b5cf6"></span>Pivot/Root</span>
             <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:#10b981"></span>Resolved</span>
           </span>
@@ -1085,9 +1085,9 @@ flowchart LR
           <line x1="340" y1="34" x2="190" y2="106" stroke="var(--border-color, #94a3b8)" stroke-width="1.5" /><line x1="340" y1="34" x2="490" y2="106" stroke="var(--border-color, #94a3b8)" stroke-width="1.5" /><line x1="190" y1="106" x2="115" y2="177" stroke="var(--border-color, #94a3b8)" stroke-width="1.5" />
           
         <g>
-          <text x="340" y="10" text-anchor="middle" font-size="9.5" font-weight="700" fill="#3b82f6" font-family="var(--font-mono, monospace)">Tuple #0</text>
-          <circle cx="340" cy="34" r="18" fill="rgba(59, 130, 246, 0.26)" stroke="#3b82f6" stroke-width="2.5" />
-          <text x="340" y="38" text-anchor="middle" font-size="11" font-weight="700" fill="#3b82f6" font-family="var(--font-mono, monospace)">OFFSE…</text>
+          <text x="340" y="10" text-anchor="middle" font-size="9.5" font-weight="700" fill="var(--accent)" font-family="var(--font-mono, monospace)">Tuple #0</text>
+          <circle cx="340" cy="34" r="18" fill="var(--accent-muted)" stroke="var(--accent)" stroke-width="2.5" />
+          <text x="340" y="38" text-anchor="middle" font-size="11" font-weight="700" fill="var(--accent)" font-family="var(--font-mono, monospace)">OFFSE…</text>
           <text x="362" y="38" text-anchor="start" font-size="9" fill="var(--fg-muted, #64748b)" font-family="var(--font-mono, monospace)">[0]</text>
         </g>
       
@@ -1123,7 +1123,7 @@ flowchart LR
         <div style="overflow-x:auto;">
           <table style="width:100%;border-collapse:collapse;">
             <thead><tr><th style="padding:5px 8px;text-align:left;border-bottom:1px solid var(--border-color,#27272a);font-size:11px;color:var(--fg-muted);font-family:var(--font-mono,monospace);">method</th><th style="padding:5px 8px;text-align:left;border-bottom:1px solid var(--border-color,#27272a);font-size:11px;color:var(--fg-muted);font-family:var(--font-mono,monospace);">page_depth</th><th style="padding:5px 8px;text-align:left;border-bottom:1px solid var(--border-color,#27272a);font-size:11px;color:var(--fg-muted);font-family:var(--font-mono,monospace);">index_rows_scanned</th><th style="padding:5px 8px;text-align:left;border-bottom:1px solid var(--border-color,#27272a);font-size:11px;color:var(--fg-muted);font-family:var(--font-mono,monospace);">rows_discarded</th><th style="padding:5px 8px;text-align:left;border-bottom:1px solid var(--border-color,#27272a);font-size:11px;color:var(--fg-muted);font-family:var(--font-mono,monospace);">latency_ms</th><th style="padding:5px 8px;text-align:left;border-bottom:1px solid var(--border-color,#27272a);font-size:11px;color:var(--fg-muted);font-family:var(--font-mono,monospace);">State</th></tr></thead>
-            <tbody><tr style="background:rgba(59,130,246,0.12);border-left:3px solid #3b82f6;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">OFFSET 0 LIMIT 20</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">Page 1</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">20</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">0</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">0.4 ms</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11px;font-weight:700;font-family:var(--font-mono,monospace);color:#3b82f6;">CURSOR START</td></tr><tr style="background:transparent;border-left:3px solid transparent;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">OFFSET 10,000 LIMIT 20</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">Page 500</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">10,020</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">10,000</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">19.2 ms</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);"></td></tr><tr style="background:transparent;border-left:3px solid transparent;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">OFFSET 100,000 LIMIT 20</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">Page 5,000</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">100,020</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">100,000 (Wasted!)</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">184.0 ms</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);"></td></tr><tr style="background:transparent;border-left:3px solid transparent;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">Keyset WHERE (ts,id) &lt; cursor LIMIT 20</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">Page 5,000</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">20 (Direct B+Tree Seek!)</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">0</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">0.5 ms ✓</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);"></td></tr></tbody>
+            <tbody><tr style="background:var(--accent-muted);border-left:3px solid var(--accent);"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">OFFSET 0 LIMIT 20</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">Page 1</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">20</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">0</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">0.4 ms</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11px;font-weight:700;font-family:var(--font-mono,monospace);color:var(--accent);">CURSOR START</td></tr><tr style="background:transparent;border-left:3px solid transparent;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">OFFSET 10,000 LIMIT 20</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">Page 500</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">10,020</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">10,000</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">19.2 ms</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);"></td></tr><tr style="background:transparent;border-left:3px solid transparent;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">OFFSET 100,000 LIMIT 20</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">Page 5,000</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">100,020</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">100,000 (Wasted!)</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">184.0 ms</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);"></td></tr><tr style="background:transparent;border-left:3px solid transparent;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">Keyset WHERE (ts,id) &lt; cursor LIMIT 20</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">Page 5,000</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">20 (Direct B+Tree Seek!)</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">0</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">0.5 ms ✓</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);"></td></tr></tbody>
           </table>
         </div>
       </div>
@@ -1296,7 +1296,7 @@ flowchart LR
                     <span class="build-lab-step-card__num">01</span>
                     <span class="build-lab-step-card__target">Phase 1 · Eliminating ORM N+1 Query Storms: Batching, Eager Joins &amp; JSON Aggregation: Ledger Account &amp; Optimistic Version Scan</span>
                   </div>
-                  <div class="build-lab-step-card__title">Inspect Accounts &amp; Optimistic Lock Versions (solving-n-plus-one-orm-queries)</div>
+                  <div class="build-lab-step-card__title">Inspect Accounts &amp; Optimistic Lock Versions</div>
                   <div class="build-lab-step-card__invariant">Inspect <code>accounts</code> in <code>fintech_ledger</code> to verify <code>posted_balance_cents</code> and MVCC/optimistic concurrency <code>version</code> counters.</div>
                   <div class="build-lab-step-card__concept">Refine the starter <code>accounts</code> query in <code>query.sql</code> to compute <code>posted_balance_usd</code> and classify account types.</div>
                   
@@ -1706,11 +1706,11 @@ ORDER BY t.transfer_id ASC;</code></pre>
           <a href="https://dsa-in-depth.vedgupta.in/" class="ds-footer__product" target="_blank" rel="noopener">Algorithms &amp; Data Structures</a>
         </div>
         <div class="ds-footer__links">
-          <a href="/sandbox" data-nav="sandbox">SQL Studio</a>
-          <a href="/roadmap" data-nav="roadmap">Roadmap</a>
-          <a href="/challenges" data-nav="challenges">Challenges</a>
+          <a href="/sandbox/" data-nav="sandbox">SQL Studio</a>
+          <a href="/roadmap/" data-nav="roadmap">Roadmap</a>
+          <a href="/challenges/" data-nav="challenges">Challenges</a>
           <a href="/glossary/" data-nav="glossary">Glossary</a>
-          <a href="/projects">Projects</a>
+          <a href="/projects/">Projects</a>
           <a href="https://github.com/innovatorved/sql-in-depth" target="_blank" rel="noopener">GitHub</a>
         </div>
         <div class="ds-footer__meta">
@@ -1783,10 +1783,10 @@ ORDER BY t.transfer_id ASC;</code></pre>
   <script type="text/plain" data-defer src="js/progress.js?v=20e4822556"></script>
   <script type="text/plain" data-defer src="js/search.js?v=cfb7464ca7"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
-  <script type="text/plain" data-defer src="js/renderer.js?v=d4cbd1df69"></script>
-  <script type="text/plain" data-defer src="js/landing.js?v=df71db4b82"></script>
+  <script type="text/plain" data-defer src="js/renderer.js?v=fd623be208"></script>
+  <script type="text/plain" data-defer src="js/landing.js?v=ab352e39f9"></script>
   <script type="text/plain" data-defer src="js/quiz.js?v=5b300d9b3d"></script>
-  <script type="text/plain" data-defer src="js/app.js?v=690ab491f1"></script>
+  <script type="text/plain" data-defer src="js/app.js?v=d7a48f58f9"></script>
 
   <!-- Route-Scoped Lazy Scripts (stamped & loaded on demand via window.Lazy) -->
   <script type="text/plain" data-lazy src="data/datasets.js?v=259e5934af"></script>
@@ -1795,15 +1795,14 @@ ORDER BY t.transfer_id ASC;</code></pre>
   <script type="text/plain" data-lazy src="data/srs-cards.js?v=fabc47dd9c"></script>
   <script type="text/plain" data-lazy src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
   <script type="text/plain" data-lazy src="data/implementations_code.js?v=fce884f8a8"></script>
-
-  <script type="text/plain" data-lazy src="data/topic_guided_labs.js?v=2a57d85494"></script>
+  <script type="text/plain" data-lazy src="data/topic_guided_labs.js?v=5b7d013daa"></script>
   <script type="text/plain" data-lazy src="data/projects.js?v=2280ac085f"></script>
-  <script type="text/plain" data-lazy src="data/glossary.js?v=4f6c79a4e0"></script>
+  <script type="text/plain" data-lazy src="data/glossary.js?v=cbce13b203"></script>
   <script type="text/plain" data-lazy src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>
   <script type="text/plain" data-lazy src="js/sql-engine.js?v=ef30cfbffa"></script>
-  <script type="text/plain" data-lazy src="js/vendor/cm6-sql.js?v=74bd776b7d"></script>
-  <script type="text/plain" data-lazy src="js/table-visualizer.js?v=984a25ac84"></script>
-  <script type="text/plain" data-lazy src="js/simulators.js?v=da56d0b088"></script>
+  <script type="text/plain" data-lazy src="js/vendor/cm6-sql.js?v=acc5cb4445"></script>
+  <script type="text/plain" data-lazy src="js/table-visualizer.js?v=abf76f2092"></script>
+  <script type="text/plain" data-lazy src="js/simulators.js?v=4cf0ceeb96"></script>
   <script type="text/plain" data-lazy src="js/simulators-relational.js?v=32c1358d02"></script>
   <script type="text/plain" data-lazy src="js/simulators-analytical.js?v=50d950f3b6"></script>
   <script type="text/plain" data-lazy src="js/simulators-modeling.js?v=1962947dcb"></script>
@@ -1812,10 +1811,10 @@ ORDER BY t.transfer_id ASC;</code></pre>
   <script type="text/plain" data-lazy src="js/simulators-olap-ops.js?v=11bb8afed3"></script>
   <script type="text/plain" data-lazy src="js/vendor/katex/katex.min.js?v=6d481709e3"></script>
   <script type="text/plain" data-lazy src="js/vendor/katex/auto-render.min.js?v=82dca94048"></script>
-  <script type="text/plain" data-lazy src="js/roadmap.js?v=cebfb7e32c"></script>
-  <script type="text/plain" data-lazy src="js/challenges.js?v=ca25055a91"></script>
-  <script type="text/plain" data-lazy src="js/dashboard.js?v=fcb1621a2e"></script>
-  <script type="text/plain" data-lazy src="js/sandbox.js?v=facac2594d"></script>
+  <script type="text/plain" data-lazy src="js/roadmap.js?v=687d490300"></script>
+  <script type="text/plain" data-lazy src="js/challenges.js?v=438d35cd1b"></script>
+  <script type="text/plain" data-lazy src="js/dashboard.js?v=3fd8d6f60d"></script>
+  <script type="text/plain" data-lazy src="js/sandbox.js?v=775e2f00c1"></script>
   <script type="text/plain" data-lazy src="js/topic-codelab.js?v=49fccccd99"></script>
 
   <!-- App bootstrap & deferred script loader -->

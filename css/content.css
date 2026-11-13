@@ -508,6 +508,16 @@
   pointer-events: none;
 }
 
+.mermaid:not([data-processed]) {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  text-align: left;
+  color: var(--fg-muted);
+  padding: 14px 16px;
+}
+
 /* ── Print Stylesheet ──────────────────────────────────────────────────── */
 @media print {
   .topbar, .sidebar, .sidebar-overlay, .ds-toc, .audio-player,

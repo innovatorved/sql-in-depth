@@ -23,9 +23,11 @@ Verified via headless Chrome Mobile Lighthouse (`formFactor: "mobile"`) against 
 | | **Accessibility** | `84` | **`100`** | **+16** |
 | | **Best Practices** | `96` | **`100`** | **+4** |
 | | **SEO** | `100` | **`100`** | `0` |
-| | **FCP / LCP** | `3.4 s` / `8.1 s` | **`1.4 s` / `1.4 s`** | **-6.7 s LCP** |
+| | **FCP / LCP** | `3.4 s` / `8.1 s` | **`1.5 s` / `1.5 s`** | **-6.6 s LCP** |
 | | **Total Blocking Time (TBT)** | `3,480 ms` | **`10 ms`** | **-3,470 ms** |
 | | **CLS** | `0.02` | **`0`** | **-0.02** |
+| **`/sandbox/` (SQL Studio)** | **Perf / A11y / BP / SEO** | `52 / 88 / 96 / 92` | **`100 / 100 / 100 / 100`** | **CLS `0`, TBT `10 ms`** |
+| **`/roadmap/` (Interactive DAG)** | **Perf / A11y / BP / SEO** | `58 / 89 / 96 / 92` | **`100 / 100 / 100 / 100`** | **CLS `0`, TBT `10 ms`** |
 
 ---
 
@@ -34,9 +36,9 @@ Verified via headless Chrome Mobile Lighthouse (`formFactor: "mobile"`) against 
 - [x] **Phase 0.1 — Learning UX Product Teardown**: Desktop + mobile study of interactive course structure, visual/interactive pedagogy, video explainers, navigation, shareability, and mobile ergonomics documented in [learning-ux-teardown.md](research/learning-ux-teardown.md).
 - [x] **Phase 0.2 — Modern Web & Frontend Design Craft**: Established product design direction in [PRODUCT.md](../PRODUCT.md) (`Impeccable` craft floor: zero `[]` anti-pattern findings; `Modern Web Guidance` patterns for native `<details>` disclosures, `loading="lazy"` `<video>` with explicit dimensions, `content-visibility: auto` + `contain-intrinsic-size`, and accessible `aria-sort` sortable tables).
 - [x] **Phase 0.3 — Strict Copyright & Permissive License Inventory**: Verified 100% original prose, code, SVG diagrams, social cards, and programmatic videos, with permissive third-party licenses (`MIT`, `Apache-2.0`, `OFL-1.1`) cataloged in [licenses.md](licenses.md) and [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md).
-- [x] **Phase 0.4 — Baseline Audit & Architectural Decisions**: Captured baseline screenshots and P0/P1/P2 findings in [audit.md](research/audit.md), and logged ADR-001 through ADR-008 in [DECISIONS.md](../DECISIONS.md).
+- [x] **Phase 0.4 — Baseline Audit & Architectural Decisions**: Captured baseline screenshots and P0/P1/P2 findings in [audit.md](research/audit.md), and logged ADR-001 through ADR-009 in [DECISIONS.md](../DECISIONS.md).
 - [x] **Phase 1 — Portable Shared Design System (`design-system/` + `DESIGN.md`)**:
-  - Created portable `design-system/tokens.css` and `design-system/components.css` documented in [DESIGN.md](../DESIGN.md) for reuse across `sql-in-depth` (Precision Cobalt `#0B53D6` / `#58A6FF`), `system-design-in-depth` (preset `[data-product="system-design"]`), and `dsa-in-depth` (preset `[data-product="dsa"]`).
+  - Created portable `design-system/tokens.css` and `design-system/components.css` documented in [DESIGN.md](../DESIGN.md) for reuse across `sql-in-depth` (Warm Neutral Paper `#F7F7F5` light / Neutral Charcoal `#0F0F10` dark + Relational Ember `#C2410C` / `#FB923C`), `system-design-in-depth` (preset `[data-product="system-design"]`), and `dsa-in-depth` (preset `[data-product="dsa"]`).
   - Self-hosted `Geist` (reading) + `Geist Mono` (SQL, execution plans, hex offsets) + `KaTeX` CSS and `.woff2` fonts (`0` external CDN font/CSS dependencies).
   - Enforced WCAG AA contrast (`>= 4.7:1` across all surfaces, badges, simulators, and syntax tokens in both light and dark modes), `68ch` reading measure, visible `:focus-visible` rings, `24×24px` minimum touch targets, and `prefers-reduced-motion` support.
 - [x] **Phase 2 — Visual-First Lesson Experience (`180/180` Prerendered Topics + `18/18` Engine Builds)**:
@@ -53,7 +55,7 @@ Verified via headless Chrome Mobile Lighthouse (`formFactor: "mobile"`) against 
   - Deduplicated external lectures in `data/topic_videos.json` from `180` noisy/non-English embeds down to `18` curated English primary-source lectures (CMU Database Group Andy Pavlo, MIT 6.830, Use The Index Luke / Markus Winand) tucked cleanly inside secondary `<details>` disclosures.
 - [x] **Phase 5 — Landing Page, Shareability & Automated Per-Page OG Social Cards**:
   - Redesigned `/` (`js/landing.js`, `css/landing.css`) with a 2-column split hero featuring an above-the-fold live interactive SQLite WASM + `EXPLAIN PLAN` playground (`Join & Rollup`, `Window RANK()`, `Index Seek Plan` presets), dynamic `Continue where you left off` resume banner, flagship visual explainers showcase, lazy simulator preview tabs, 6-track curriculum map, and 18 engine builds.
-  - Built `tools/generate-og.js` (`rsvg-convert` + Pillow 96-color PNG8 quantization) generating **201 unique `1200×630` PNG social cards** (`assets/og/*.png`, `4.81 MB` total, `~24 KB` avg) with track-specific B+Tree / MVCC / Query Pipeline schematics, wired across all `201` HTML pages alongside canonical URLs, `sitemap.xml` (`217` URLs), `robots.txt`, JSON-LD (`WebSite`, `Course`, `TechArticle`), and native/clipboard Share buttons across lessons, playground queries, and challenges.
+  - Built `tools/generate-og.js` (`rsvg-convert` + Pillow 96-color PNG8 quantization) generating **218 unique `1200×630` PNG social cards** (`assets/og/*.png`, `4.85 MB` total, `~22 KB` avg) with track-specific B+Tree / MVCC / Query Pipeline schematics, wired across all `218` static HTML pages (including dedicated static hub directories `/roadmap/`, `/challenges/`, `/challenges/<id>/`, `/sandbox/`, `/dashboard/`, `/glossary/`, and `/projects/` to prevent Cloudflare Pages 308 redirect loops) alongside canonical URLs, `sitemap.xml` (`217` URLs), `robots.txt`, JSON-LD (`WebSite`, `Course`, `TechArticle`), and native/clipboard Share buttons across lessons, playground queries, and challenges.
 
 ---
 
@@ -85,9 +87,9 @@ Verified via headless Chrome Mobile Lighthouse (`formFactor: "mobile"`) against 
 ## Automated Quality Gate Summary
 
 - `npm run build` (`tools/build.js` + `esbuild` CSS/JS minification): **PASS** (`84` assets minified into `dist/`)
-- `npm run lint` (`tools/validate.js` + `tools/stamp-assets.js --check`): **PASS** (`0 errors, 0 warnings`, `0 stale files across 201 HTML files`)
+- `npm run lint` (`tools/validate.js` + `tools/stamp-assets.js --check`): **PASS** (`0 errors, 0 warnings`, `0 stale files across 218 HTML files`)
 - `npm run typecheck` (`tools/check-rendered.js`): **PASS** (`199/199` prerendered topic, build, and root HTML pages verified)
 - `npm test`: **PASS**
 - `npm run e2e` (`tools/e2e-test.js`): **PASS** (`346 / 346` assertions passed across 4 tiers, `0` failed)
 - `impeccable detect --json css/landing.css design-system/components.css`: **PASS** (`[]` — `0` anti-pattern findings)
-- Playwright Real-Browser Verification (`1440×900` desktop + `390×844` mobile, light + dark across `/`, `/topic/why-databases-exist/`, `/topic/btree-bplustree-internal-anatomy/`, `/sandbox`, `/sandbox?q=...`, `/roadmap`, `/glossary/`): **PASS** (`0` console errors, `0` page errors, `0` horizontal overflow)
+- Playwright Real-Browser Verification (`1440×900` desktop + `390×844` mobile, light + dark across `/`, `/topic/why-databases-exist/`, `/build/build-btree-index-advisor/`, `/sandbox/`, `/sandbox/?q=...`, `/roadmap/`, `/challenges/`, `/dashboard/`, `/glossary/`, `/projects/`): **PASS** (`0` console errors, `0` page errors, `0` horizontal overflow, `1` `<main>` landmark per page)

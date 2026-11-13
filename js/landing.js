@@ -150,7 +150,7 @@ window.Landing = (() => {
 
   function buildStudioHref(sql) {
     const token = encodeQueryToken(sql);
-    return token ? `/sandbox?q=${token}` : '/sandbox';
+    return token ? `/sandbox/?q=${token}` : '/sandbox/';
   }
 
   function allUnits() {
@@ -225,7 +225,7 @@ window.Landing = (() => {
 
             <div class="landing-hero__actions">
               <a class="btn btn--primary landing-btn" id="landing-primary-cta" href="/topic/${esc(first?.slug || 'why-databases-exist')}/">Start learning →</a>
-              <a class="btn btn--outline landing-btn" href="/sandbox" data-nav="sandbox">Open SQL Studio</a>
+              <a class="btn btn--outline landing-btn" href="/sandbox/" data-nav="sandbox">Open SQL Studio</a>
               <button class="landing-search" type="button" data-landing-search>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                 Search ${c.topics} topics <kbd>⌘K</kbd>
@@ -355,7 +355,7 @@ window.Landing = (() => {
         <p class="landing-closing__desc">Start at Module 01 with zero setup, or jump straight to the interactive topic roadmap.</p>
         <div class="landing-closing__actions">
           <a class="btn btn--primary landing-btn" href="/topic/${esc(first?.slug || 'why-databases-exist')}/">Start Module 01 →</a>
-          <a class="btn btn--outline landing-btn" href="/roadmap" data-nav="roadmap">View Topic Roadmap</a>
+          <a class="btn btn--outline landing-btn" href="/roadmap/" data-nav="roadmap">View Topic Roadmap</a>
         </div>
       </section>`;
   }

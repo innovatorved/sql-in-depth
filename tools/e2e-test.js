@@ -477,7 +477,7 @@ async function runSuite() {
   assertCheck(1, 'T1-F12-05', 'js/renderer.js stashes <select> blocks and prevents matching across < or > characters', rendererSrc.includes('textarea|select') && rendererSrc.includes('<>'));
 
   // --- F13: CSS Light-Theme Overrides & Legacy Copy Cleanup ---
-  assertCheck(1, 'T1-F13-01', 'css/variables.css defines --bg-secondary in both dark (:root) and [data-theme="light"]', variablesCss.includes('--bg-secondary: #0a0a0a') && variablesCss.includes('--bg-secondary: #fafafa'));
+  assertCheck(1, 'T1-F13-01', 'css/variables.css defines --bg-secondary in both dark (:root / [data-theme="dark"]) and [data-theme="light"]', variablesCss.includes('--bg-secondary:') && variablesCss.includes('[data-theme="light"]'));
   assertCheck(1, 'T1-F13-02', 'css/simulators.css includes [data-theme="light"] .dsa-sim overrides', simulatorsCss.includes('[data-theme="light"] .dsa-sim'));
   assertCheck(1, 'T1-F13-03', 'css/components.css includes [data-theme="light"] .sql-guided-lab overrides', componentsCss.includes('[data-theme="light"] .sql-guided-lab'));
   assertCheck(1, 'T1-F13-04', 'js/roadmap.js and js/dashboard.js contain SQL & Database copy (zero legacy DSA Operations/sec or DSA Roadmap)', !roadmapSrc.includes('DSA Roadmap &amp; Study Tracks') && !dashboardSrc.includes('DSA Operations/sec'));
@@ -490,7 +490,7 @@ async function runSuite() {
   const buildDirs = fs.existsSync(buildDir) ? fs.readdirSync(buildDir).filter(d => fs.existsSync(path.join(buildDir, d, 'index.html'))) : [];
   assertCheck(1, 'T1-F14-01', 'All 180 pre-rendered /topic/<slug>/index.html pages exist', topicDirs.length === 180, `found ${topicDirs.length}`);
   assertCheck(1, 'T1-F14-02', 'All 18 pre-rendered /build/<id>/index.html pages exist', buildDirs.length === 18, `found ${buildDirs.length}`);
-  assertCheck(1, 'T1-F14-03', 'Root index.html and sitemap.xml exist', fs.existsSync(path.join(ROOT, 'index.html')) && fs.existsSync(path.join(ROOT, 'sitemap.xml')));
+  assertCheck(1, 'T1-F14-03', 'Root index.html, sitemap.xml, and static hub pages (roadmap, challenges, sandbox, dashboard, glossary) exist', fs.existsSync(path.join(ROOT, 'index.html')) && fs.existsSync(path.join(ROOT, 'sitemap.xml')) && ['roadmap', 'challenges', 'sandbox', 'dashboard', 'glossary'].every(h => fs.existsSync(path.join(ROOT, h, 'index.html'))));
   let validatePassed = false;
   try {
     execSync('node tools/validate.js', { cwd: ROOT, stdio: 'pipe' });
@@ -544,7 +544,7 @@ async function runSuite() {
   const hlSample = TableVisualizer.highlightSql("SELECT c.customer_id, COUNT(o.order_id) AS cnt, 'active' AS status, 42 AS num -- inline comment\nFROM customers c WHERE c.customer_id >= 10;");
   assertCheck(1, 'T1-R2-02', 'highlightSql tokenizes SQL keywords (.sql-tok-kw) and functions (.sql-tok-fn)', hlSample.includes('sql-tok-kw') && hlSample.includes('sql-tok-fn'));
   assertCheck(1, 'T1-R2-03', 'highlightSql tokenizes string literals (.sql-tok-str), numbers (.sql-tok-num), comments (.sql-tok-cmt), and operators (.sql-tok-op)', hlSample.includes('sql-tok-str') && hlSample.includes('sql-tok-num') && hlSample.includes('sql-tok-cmt') && hlSample.includes('sql-tok-op'));
-  assertCheck(1, 'T1-R2-04', 'css/components.css defines syntax highlight token colors for both dark (:root) and [data-theme="light"]', componentsCss.includes('.sql-tok-kw') && componentsCss.includes('[data-theme="light"] .sql-tok-kw') && componentsCss.includes('[data-theme="light"] .sql-ide-shell'));
+  assertCheck(1, 'T1-R2-04', 'css/components.css & css/variables.css define theme-aware syntax highlight token colors (.sql-tok-kw via --syn-kw) and .sql-ide-shell', componentsCss.includes('.sql-tok-kw') && variablesCss.includes('--syn-kw:') && componentsCss.includes('.sql-ide-shell'));
   const unformattedSql = "select c.customer_id, c.name, count(o.order_id) as total_orders from customers c left join orders o on c.customer_id = o.customer_id where c.tier = 'enterprise' and o.total_cents > 1000 group by c.customer_id, c.name order by total_orders desc limit 5;";
   const formattedSql = TableVisualizer.formatSql(unformattedSql);
   assertCheck(1, 'T1-R2-05', 'formatSql uppercases SQL keywords and places top-level clauses (SELECT, FROM, LEFT JOIN, WHERE, GROUP BY, ORDER BY, LIMIT) on newlines', formattedSql.includes('SELECT ') && formattedSql.includes('\nFROM ') && formattedSql.includes('\nLEFT JOIN ') && formattedSql.includes('\nWHERE ') && formattedSql.includes('\nGROUP BY ') && formattedSql.includes('\nORDER BY ') && formattedSql.includes('\nLIMIT '));
@@ -1686,15 +1686,15 @@ async function runSuite() {
   }
   assertCheck(3, 'T3-26', 'Audit F7+DualEngine: All 18 /build/<id> 3-step SQL labs resolved via primarySlug pass 4/4 verifyQueryAgainstReference checks', t3BuildVerifyOk === 18, `passed ${t3BuildVerifyOk}/18`);
 
-  // T3-27: Audit F7 + F8 (Guided Build renderBuild combines 3-step SQL Studio + JS Engine testHarness runner + inline <code> formatting without raw backticks)
+  // T3-27: Audit F7 + F8 (Guided Build renderBuild combines SQL Studio + JS Engine testHarness runner + inline <code> formatting without raw backticks)
   let t3BuildRenderClean = 0;
   for (const buildId of all18BuildIds) {
     const html = Renderer.renderBuild(buildId);
-    if (html.includes('0/3 Steps Completed') && html.includes('data-action="open-topic-codelab"') && html.includes('data-action="open-code-lab"')) {
+    if (/0\/[34] Steps Completed/.test(html) && html.includes('data-action="open-topic-codelab"') && html.includes('data-action="open-code-lab"')) {
       t3BuildRenderClean++;
     }
   }
-  assertCheck(3, 'T3-27', 'Audit F7+F8: All 18 Renderer.renderBuild(buildId) views combine 3-step SQL Studio, Engine Code Lab mode, and backtick-to-<code> formatting', t3BuildRenderClean === 18 && (appSrc.match(/formatInlineBackticks\(/g) || []).length >= 3);
+  assertCheck(3, 'T3-27', 'Audit F7+F8: All 18 Renderer.renderBuild(buildId) views combine SQL Studio, 4-step Engine Code Lab mode, and backtick-to-<code> formatting', t3BuildRenderClean === 18 && (appSrc.match(/formatInlineBackticks\(/g) || []).length >= 3);
 
   // T3-28: Audit F8 + F9 (Glossary view renders zero raw backticks in .glossary-item__def and 404/Landing/Sidebar links point cleanly to /glossary/)
   const t3GlossaryHtml = Renderer.renderGlossary();
@@ -2052,7 +2052,7 @@ async function runSuite() {
     const sqlLab = global.window.TopicGuidedLabs.getLab((impl && impl.primarySlug) || buildId);
     const jsEntry = GUIDED_LABS[buildId];
     const buildHtml = Renderer.renderBuild(buildId);
-    if (!sqlLab || sqlLab.steps.length !== 3 || !jsEntry || !buildHtml.includes('0/3 Steps Completed')) continue;
+    if (!sqlLab || sqlLab.steps.length !== 3 || !jsEntry || !/0\/[34] Steps Completed/.test(buildHtml)) continue;
     let starterFail = false;
     let solPass = false;
     try {

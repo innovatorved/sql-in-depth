@@ -227,11 +227,33 @@
     },
 
     _getData: function() {
-      return root.WHITEBOARD_DATA || {
+      var raw = root.WHITEBOARD_DATA || {
         buildingBlocks: [],
         blueprints: [],
         calculateCapacity: function() { return { bottlenecks: [] }; }
       };
+      var catColors = {
+        edge: '#C2410C',
+        cache: '#D97706',
+        storage: '#16A34A',
+        compute: '#EA580C',
+        index: '#C2410C',
+        olap: '#0D9488',
+        replication: '#7C3AED'
+      };
+      if (Array.isArray(raw.buildingBlocks)) {
+        raw.buildingBlocks.forEach(function(b) {
+          if (!b) return;
+          if (!b.type) b.type = b.id || 'engine-block';
+          if (!b.label) b.label = b.name || b.type;
+          if (!b.color) b.color = catColors[b.category] || '#C2410C';
+          if (!b.badge) {
+            var qps = b.maxQpsPerInstance ? (b.maxQpsPerInstance >= 1000 ? Math.round(b.maxQpsPerInstance / 1000) + 'k QPS' : b.maxQpsPerInstance + ' QPS') : '';
+            b.badge = [b.category ? String(b.category).toUpperCase() : '', qps].filter(Boolean).join(' · ');
+          }
+        });
+      }
+      return raw;
     },
 
     _findBlueprint: function(bpId) {
@@ -1294,7 +1316,7 @@
           '<button class="sandbox-block-btn" draggable="true" data-add-block="' + escapeHtml(b.type) + '" title="Click or drag onto canvas: ' + escapeHtml(b.description) + '">' +
             '<span class="block-color-dot" style="background:' + escapeHtml(b.color) + '"></span>' +
             '<div class="block-btn-info">' +
-              '<strong>' + escapeHtml(b.type) + '</strong>' +
+              '<strong>' + escapeHtml(b.label || b.name || b.type) + '</strong>' +
               '<span>' + escapeHtml(b.badge) + '</span>' +
             '</div>' +
             '<span class="block-add-plus">+</span>' +
@@ -1370,14 +1392,18 @@
             '</ul>'
           : '<p class="studio-hints__text">' + escapeHtml(cf.summary || activeChal.summary || '') + '</p>';
 
+        var chalLevelNames = { easy: 'Beginner', medium: 'Intermediate', hard: 'Advanced', insane: 'Expert' };
         var chalOptionsHtml = challengesList.map(function(ch, idx) {
           var doneMark = solvedMap[ch.id] ? '✓ ' : '';
+          var rawDiff = String(ch.difficulty || 'medium').toLowerCase();
+          var friendlyDiff = chalLevelNames[rawDiff] || ch.difficulty || 'Intermediate';
           return '<option value="' + escapeHtml(ch.id) + '" ' + (ch.id === activeChal.id ? 'selected' : '') + '>' +
-            doneMark + (idx + 1) + '. ' + escapeHtml(ch.title) + ' [' + escapeHtml(String(ch.difficulty || 'medium').toUpperCase()) + ']' +
+            doneMark + (idx + 1) + '. ' + escapeHtml(ch.title) + ' (' + escapeHtml(friendlyDiff) + ')' +
           '</option>';
         }).join('');
 
         var difficultyLabel = String(activeChal.difficulty || 'medium').toLowerCase();
+        var difficultyDisplay = chalLevelNames[difficultyLabel] || activeChal.difficulty || 'Intermediate';
         var chalIndex = Math.max(0, challengesList.findIndex(function(c) { return c.id === activeChal.id; }));
         var chalTotal = challengesList.length || 1;
         var solvedPct = Math.round((solvedCount / chalTotal) * 100);
@@ -1392,7 +1418,7 @@
                 engineSelectHtml +
               '</div>' +
             '</header>' +
-            '<main class="studio-body studio-body--challenge" id="sandbox-mount-target">' +
+            '<div class="studio-body studio-body--challenge" id="sandbox-mount-target">' +
               '<aside class="studio-panel studio-brief" aria-label="Challenge brief">' +
                 '<div class="studio-panel__head studio-brief__nav">' +
                   '<button type="button" class="studio-icon-btn" data-chal-action="prev" aria-label="Previous challenge" title="Previous challenge"' + (chalIndex === 0 ? ' disabled' : '') + '>‹</button>' +
@@ -1409,7 +1435,7 @@
                   '</div>' +
                   '<h2 class="studio-brief__title">' + escapeHtml(cf.title || activeChal.title) + '</h2>' +
                   '<div class="studio-brief__meta">' +
-                    '<span class="studio-tag studio-tag--' + escapeHtml(difficultyLabel) + '">' + escapeHtml(difficultyLabel) + '</span>' +
+                    '<span class="studio-tag studio-tag--' + escapeHtml(difficultyLabel) + '">' + escapeHtml(difficultyDisplay) + '</span>' +
                     '<span class="studio-tag">' + escapeHtml(activeChal.category || 'SQL Challenge') + '</span>' +
                     (isSolved ? '<span class="studio-tag studio-tag--solved" id="wb-chal-solved-pill">✓ Solved</span>' : '<span class="studio-tag" id="wb-chal-solved-pill">Unsolved</span>') +
                   '</div>' +
@@ -1457,7 +1483,7 @@
                   '<div id="wb-challenge-visualizer-slot" class="studio-results"></div>' +
                 '</div>' +
               '</section>' +
-            '</main>' +
+            '</div>' +
           '</div>';
         this._initStudioSplitter();
 
@@ -1474,7 +1500,7 @@
             ideCtrl: self._chalIdeCtrl || null,
             startAtFinal: true,
             focusExplain: Boolean(focusExplain),
-            compactHeader: false
+            compactHeader: true
           });
           if (onlyPreview) return;
           if (chalVerdict) {
@@ -1554,7 +1580,7 @@
                 '<button type="button" class="studio-btn studio-btn--ghost" data-sql-studio-action="reset-db" title="Restore every table to its original rows">Reset data</button>' +
               '</div>' +
             '</header>' +
-            '<main class="studio-body studio-body--playground" id="sandbox-mount-target">' +
+            '<div class="studio-body studio-body--playground" id="sandbox-mount-target">' +
               '<aside class="studio-panel studio-explorer wb-schema-sidebar" aria-label="Database schema">' +
                 '<div class="studio-panel__head studio-explorer__head">' +
                   '<select id="wb-sql-dataset-select" class="studio-select studio-select--flush" aria-label="Dataset">' +
@@ -1628,7 +1654,7 @@
                   '<div id="wb-sql-studio-visualizer-slot" class="studio-results"></div>' +
                 '</div>' +
               '</section>' +
-            '</main>' +
+            '</div>' +
           '</div>';
         this._initStudioSplitter();
         if (this._schemaFilter) this._applySchemaFilter(this._schemaFilter);
@@ -1697,7 +1723,7 @@
             '</div>' +
           '</header>' +
 
-          '<main class="view-body" id="sandbox-mount-target">' +
+          '<div class="view-body" id="sandbox-mount-target">' +
             '<div class="sandbox-workspace">' +
               '<aside class="sandbox-palette">' +
                 '<div class="sandbox-palette__header">' +
@@ -1714,7 +1740,7 @@
               '</section>' +
             '</div>' +
             capacityPanelHtml +
-          '</main>' +
+          '</div>' +
         '</div>';
     },
 
@@ -1797,7 +1823,7 @@
           '<g class="wb-frame ' + (isSelected ? 'selected' : '') + '" data-wb-frame-id="' + escapeHtml(f.id) + '" transform="translate(' + f.x + ',' + f.y + ')">' +
             '<rect width="' + f.width + '" height="' + f.height + '" rx="8" fill="rgba(255,255,255,0.015)" stroke="' + (isSelected ? 'var(--fg)' : 'var(--border-strong)') + '" stroke-width="' + (isSelected ? '2' : '1.25') + '" stroke-dasharray="6 4" />' +
             '<rect x="10" y="-10" width="' + Math.max(90, Math.min(f.width - 20, f.label.length * 6.5 + 20)) + '" height="20" rx="4" fill="var(--bg)" stroke="var(--border-strong)" stroke-width="1" />' +
-            '<text x="18" y="3" fill="var(--fg-muted)" font-family="var(--font-mono)" font-size="9.5" font-weight="600" letter-spacing="0.04em">' + escapeHtml(f.label.toUpperCase()) + '</text>' +
+            '<text x="18" y="3" fill="var(--fg-muted)" font-family="var(--font-mono)" font-size="11" font-weight="600" letter-spacing="0.04em">' + escapeHtml(f.label.toUpperCase()) + '</text>' +
             '<rect class="wb-frame-resize" data-frame-resize="' + escapeHtml(f.id) + '" x="' + (f.width - 12) + '" y="' + (f.height - 12) + '" width="12" height="12" rx="2" fill="var(--border-focus)" style="cursor:nwse-resize;" />' +
           '</g>'
         );
@@ -1829,7 +1855,7 @@
           labelsSvg.push(
             '<g class="wb-edge-label ' + (isEdgeSelected ? 'selected' : '') + '" data-edge-label-index="' + idx + '" data-edge-index="' + idx + '" style="cursor:pointer;">' +
               '<rect x="' + Math.round(geom.mx - lblW / 2) + '" y="' + (geom.my - 9) + '" width="' + lblW + '" height="17" rx="4" fill="var(--bg)" stroke="' + (isEdgeSelected ? 'var(--fg)' : 'var(--border-strong)') + '" stroke-width="' + (isEdgeSelected ? '1.5' : '1') + '" />' +
-              '<text x="' + geom.mx + '" y="' + (geom.my + 2) + '" text-anchor="middle" fill="' + (isEdgeSelected ? 'var(--fg)' : 'var(--fg-muted)') + '" font-family="var(--font-mono)" font-size="8.5" font-weight="500">' + escapeHtml(labelText) + '</text>' +
+              '<text x="' + geom.mx + '" y="' + (geom.my + 3) + '" text-anchor="middle" fill="' + (isEdgeSelected ? 'var(--fg)' : 'var(--fg-muted)') + '" font-family="var(--font-mono)" font-size="11" font-weight="500">' + escapeHtml(labelText) + '</text>' +
             '</g>'
           );
         }
@@ -1859,14 +1885,14 @@
           '<g class="wb-note ' + (isNoteSelected ? 'selected' : '') + '" data-wb-note-id="' + escapeHtml(nt.id) + '" transform="translate(' + nt.x + ',' + nt.y + ')" style="cursor:grab;">' +
             '<rect width="195" height="' + boxH + '" rx="6" fill="var(--bg-elevated)" stroke="' + (isNoteSelected ? 'var(--fg)' : 'var(--border-focus)') + '" stroke-width="' + (isNoteSelected ? '2' : '1.25') + '" />' +
             '<line x1="0" y1="6" x2="195" y2="6" stroke="var(--border-strong)" stroke-width="1" />' +
-            '<text x="12" y="23" fill="var(--fg)" font-family="var(--font-mono)" font-size="9.5">' + tspans + '</text>' +
+            '<text x="12" y="23" fill="var(--fg)" font-family="var(--font-mono)" font-size="11">' + tspans + '</text>' +
           '</g>'
         );
       }).join('');
 
       // 5. Nodes Layer (with 4-side Connection Ports & Replica Badge)
       var nodesSvg = this._nodes.map(function(n) {
-        var color = blockColorMap[n.type] || '#3291ff';
+        var color = blockColorMap[n.type] || '#C2410C';
         var isSelected = (sel && sel.kind === 'node' && sel.id === n.id) || self._selectedNodeId === n.id || self._connectSourceId === n.id;
         var labelShort = (n.name || n.type).length > 20 ? (n.name || n.type).slice(0, 18) + '…' : (n.name || n.type);
         var rep = n.replicas && n.replicas > 1 ? n.replicas + 'x' : '';
@@ -1875,9 +1901,9 @@
           '<g class="wb-node ' + (isSelected ? 'selected' : '') + '" data-wb-node-id="' + escapeHtml(n.id) + '" data-wb-node-type="' + escapeHtml(n.type) + '" transform="translate(' + n.x + ',' + n.y + ')" style="cursor:grab;">' +
             '<rect width="150" height="58" rx="6" fill="var(--surface)" stroke="' + (isSelected ? 'var(--fg)' : 'var(--border-strong)') + '" stroke-width="' + (isSelected ? '2' : '1.25') + '" />' +
             '<rect x="0" y="0" width="4" height="58" rx="2" fill="' + color + '" />' +
-            '<text x="13" y="21" fill="var(--fg-faint)" font-family="var(--font-mono)" font-size="9" font-weight="600" letter-spacing="0.05em">' + escapeHtml(n.type.toUpperCase()) + '</text>' +
-            (rep ? '<text x="140" y="21" text-anchor="end" fill="var(--fg-muted)" font-family="var(--font-mono)" font-size="8.5" font-weight="600">' + escapeHtml(rep) + '</text>' : '') +
-            '<text x="13" y="41" fill="var(--fg)" font-family="var(--font-sans)" font-size="11" font-weight="600">' + escapeHtml(labelShort) + '</text>' +
+            '<text x="13" y="21" fill="var(--fg-faint)" font-family="var(--font-mono)" font-size="11" font-weight="600" letter-spacing="0.03em">' + escapeHtml(n.type.slice(0, 14).toUpperCase()) + '</text>' +
+            (rep ? '<text x="140" y="21" text-anchor="end" fill="var(--fg-muted)" font-family="var(--font-mono)" font-size="11" font-weight="600">' + escapeHtml(rep) + '</text>' : '') +
+            '<text x="13" y="42" fill="var(--fg)" font-family="var(--font-sans)" font-size="12" font-weight="600">' + escapeHtml(labelShort) + '</text>' +
             '<!-- 4-Sided Excalidraw Connection Ports -->' +
             '<circle class="wb-port" data-port-node="' + escapeHtml(n.id) + '" data-port-side="top" cx="75" cy="0" r="4.5" />' +
             '<circle class="wb-port" data-port-node="' + escapeHtml(n.id) + '" data-port-side="right" cx="150" cy="29" r="4.5" />' +

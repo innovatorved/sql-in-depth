@@ -112,14 +112,8 @@
           '<header class="view-header">' +
             '<div class="view-header__top">' +
               '<div class="view-header__content">' +
-                '<div class="view-badge-row">' +
-                  '<span class="eco-pill eco-pill--accent">Interactive DAG Architecture</span>' +
-                  '<span class="eco-pill">' + nodes.length + ' Milestones</span>' +
-                  '<span class="eco-pill">' + (data.paths || []).length + ' Career Paths</span>' +
-                  '<span class="eco-pill">' + doneCount + '/' + nodes.length + ' Completed (' + pct + '%)</span>' +
-                '</div>' +
-                '<h1 class="view-title">SQL &amp; Database Architecture Roadmap &amp; Study Tracks</h1>' +
-                '<p class="view-subtitle">Interactive visual dependency graph, curated role-based learning paths, and modular curriculum explorer.</p>' +
+                '<h1 class="view-title">Curriculum Roadmap</h1>' +
+                '<p class="view-subtitle">' + nodes.length + ' milestones across 6 tracks · ' + doneCount + ' of ' + nodes.length + ' completed (' + pct + '%). Pick a visual stage, role track, or module.</p>' +
               '</div>' +
               '<div class="view-tabs" role="tablist">' +
                 '<button class="view-tab ' + (this._activeTab === 'graph' ? 'active' : '') + '" data-roadmap-tab="graph" role="tab" aria-selected="' + (this._activeTab === 'graph') + '">Visual Roadmap</button>' +
@@ -145,35 +139,58 @@
       var nodes = data.nodes || [];
       var edges = data.edges || [];
 
-      var nodeMap = {};
-      nodes.forEach(function(n) { nodeMap[n.id] = n; });
+      var nodeW = 216;
+      var nodeH = 64;
+      var nodePos = {};
+      var stageBounds = {};
+      nodes.forEach(function(n) {
+        var stNum = Number(n.stage) || 1;
+        var mx = Math.round((n.x - 160) * 1.38 + 42);
+        var my = Math.round(n.y + (stNum - 1) * 26 + 8);
+        nodePos[n.id] = { x: mx, y: my, node: n };
+        if (!stageBounds[stNum]) {
+          stageBounds[stNum] = { minY: my, maxY: my };
+        } else {
+          if (my < stageBounds[stNum].minY) stageBounds[stNum].minY = my;
+          if (my > stageBounds[stNum].maxY) stageBounds[stNum].maxY = my;
+        }
+      });
 
+      var maxStageBottom = 680;
       var stageSwimlanesSvg = stages.map(function(st, idx) {
-        var yTop = 40 + idx * 195;
-        var yHeight = 186;
+        var b = stageBounds[st.number];
+        var yTop = b ? (b.minY - 46) : (24 + idx * 240);
+        var yHeight = b ? (b.maxY - b.minY + nodeH + 64) : 210;
+        if (yTop + yHeight > maxStageBottom) maxStageBottom = yTop + yHeight;
         return (
           '<g class="roadmap-stage-lane" data-stage="' + st.number + '">' +
-            '<rect x="20" y="' + yTop + '" width="1210" height="' + yHeight + '" rx="8" fill="var(--surface)" stroke="var(--border)" stroke-width="1" />' +
-            '<rect x="20" y="' + yTop + '" width="4" height="' + yHeight + '" rx="2" fill="' + st.color + '" />' +
-            '<text x="40" y="' + (yTop + 20) + '" fill="var(--fg-muted)" font-family="var(--font-mono)" font-size="10.5" font-weight="600" letter-spacing="0.06em">STAGE 0' + st.number + ' · ' + escapeHtml(st.title.toUpperCase()) + ' · ' + st.hours + 'H</text>' +
+            '<rect x="16" y="' + yTop + '" width="768" height="' + yHeight + '" rx="10" fill="var(--surface)" stroke="var(--border)" stroke-width="1" />' +
+            '<rect x="16" y="' + yTop + '" width="4" height="' + yHeight + '" rx="2" fill="var(--accent)" />' +
+            '<text x="36" y="' + (yTop + 26) + '" fill="var(--fg-muted)" font-family="var(--font-mono)" font-size="11" font-weight="600" letter-spacing="0.05em">STAGE 0' + st.number + ' · ' + escapeHtml(st.title.toUpperCase()) + (st.hours ? ' · ' + escapeHtml(st.hours) : '') + '</text>' +
           '</g>'
         );
       }).join('');
 
       var edgesSvg = edges.map(function(e) {
-        var src = nodeMap[e.source];
-        var tgt = nodeMap[e.target];
-        if (!src || !tgt) return '';
-        var x1 = src.x + 82;
-        var y1 = src.y + 39;
-        var x2 = tgt.x + 82;
-        var y2 = tgt.y + 39;
+        var srcP = nodePos[e.source];
+        var tgtP = nodePos[e.target];
+        if (!srcP || !tgtP) return '';
+        var x1 = srcP.x + Math.round(nodeW / 2);
+        var y1 = srcP.y + nodeH;
+        var x2 = tgtP.x + Math.round(nodeW / 2);
+        var y2 = tgtP.y;
+        if (Math.abs(srcP.y - tgtP.y) < 20) {
+          x1 = srcP.x < tgtP.x ? srcP.x + nodeW : srcP.x;
+          y1 = srcP.y + Math.round(nodeH / 2);
+          x2 = srcP.x < tgtP.x ? tgtP.x : tgtP.x + nodeW;
+          y2 = tgtP.y + Math.round(nodeH / 2);
+        }
         var dx = x2 - x1;
         var dy = y2 - y1;
-        var cx1 = x1 + dx * 0.45;
-        var cy1 = y1 + dy * 0.1;
-        var cx2 = x1 + dx * 0.55;
-        var cy2 = y2 - dy * 0.1;
+        var cx1 = Math.round(x1 + dx * 0.25);
+        var cy1 = Math.round(y1 + dy * 0.45);
+        var cx2 = Math.round(x1 + dx * 0.75);
+        var cy2 = Math.round(y1 + dy * 0.55);
         var pathD = 'M ' + x1 + ' ' + y1 + ' C ' + cx1 + ' ' + cy1 + ', ' + cx2 + ' ' + cy2 + ', ' + x2 + ' ' + y2;
         return (
           '<g class="roadmap-edge" data-edge-id="' + escapeHtml(e.id) + '">' +
@@ -183,25 +200,29 @@
       }).join('');
 
       var self = this;
+      var nodeMap = {};
+      nodes.forEach(function(n) { nodeMap[n.id] = n; });
+
       var nodesSvg = nodes.map(function(n) {
+        var pos = nodePos[n.id] || { x: n.x, y: n.y };
         var status = self.getNodeStatus(n);
         var isSelected = self._selectedNodeId === n.id;
         var statusColor = status === 'done' ? 'var(--success)' : (status === 'in-progress' ? 'var(--warning)' : 'var(--fg-faint)');
         var typeBadge = (n.type || 'concept').toUpperCase();
-        var strokeColor = isSelected ? 'var(--fg)' : (status === 'done' ? 'var(--success)' : 'var(--border-strong)');
+        var strokeColor = isSelected ? 'var(--accent)' : (status === 'done' ? 'var(--success)' : 'var(--border-strong)');
         var strokeW = isSelected ? '2' : '1.25';
-        var labelShort = n.label.length > 24 ? n.label.slice(0, 22) + '…' : n.label;
+        var labelShort = n.label.length > 27 ? n.label.slice(0, 25) + '…' : n.label;
 
         return (
           '<g class="roadmap-node roadmap-node--' + status + (isSelected ? ' selected' : '') + '" ' +
              'data-node-id="' + escapeHtml(n.id) + '" ' +
              'data-node-status="' + status + '" ' +
-             'transform="translate(' + n.x + ',' + (n.y + 8) + ')" ' +
-             'style="cursor:pointer;" role="button" tabindex="0" aria-label="' + escapeHtml(n.label) + '">' +
-            '<rect width="165" height="62" rx="6" fill="var(--bg)" stroke="' + strokeColor + '" stroke-width="' + strokeW + '" />' +
-            '<circle cx="15" cy="18" r="4" fill="' + statusColor + '" />' +
-            '<text x="25" y="21" fill="var(--fg-faint)" font-family="var(--font-mono)" font-size="9" font-weight="600" letter-spacing="0.05em">' + escapeHtml(typeBadge) + '</text>' +
-            '<text x="14" y="42" fill="var(--fg)" font-family="var(--font-sans)" font-size="11.5" font-weight="600">' + escapeHtml(labelShort) + '</text>' +
+             'transform="translate(' + pos.x + ',' + pos.y + ')" ' +
+             'style="cursor:pointer;" role="button" tabindex="0" aria-label="' + escapeHtml(typeBadge + ' ' + labelShort) + '">' +
+            '<rect width="' + nodeW + '" height="' + nodeH + '" rx="8" fill="var(--bg)" stroke="' + strokeColor + '" stroke-width="' + strokeW + '" />' +
+            '<circle cx="15" cy="20" r="4" fill="' + statusColor + '" />' +
+            '<text x="25" y="24" fill="var(--fg-faint)" font-family="var(--font-mono)" font-size="11" font-weight="600" letter-spacing="0.04em">' + escapeHtml(typeBadge) + '</text>' +
+            '<text x="14" y="46" fill="var(--fg)" font-family="var(--font-sans)" font-size="12" font-weight="600">' + escapeHtml(labelShort) + '</text>' +
           '</g>'
         );
       }).join('');
@@ -220,6 +241,7 @@
         );
       }).join('');
 
+      var totalSvgHeight = maxStageBottom + 24;
       var transformAttr = 'translate(' + this._panX + ',' + this._panY + ') scale(' + this._zoom + ')';
 
       return (
@@ -231,15 +253,15 @@
               '<span class="legend-item"><span class="legend-dot legend-dot--todo"></span> To Do</span>' +
             '</div>' +
             '<div class="roadmap-zoom-controls">' +
-              '<button class="eco-btn eco-btn--sm" data-roadmap-action="zoom-in" title="Zoom In">+ Zoom In</button>' +
-              '<button class="eco-btn eco-btn--sm" data-roadmap-action="zoom-out" title="Zoom Out">− Zoom Out</button>' +
-              '<button class="eco-btn eco-btn--sm" data-roadmap-action="zoom-reset" title="Fit to Screen">Fit to Screen</button>' +
+              '<button class="eco-btn eco-btn--sm" data-roadmap-action="zoom-in" title="Zoom In">+ Zoom</button>' +
+              '<button class="eco-btn eco-btn--sm" data-roadmap-action="zoom-out" title="Zoom Out">− Zoom</button>' +
+              '<button class="eco-btn eco-btn--sm" data-roadmap-action="zoom-reset" title="Reset View">Reset</button>' +
               '<button class="eco-btn eco-btn--sm ' + (this._checklistOpen ? 'eco-btn--primary' : '') + '" data-roadmap-action="toggle-checklist">Checklist (' + nodes.length + ')</button>' +
             '</div>' +
           '</div>' +
           '<div class="roadmap-workspace">' +
             '<div class="roadmap-svg-viewport" id="roadmap-svg-viewport">' +
-              '<svg class="roadmap-svg" viewBox="0 0 1250 1250" width="100%" height="680">' +
+              '<svg class="roadmap-svg" viewBox="0 0 800 ' + totalSvgHeight + '" width="100%">' +
                 '<defs>' +
                   '<marker id="roadmap-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">' +
                     '<path d="M 0 1 L 10 5 L 0 9 z" fill="var(--fg-muted)" />' +
@@ -269,14 +291,15 @@
     _renderNodeDetail: function(node) {
       var status = this.getNodeStatus(node);
       var statusLabel = status === 'done' ? 'Completed' : (status === 'in-progress' ? 'In Progress' : 'Not Started');
+      var isRealBuild = Boolean(node.type === 'build' && node.slug && ((root.IMPLEMENTATIONS_DATA && root.IMPLEMENTATIONS_DATA[node.slug]) || String(node.slug).indexOf('build-') === 0));
       var actionLabel = 'Open Topic Lesson';
-      if (node.type === 'challenge') actionLabel = 'Enter Incident Challenge';
-      else if (node.type === 'sandbox') actionLabel = 'Launch Architecture Blueprint';
-      else if (node.type === 'build') actionLabel = 'Open Interactive Build Lab';
-      else if (node.type === 'simulator') actionLabel = 'Launch Interactive Simulator';
+      if (node.type === 'challenge') actionLabel = 'Enter Challenge';
+      else if (node.type === 'sandbox') actionLabel = 'Open Architecture Blueprint';
+      else if (isRealBuild) actionLabel = 'Open Build Lab';
+      else if (node.type === 'simulator') actionLabel = 'Open Interactive Lesson';
 
       var buildProgHtml = '';
-      if (node.type === 'build' && node.slug && root.Progress && typeof root.Progress.getBuildProgress === 'function') {
+      if (isRealBuild && root.Progress && typeof root.Progress.getBuildProgress === 'function') {
         var bp = root.Progress.getBuildProgress(node.slug);
         buildProgHtml = '<span class="eco-pill">' + bp.completedSteps.length + '/' + bp.totalSteps + ' Lab Steps</span>';
       }
@@ -289,7 +312,7 @@
             '<span class="eco-pill">' + escapeHtml(statusLabel) + '</span>' +
             buildProgHtml +
           '</div>' +
-          '<h3 class="inspector-title">' + escapeHtml(node.label) + '</h3>' +
+          '<h2 class="inspector-title">' + escapeHtml(node.label) + '</h2>' +
           '<p class="inspector-desc">' + escapeHtml(node.description || '') + '</p>' +
           (node.prerequisites && node.prerequisites.length > 0 ? (
             '<div class="inspector-prereqs">' +
@@ -337,8 +360,7 @@
                 '<div class="view-badge-row">' +
                   '<span class="eco-pill eco-pill--accent">' + escapeHtml(p.role) + '</span>' +
                   '<span class="eco-pill">' + escapeHtml(p.difficulty) + '</span>' +
-                  '<span class="eco-pill">' + p.estimatedHours + ' Hours</span>' +
-                  '<span class="eco-pill">+' + p.xpReward + ' XP</span>' +
+                  '<span class="eco-pill">' + escapeHtml(p.estimatedHours) + '</span>' +
                 '</div>' +
                 '<h2 class="eco-card__title">' + escapeHtml(p.title) + '</h2>' +
                 '<p class="eco-card__desc">' + escapeHtml(p.description) + '</p>' +
@@ -426,7 +448,8 @@
         root.App.navigateToSandbox(node.blueprintId);
         return;
       }
-      if (node.type === 'build' && node.slug && root.App && root.App.navigateToBuild) {
+      var isBuildSlug = Boolean(node.slug && ((root.IMPLEMENTATIONS_DATA && root.IMPLEMENTATIONS_DATA[node.slug]) || String(node.slug).indexOf('build-') === 0));
+      if (node.type === 'build' && isBuildSlug && root.App && root.App.navigateToBuild) {
         root.App.navigateToBuild(node.slug);
         return;
       }
@@ -437,11 +460,12 @@
 
     _launchStep: function(type, target) {
       if (!target) return;
+      var isBuildTarget = Boolean((root.IMPLEMENTATIONS_DATA && root.IMPLEMENTATIONS_DATA[target]) || String(target).indexOf('build-') === 0);
       if (type === 'challenge' && root.App && root.App.navigateToChallenges) {
         root.App.navigateToChallenges(target);
       } else if (type === 'sandbox' && root.App && root.App.navigateToSandbox) {
         root.App.navigateToSandbox(target);
-      } else if (type === 'build' && root.App && root.App.navigateToBuild) {
+      } else if (type === 'build' && isBuildTarget && root.App && root.App.navigateToBuild) {
         root.App.navigateToBuild(target);
       } else if (root.App && root.App.navigateTo) {
         root.App.navigateTo(target);

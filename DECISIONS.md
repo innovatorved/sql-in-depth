@@ -6,13 +6,13 @@ All product, UX, engineering, and infrastructure ambiguities encountered during 
 
 ## ADR-001: Portable Shared Design System & Product Family Accents
 - **Decision**: Author a portable, framework-free CSS design system under `design-system/tokens.css` and `design-system/components.css` (imported directly by `sql-in-depth` and copy-ready for `system-design-in-depth` and `dsa-in-depth`). Set per-product brand accent via `data-product`:
-  - `sql` (`sql-in-depth`): **Precision Cobalt** (`#0F62FE` light / `#58A6FF` dark)
+  - `sql` (`sql-in-depth`): **Relational Ember** (`#C2410C` light / `#FB923C` dark) on Warm Neutral Paper (`#F7F7F5` canvas, `#FFFFFF` surface) in default Light mode and Neutral Charcoal (`#0F0F10` canvas, `#18181A` surface) in Dark mode
   - `system-design` (`system-design-in-depth`): **Distributed Teal** (`#0D9488` light / `#2DD4BF` dark)
   - `dsa` (`dsa-in-depth`): **Algorithmic Violet** (`#6D28D9` light / `#A78BFA` dark)
 - **Why**: All three repositories use static-first vanilla HTML/CSS/JS architectures without React/Tailwind build lock-in. Pure CSS custom properties + semantic component classes guarantee zero runtime overhead, instant dark/light switching (`color-scheme: light dark`), WCAG AA contrast (`>= 4.5:1`), and effortless portability across all three repos.
 - **Alternatives Rejected**:
   - *Tailwind CSS / React component library*: Introduces unnecessary framework migration risk across 200+ pre-rendered HTML pages and breaks vanilla script contracts tested by `tools/e2e-test.js`.
-  - *Pure `#000000` dark mode canvas*: Causes severe text halation and ghosting on OLED panels; replaced with deep slate ink (`#0B0E14` ground, `#11161F` elevated surface).
+  - *Pure `#000000` or saturated navy dark mode canvas*: Pure `#000000` causes text halation on OLED panels while saturated blue-navy feels cold and generic; replaced with neutral charcoal (`#0F0F10` ground, `#18181A` elevated surface).
 
 ---
 
@@ -81,8 +81,16 @@ All product, UX, engineering, and infrastructure ambiguities encountered during 
 ---
 
 ## ADR-008: Per-Page Open Graph Cards (`1200×630` PNG) Generated Deterministically at Build Time
-- **Decision**: Create `tools/generate-og.js` to generate crisp `1200×630` PNG social cards (`assets/og/*.png`, palette-indexed PNG8 `~14–22 KB` each) for the landing page, hub routes (`/sandbox/`, `/roadmap/`, `/challenges/`, `/glossary/`, `/projects/`), all 18 module tracks, and topic pages — wired automatically into `<meta property="og:image">` and `<meta name="twitter:image">` by `tools/generate-static.js`.
+- **Decision**: Create `tools/generate-og.js` to generate crisp `1200×630` PNG social cards (`assets/og/*.png`, palette-indexed PNG8 `~14–22 KB` each) for all **218** static HTML pages — landing, hub routes (`/sandbox/`, `/roadmap/`, `/challenges/`, `/dashboard/`, `/glossary/`, `/projects/`), all 12 incident challenges (`challenges/chal-*/`), all 18 engine builds (`build/build-*/`), and all 180 topic pages — wired automatically into `<meta property="og:image">` and `<meta name="twitter:image">` by `tools/generate-static.js`.
 - **Why**: Social crawlers (X/Twitter, Slack, LinkedIn, iMessage, Discord) universally support PNG `summary_large_image` (`1200×630`) while frequently rejecting SVG OG images. Indexed 8-bit PNG keeps file sizes tiny while rendering razor-sharp typography.
 - **Alternatives Rejected**:
-  - *Single generic `og-image.png` for all 201 URLs*: Fails Phase 5 requirement for per-page generated OG/Twitter cards with title, product name, and accent color.
+  - *Single generic `og-image.png` for all URLs*: Fails Phase 5 requirement for per-page generated OG/Twitter cards with title, product name, and accent color.
   - *Runtime edge OG generation (Vercel `@vercel/og`)*: Incompatible with pure static hosting (`GitHub Pages` / Cloudflare static assets).
+
+---
+
+## ADR-009: Pre-Rendered Static Hub Directories (`index.html`) for Cloudflare Pages Routing
+- **Decision**: Pre-render dedicated directory entry pages (`roadmap/index.html`, `challenges/index.html`, `challenges/<id>/index.html`, `sandbox/index.html`, `dashboard/index.html`, and `glossary/index.html`) in `tools/generate-static.js` and remove `/index.html 200` SPA rewrite targets from `_redirects` in favor of directory targets (`/roadmap/* /roadmap/ 200`, etc.).
+- **Why**: Cloudflare Pages Pretty-URL normalization intercepts `/index.html 200` rewrites and issues an external `308 Permanent Redirect` back to `/`, breaking direct navigation and social crawlers on `/roadmap`, `/challenges`, `/sandbox`, and `/dashboard`. Pre-rendered static `index.html` directories eliminate the 308 loop entirely while giving every hub and challenge route its own crawlable `<title>`, meta description, canonical URL, JSON-LD, and `og:image`.
+- **Alternatives Rejected**:
+  - *Hash-only hub URLs (`/#/roadmap`, `/#/sandbox`)*: Breaks clean URL sharing, server-side OG previews, and `sitemap.xml` indexing.

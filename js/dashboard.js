@@ -166,9 +166,9 @@
               tab('notes', 'Notes &amp; bookmarks') +
             '</div>' +
           '</header>' +
-          '<main class="view-body" id="dashboard-mount-target">' +
+          '<div class="view-body" id="dashboard-mount-target">' +
             this._renderTabBody() +
-          '</main>' +
+          '</div>' +
         '</div>';
     },
 

@@ -7,7 +7,7 @@
   <title>Complete SaaS Analytics Engine (MRR, Cohorts &amp; Funnels) — Interactive Build Lab | SQL In Depth</title>
   <meta name="description" content="Complete SaaS Analytics Engine (MRR, Cohorts &amp; Funnels): A SaaS product analytics engine implementing gapless date spines, triangular cohort retention...">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#f7f8fa">
+  <meta name="theme-color" content="#f7f7f5">
   
   <!-- Open Graph -->
   <meta property="og:type" content="article">
@@ -34,16 +34,16 @@
   <link rel="stylesheet" href="design-system/tokens.css?v=3bc26075fb">
   <link rel="stylesheet" href="design-system/components.css?v=606a179125">
   <link rel="stylesheet" href="css/vendor/katex/katex.min.css?v=83121916c0" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/variables.css?v=b32198442b">
+  <link rel="stylesheet" href="css/variables.css?v=98985bd48f">
   <link rel="stylesheet" href="css/layout.css?v=0dc598dfac">
-  <link rel="stylesheet" href="css/components.css?v=4450289dec">
-  <link rel="stylesheet" href="css/content.css?v=f28f40e024">
+  <link rel="stylesheet" href="css/components.css?v=5ff1bbfde1">
+  <link rel="stylesheet" href="css/content.css?v=c40a7aea42">
   <link rel="stylesheet" href="css/landing.css?v=8c43435edd" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/simulators.css?v=283a35f45b" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/simulators.css?v=0ad47327a0" media="print" onload="this.media='all'">
 
   <!-- Core scripts: head initializer & asset manifest -->
-  <script src="js/init.js?v=f6a6002f60"></script>
-  <script src="js/manifest.js?v=ec151c5627"></script>
+  <script src="js/init.js?v=d98d79ab7a"></script>
+  <script src="js/manifest.js?v=cd330e015c"></script>
 
   <script type="application/ld+json">
 {
@@ -92,13 +92,13 @@
 
     <div class="topbar__actions">
       <nav class="topbar__nav" aria-label="Primary navigation">
-        <a href="/roadmap" class="topbar__nav-link" data-nav="roadmap">Roadmap</a>
-        <a href="/challenges" class="topbar__nav-link" data-nav="challenges">Challenges</a>
-        <a href="/sandbox" class="topbar__nav-link" data-nav="sandbox">SQL Studio</a>
+        <a href="/roadmap/" class="topbar__nav-link" data-nav="roadmap">Roadmap</a>
+        <a href="/challenges/" class="topbar__nav-link" data-nav="challenges">Challenges</a>
+        <a href="/sandbox/" class="topbar__nav-link" data-nav="sandbox">SQL Studio</a>
         <a href="/glossary/" class="topbar__nav-link" data-nav="glossary">Glossary</a>
       </nav>
 
-      <a href="/dashboard" class="topbar__progress-pill" id="progress-pill" data-nav="dashboard" title="Your learning progress" aria-label="Your learning progress">
+      <a href="/dashboard/" class="topbar__progress-pill" id="progress-pill" data-nav="dashboard" title="Your learning progress" aria-label="Your learning progress">
         <svg class="topbar__progress-ring" viewBox="0 0 20 20">
           <circle class="track" cx="10" cy="10" r="8"/>
           <circle class="fill" cx="10" cy="10" r="8" stroke-dasharray="50.27" stroke-dashoffset="50.27" id="progress-ring-fill"/>
@@ -817,8 +817,8 @@
         <h1 class="lesson-header__title">Complete SaaS Analytics Engine (MRR, Cohorts &amp; Funnels)</h1>
         <p class="build-summary">A SaaS product analytics engine implementing gapless date spines, triangular cohort retention matrices, strict chronological funnel conversion attribution, and Allen interval overlap detection.</p>
         <div class="lesson-header__meta">
-          <span class="lesson-header__meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ~25 min</span>
-          <span class="lesson-header__meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Intermediate</span>
+          <span class="lesson-header__meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ~40 min</span>
+          <span class="lesson-header__meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Advanced</span>
           <span class="lesson-header__meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Lessons: <a href="#" data-nav="topic" data-slug="build-saas-cohort-funnel-workbench">Hands-On Build: Complete SaaS Analytics Engine (MRR, Cohorts &amp; Funnels)</a>, <a href="#" data-nav="topic" data-slug="calendar-tables-date-spines">Calendar Tables &amp; Date Spines: Filling Missing Zero-Activity Time Buckets</a>, <a href="#" data-nav="topic" data-slug="cohort-retention-matrix-sql">Triangle Cohort Retention &amp; Net Dollar Retention (NDR) Matrices in SQL</a>, <a href="#" data-nav="topic" data-slug="funnel-conversion-attribution-sql">Multi-Step Ordered Funnel Conversion &amp; First/Last-Touch Attribution</a>, <a href="#" data-nav="topic" data-slug="interval-overlap-allen-algebra">Temporal Interval Overlap (Allen&#039;s Algebra) &amp; Packing Contiguous Intervals</a>, <a href="#" data-nav="topic" data-slug="pivoting-unpivoting-cross-tabs">Rows to Columns &amp; Back: Cross-Tab Pivoting and Unpivoting Patterns</a></span>
         </div>
       </div>
@@ -828,11 +828,11 @@
           <div class="build-lab-card__intro">
             <div class="build-lab-card__eyebrow">
               <span>Guided SQL &amp; Storage Engine Lab</span>
-              <span class="build-lab-card__progress" id="build-lab-progress-badge">0/3 Steps Completed</span>
+              <span class="build-lab-card__progress" id="build-lab-progress-badge">0/4 Steps Completed</span>
             </div>
             <h2 class="build-lab-card__title">Execute &amp; Verify SQL &amp; Storage Engine Invariants in the Browser SQL Studio</h2>
             <p class="build-lab-card__desc">
-              Complete 3 progressive relational steps with guided hints in <strong>PostgreSQL 18 WASM, SQLite 3 &amp; Step-by-Step Relational Table Visualizer</strong> against automated result-set and query-plan assertions — zero local setup required.
+              Complete 4 progressive relational steps with guided hints in <strong>PostgreSQL 18 WASM, SQLite 3 &amp; Step-by-Step Relational Table Visualizer</strong> against automated result-set and query-plan assertions — zero local setup required.
             </p>
             <div class="build-lab-progress-track" aria-hidden="true">
               <div class="build-lab-progress-track__fill" style="width:0%"></div>
@@ -849,7 +849,7 @@
             </button>
             <button type="button" class="btn btn--outline build-lab-card__launch-btn" data-action="open-code-lab" data-build="build-saas-cohort-funnel-workbench" data-lab-mode="guided">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-              <span>⚙ Open Engine Code Lab</span>
+              <span>Open Engine Code Lab</span>
             </button>
           </div>
         </div>
@@ -857,42 +857,55 @@
         
           <div class="build-lab-steps-grid" id="build-lab-steps-grid">
             
-                <div class="build-lab-step-card " data-action="open-topic-codelab" data-slug="build-saas-cohort-funnel-workbench" data-mode="guided" data-step="0" data-step-index="0">
+                <div class="build-lab-step-card " data-action="open-code-lab" data-build="build-saas-cohort-funnel-workbench" data-lab-mode="guided" data-step="0" data-step-index="0">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">01</span>
-                    <span class="build-lab-step-card__target">Phase 1 · Hands-On Build: Complete SaaS Analytics Engine (MRR, Cohorts &amp; Funnels): Telemetry Event Stream &amp; Null Latency Guard</span>
+                    <span class="build-lab-step-card__target">index.js · SaasAnalyticsWorkbench.generateDaySpine</span>
                   </div>
-                  <div class="build-lab-step-card__title">Filter Non-Null Telemetry Latency Events (build-saas-cohort-funnel-workbench)</div>
-                  <div class="build-lab-step-card__concept">Inspect <code>user_events</code> in <code>saas_telemetry</code> and apply an explicit <code>latency_ms IS NOT NULL</code> guard before computing latency statistics.</div>
+                  <div class="build-lab-step-card__title">Gapless Date Spine Generator</div>
+                  <div class="build-lab-step-card__concept">Synthesizing Continuous Calendar Buckets to Prevent Missing Zero-Event Days</div>
                   <div class="build-lab-step-card__footer">
-                    <span>4 SQL assertions</span>
+                    <span>1 SQL assertion</span>
                     <button type="button" class="btn btn--xs btn--ghost build-lab-step-card__open" data-action="open-topic-codelab" data-slug="build-saas-cohort-funnel-workbench" data-mode="modal" data-step="0" data-step-index="0">Step 1 →</button>
                   </div>
                 </div>
               
-                <div class="build-lab-step-card " data-action="open-topic-codelab" data-slug="build-saas-cohort-funnel-workbench" data-mode="guided" data-step="1" data-step-index="1">
+                <div class="build-lab-step-card " data-action="open-code-lab" data-build="build-saas-cohort-funnel-workbench" data-lab-mode="guided" data-step="1" data-step-index="1">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">02</span>
-                    <span class="build-lab-step-card__target">Phase 2 · Hands-On Build: Complete SaaS Analytics Engine (MRR, Cohorts &amp; Funnels): Subscription MRR &amp; Invoice Settlement Join</span>
+                    <span class="build-lab-step-card__target">index.js · SaasAnalyticsWorkbench.buildCohortMatrix</span>
                   </div>
-                  <div class="build-lab-step-card__title">Correlate SaaS Tenants with Subscriptions &amp; Invoices (Hands-On Build: Complete SaaS Analytics Engine (MRR, Cohorts &amp; Funnels))</div>
-                  <div class="build-lab-step-card__concept">Join <code>saas_users</code>, <code>subscriptions</code>, and <code>invoices</code> to compare contracted MRR against paid vs unpaid billing invoices.</div>
+                  <div class="build-lab-step-card__title">Triangular Cohort Retention Matrix</div>
+                  <div class="build-lab-step-card__concept">Grouping Users by Signup Month and Offset Month (activityMonth - cohortMonth)</div>
                   <div class="build-lab-step-card__footer">
-                    <span>4 SQL assertions</span>
+                    <span>1 SQL assertion</span>
                     <button type="button" class="btn btn--xs btn--ghost build-lab-step-card__open" data-action="open-topic-codelab" data-slug="build-saas-cohort-funnel-workbench" data-mode="modal" data-step="1" data-step-index="1">Step 2 →</button>
                   </div>
                 </div>
               
-                <div class="build-lab-step-card " data-action="open-topic-codelab" data-slug="build-saas-cohort-funnel-workbench" data-mode="guided" data-step="2" data-step-index="2">
+                <div class="build-lab-step-card " data-action="open-code-lab" data-build="build-saas-cohort-funnel-workbench" data-lab-mode="guided" data-step="2" data-step-index="2">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">03</span>
-                    <span class="build-lab-step-card__target">Phase 3 · Hands-On Build: Complete SaaS Analytics Engine (MRR, Cohorts &amp; Funnels): Cohort Funnel &amp; Telemetry Latency Profile</span>
+                    <span class="build-lab-step-card__target">index.js · SaasAnalyticsWorkbench.computeFunnel</span>
                   </div>
-                  <div class="build-lab-step-card__title">Production SaaS Telemetry Latency &amp; Plan Profile (Hands-On Build: Complete SaaS Analytics Engine (MRR, Cohorts &amp; Funnels))</div>
-                  <div class="build-lab-step-card__concept">Aggregate event volume, average latency, and peak latency across <code>plan_tier</code> and <code>event_type</code> to verify SLA compliance.</div>
+                  <div class="build-lab-step-card__title">Chronological Funnel Conversion Attribution</div>
+                  <div class="build-lab-step-card__concept">Enforcing t_signup &lt;= t_activate &lt;= t_subscribe Across User Events</div>
                   <div class="build-lab-step-card__footer">
-                    <span>4 SQL assertions</span>
+                    <span>1 SQL assertion</span>
                     <button type="button" class="btn btn--xs btn--ghost build-lab-step-card__open" data-action="open-topic-codelab" data-slug="build-saas-cohort-funnel-workbench" data-mode="modal" data-step="2" data-step-index="2">Step 3 →</button>
+                  </div>
+                </div>
+              
+                <div class="build-lab-step-card " data-action="open-code-lab" data-build="build-saas-cohort-funnel-workbench" data-lab-mode="guided" data-step="3" data-step-index="3">
+                  <div class="build-lab-step-card__header">
+                    <span class="build-lab-step-card__num">04</span>
+                    <span class="build-lab-step-card__target">index.js · SaasAnalyticsWorkbench.findOverlappingSubscriptions</span>
+                  </div>
+                  <div class="build-lab-step-card__title">Allen’s Interval Overlap Detector</div>
+                  <div class="build-lab-step-card__concept">Half-Open Interval Intersection: startA &lt; endB AND endA &gt; startB</div>
+                  <div class="build-lab-step-card__footer">
+                    <span>1 SQL assertion</span>
+                    <button type="button" class="btn btn--xs btn--ghost build-lab-step-card__open" data-action="open-topic-codelab" data-slug="build-saas-cohort-funnel-workbench" data-mode="modal" data-step="3" data-step-index="3">Step 4 →</button>
                   </div>
                 </div>
               
@@ -970,11 +983,11 @@
           <a href="https://dsa-in-depth.vedgupta.in/" class="ds-footer__product" target="_blank" rel="noopener">Algorithms &amp; Data Structures</a>
         </div>
         <div class="ds-footer__links">
-          <a href="/sandbox" data-nav="sandbox">SQL Studio</a>
-          <a href="/roadmap" data-nav="roadmap">Roadmap</a>
-          <a href="/challenges" data-nav="challenges">Challenges</a>
+          <a href="/sandbox/" data-nav="sandbox">SQL Studio</a>
+          <a href="/roadmap/" data-nav="roadmap">Roadmap</a>
+          <a href="/challenges/" data-nav="challenges">Challenges</a>
           <a href="/glossary/" data-nav="glossary">Glossary</a>
-          <a href="/projects">Projects</a>
+          <a href="/projects/">Projects</a>
           <a href="https://github.com/innovatorved/sql-in-depth" target="_blank" rel="noopener">GitHub</a>
         </div>
         <div class="ds-footer__meta">
@@ -1047,10 +1060,10 @@
   <script type="text/plain" data-defer src="js/progress.js?v=20e4822556"></script>
   <script type="text/plain" data-defer src="js/search.js?v=cfb7464ca7"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
-  <script type="text/plain" data-defer src="js/renderer.js?v=d4cbd1df69"></script>
-  <script type="text/plain" data-defer src="js/landing.js?v=df71db4b82"></script>
+  <script type="text/plain" data-defer src="js/renderer.js?v=fd623be208"></script>
+  <script type="text/plain" data-defer src="js/landing.js?v=ab352e39f9"></script>
   <script type="text/plain" data-defer src="js/quiz.js?v=5b300d9b3d"></script>
-  <script type="text/plain" data-defer src="js/app.js?v=690ab491f1"></script>
+  <script type="text/plain" data-defer src="js/app.js?v=d7a48f58f9"></script>
 
   <!-- Route-Scoped Lazy Scripts (stamped & loaded on demand via window.Lazy) -->
   <script type="text/plain" data-lazy src="data/datasets.js?v=259e5934af"></script>
@@ -1060,14 +1073,14 @@
   <script type="text/plain" data-lazy src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
   <script type="text/plain" data-lazy src="data/implementations_code.js?v=fce884f8a8"></script>
   <script type="text/plain" data-lazy src="data/guided_labs.js?v=3bd996e9dc"></script>
-  <script type="text/plain" data-lazy src="data/topic_guided_labs.js?v=2a57d85494"></script>
+  <script type="text/plain" data-lazy src="data/topic_guided_labs.js?v=5b7d013daa"></script>
   <script type="text/plain" data-lazy src="data/projects.js?v=2280ac085f"></script>
-  <script type="text/plain" data-lazy src="data/glossary.js?v=4f6c79a4e0"></script>
+  <script type="text/plain" data-lazy src="data/glossary.js?v=cbce13b203"></script>
   <script type="text/plain" data-lazy src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>
   <script type="text/plain" data-lazy src="js/sql-engine.js?v=ef30cfbffa"></script>
-  <script type="text/plain" data-lazy src="js/vendor/cm6-sql.js?v=74bd776b7d"></script>
-  <script type="text/plain" data-lazy src="js/table-visualizer.js?v=984a25ac84"></script>
-  <script type="text/plain" data-lazy src="js/simulators.js?v=da56d0b088"></script>
+  <script type="text/plain" data-lazy src="js/vendor/cm6-sql.js?v=acc5cb4445"></script>
+  <script type="text/plain" data-lazy src="js/table-visualizer.js?v=abf76f2092"></script>
+  <script type="text/plain" data-lazy src="js/simulators.js?v=4cf0ceeb96"></script>
   <script type="text/plain" data-lazy src="js/simulators-relational.js?v=32c1358d02"></script>
   <script type="text/plain" data-lazy src="js/simulators-analytical.js?v=50d950f3b6"></script>
   <script type="text/plain" data-lazy src="js/simulators-modeling.js?v=1962947dcb"></script>
@@ -1076,10 +1089,10 @@
   <script type="text/plain" data-lazy src="js/simulators-olap-ops.js?v=11bb8afed3"></script>
   <script type="text/plain" data-lazy src="js/vendor/katex/katex.min.js?v=6d481709e3"></script>
   <script type="text/plain" data-lazy src="js/vendor/katex/auto-render.min.js?v=82dca94048"></script>
-  <script type="text/plain" data-lazy src="js/roadmap.js?v=cebfb7e32c"></script>
-  <script type="text/plain" data-lazy src="js/challenges.js?v=ca25055a91"></script>
-  <script type="text/plain" data-lazy src="js/dashboard.js?v=fcb1621a2e"></script>
-  <script type="text/plain" data-lazy src="js/sandbox.js?v=facac2594d"></script>
+  <script type="text/plain" data-lazy src="js/roadmap.js?v=687d490300"></script>
+  <script type="text/plain" data-lazy src="js/challenges.js?v=438d35cd1b"></script>
+  <script type="text/plain" data-lazy src="js/dashboard.js?v=3fd8d6f60d"></script>
+  <script type="text/plain" data-lazy src="js/sandbox.js?v=775e2f00c1"></script>
   <script type="text/plain" data-lazy src="js/topic-codelab.js?v=49fccccd99"></script>
 
   <!-- App bootstrap & deferred script loader -->

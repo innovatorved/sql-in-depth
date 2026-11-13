@@ -514,7 +514,7 @@ window.Renderer = (() => {
     // TableVisualizer.enhanceSqlCodeBlocks attaches the unified SQL execution toolbar below <pre> for SQL blocks
     const runBtn = (isRunnable && !isSqlLang)
       ? `<button type="button" class="code-block__copy code-block__run-btn" data-action="run-sql-inline" data-lang="${escapeHtml(cleanLang)}" title="Execute this query and view the interactive output table &amp; editor"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"/></svg><span>Run Query</span></button>` +
-        `<button type="button" class="code-block__copy" data-action="edit-sql-inline" data-lang="${escapeHtml(cleanLang)}" title="Edit and test variations inline"><span>✎ Edit &amp; Try</span></button>` +
+        `<button type="button" class="code-block__copy" data-action="edit-sql-inline" data-lang="${escapeHtml(cleanLang)}" title="Edit and test variations inline"><span>Edit &amp; Try</span></button>` +
         `<button type="button" class="code-block__copy" data-action="open-sql-studio" data-lang="${escapeHtml(cleanLang)}" title="Open in Full-Screen SQL Studio"><span>⤢ SQL Studio</span></button>`
       : '';
 
@@ -1116,9 +1116,9 @@ window.Renderer = (() => {
 
     const build = impls[buildId];
     const primarySlug = build.primarySlug || (Array.isArray(build.relatedSlugs) && build.relatedSlugs[0]) || buildId;
-    const guided = (window.TOPIC_GUIDED_LABS && (window.TOPIC_GUIDED_LABS[buildId] || window.TOPIC_GUIDED_LABS[primarySlug]))
-      || (window.TopicGuidedLabs && typeof window.TopicGuidedLabs.getLab === 'function' ? window.TopicGuidedLabs.getLab(primarySlug, build.title) : null)
-      || (window.GUIDED_LABS_DATA && window.GUIDED_LABS_DATA[buildId])
+    const guided = (window.GUIDED_LABS_DATA && window.GUIDED_LABS_DATA[buildId])
+      || (window.TOPIC_GUIDED_LABS && (window.TOPIC_GUIDED_LABS[buildId] || window.TOPIC_GUIDED_LABS[primarySlug]))
+      || (window.TopicGuidedLabs && typeof window.TopicGuidedLabs.getLab === 'function' ? window.TopicGuidedLabs.getLab(primarySlug, build.title, '') : null)
       || null;
     const steps = Array.isArray(guided?.steps) ? guided.steps : [];
     const files = orderedBuildFiles(build.files);
@@ -1189,7 +1189,7 @@ window.Renderer = (() => {
             </button>
             <button type="button" class="btn btn--outline build-lab-card__launch-btn" data-action="open-code-lab" data-build="${escapeHtml(buildId)}" data-lab-mode="guided">
               ${icons.code}
-              <span>⚙ Open Engine Code Lab</span>
+              <span>Open Engine Code Lab</span>
             </button>
           </div>
         </div>
@@ -1198,11 +1198,11 @@ window.Renderer = (() => {
           <div class="build-lab-steps-grid" id="build-lab-steps-grid">
             ${steps.map((s, idx) => {
               const isDone = completedIds.includes(s.id);
-              const cleanTitle = (s.title || '').replace(/^Step\s*\d+:\s*/i, '');
+              const cleanTitle = (s.title || '').replace(/^Step\s*\d+:\s*/i, '').replace(/\s*\([a-z0-9-]+\)\s*$/i, '');
               const targetLabel = s.phase || (s.targetFile ? `${s.targetFile}${s.targetSymbol ? ' · ' + s.targetSymbol.split('/')[0].trim() : ''}` : 'query.sql');
               const assertionCount = Array.isArray(s.testNames) && s.testNames.length ? s.testNames.length : 4;
               return `
-                <div class="build-lab-step-card ${isDone ? 'is-done' : ''}" data-action="open-topic-codelab" data-slug="${escapeHtml(buildId)}" data-mode="guided" data-step="${idx}" data-step-index="${idx}">
+                <div class="build-lab-step-card ${isDone ? 'is-done' : ''}" data-action="open-code-lab" data-build="${escapeHtml(buildId)}" data-lab-mode="guided" data-step="${idx}" data-step-index="${idx}">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">${isDone ? icons.check : `0${idx + 1}`}</span>
                     <span class="build-lab-step-card__target">${escapeHtml(targetLabel)}</span>
@@ -1324,7 +1324,7 @@ window.Renderer = (() => {
       ${video.title ? `<div class="video-embed__info">
         <span class="video-embed__channel">${escapeHtml(video.channel || 'YouTube')}</span>
         <span class="video-embed__title">${escapeHtml(video.title)}</span>
-        <a href="https://www.youtube.com/watch?v=${id}" target="_blank" rel="noopener noreferrer" style="margin-left:auto; font-size:11px; color:var(--accent,#6366f1); text-decoration:none; display:flex; align-items:center; gap:2px;">
+        <a href="https://www.youtube.com/watch?v=${id}" target="_blank" rel="noopener noreferrer" style="margin-left:auto; font-size:11px; color:var(--accent); text-decoration:none; display:flex; align-items:center; gap:2px;">
           Watch on YouTube ↗
         </a>
       </div>` : ''}
@@ -2151,7 +2151,7 @@ window.Renderer = (() => {
         <h1 class="lesson-header__title">SQL &amp; Database Internals Glossary</h1>
         <p class="hero__subtitle" style="margin-top:0.5rem;">Rigorous mathematical, asymptotic, and mechanical definitions across all 18 modules.</p>
         <div style="margin-top:1rem;">
-          <input type="text" id="glossary-filter" aria-label="Filter glossary terms" data-action="filter-glossary" placeholder="Filter terms (e.g. SARGable, MVCC, B+Tree, window frame, WAL)..." style="width:100%; max-width:400px; padding:0.5rem 0.75rem; background:var(--surface); border:1px solid var(--border); border-radius:6px; color:var(--fg); font-size:13px;">
+          <input type="text" id="glossary-filter" aria-label="Filter glossary terms" data-action="filter-glossary" placeholder="Filter 180 terms (e.g. SARGable, MVCC, B+Tree, WAL)…" style="width:100%; max-width:520px; padding:0.55rem 0.85rem; background:var(--surface); border:1px solid var(--border); border-radius:8px; color:var(--fg); font-size:13px;">
         </div>
       </div>
 
@@ -2161,16 +2161,18 @@ window.Renderer = (() => {
     for (let gIdx = 0; gIdx < glossary.length; gIdx++) {
       const item = glossary[gIdx];
       const defText = item.definition || item.def || '';
-      const catText = item.category || item.cat || 'Algorithms';
+      const catText = item.category || item.cat || 'Database Internals';
       const compText = item.complexity ? ` · <code>${escapeHtml(item.complexity)}</code>` : '';
       const foldCls = gIdx >= 12 ? ' ds-below-fold' : '';
+      const targetSlug = item.slug || item.relatedSlug || '';
+      const lessonLink = targetSlug ? ` <a href="/topic/${escapeHtml(targetSlug)}/" style="font-size:12px;font-weight:500;color:var(--accent);text-decoration:none;margin-left:6px;white-space:nowrap;">Read lesson →</a>` : '';
       html += `
-        <div class="glossary-item${foldCls}" style="padding:1rem; border:1px solid var(--border); border-radius:6px; background:var(--surface);">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.25rem; gap:8px; flex-wrap:wrap;">
+        <div class="glossary-item${foldCls}" style="padding:1rem 1.15rem; border:1px solid var(--border); border-radius:8px; background:var(--surface);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem; gap:8px; flex-wrap:wrap;">
             <strong style="font-size:15px; color:var(--fg);">${escapeHtml(item.term)}${compText}</strong>
             <span class="badge badge--secondary" style="font-size:11px;">${escapeHtml(catText)}</span>
           </div>
-          <p style="margin:0.25rem 0 0; font-size:13px; color:var(--fg-muted); line-height:1.5;">${renderMathInHtml(formatInlineCode(defText))}</p>
+          <p style="margin:0.25rem 0 0; font-size:13.5px; color:var(--fg-muted); line-height:1.6;">${renderMathInHtml(formatInlineCode(defText))}${lessonLink}</p>
         </div>
       `;
     }

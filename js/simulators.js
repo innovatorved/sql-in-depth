@@ -163,7 +163,7 @@ window.Simulators = (() => {
       let raw = frame?.log || frame?.invariant || `Step ${idx + 1} of ${total}`;
       raw = String(raw)
         .replace(/<[^>]+>/g, ' ')
-        .replace(/[🐢🐇♛✕✓★•]/g, ' ')
+        .replace(/[\u265B\u2715\u2713\u2605\u2022]|\p{Extended_Pictographic}/gu, ' ')
         .replace(/⇄|↔/g, ' swapped with ')
         .replace(/->|→|⟶/g, ' to ')
         .replace(/<-|←/g, ' from ')
@@ -871,7 +871,7 @@ window.Simulators = (() => {
       return { fill: 'rgba(245, 158, 11, 0.26)', stroke: '#f59e0b', text: '#f59e0b', glow: 'rgba(245, 158, 11, 0.45)' };
     }
     if (c.active) {
-      return { fill: 'rgba(59, 130, 246, 0.26)', stroke: '#3b82f6', text: '#3b82f6', glow: 'rgba(59, 130, 246, 0.45)' };
+      return { fill: 'var(--accent-muted)', stroke: 'var(--accent)', text: 'var(--accent)', glow: 'rgba(194, 65, 12, 0.28)' };
     }
     return { fill: 'var(--bg-secondary, #f1f5f9)', stroke: 'var(--border-color, #94a3b8)', text: 'var(--fg-primary, #1e293b)', glow: 'none' };
   }
@@ -927,7 +927,7 @@ window.Simulators = (() => {
         <div class="dsa-sim__visual-label">
           <span>Array view · ${esc(title)}</span>
           <span class="dsa-sim__legend">
-            <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:#3b82f6"></span>Active</span>
+            <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:var(--accent)"></span>Active</span>
             <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:#8b5cf6"></span>Pivot</span>
             <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:#10b981"></span>Match/Sorted</span>
           </span>
@@ -965,7 +965,7 @@ window.Simulators = (() => {
       if (!parent) return '';
       const isHighlighted = (node.c.active || node.c.match || node.c.pivot || node.c.warn) &&
                             (parent.c.active || parent.c.match || parent.c.pivot || parent.c.warn);
-      const stroke = isHighlighted ? '#3b82f6' : 'var(--border-color, #94a3b8)';
+      const stroke = isHighlighted ? 'var(--accent)' : 'var(--border-color, #94a3b8)';
       const width = isHighlighted ? 2.4 : 1.5;
       return `<line x1="${parent.x}" y1="${parent.y}" x2="${node.x}" y2="${node.y}" stroke="${stroke}" stroke-width="${width}" />`;
     }).join('');
@@ -991,7 +991,7 @@ window.Simulators = (() => {
         <div class="dsa-sim__visual-label">
           <span>Tree view · ${esc(title)}</span>
           <span class="dsa-sim__legend">
-            <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:#3b82f6"></span>Visited/Active</span>
+            <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:var(--accent)"></span>Visited/Active</span>
             <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:#8b5cf6"></span>Pivot/Root</span>
             <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:#10b981"></span>Resolved</span>
           </span>
@@ -1030,7 +1030,7 @@ window.Simulators = (() => {
     for (let i = 0; i < highlighted.length - 1; i++) {
       const a = highlighted[i];
       const b = highlighted[i + 1];
-      chordsSvg += `<path d="M ${a.x} ${a.y} Q ${cx} ${cy} ${b.x} ${b.y}" fill="none" stroke="#3b82f6" stroke-width="2" stroke-dasharray="4 3" />`;
+      chordsSvg += `<path d="M ${a.x} ${a.y} Q ${cx} ${cy} ${b.x} ${b.y}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="4 3" />`;
     }
 
     const ringNodesSvg = pts.map(({ x, y, c }) => {
@@ -1067,7 +1067,7 @@ window.Simulators = (() => {
         <div class="dsa-sim__visual-label">
           <span>Hash buckets · ${esc(title)}</span>
           <span class="dsa-sim__legend">
-            <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:#3b82f6"></span>Probe</span>
+            <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:var(--accent)"></span>Probe</span>
             <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:#f59e0b"></span>Collision/Swap</span>
             <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:#10b981"></span>Hit/Placed</span>
           </span>
@@ -1102,7 +1102,7 @@ window.Simulators = (() => {
     const linksSvg = pts.slice(0, -1).map((p, i) => {
       const next = pts[i + 1];
       const activeEdge = (p.c.active || p.c.match) && (next.c.active || next.c.match);
-      const col = activeEdge ? '#3b82f6' : 'var(--border-color, #94a3b8)';
+      const col = activeEdge ? 'var(--accent)' : 'var(--border-color, #94a3b8)';
       return `
         <g>
           <line x1="${p.x + 22}" y1="${p.y}" x2="${next.x - 24}" y2="${next.y}" stroke="${col}" stroke-width="${activeEdge ? 2.4 : 1.6}" />
@@ -1147,7 +1147,7 @@ window.Simulators = (() => {
         <div class="dsa-sim__visual-label">
           <span>State graph · ${esc(title)}</span>
           <span class="dsa-sim__legend">
-            <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:#3b82f6"></span>Active Pointer</span>
+            <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:var(--accent)"></span>Active Pointer</span>
             <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:#8b5cf6"></span>Jump/Transition</span>
             <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:#10b981"></span>Matched/Optimal</span>
           </span>
@@ -1640,7 +1640,7 @@ window.Simulators = (() => {
       if (isMatch) { bg = 'rgba(16,185,129,0.12)'; borderLeft = '3px solid #10b981'; }
       else if (isPivot) { bg = 'rgba(139,92,246,0.14)'; borderLeft = '3px solid #8b5cf6'; }
       else if (isWarn) { bg = 'rgba(245,158,11,0.12)'; borderLeft = '3px solid #f59e0b'; }
-      else if (isActive) { bg = 'rgba(59,130,246,0.12)'; borderLeft = '3px solid #3b82f6'; }
+      else if (isActive) { bg = 'var(--accent-muted)'; borderLeft = '3px solid var(--accent)'; }
 
       const tds = columns.map((col, cIdx) => {
         const val = Array.isArray(r) ? r[cIdx] : r[col];
@@ -1652,7 +1652,7 @@ window.Simulators = (() => {
       }).join('');
 
       const tagHtml = rowTags[rIdx]
-        ? `<td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11px;font-weight:700;font-family:var(--font-mono,monospace);color:${isMatch ? '#10b981' : isWarn ? '#f59e0b' : isPivot ? '#8b5cf6' : '#3b82f6'};">${esc(rowTags[rIdx])}</td>`
+        ? `<td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11px;font-weight:700;font-family:var(--font-mono,monospace);color:${isMatch ? '#10b981' : isWarn ? '#f59e0b' : isPivot ? '#8b5cf6' : 'var(--accent)'};">${esc(rowTags[rIdx])}</td>`
         : (Object.keys(rowTags).length ? `<td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);"></td>` : '');
 
       return `<tr style="background:${bg};border-left:${borderLeft};">${tds}${tagHtml}</tr>`;

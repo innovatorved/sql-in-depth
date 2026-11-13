@@ -6,12 +6,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>404 — Page Not Found | SQL In Depth</title>
   <meta name="description" content="The SQL lesson, table visualizer, or database build lab you are looking for cannot be found. Explore our 6 tracks, 180 units, interactive visualizers, and from-scratch builds.">
+  <meta property="og:title" content="404 — Page Not Found | SQL In Depth">
+  <meta property="og:description" content="The SQL lesson, table visualizer, or database build lab you are looking for cannot be found. Explore our 6 tracks, 180 units, interactive visualizers, and from-scratch builds.">
   <meta property="og:image" content="https://sql-in-depth.vedgupta.in/assets/og/404.png">
+  <meta name="twitter:title" content="404 — Page Not Found | SQL In Depth">
+  <meta name="twitter:description" content="The SQL lesson, table visualizer, or database build lab you are looking for cannot be found. Explore our 6 tracks, 180 units, interactive visualizers, and from-scratch builds.">
   <meta name="twitter:image" content="https://sql-in-depth.vedgupta.in/assets/og/404.png">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="robots" content="noindex, follow">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#f7f8fa">
+  <meta name="theme-color" content="#f7f7f5">
 
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preload" href="fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
@@ -19,15 +23,15 @@
   <!-- Stylesheets -->
   <link rel="stylesheet" href="design-system/tokens.css?v=3bc26075fb">
   <link rel="stylesheet" href="design-system/components.css?v=606a179125">
-  <link rel="stylesheet" href="css/variables.css?v=b32198442b">
+  <link rel="stylesheet" href="css/variables.css?v=98985bd48f">
   <link rel="stylesheet" href="css/layout.css?v=0dc598dfac">
-  <link rel="stylesheet" href="css/components.css?v=4450289dec">
-  <link rel="stylesheet" href="css/content.css?v=f28f40e024">
-  <link rel="stylesheet" href="css/simulators.css?v=283a35f45b">
+  <link rel="stylesheet" href="css/components.css?v=5ff1bbfde1">
+  <link rel="stylesheet" href="css/content.css?v=c40a7aea42">
+  <link rel="stylesheet" href="css/simulators.css?v=0ad47327a0">
 
   <!-- Core scripts: head initializer & asset manifest -->
-  <script src="js/init.js?v=f6a6002f60"></script>
-  <script src="js/manifest.js?v=ec151c5627"></script>
+  <script src="js/init.js?v=d98d79ab7a"></script>
+  <script src="js/manifest.js?v=cd330e015c"></script>
 
   <style>
     .not-found-wrapper {
@@ -181,11 +185,14 @@
     </div>
 
     <div class="topbar__actions">
-      <nav class="topbar__nav" style="display:flex; gap:0.4rem; margin-right:0.5rem;">
-        <a href="/glossary/" class="btn btn--sm btn--outline" style="font-size:11px; padding:4px 8px; text-decoration:none; white-space:nowrap;">Glossary</a>
+      <nav class="topbar__nav" aria-label="Primary navigation">
+        <a href="/roadmap/" class="topbar__nav-link">Roadmap</a>
+        <a href="/challenges/" class="topbar__nav-link">Challenges</a>
+        <a href="/sandbox/" class="topbar__nav-link">SQL Studio</a>
+        <a href="/glossary/" class="topbar__nav-link">Glossary</a>
       </nav>
 
-      <a href="/dashboard" class="topbar__progress-pill" id="progress-pill" data-nav="dashboard" title="Your learning progress" aria-label="Your learning progress">
+      <a href="/dashboard/" class="topbar__progress-pill" id="progress-pill" data-nav="dashboard" title="Your learning progress" aria-label="Your learning progress">
         <svg class="topbar__progress-ring" viewBox="0 0 20 20">
           <circle class="track" cx="10" cy="10" r="8"/>
           <circle class="fill" cx="10" cy="10" r="8" stroke-dasharray="50.27" stroke-dashoffset="50.27" id="progress-ring-fill"/>
@@ -225,7 +232,7 @@
           <a class="btn btn--primary" href="/">← Return to Home</a>
           <a class="btn btn--outline" href="/topic/why-databases-exist/">Start Curriculum</a>
           <a class="btn btn--outline" href="/build/build-sql-query-interpreter/">18 Build Labs</a>
-          <a class="btn btn--outline" href="/projects">Projects</a>
+          <a class="btn btn--outline" href="/projects/">Projects</a>
         </div>
 
         <!-- Popular Topics -->
@@ -245,10 +252,10 @@
 
     <!-- Footer -->
     <footer class="not-found-footer">
-      <span>SQL In Depth &copy; 2024–2026 Ved Gupta. <a href="/">Curriculum</a> &bull; <a href="/build/build-sql-query-interpreter/">18 Builds</a> &bull; <a href="/projects">Projects</a> &bull; <a href="https://github.com/innovatorved/sql-in-depth" target="_blank" rel="noopener">GitHub</a></span>
+      <span>SQL In Depth &copy; 2024–2026 Ved Gupta. <a href="/">Curriculum</a> &bull; <a href="/build/build-sql-query-interpreter/">18 Builds</a> &bull; <a href="/projects/">Projects</a> &bull; <a href="https://github.com/innovatorved/sql-in-depth" target="_blank" rel="noopener">GitHub</a></span>
     </footer>
   </div>
 
-  <script src="js/404.js?v=0ac84f51f1"></script>
+  <script src="js/404.js?v=9a6c47a4c3"></script>
 </body>
 </html>

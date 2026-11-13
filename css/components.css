@@ -3715,7 +3715,8 @@ body.view-ecosystem .main__content {
 .roadmap-svg-viewport {
   position: relative;
   width: 100%;
-  height: 680px;
+  height: auto;
+  min-height: 520px;
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
@@ -3731,7 +3732,7 @@ body.view-ecosystem .main__content {
 .roadmap-svg {
   display: block;
   width: 100%;
-  height: 100%;
+  height: auto;
 }
 
 .roadmap-node rect {
@@ -5574,12 +5575,12 @@ body.view-ecosystem .main__content {
 
 .sql-lab-step-tab:hover {
   color: var(--fg);
-  border-color: rgba(99, 102, 241, 0.45);
+  border-color: var(--accent);
 }
 
 .sql-lab-step-tab.is-active {
-  background: rgba(99, 102, 241, 0.18);
-  border-color: #6366f1;
+  background: var(--accent-muted);
+  border-color: var(--accent);
   color: var(--fg);
 }
 
@@ -8066,6 +8067,17 @@ body.view-ecosystem .main__content:has(.dashboard-view) {
     max-width: none;
     flex: 1 1 120px;
   }
+}
+
+.studio-pane__editor .cm-editor {
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+}
+
+.studio-pane__editor .cm-scroller {
+  max-height: none;
+  height: 100%;
 }
 
 

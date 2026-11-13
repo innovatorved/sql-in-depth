@@ -2,7 +2,8 @@
 /**
  * Per-Page Open Graph & Twitter Card Generator — SQL In Depth
  * Generates 1200×630 PNG social cards in assets/og/*.png (plus assets/og-image.png)
- * for the landing page, projects hub, 404, all 180 topic lessons, and all 18 build labs.
+ * for the landing page, hubs, 404, 12 challenges, 180 topic lessons, and 18 build labs
+ * using the Warm Charcoal (#0F0F10 / #18181A) + Ember (#FB923C / #C2410C) design palette.
  *
  * Usage: node tools/generate-og.js
  */
@@ -73,59 +74,58 @@ function wrapLines(text, maxChars, maxLines) {
 }
 
 function schematicSvg(variant) {
-  // Crisp geometric architectural motif on the right side (x=850..1136, y=155..475)
   if (variant === 'btree') {
     return `
       <g transform="translate(855, 165)">
-        <rect x="0" y="0" width="275" height="300" rx="12" fill="#11151E" stroke="#1F2937" stroke-width="1.5"/>
-        <text x="20" y="30" fill="#64748B" font-family="Menlo, Monaco, monospace" font-size="12" font-weight="700">8KB B+TREE PAGE HIERARCHY</text>
-        <rect x="78" y="52" width="120" height="40" rx="6" fill="#0F62FE" fill-opacity="0.18" stroke="#3B82F6" stroke-width="1.5"/>
-        <text x="138" y="77" text-anchor="middle" fill="#F8FAFC" font-family="Menlo, Monaco, monospace" font-size="13" font-weight="700">[ 42 | 108 ]</text>
-        <line x1="105" y1="92" x2="55" y2="144" stroke="#3B82F6" stroke-width="1.5"/>
-        <line x1="138" y1="92" x2="138" y2="144" stroke="#3B82F6" stroke-width="1.5"/>
-        <line x1="172" y1="92" x2="220" y2="144" stroke="#3B82F6" stroke-width="1.5"/>
-        <rect x="18" y="144" width="74" height="36" rx="5" fill="#161B26" stroke="#334155" stroke-width="1.5"/>
-        <text x="55" y="166" text-anchor="middle" fill="#CBD5E1" font-family="Menlo, Monaco, monospace" font-size="11">10..41</text>
-        <rect x="101" y="144" width="74" height="36" rx="5" fill="#0F62FE" fill-opacity="0.22" stroke="#60A5FA" stroke-width="1.5"/>
+        <rect x="0" y="0" width="275" height="300" rx="12" fill="#18181A" stroke="#2D2D31" stroke-width="1.5"/>
+        <text x="20" y="30" fill="#A1A1AA" font-family="Menlo, Monaco, monospace" font-size="12" font-weight="700">8KB B+TREE PAGE HIERARCHY</text>
+        <rect x="78" y="52" width="120" height="40" rx="6" fill="#C2410C" fill-opacity="0.22" stroke="#FB923C" stroke-width="1.5"/>
+        <text x="138" y="77" text-anchor="middle" fill="#FAFAFA" font-family="Menlo, Monaco, monospace" font-size="13" font-weight="700">[ 42 | 108 ]</text>
+        <line x1="105" y1="92" x2="55" y2="144" stroke="#FB923C" stroke-width="1.5"/>
+        <line x1="138" y1="92" x2="138" y2="144" stroke="#FB923C" stroke-width="1.5"/>
+        <line x1="172" y1="92" x2="220" y2="144" stroke="#FB923C" stroke-width="1.5"/>
+        <rect x="18" y="144" width="74" height="36" rx="5" fill="#1F1F23" stroke="#3F3F46" stroke-width="1.5"/>
+        <text x="55" y="166" text-anchor="middle" fill="#D4D4D8" font-family="Menlo, Monaco, monospace" font-size="11">10..41</text>
+        <rect x="101" y="144" width="74" height="36" rx="5" fill="#C2410C" fill-opacity="0.26" stroke="#FB923C" stroke-width="1.5"/>
         <text x="138" y="166" text-anchor="middle" fill="#FFFFFF" font-family="Menlo, Monaco, monospace" font-size="11" font-weight="700">42..107</text>
-        <rect x="184" y="144" width="74" height="36" rx="5" fill="#161B26" stroke="#334155" stroke-width="1.5"/>
-        <text x="221" y="166" text-anchor="middle" fill="#CBD5E1" font-family="Menlo, Monaco, monospace" font-size="11">108..250</text>
-        <rect x="18" y="212" width="240" height="64" rx="6" fill="#0B0D12" stroke="#1E293B" stroke-width="1.5"/>
-        <text x="32" y="236" fill="#60A5FA" font-family="Menlo, Monaco, monospace" font-size="11" font-weight="700">EXPLAIN: INDEX SEEK</text>
-        <text x="32" y="258" fill="#94A3B8" font-family="Menlo, Monaco, monospace" font-size="11">3 page reads · O(log_B N)</text>
+        <rect x="184" y="144" width="74" height="36" rx="5" fill="#1F1F23" stroke="#3F3F46" stroke-width="1.5"/>
+        <text x="221" y="166" text-anchor="middle" fill="#D4D4D8" font-family="Menlo, Monaco, monospace" font-size="11">108..250</text>
+        <rect x="18" y="212" width="240" height="64" rx="6" fill="#121213" stroke="#27272A" stroke-width="1.5"/>
+        <text x="32" y="236" fill="#FB923C" font-family="Menlo, Monaco, monospace" font-size="11" font-weight="700">EXPLAIN: INDEX SEEK</text>
+        <text x="32" y="258" fill="#A1A1AA" font-family="Menlo, Monaco, monospace" font-size="11">3 page reads · O(log_B N)</text>
       </g>`;
   }
   if (variant === 'mvcc') {
     return `
       <g transform="translate(855, 165)">
-        <rect x="0" y="0" width="275" height="300" rx="12" fill="#11151E" stroke="#1F2937" stroke-width="1.5"/>
-        <text x="20" y="30" fill="#64748B" font-family="Menlo, Monaco, monospace" font-size="12" font-weight="700">MVCC SNAPSHOT CHAIN</text>
-        <rect x="20" y="52" width="235" height="54" rx="6" fill="#161B26" stroke="#334155" stroke-width="1.5"/>
-        <text x="34" y="74" fill="#94A3B8" font-family="Menlo, Monaco, monospace" font-size="11">v1 · xmin=102  xmax=108</text>
-        <text x="34" y="94" fill="#CBD5E1" font-family="Menlo, Monaco, monospace" font-size="12">bal = 1200  (reader snap)</text>
-        <line x1="138" y1="106" x2="138" y2="134" stroke="#3B82F6" stroke-width="1.5"/>
-        <rect x="20" y="134" width="235" height="54" rx="6" fill="#0F62FE" fill-opacity="0.2" stroke="#60A5FA" stroke-width="1.5"/>
-        <text x="34" y="156" fill="#60A5FA" font-family="Menlo, Monaco, monospace" font-size="11" font-weight="700">v2 · xmin=108  xmax=INF</text>
+        <rect x="0" y="0" width="275" height="300" rx="12" fill="#18181A" stroke="#2D2D31" stroke-width="1.5"/>
+        <text x="20" y="30" fill="#A1A1AA" font-family="Menlo, Monaco, monospace" font-size="12" font-weight="700">MVCC SNAPSHOT CHAIN</text>
+        <rect x="20" y="52" width="235" height="54" rx="6" fill="#1F1F23" stroke="#3F3F46" stroke-width="1.5"/>
+        <text x="34" y="74" fill="#A1A1AA" font-family="Menlo, Monaco, monospace" font-size="11">v1 · xmin=102  xmax=108</text>
+        <text x="34" y="94" fill="#D4D4D8" font-family="Menlo, Monaco, monospace" font-size="12">bal = 1200  (reader snap)</text>
+        <line x1="138" y1="106" x2="138" y2="134" stroke="#FB923C" stroke-width="1.5"/>
+        <rect x="20" y="134" width="235" height="54" rx="6" fill="#C2410C" fill-opacity="0.24" stroke="#FB923C" stroke-width="1.5"/>
+        <text x="34" y="156" fill="#FB923C" font-family="Menlo, Monaco, monospace" font-size="11" font-weight="700">v2 · xmin=108  xmax=INF</text>
         <text x="34" y="176" fill="#FFFFFF" font-family="Menlo, Monaco, monospace" font-size="12" font-weight="700">bal = 950   (committed)</text>
-        <rect x="20" y="214" width="235" height="62" rx="6" fill="#0B0D12" stroke="#1E293B" stroke-width="1.5"/>
-        <text x="34" y="238" fill="#34D399" font-family="Menlo, Monaco, monospace" font-size="11" font-weight="700">WAL LSN 0/16B3748</text>
-        <text x="34" y="258" fill="#94A3B8" font-family="Menlo, Monaco, monospace" font-size="11">Readers never block writers</text>
+        <rect x="20" y="214" width="235" height="62" rx="6" fill="#121213" stroke="#27272A" stroke-width="1.5"/>
+        <text x="34" y="238" fill="#4ADE80" font-family="Menlo, Monaco, monospace" font-size="11" font-weight="700">WAL LSN 0/16B3748</text>
+        <text x="34" y="258" fill="#A1A1AA" font-family="Menlo, Monaco, monospace" font-size="11">Readers never block writers</text>
       </g>`;
   }
   return `
     <g transform="translate(855, 165)">
-      <rect x="0" y="0" width="275" height="300" rx="12" fill="#11151E" stroke="#1F2937" stroke-width="1.5"/>
-      <text x="20" y="30" fill="#64748B" font-family="Menlo, Monaco, monospace" font-size="12" font-weight="700">RELATIONAL QUERY PIPELINE</text>
-      <rect x="20" y="50" width="235" height="44" rx="6" fill="#161B26" stroke="#334155" stroke-width="1.5"/>
-      <text x="34" y="77" fill="#CBD5E1" font-family="Menlo, Monaco, monospace" font-size="12">1.SCAN + SARGABLE FILTER</text>
-      <line x1="138" y1="94" x2="138" y2="116" stroke="#3B82F6" stroke-width="1.5"/>
-      <rect x="20" y="116" width="235" height="44" rx="6" fill="#0F62FE" fill-opacity="0.2" stroke="#60A5FA" stroke-width="1.5"/>
+      <rect x="0" y="0" width="275" height="300" rx="12" fill="#18181A" stroke="#2D2D31" stroke-width="1.5"/>
+      <text x="20" y="30" fill="#A1A1AA" font-family="Menlo, Monaco, monospace" font-size="12" font-weight="700">RELATIONAL QUERY PIPELINE</text>
+      <rect x="20" y="50" width="235" height="44" rx="6" fill="#1F1F23" stroke="#3F3F46" stroke-width="1.5"/>
+      <text x="34" y="77" fill="#D4D4D8" font-family="Menlo, Monaco, monospace" font-size="12">1.SCAN + SARGABLE FILTER</text>
+      <line x1="138" y1="94" x2="138" y2="116" stroke="#FB923C" stroke-width="1.5"/>
+      <rect x="20" y="116" width="235" height="44" rx="6" fill="#C2410C" fill-opacity="0.24" stroke="#FB923C" stroke-width="1.5"/>
       <text x="34" y="143" fill="#FFFFFF" font-family="Menlo, Monaco, monospace" font-size="12" font-weight="700">2.HASH / INDEX JOIN  ⋈</text>
-      <line x1="138" y1="160" x2="138" y2="182" stroke="#3B82F6" stroke-width="1.5"/>
-      <rect x="20" y="182" width="235" height="44" rx="6" fill="#161B26" stroke="#334155" stroke-width="1.5"/>
-      <text x="34" y="209" fill="#CBD5E1" font-family="Menlo, Monaco, monospace" font-size="12">3.GROUP · WINDOW · SORT</text>
-      <rect x="20" y="242" width="235" height="40" rx="6" fill="#0B0D12" stroke="#1E293B" stroke-width="1.5"/>
-      <text x="34" y="267" fill="#60A5FA" font-family="Menlo, Monaco, monospace" font-size="11" font-weight="700">SQLite + PostgreSQL 18 WASM</text>
+      <line x1="138" y1="160" x2="138" y2="182" stroke="#FB923C" stroke-width="1.5"/>
+      <rect x="20" y="182" width="235" height="44" rx="6" fill="#1F1F23" stroke="#3F3F46" stroke-width="1.5"/>
+      <text x="34" y="209" fill="#D4D4D8" font-family="Menlo, Monaco, monospace" font-size="12">3.GROUP · WINDOW · SORT</text>
+      <rect x="20" y="242" width="235" height="40" rx="6" fill="#121213" stroke="#27272A" stroke-width="1.5"/>
+      <text x="34" y="267" fill="#FB923C" font-family="Menlo, Monaco, monospace" font-size="11" font-weight="700">SQLite + PostgreSQL 18 WASM</text>
     </g>`;
 }
 
@@ -138,26 +138,26 @@ function buildCardSvg({ badge, title, subtitle, variant }) {
   const titleStartY = 225;
 
   const titleTspans = titleLines.map((line, i) => (
-    `<text x="68" y="${titleStartY + i * titleLineHeight}" fill="#F8FAFC" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="${titleFontSize}" font-weight="700">${escXml(line)}</text>`
+    `<text x="68" y="${titleStartY + i * titleLineHeight}" fill="#F4F4F5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="${titleFontSize}" font-weight="700">${escXml(line)}</text>`
   )).join('\n  ');
 
   const subStartY = titleStartY + titleLines.length * titleLineHeight + 18;
   const subTspans = subLines.map((line, i) => (
-    `<text x="68" y="${subStartY + i * 32}" fill="#94A3B8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="22" font-weight="400">${escXml(line)}</text>`
+    `<text x="68" y="${subStartY + i * 32}" fill="#A1A1AA" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="22" font-weight="400">${escXml(line)}</text>`
   )).join('\n  ');
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-  <rect width="1200" height="630" fill="#0B0D12"/>
-  <rect x="24" y="24" width="1152" height="582" rx="16" fill="#0E1117" stroke="#1E2533" stroke-width="1.5"/>
-  <rect x="24" y="24" width="1152" height="6" fill="#0F62FE"/>
+  <rect width="1200" height="630" fill="#0F0F10"/>
+  <rect x="24" y="24" width="1152" height="582" rx="16" fill="#141416" stroke="#27272A" stroke-width="1.5"/>
+  <rect x="24" y="24" width="1152" height="6" fill="#C2410C"/>
 
   <!-- Brand & Module Header -->
-  <rect x="68" y="72" width="54" height="34" rx="6" fill="#0F62FE"/>
-  <text x="95" y="95" text-anchor="middle" fill="#FFFFFF" font-family="Menlo, Monaco, monospace" font-size="16" font-weight="700">SQL</text>
-  <text x="136" y="95" fill="#E2E8F0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="700">SQL IN DEPTH</text>
+  <rect x="68" y="72" width="54" height="34" rx="6" fill="#F4F4F5"/>
+  <text x="95" y="95" text-anchor="middle" fill="#0F0F10" font-family="Menlo, Monaco, monospace" font-size="16" font-weight="700">SQL</text>
+  <text x="136" y="95" fill="#F4F4F5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="700">SQL IN DEPTH</text>
 
-  <rect x="68" y="128" width="${Math.min(720, Math.max(210, badge.length * 10 + 28))}" height="30" rx="6" fill="#151C28" stroke="#263248" stroke-width="1"/>
-  <text x="82" y="148" fill="#60A5FA" font-family="Menlo, Monaco, monospace" font-size="13" font-weight="700">${escXml(badge.toUpperCase())}</text>
+  <rect x="68" y="128" width="${Math.min(720, Math.max(210, badge.length * 10 + 28))}" height="30" rx="6" fill="#231610" stroke="#4D2614" stroke-width="1"/>
+  <text x="82" y="148" fill="#FB923C" font-family="Menlo, Monaco, monospace" font-size="13" font-weight="700">${escXml(badge.toUpperCase())}</text>
 
   <!-- Title & Promise -->
   ${titleTspans}
@@ -167,9 +167,9 @@ function buildCardSvg({ badge, title, subtitle, variant }) {
   ${schematicSvg(variant)}
 
   <!-- Footer -->
-  <line x1="68" y1="530" x2="1132" y2="530" stroke="#1E2533" stroke-width="1"/>
-  <text x="68" y="566" fill="#60A5FA" font-family="Menlo, Monaco, monospace" font-size="16" font-weight="700">sql-in-depth.vedgupta.in</text>
-  <text x="1132" y="566" text-anchor="end" fill="#64748B" font-family="Menlo, Monaco, monospace" font-size="14">6 Tracks · 180 Topics · Browser WASM SQL Lab</text>
+  <line x1="68" y1="530" x2="1132" y2="530" stroke="#27272A" stroke-width="1"/>
+  <text x="68" y="566" fill="#FB923C" font-family="Menlo, Monaco, monospace" font-size="16" font-weight="700">sql-in-depth.vedgupta.in</text>
+  <text x="1132" y="566" text-anchor="end" fill="#A1A1AA" font-family="Menlo, Monaco, monospace" font-size="14">6 Tracks · 180 Topics · Browser WASM SQL Studio</text>
 </svg>`;
 }
 
@@ -182,10 +182,12 @@ function renderPng(svgStr, outPath) {
   }
 }
 
-// Load curriculum, content, and builds
-const ctx = { window: { MODULE_CONTENT: {}, IMPLEMENTATIONS_DATA: {}, CURRICULUM_DATA: null } };
+const ctx = { window: { MODULE_CONTENT: {}, IMPLEMENTATIONS_DATA: {}, CURRICULUM_DATA: null, CHALLENGES_DATA: [] } };
 vm.runInNewContext(fs.readFileSync(path.join(ROOT, 'data/curriculum.js'), 'utf8'), ctx);
 vm.runInNewContext(fs.readFileSync(path.join(ROOT, 'data/implementations_code.js'), 'utf8'), ctx);
+if (fs.existsSync(path.join(ROOT, 'data/challenges.js'))) {
+  vm.runInNewContext(fs.readFileSync(path.join(ROOT, 'data/challenges.js'), 'utf8'), ctx);
+}
 const contentDir = path.join(ROOT, 'data/content');
 for (const f of fs.readdirSync(contentDir).filter(f => f.endsWith('.js')).sort()) {
   vm.runInNewContext(fs.readFileSync(path.join(contentDir, f), 'utf8'), ctx);
@@ -197,6 +199,41 @@ const cards = [
     badge: 'Interactive Textbook & WASM SQL Studio',
     title: 'SQL & Database Internals, In Depth',
     subtitle: 'From 8KB slotted pages and B+Tree splits to query execution plans and MVCC snapshots.',
+    variant: 'btree'
+  },
+  {
+    name: 'roadmap',
+    badge: '6 Tracks · 18 Modules · 180 Lessons',
+    title: 'SQL & Storage Internals Roadmap',
+    subtitle: 'Interactive prerequisite DAG, role-based career paths, and weekly study planner.',
+    variant: 'pipeline'
+  },
+  {
+    name: 'challenges',
+    badge: '12 Production SQL Scenarios',
+    title: 'SQL & Database Challenges',
+    subtitle: 'Debug NULL traps, SARGable predicates, window analytics, and MVCC concurrency bugs.',
+    variant: 'mvcc'
+  },
+  {
+    name: 'sandbox',
+    badge: 'SQLite 3 + PostgreSQL 18 WASM',
+    title: 'Browser SQL Studio & Query Visualizer',
+    subtitle: 'Run queries client-side with clause-by-clause steppers, EXPLAIN plans, and schema explorer.',
+    variant: 'pipeline'
+  },
+  {
+    name: 'dashboard',
+    badge: 'Local-First Study Workspace',
+    title: 'Learning Progress, Flashcards & Notes',
+    subtitle: 'Track completed modules, spaced-repetition flashcards, and portable JSON study backups.',
+    variant: 'btree'
+  },
+  {
+    name: 'glossary',
+    badge: '180 First-Principles Definitions',
+    title: 'SQL & Database Internals Glossary',
+    subtitle: 'Searchable reference for relational algebra, B+Tree pages, query planners, MVCC, and WAL.',
     variant: 'btree'
   },
   {
@@ -214,6 +251,17 @@ const cards = [
     variant: 'pipeline'
   }
 ];
+
+for (const ch of (ctx.window.CHALLENGES_DATA || [])) {
+  if (!ch || !ch.id) continue;
+  cards.push({
+    name: ch.id,
+    badge: `SQL Challenge · ${String(ch.category || 'Production Debugging')}`,
+    title: ch.title,
+    subtitle: String(ch.context || 'Write and verify the production SQL fix in the browser playground.').slice(0, 140),
+    variant: /index|sarg|btree/i.test(ch.id) ? 'btree' : /mvcc|lock|tx|isolation/i.test(ch.id) ? 'mvcc' : 'pipeline'
+  });
+}
 
 for (const part of ctx.window.CURRICULUM_DATA.parts) {
   for (const mod of part.modules) {
@@ -252,7 +300,6 @@ for (const card of cards) {
   totalBytes += fs.statSync(outPath).size;
 }
 
-// Quantize PNGs with Pillow if available so all 201 1200x630 cards stay ~3-4 MB total
 const pyCandidates = ['/opt/homebrew/Caskroom/miniconda/base/bin/python3', 'python3'];
 for (const py of pyCandidates) {
   const qRes = spawnSync(py, ['-c', `
@@ -267,7 +314,6 @@ for p in glob.glob(${JSON.stringify(path.join(OUT_DIR, '*.png'))}):
 
 totalBytes = fs.readdirSync(OUT_DIR).filter(f => f.endsWith('.png')).reduce((s, f) => s + fs.statSync(path.join(OUT_DIR, f)).size, 0);
 
-// Keep assets/og-image.png synced with home.png as default fallback
 fs.copyFileSync(path.join(OUT_DIR, 'home.png'), path.join(ROOT, 'assets', 'og-image.png'));
 
 console.log(`✓ Generated ${cards.length} OG cards in assets/og/ (${(totalBytes / (1024 * 1024)).toFixed(2)} MB total)`);

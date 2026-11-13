@@ -231,11 +231,11 @@
             '<input type="search" class="chal-search" id="challenges-search-input" placeholder="Search by topic, e.g. NULL, JOIN, window" aria-label="Search challenges" value="' + escapeHtml(this._searchQuery) + '" />' +
             '<div class="chal-filters" role="group" aria-label="Filter by level">' + filterHtml + '</div>' +
           '</div>' +
-          '<main class="view-body" id="challenges-mount-target">' +
+          '<div class="view-body" id="challenges-mount-target">' +
             (rowsHtml
               ? '<ol class="chal-list">' + rowsHtml + '</ol>'
               : '<p class="chal-empty">No challenges match. Try a different word or level.</p>') +
-          '</main>' +
+          '</div>' +
         '</div>'
       );
     },
@@ -443,7 +443,7 @@
               '</div>' +
             '</div>' +
           '</header>' +
-          '<main class="view-body" id="challenges-mount-target">' +
+          '<div class="view-body" id="challenges-mount-target">' +
             verifyBanner +
             '<div class="incident-room-grid">' +
               '<section class="incident-panel">' +
@@ -482,7 +482,7 @@
                 '</div>' +
               '</section>' +
             '</div>' +
-          '</main>' +
+          '</div>' +
         '</div>'
       );
     },

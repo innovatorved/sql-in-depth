@@ -1,7 +1,7 @@
 # In-Depth Engineering Series — Shared Design System (`DESIGN.md`)
 
 This document specifies the portable design system shared across all three repositories in the **In-Depth Engineering Series**:
-1. **`sql-in-depth`** (`data-product="sql"`) — Precision Cobalt (`#0F62FE` light / `#58A6FF` dark)
+1. **`sql-in-depth`** (`data-product="sql"`) — Relational Ember (`#C2410C` light / `#FB923C` dark)
 2. **`system-design-in-depth`** (`data-product="system-design"`) — Distributed Teal (`#0D9488` light / `#2DD4BF` dark)
 3. **`dsa-in-depth`** (`data-product="dsa"`) — Algorithmic Violet (`#6D28D9` light / `#A78BFA` dark)
 
@@ -11,30 +11,30 @@ To adopt this design system in a sibling repo, copy `design-system/tokens.css`, 
 
 ## 1. Color Architecture & WCAG AA Contrast
 
-### Light Mode ("Daylight Architectural Paper")
-- **Ground (`--ds-canvas`)**: `#F7F8FA` — eliminates harsh white glare during multi-hour study sessions while letting `#FFFFFF` elevated cards (`--ds-surface`) separate cleanly with a single `1px` hairline (`--ds-border: #E2E6EE`).
+### Light Mode ("Warm Neutral Paper" — Default until user sets `sd-theme`)
+- **Ground (`--ds-canvas`)**: `#F7F7F5` — eliminates harsh white glare during multi-hour study sessions while letting `#FFFFFF` elevated cards (`--ds-surface`) separate cleanly with a single `1px` hairline (`--ds-border: #E5E4DF`).
 - **Ink Hierarchy**:
-  - Primary Ink (`--ds-ink`): `#0F172A` (`17.4:1` contrast)
-  - Prose Ink (`--ds-ink-prose`): `#1E293B` (`14.1:1` contrast)
-  - Muted Ink (`--ds-ink-muted`): `#475569` (`7.3:1` contrast)
-  - Faint / Metadata Ink (`--ds-ink-faint`): `#526075` (`5.9:1` contrast — exceeds WCAG AA `4.5:1` even at `12px`)
+  - Primary Ink (`--ds-ink`): `#1A1917` (`17.6:1` contrast)
+  - Prose Ink (`--ds-ink-prose`): `#2D2B27` (`13.8:1` contrast)
+  - Muted Ink (`--ds-ink-muted`): `#57534E` (`7.1:1` contrast)
+  - Faint / Metadata Ink (`--ds-ink-faint`): `#6B665F` (`5.3:1` contrast — exceeds WCAG AA `4.5:1` even at `11px`–`12px`)
 
-### Dark Mode ("Deep Slate Ink")
-- **Ground (`--ds-canvas`)**: `#0B0E14` — replaces pure `#000000` to prevent OLED smearing and bright-on-black halation.
-- **Elevated Surface (`--ds-surface`)**: `#131924` with `1px` border (`#222B3A`).
+### Dark Mode ("Neutral Charcoal Ink")
+- **Ground (`--ds-canvas`)**: `#0F0F10` — replaces pure `#000000` and tinted navy to prevent OLED smearing and bright-on-black halation.
+- **Elevated Surface (`--ds-surface`)**: `#18181A` with `1px` border (`#27272A`).
 - **Ink Hierarchy**:
-  - Primary Ink (`--ds-ink`): `#F1F5F9` (`16.2:1`)
-  - Prose Ink (`--ds-ink-prose`): `#CBD5E1` (`11.8:1`)
-  - Muted Ink (`--ds-ink-muted`): `#94A3B8` (`6.4:1`)
-  - Faint Ink (`--ds-ink-faint`): `#8899B0` (`5.3:1`)
+  - Primary Ink (`--ds-ink`): `#F4F4F5` (`16.9:1`)
+  - Prose Ink (`--ds-ink-prose`): `#D4D4D8` (`12.4:1`)
+  - Muted Ink (`--ds-ink-muted`): `#A1A1AA` (`7.2:1`)
+  - Faint Ink (`--ds-ink-faint`): `#8E8E98` (`5.6:1`)
 
 ---
 
 ## 2. Typography & Reading Ergonomics
 
 - **Reading & Display Font (`--ds-font-sans`)**: Self-hosted **Geist** (`fonts/geist-latin.woff2`, SIL OFL-1.1).
-  - Body prose (`16px` / `1rem`), line-height `1.68`, strict prose measure `68ch` (`--ds-prose-measure`).
-  - Heading scale: `h1` `clamp(1.75rem, 3.2vw, 2.25rem)` (`-0.032em` tracking), `h2` `1.375rem` (`-0.022em` tracking, `2.5rem` top margin / `0.75rem` bottom margin), `h3` `1.125rem`.
+  - Body prose (`15px` / `0.9375rem`), line-height `1.68`, strict prose measure `68ch` (`--ds-prose-measure`).
+  - Heading scale: `h1` `1.75rem` (`28px`, `-0.032em` tracking), `h2` `1.25rem` (`20px`, `-0.022em` tracking, `2.5rem` top margin / `0.75rem` bottom margin), `h3` `1.0625rem` (`17px`).
 - **Code & Data Font (`--ds-font-mono`)**: Self-hosted **Geist Mono** (`fonts/geist-mono-latin.woff2`, SIL OFL-1.1).
   - `font-variant-numeric: tabular-nums` enforced across result tables, latency badges, progress counters, and slotted-page offsets.
 
