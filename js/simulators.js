@@ -1284,7 +1284,7 @@ window.Simulators = (() => {
             </div>
 
             <div class="invariant-box" style="margin:0 0 0.75rem 0;padding:0.6rem 0.9rem;">
-              <h4 style="margin:0 0 0.25rem 0;font-size:12px;">Invariant &amp; State</h4>
+              <div style="margin:0 0 0.25rem 0;font-size:12px;font-weight:600;color:var(--fg);">Invariant &amp; State</div>
               <div data-role="invariant" style="font-size:12.5px;font-family:var(--font-mono,monospace);color:var(--fg-primary);">${f0.invariant || 'Invariant holds.'}</div>
             </div>
             <div class="dsa-sim__stage" data-role="stage">${f0.stageHtml}</div>

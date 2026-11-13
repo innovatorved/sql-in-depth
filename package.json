@@ -5,12 +5,17 @@
   "private": true,
   "scripts": {
     "build": "node tools/build.js",
+    "lint": "node tools/validate.js && node tools/stamp-assets.js --check",
+    "typecheck": "node tools/check-rendered.js",
     "validate": "node tools/validate.js",
     "check:rendered": "node tools/check-rendered.js",
     "test": "node tools/validate.js && node tools/check-rendered.js",
+    "e2e": "node tools/e2e-test.js",
     "stamp": "node tools/stamp-assets.js",
     "stamp:check": "node tools/stamp-assets.js --check",
     "prerender": "node tools/generate-static.js",
+    "og": "node tools/generate-og.js",
+    "videos": "node tools/generate-videos.js",
     "serve": "python3 -m http.server 8000"
   },
   "repository": {
@@ -36,5 +41,17 @@
     "@innovatorved/code-lab": "^0.3.1",
     "katex": "^0.16.11",
     "sql.js": "^1.15.2"
+  },
+  "devDependencies": {
+    "@codemirror/autocomplete": "^6.20.4",
+    "@codemirror/commands": "^6.11.1",
+    "@codemirror/lang-sql": "^6.10.0",
+    "@codemirror/language": "^6.13.1",
+    "@codemirror/lint": "^6.9.7",
+    "@codemirror/search": "^6.7.2",
+    "@codemirror/state": "^6.7.6",
+    "@codemirror/view": "^6.43.15",
+    "@lezer/highlight": "^1.2.5",
+    "esbuild": "^0.28.2"
   }
 }

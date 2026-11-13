@@ -401,6 +401,10 @@ if (fs.existsSync(projectsHtmlPath)) {
 console.log(`Starting SSG generation for ${units.length} curriculum units...`);
 
 let template = baseHtml.replace(/\s*<script type="application\/ld\+json">[\s\S]*?<\/script>/gi, '');
+// On lesson & build pages, content.css is critical while landing.css is deferred
+template = template
+  .replace(/(<link\s+rel="stylesheet"\s+href="css\/content\.css[^"]*?")\s+media="print"\s+onload="this\.media='all'"/i, '$1')
+  .replace(/(<link\s+rel="stylesheet"\s+href="css\/landing\.css[^"]*?")>/i, '$1 media="print" onload="this.media=\'all\'">');
 if (!template.includes('<base href="/">')) {
   template = template.replace('<head>', '<head>\n  <base href="/">');
 }
@@ -479,15 +483,16 @@ for (const { unit, mod } of units) {
     /<meta\s+property="og:url"\s+content="[^"]*">/i,
     () => `<meta property="og:url" content="${canonicalUrl}">`
   );
+  const topicOgUrl = `${baseUrl}/assets/og/${slug}.png`;
   if (/<meta\s+property="og:image"/i.test(page)) {
     page = page.replace(
       /<meta\s+property="og:image"\s+content="[^"]*">/i,
-      `<meta property="og:image" content="${baseUrl}/assets/og-image.png">`
+      `<meta property="og:image" content="${topicOgUrl}">`
     );
   } else {
     page = page.replace(
       /<meta\s+property="og:url"\s+content="[^"]*">/i,
-      () => `<meta property="og:url" content="${canonicalUrl}">\n  <meta property="og:image" content="${baseUrl}/assets/og-image.png">`
+      () => `<meta property="og:url" content="${canonicalUrl}">\n  <meta property="og:image" content="${topicOgUrl}">`
     );
   }
 
@@ -508,12 +513,12 @@ for (const { unit, mod } of units) {
   if (/<meta\s+name="twitter:image"/i.test(page)) {
     page = page.replace(
       /<meta\s+name="twitter:image"\s+content="[^"]*">/i,
-      `<meta name="twitter:image" content="${baseUrl}/assets/og-image.png">`
+      `<meta name="twitter:image" content="${topicOgUrl}">`
     );
   } else {
     page = page.replace(
       /<meta\s+name="twitter:description"\s+content="[^"]*">/i,
-      () => `<meta name="twitter:description" content="${escapeAttr(desc)}">\n  <meta name="twitter:image" content="${baseUrl}/assets/og-image.png">`
+      () => `<meta name="twitter:description" content="${escapeAttr(desc)}">\n  <meta name="twitter:image" content="${topicOgUrl}">`
     );
   }
 
@@ -522,6 +527,7 @@ for (const { unit, mod } of units) {
     '@type': 'TechArticle',
     'headline': unit.title,
     'description': desc,
+    'image': topicOgUrl,
     'url': canonicalUrl,
     'author': {
       '@type': 'Person',
@@ -541,7 +547,7 @@ for (const { unit, mod } of units) {
   page = replaceSidebarContent(page, sidebarHtml);
 
   page = page.replace(
-    /<div class="main__content" id="reader">[\s\S]*?<\/div>(\s*<\/main>)/i,
+    /<div class="main__content" id="reader">[\s\S]*?<\/div>(\s*(?:<footer\b[\s\S]*?<\/footer>\s*)?<\/main>)/i,
     (_, closingMain) => `<div class="main__content" id="reader" data-prerendered="${slug}">\n${lessonHtml}\n    </div>${closingMain}`
   );
 
@@ -600,15 +606,16 @@ for (const [buildId, build] of buildEntries) {
     /<meta\s+property="og:url"\s+content="[^"]*">/i,
     () => `<meta property="og:url" content="${canonicalUrl}">`
   );
+  const buildOgUrl = `${baseUrl}/assets/og/${buildId}.png`;
   if (/<meta\s+property="og:image"/i.test(page)) {
     page = page.replace(
       /<meta\s+property="og:image"\s+content="[^"]*">/i,
-      `<meta property="og:image" content="${baseUrl}/assets/og-image.png">`
+      `<meta property="og:image" content="${buildOgUrl}">`
     );
   } else {
     page = page.replace(
       /<meta\s+property="og:url"\s+content="[^"]*">/i,
-      () => `<meta property="og:url" content="${canonicalUrl}">\n  <meta property="og:image" content="${baseUrl}/assets/og-image.png">`
+      () => `<meta property="og:url" content="${canonicalUrl}">\n  <meta property="og:image" content="${buildOgUrl}">`
     );
   }
 
@@ -629,12 +636,12 @@ for (const [buildId, build] of buildEntries) {
   if (/<meta\s+name="twitter:image"/i.test(page)) {
     page = page.replace(
       /<meta\s+name="twitter:image"\s+content="[^"]*">/i,
-      `<meta name="twitter:image" content="${baseUrl}/assets/og-image.png">`
+      `<meta name="twitter:image" content="${buildOgUrl}">`
     );
   } else {
     page = page.replace(
       /<meta\s+name="twitter:description"\s+content="[^"]*">/i,
-      () => `<meta name="twitter:description" content="${escapeAttr(desc)}">\n  <meta name="twitter:image" content="${baseUrl}/assets/og-image.png">`
+      () => `<meta name="twitter:description" content="${escapeAttr(desc)}">\n  <meta name="twitter:image" content="${buildOgUrl}">`
     );
   }
 
@@ -643,6 +650,7 @@ for (const [buildId, build] of buildEntries) {
     '@type': 'TechArticle',
     'headline': `${build.title} — Interactive Build Lab`,
     'description': desc,
+    'image': buildOgUrl,
     'url': canonicalUrl,
     'author': {
       '@type': 'Person',
@@ -662,7 +670,7 @@ for (const [buildId, build] of buildEntries) {
   page = replaceSidebarContent(page, buildsSidebarHtml);
 
   page = page.replace(
-    /<div class="main__content" id="reader">[\s\S]*?<\/div>(\s*<\/main>)/i,
+    /<div class="main__content" id="reader">[\s\S]*?<\/div>(\s*(?:<footer\b[\s\S]*?<\/footer>\s*)?<\/main>)/i,
     (_, closingMain) => `<div class="main__content" id="reader" data-prerendered-build="${buildId}">\n${buildHtml}\n    </div>${closingMain}`
   );
 

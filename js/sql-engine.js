@@ -8,8 +8,30 @@
   'use strict';
 
   var isBrowserEnv = typeof window !== 'undefined' && typeof document !== 'undefined' && typeof process === 'undefined';
-  var _engineMode = isBrowserEnv ? 'postgres' : 'sqlite';
+  var isWorkerEnv = Boolean(root && root._IS_SQL_WORKER);
+  var canUseWorker = isBrowserEnv
+    && !isWorkerEnv
+    && typeof Worker === 'function'
+    && typeof window.location !== 'undefined'
+    && /^https?:$/i.test(window.location.protocol);
+
+  var _savedEngineMode = null;
+  try {
+    if (isBrowserEnv && typeof localStorage !== 'undefined' && localStorage) {
+      _savedEngineMode = localStorage.getItem('sql-in-depth-engine-mode');
+    }
+  } catch (e) {}
+  var _engineMode = (_savedEngineMode === 'postgres' || _savedEngineMode === 'sqlite')
+    ? _savedEngineMode
+    : 'sqlite';
   var _engineListeners = [];
+
+  // Dedicated Web Worker RPC state (main thread -> js/sql-worker.js)
+  var _worker = null;
+  var _workerSeq = 0;
+  var _workerPending = {};
+  var _workerFailed = false;
+  var _workerPgReady = false;
 
   // SQLite (sql.js) state
   var _sqlJsPromise = null;
@@ -23,6 +45,70 @@
   var _pgSeededDatasets = {};
 
   var _activeDatasetId = 'ecommerce';
+
+  function getWorker() {
+    if (!canUseWorker || _workerFailed) return null;
+    if (_worker) return _worker;
+    try {
+      var ver = (typeof window !== 'undefined' && window.ASSET_VERSION)
+        ? ('?v=' + encodeURIComponent(window.ASSET_VERSION))
+        : '';
+      _worker = new Worker('/js/sql-worker.js' + ver);
+      _worker.onmessage = function (ev) {
+        var msg = ev && ev.data ? ev.data : {};
+        if (msg.type === 'engineChange') {
+          var prev = _workerPgReady;
+          _workerPgReady = Boolean(msg.pgliteReady);
+          if (prev !== _workerPgReady) notifyEngineListeners();
+          return;
+        }
+        if (typeof msg.pgliteReady === 'boolean') {
+          var changedReady = _workerPgReady !== msg.pgliteReady;
+          _workerPgReady = msg.pgliteReady;
+          if (changedReady) notifyEngineListeners();
+        }
+        var entry = msg.id ? _workerPending[msg.id] : null;
+        if (!entry) return;
+        delete _workerPending[msg.id];
+        if (msg.ok) {
+          entry.resolve(msg.result);
+        } else {
+          entry.reject(new Error(msg.error || 'SQL Worker execution failed'));
+        }
+      };
+      _worker.onerror = function (err) {
+        _workerFailed = true;
+        var keys = Object.keys(_workerPending);
+        keys.forEach(function (k) {
+          var pending = _workerPending[k];
+          delete _workerPending[k];
+          if (pending) pending.reject(err || new Error('SQL Worker crashed'));
+        });
+        try { _worker.terminate(); } catch (e) {}
+        _worker = null;
+      };
+      return _worker;
+    } catch (e) {
+      _workerFailed = true;
+      _worker = null;
+      return null;
+    }
+  }
+
+  function workerCall(action, payload) {
+    var w = getWorker();
+    if (!w) return Promise.reject(new Error('SQL Worker unavailable'));
+    return new Promise(function (resolve, reject) {
+      var id = 'sqlw_' + (++_workerSeq);
+      _workerPending[id] = { resolve: resolve, reject: reject };
+      w.postMessage({
+        id: id,
+        action: action,
+        payload: payload || {},
+        assetVersion: (typeof window !== 'undefined' && window.ASSET_VERSION) ? window.ASSET_VERSION : ''
+      });
+    });
+  }
 
   var PG_OID_MAP = {
     16: 'BOOL',
@@ -66,12 +152,12 @@
   }
 
   function isPgliteReady() {
-    return Boolean(_pgDb);
+    return Boolean(_pgDb || _workerPgReady);
   }
 
   function getEngineLabel() {
     if (_engineMode === 'postgres') {
-      return _pgDb ? 'PostgreSQL 18.6 (PGlite WASM)' : 'PostgreSQL 18.6 (Initializing WASM…)';
+      return isPgliteReady() ? 'PostgreSQL 18.6 (PGlite WASM)' : 'PostgreSQL 18.6 (Initializing WASM…)';
     }
     return 'SQLite 3 (sql.js WASM)';
   }
@@ -97,6 +183,22 @@
     if (changed) {
       notifyEngineListeners();
     }
+    if (canUseWorker && !_workerFailed) {
+      return workerCall('setEngineMode', { mode: _engineMode }).then(function () {
+        return _engineMode;
+      }).catch(function () {
+        if (_engineMode === 'postgres') {
+          return initPglite().catch(function () {
+            return initSqlite();
+          }).then(function () {
+            return _engineMode;
+          });
+        }
+        return initSqlite().then(function () {
+          return _engineMode;
+        });
+      });
+    }
     if (_engineMode === 'postgres') {
       return initPglite().catch(function () {
         return initSqlite();
@@ -113,6 +215,15 @@
    * Initializes SQLite 3 (sql.js WASM).
    */
   function initSqlite() {
+    if (canUseWorker && !_workerFailed) {
+      return workerCall('initSqlite', {}).catch(function () {
+        return initSqliteLocal();
+      });
+    }
+    return initSqliteLocal();
+  }
+
+  function initSqliteLocal() {
     if (_SQL) return Promise.resolve(_SQL);
     if (_sqlJsPromise) return _sqlJsPromise;
 
@@ -223,11 +334,24 @@
    * Initializes PostgreSQL 18.6 (PGlite WASM) and seeds all 5 datasets.
    */
   function initPglite() {
+    if (canUseWorker && !_workerFailed) {
+      return workerCall('initPglite', {}).then(function (res) {
+        _workerPgReady = true;
+        notifyEngineListeners();
+        return res;
+      }).catch(function () {
+        return initPgliteLocal();
+      });
+    }
+    return initPgliteLocal();
+  }
+
+  function initPgliteLocal() {
     if (_pgDb) return Promise.resolve(_pgDb);
     if (_pglitePromise) return _pglitePromise;
 
     var loaderPromise;
-    if (isBrowserEnv) {
+    if (isBrowserEnv || isWorkerEnv) {
       loaderPromise = import('/js/vendor/pglite/index.js');
     } else if (typeof require === 'function') {
       try {
@@ -269,17 +393,10 @@
   }
 
   function init() {
-    if (_engineMode === 'postgres' && !_pgDb) {
+    if (_engineMode === 'postgres' && !isPgliteReady()) {
       initPglite().catch(function () {});
     }
     return initSqlite();
-  }
-
-  // Kick off background PGlite initialization in Browser immediately
-  if (isBrowserEnv) {
-    setTimeout(function () {
-      initPglite().catch(function () {});
-    }, 10);
   }
 
   /**
@@ -367,7 +484,7 @@
       return Promise.resolve(_databases[dsId]);
     }
 
-    return initSqlite().then(function (SQL) {
+    return initSqliteLocal().then(function (SQL) {
       if (!forceReset && _databases[dsId]) {
         return _databases[dsId];
       }
@@ -398,7 +515,7 @@
     if (!forceReset && _databases.__unified__) {
       return Promise.resolve(_databases.__unified__);
     }
-    return initSqlite().then(function (SQL) {
+    return initSqliteLocal().then(function (SQL) {
       if (!forceReset && _databases.__unified__) {
         return _databases.__unified__;
       }
@@ -808,9 +925,11 @@
         }).catch(function (err) {
           var t1 = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
           var elapsedMs = Math.max(0.05, Number((t1 - t0).toFixed(2)));
+          var errMsg = err && err.message ? err.message : String(err);
           return {
             ok: false,
-            error: err && err.message ? err.message : String(err),
+            error: errMsg,
+            errorHint: getErrorHint(errMsg, sql),
             engine: 'postgres',
             engineLabel: 'PostgreSQL 18.6 (PGlite WASM)',
             sql: sql,
@@ -833,6 +952,56 @@
   }
 
   /**
+   * Produces a concise, pedagogical fix hint for common SQL errors and anti-patterns.
+   */
+  function getErrorHint(errorMessage, sql) {
+    if (!errorMessage) return null;
+    var msg = String(errorMessage);
+    var query = String(sql || '');
+
+    var colMatch = /(?:no such column:\s*|column\s+"?)([a-zA-Z0-9_.]+)"?\s*(?:does not exist|$)/i.exec(msg);
+    if (colMatch) {
+      var missingCol = colMatch[1].split('.').pop();
+      var aliasRe = new RegExp('\\bAS\\s+["`]?(' + missingCol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')["`]?\\b', 'i');
+      if (aliasRe.test(query) && /\b(WHERE|GROUP\s+BY|HAVING)\b/i.test(query)) {
+        return 'Logical execution order: WHERE and GROUP BY run BEFORE SELECT, so SELECT aliases like `' + missingCol + '` do not exist yet. Repeat the expression, or wrap the query in a CTE (`WITH step AS (...)`).';
+      }
+      return 'Column `' + colMatch[1] + '` was not found on the referenced tables. Open the Schema Browser to inspect exact column names or qualify with a table alias.';
+    }
+
+    var tblMatch = /(?:no such table:\s*|relation\s+"?)([a-zA-Z0-9_.]+)"?\s*(?:does not exist|$)/i.exec(msg);
+    if (tblMatch) {
+      return 'Table `' + tblMatch[1] + '` does not exist in the current scope. Check spelling in the Schema Browser or switch the dataset selector to "All 26 Tables".';
+    }
+
+    if (/misuse of aggregate|aggregate functions are not allowed in WHERE/i.test(msg)) {
+      return '`WHERE` filters individual rows before grouping. Move aggregate conditions (`COUNT`, `SUM`, `AVG`) into a `HAVING` clause after `GROUP BY`.';
+    }
+
+    if (/must appear in the GROUP BY clause|not in GROUP BY/i.test(msg)) {
+      return 'Every non-aggregated column in `SELECT` must either appear in `GROUP BY` or be wrapped in an aggregate (`SUM`, `MAX`, `MIN`, `COUNT`).';
+    }
+
+    if (/misuse of window function|window functions are not allowed in WHERE/i.test(msg)) {
+      return 'Window functions (`OVER (...)`) execute during projection after `WHERE`/`GROUP BY`. Wrap the windowed query in a `WITH ranked AS (...)` CTE and filter in the outer `SELECT`.';
+    }
+
+    if (/ambiguous column name|column reference .* is ambiguous/i.test(msg)) {
+      return 'Multiple joined tables share that column name. Prefix it with the table alias (for example `o.id` or `c.id`).';
+    }
+
+    if (/near "FROM": syntax error|syntax error at or near "FROM"/i.test(msg)) {
+      return 'Check for a trailing comma right before `FROM` in your `SELECT` column list.';
+    }
+
+    if (/syntax error/i.test(msg)) {
+      return 'Check for unbalanced parentheses, missing commas between projected columns, or a `JOIN` missing its `ON` predicate.';
+    }
+
+    return null;
+  }
+
+  /**
    * Executes a SQL string and returns structured result sets, columnTypes, dmlDiff, timing, and EXPLAIN plan.
    */
   function execute(sql, options, thirdOptions) {
@@ -845,6 +1014,21 @@
     var explicitEngine = options.engine || null;
     var forceEngine = explicitEngine || _engineMode;
 
+    if (canUseWorker && !_workerFailed) {
+      var workerOpts = Object.assign({}, options, {
+        datasetId: datasetId,
+        explain: includeExplain,
+        engine: forceEngine
+      });
+      return workerCall('execute', { sql: sql, options: workerOpts }).catch(function () {
+        return executeLocal(sql, options, datasetId, includeExplain, explicitEngine, forceEngine);
+      });
+    }
+
+    return executeLocal(sql, options, datasetId, includeExplain, explicitEngine, forceEngine);
+  }
+
+  function executeLocal(sql, options, datasetId, includeExplain, explicitEngine, forceEngine) {
     function runSqliteFallback() {
       var dbGetter = datasetId === '__unified__'
         ? getUnifiedDatabase(Boolean(options.reset))
@@ -918,6 +1102,7 @@
         return {
           ok: !error,
           error: error,
+          errorHint: error ? getErrorHint(error, sql) : null,
           engine: 'sqlite',
           engineLabel: 'SQLite 3 (sql.js WASM)',
           sql: sql,
@@ -939,7 +1124,7 @@
 
     // Use PostgreSQL 18 when explicitly requested or when PGlite is already warm in postgres mode
     if (explicitEngine === 'postgres' || (forceEngine === 'postgres' && Boolean(_pgDb))) {
-      return initPglite().then(function (pgDb) {
+      return initPgliteLocal().then(function (pgDb) {
         return executePostgres(pgDb, sql, options);
       }).catch(function () {
         return runSqliteFallback();
@@ -948,7 +1133,7 @@
 
     // If in postgres mode while PGlite is still booting, warm PGlite in background and execute immediately on SQLite
     if (forceEngine === 'postgres' && !_pgDb) {
-      initPglite().catch(function () {});
+      initPgliteLocal().catch(function () {});
     }
 
     // Fallback or explicit SQLite 3 execution
@@ -995,6 +1180,15 @@
    */
   function introspectSchema(datasetId) {
     var dsId = datasetId || _activeDatasetId || 'ecommerce';
+    if (canUseWorker && !_workerFailed) {
+      return workerCall('introspectSchema', { datasetId: dsId }).catch(function () {
+        return introspectSchemaLocal(dsId);
+      });
+    }
+    return introspectSchemaLocal(dsId);
+  }
+
+  function introspectSchemaLocal(dsId) {
     return createDatabaseForDataset(dsId, false).then(function (db) {
       var tablesRes = db.exec("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name;");
       var tableNames = (tablesRes[0] && tablesRes[0].values) ? tablesRes[0].values.map(function (r) { return r[0]; }) : [];
@@ -1058,6 +1252,15 @@
 
   function resetDataset(datasetId) {
     var dsId = datasetId || '__unified__';
+    if (canUseWorker && !_workerFailed) {
+      return workerCall('resetDataset', { datasetId: dsId }).catch(function () {
+        return resetDatasetLocal(dsId);
+      });
+    }
+    return resetDatasetLocal(dsId);
+  }
+
+  function resetDatasetLocal(dsId) {
     var sqlitePromise = (!dsId || dsId === '__unified__')
       ? getUnifiedDatabase(true)
       : createDatabaseForDataset(dsId, true);
@@ -1095,6 +1298,8 @@
     onEngineChange: onEngineChange,
     onEngineReady: onEngineChange,
     normalizeDialect: normalizeDialect,
+    getErrorHint: getErrorHint,
+    isWorkerEnabled: function () { return Boolean(canUseWorker && !_workerFailed); },
     createDatabaseForDataset: createDatabaseForDataset,
     getUnifiedDatabase: getUnifiedDatabase,
     execute: execute,

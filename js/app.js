@@ -649,6 +649,13 @@ window.App = (() => {
         break;
 
       case 'roadmap':
+        if (!window.RoadmapController && window.Lazy) {
+          reader.innerHTML = '<div class="prose"><p style="padding:2rem 0;color:var(--fg-muted);">Loading Interactive SQL Roadmap…</p></div>';
+          window.Lazy.loadAll(['data/roadmap.js', 'js/roadmap.js']).then(() => {
+            if (currentView === 'roadmap') renderCurrentView();
+          });
+          break;
+        }
         if (window.RoadmapController) {
           window.RoadmapController.mount(reader, { tab: currentSlug || 'graph' });
           activeRoadmap = true;
@@ -659,6 +666,15 @@ window.App = (() => {
         break;
 
       case 'challenges':
+        if ((!window.ChallengesController || !window.SqlEngine || !window.CHALLENGES_DATA) && window.Lazy) {
+          reader.innerHTML = '<div class="prose"><p style="padding:2rem 0;color:var(--fg-muted);">Loading SQL Incident Challenges &amp; WASM Engine…</p></div>';
+          window.Lazy.ensureSqlStack()
+            .then(() => window.Lazy.loadAll(['data/challenges.js', 'js/challenges.js']))
+            .then(() => {
+              if (currentView === 'challenges') renderCurrentView();
+            });
+          break;
+        }
         if (window.ChallengesController) {
           window.ChallengesController.mount(reader, { challengeId: currentSlug });
           activeChallenge = true;
@@ -669,6 +685,13 @@ window.App = (() => {
         break;
 
       case 'dashboard':
+        if ((!window.DashboardController || !window.SRS_CARDS_DATA) && window.Lazy) {
+          reader.innerHTML = '<div class="prose"><p style="padding:2rem 0;color:var(--fg-muted);">Loading Study Dashboard &amp; Spaced-Repetition Deck…</p></div>';
+          window.Lazy.loadAll(['data/srs-cards.js', 'data/challenges.js', 'js/dashboard.js']).then(() => {
+            if (currentView === 'dashboard') renderCurrentView();
+          });
+          break;
+        }
         if (window.DashboardController) {
           window.DashboardController.mount(reader, { tab: currentSlug || 'overview' });
           activeDashboard = true;
@@ -679,16 +702,32 @@ window.App = (() => {
         break;
 
       case 'sandbox':
+        if ((!window.SandboxController || !window.SqlEngine || !window.TableVisualizer) && window.Lazy) {
+          reader.innerHTML = '<div class="prose"><p style="padding:2rem 0;color:var(--fg-muted);">Booting Client-Side SQL Studio…</p></div>';
+          window.Lazy.ensureSqlStack()
+            .then(() => window.Lazy.loadAll(['data/whiteboard-blueprints.js', 'data/challenges.js', 'js/sandbox.js']))
+            .then(() => {
+              if (currentView === 'sandbox') renderCurrentView();
+            });
+          break;
+        }
         if (window.SandboxController) {
           window.SandboxController.mount(reader, { blueprintId: currentSlug || 'sargable-composite-index-selector' });
           activeSandbox = true;
         }
         if (window.Analytics) {
-          window.Analytics.trackPageView('Architecture Whiteboard & Capacity Sandbox | SQL In Depth', '/sandbox', window.location.href);
+          window.Analytics.trackPageView('SQL Playground & Execution Plan Studio | SQL In Depth', '/sandbox', window.location.href);
         }
         break;
 
       case 'glossary':
+        if (!window.GLOSSARY_DATA && window.Lazy) {
+          reader.innerHTML = '<div class="prose"><p style="padding:2rem 0;color:var(--fg-muted);">Loading SQL &amp; Storage Glossary…</p></div>';
+          window.Lazy.load('data/glossary.js').then(() => {
+            if (currentView === 'glossary') renderCurrentView();
+          });
+          break;
+        }
         reader.innerHTML = window.Renderer.renderGlossary();
         if (window.Analytics) {
           window.Analytics.trackPageView('SQL & Database Glossary | SQL In Depth', '/glossary/', window.location.href);
@@ -697,6 +736,11 @@ window.App = (() => {
       case 'cheatsheet':
         loadModuleContent(currentSlug);
         reader.innerHTML = window.Renderer.renderCheatSheet(currentSlug);
+        if (window.Lazy && reader.textContent.includes('$')) {
+          window.Lazy.ensureKatex().then(() => renderMathOnPage(reader)).catch(() => {});
+        } else {
+          renderMathOnPage(reader);
+        }
         if (window.Analytics) {
           window.Analytics.trackPageView('Cheat Sheet', '/#cheatsheet/' + currentSlug, window.location.href);
         }
@@ -720,85 +764,139 @@ window.App = (() => {
           reader.removeAttribute('data-prerendered');
           reader.innerHTML = window.Renderer.renderLesson(currentSlug);
         }
-        
-        const handleSimulator = () => {
-          const mountedSims = [];
-          const mounts = reader.querySelectorAll('.simulator-mount[data-sim]');
-          if (mounts.length > 0) {
-            mounts.forEach(mountEl => {
-              const simId = mountEl.getAttribute('data-sim');
-              const sim = window.SIMULATORS?.[simId];
-              if (sim) {
+
+        setupLessonTocScrollSpy(reader);
+        window.Lazy?.observeLazyMedia?.(reader);
+
+        const activeLessonSlug = currentSlug;
+        const hydrateTopicSimulator = () => {
+          if (currentView !== 'topic' || currentSlug !== activeLessonSlug) return;
+          const loadSimRegistry = (!window.Simulators && window.Lazy)
+            ? window.Lazy.load('js/simulators.js')
+            : Promise.resolve();
+          loadSimRegistry.then(() => {
+            const simFile = window.SIMULATOR_SCRIPT_MAP?.[activeLessonSlug];
+            if (simFile && window.Lazy) return window.Lazy.load(simFile);
+            return Promise.resolve();
+          }).then(() => {
+            if (currentView !== 'topic' || currentSlug !== activeLessonSlug) return;
+            const mountedSims = [];
+            const mounts = reader.querySelectorAll('.simulator-mount[data-sim]');
+            if (mounts.length > 0) {
+              mounts.forEach(mountEl => {
+                const simId = mountEl.getAttribute('data-sim');
+                const sim = window.SIMULATORS?.[simId];
+                if (sim) {
+                  try {
+                    if ((!mountEl.innerHTML.trim() || !mountEl.querySelector('[data-role="custom-input"]')) && typeof sim.render === 'function') {
+                      mountEl.innerHTML = sim.render();
+                    }
+                    if (typeof sim.mount === 'function') {
+                      sim.mount(mountEl);
+                    }
+                    mountedSims.push({ sim, el: mountEl });
+                  } catch (err) {
+                    console.error('[Inline simulator mount error]', simId, err);
+                  }
+                }
+              });
+            } else if (window.Simulators && window.Simulators.getSimulatorForUnit) {
+              const simData = window.Simulators.getSimulatorForUnit(activeLessonSlug);
+              if (simData && simData.sim) {
                 try {
-                  if ((!mountEl.innerHTML.trim() || !mountEl.querySelector('[data-role="custom-input"]')) && typeof sim.render === 'function') {
-                    mountEl.innerHTML = sim.render();
+                  const placeholder = reader.querySelector(`.sim-card-placeholder[data-sim-slug="${activeLessonSlug}"]`);
+                  if (placeholder) {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'simulator-mount';
+                    wrapper.id = placeholder.id || ('topic-simulator-' + activeLessonSlug);
+                    wrapper.setAttribute('data-sim', simData.sim.id);
+                    wrapper.innerHTML = simData.html;
+                    placeholder.replaceWith(wrapper);
+                    simData.sim.mount(wrapper);
+                    mountedSims.push({ sim: simData.sim, el: wrapper });
+                  } else {
+                    simData.sim.mount(reader);
+                    mountedSims.push({ sim: simData.sim, el: reader });
                   }
-                  if (typeof sim.mount === 'function') {
-                    sim.mount(mountEl);
-                  }
-                  mountedSims.push({ sim, el: mountEl });
                 } catch (err) {
-                  console.error('[Inline simulator mount error]', simId, err);
+                  console.error('[Simulator mount error]', err);
                 }
-              }
-            });
-          } else if (window.Simulators && window.Simulators.getSimulatorForUnit) {
-            const simData = window.Simulators.getSimulatorForUnit(currentSlug);
-            if (simData && simData.sim) {
-              try {
-                const placeholder = reader.querySelector(`.sim-card-placeholder[data-sim-slug="${currentSlug}"]`);
-                if (placeholder) {
-                  const wrapper = document.createElement('div');
-                  wrapper.className = 'simulator-mount';
-                  wrapper.id = placeholder.id || ('topic-simulator-' + currentSlug);
-                  wrapper.setAttribute('data-sim', simData.sim.id);
-                  wrapper.innerHTML = simData.html;
-                  placeholder.replaceWith(wrapper);
-                  simData.sim.mount(wrapper);
-                  mountedSims.push({ sim: simData.sim, el: wrapper });
-                } else {
-                  simData.sim.mount(reader);
-                  mountedSims.push({ sim: simData.sim, el: reader });
-                }
-              } catch (err) {
-                console.error('[Simulator mount error]', err);
               }
             }
-          }
-          if (mountedSims.length > 0) {
-            activeSimulator = {
-              unmount() {
-                mountedSims.forEach(({ sim, el }) => {
-                  try { sim.unmount?.(el); } catch (_) {}
-                });
-              }
-            };
-          }
+            if (mountedSims.length > 0) {
+              activeSimulator = {
+                unmount() {
+                  mountedSims.forEach(({ sim, el }) => {
+                    try { sim.unmount?.(el); } catch (_) {}
+                  });
+                }
+              };
+            }
+          }).catch(err => {
+            console.warn('[Failed to hydrate simulator]', err);
+          });
         };
 
-        const simFile = window.SIMULATOR_SCRIPT_MAP?.[currentSlug];
-        if (simFile && window.loadScript) {
-          window.loadScript(simFile).then(handleSimulator).catch(err => {
-            console.error('[Failed to load simulator script]', simFile, err);
-          });
-        } else {
-          handleSimulator();
+        const simTarget = reader.querySelector('.simulator-mount[data-sim], .sim-card-placeholder');
+        if (simTarget && typeof IntersectionObserver === 'function') {
+          const simObs = new IntersectionObserver((entries, obs) => {
+            if (entries.some(e => e.isIntersecting)) {
+              obs.disconnect();
+              hydrateTopicSimulator();
+            }
+          }, { rootMargin: '450px 0px' });
+          simObs.observe(simTarget);
+        } else if (simTarget) {
+          hydrateTopicSimulator();
         }
-        
+
         initMermaid();
-        renderMathOnPage(reader);
-        if (window.TableVisualizer && typeof window.TableVisualizer.enhanceSqlCodeBlocks === 'function') {
-          try { window.TableVisualizer.enhanceSqlCodeBlocks(reader); } catch (err) { console.warn('[TableVisualizer]', err); }
-        }
-        if (!window.TOPIC_GUIDED_LABS && window.loadScript) {
-          window.loadScript('data/topic_guided_labs.js').then(() => {
-            mountInlineTopicSqlLab(currentSlug, reader);
-          }).catch(() => {
-            mountInlineTopicSqlLab(currentSlug, reader);
-          });
+        if (!isPrerendered && window.Lazy && reader.textContent.includes('$')) {
+          window.Lazy.ensureKatex().then(() => renderMathOnPage(reader)).catch(() => {});
         } else {
-          mountInlineTopicSqlLab(currentSlug, reader);
+          renderMathOnPage(reader);
         }
+
+        const hydrateTopicSqlWidgets = () => {
+          if (currentView !== 'topic' || currentSlug !== activeLessonSlug) return;
+          const ensurePromise = window.Lazy ? window.Lazy.ensureSqlStack() : Promise.resolve();
+          ensurePromise.then(() => {
+            if (currentView !== 'topic' || currentSlug !== activeLessonSlug) return;
+            if (window.TableVisualizer && typeof window.TableVisualizer.enhanceSqlCodeBlocks === 'function') {
+              try { window.TableVisualizer.enhanceSqlCodeBlocks(reader); } catch (err) { console.warn('[TableVisualizer]', err); }
+            }
+            const labHost = reader.querySelector('.sql-guided-lab-host');
+            if (!labHost) return;
+            const loadLabs = (!window.TOPIC_GUIDED_LABS && window.Lazy)
+              ? window.Lazy.load('data/topic_guided_labs.js')
+              : Promise.resolve();
+            return loadLabs.then(() => {
+              if (currentView === 'topic' && currentSlug === activeLessonSlug) {
+                mountInlineTopicSqlLab(activeLessonSlug, reader);
+              }
+            }).catch(() => {
+              if (currentView === 'topic' && currentSlug === activeLessonSlug) {
+                mountInlineTopicSqlLab(activeLessonSlug, reader);
+              }
+            });
+          }).catch(err => {
+            console.warn('[SQL widget hydration warning]', err);
+          });
+        };
+
+        const sqlWidgetTargets = reader.querySelectorAll('.code-block, .sql-executable-block, .sql-guided-lab-host');
+        if (sqlWidgetTargets.length > 0 && typeof IntersectionObserver === 'function') {
+          const sqlObs = new IntersectionObserver((entries, obs) => {
+            if (entries.some(e => e.isIntersecting)) {
+              obs.disconnect();
+              hydrateTopicSqlWidgets();
+            }
+          }, { rootMargin: '450px 0px' });
+          sqlWidgetTargets.forEach(el => sqlObs.observe(el));
+        } else if (sqlWidgetTargets.length > 0) {
+          hydrateTopicSqlWidgets();
+        }
+
         if (window.setupAudioListeners) {
           window.setupAudioListeners(currentSlug);
         }
@@ -834,6 +932,13 @@ window.App = (() => {
         }
         break;
       case 'projects':
+        if (!window.PROJECTS_DATA && window.Lazy) {
+          reader.innerHTML = '<div class="prose"><p style="padding:2rem 0;color:var(--fg-muted);">Loading Systems Engineering Projects…</p></div>';
+          window.Lazy.load('data/projects.js').then(() => {
+            if (currentView === 'projects') renderCurrentView();
+          });
+          break;
+        }
         reader.innerHTML = window.Renderer.renderProjects(currentSlug);
         if (currentSlug) {
           setTimeout(() => {
@@ -1039,15 +1144,21 @@ window.App = (() => {
         if (!window.GUIDED_LABS_DATA) {
           neededBuildScripts.push('data/guided_labs.js');
         }
+        if (!window.CodeLab) {
+          neededBuildScripts.push('js/topic-codelab.js');
+        }
 
-        if (neededBuildScripts.length > 0 && window.loadScript) {
+        if ((neededBuildScripts.length > 0 || !window.SqlEngine || !window.TableVisualizer) && window.Lazy) {
           if (!isPrerenderedBuild) {
-            reader.innerHTML = '<div class="prose"><p style="padding:2rem 0;color:var(--fg-muted);">Loading Interactive SQL Studio &amp; Reference Build...</p></div>';
+            reader.innerHTML = '<div class="prose"><p style="padding:2rem 0;color:var(--fg-muted);">Loading Interactive SQL Studio &amp; Reference Build…</p></div>';
           }
-          Promise.all(neededBuildScripts.map(s => window.loadScript(s))).then(renderBuildView).catch(err => {
-            console.error('[Failed to load build lab scripts]', err);
-            renderBuildView();
-          });
+          window.Lazy.ensureSqlStack()
+            .then(() => Promise.all(neededBuildScripts.map(s => window.Lazy.load(s))))
+            .then(renderBuildView)
+            .catch(err => {
+              console.error('[Failed to load build lab scripts]', err);
+              renderBuildView();
+            });
         } else {
           renderBuildView();
         }
@@ -1074,10 +1185,9 @@ window.App = (() => {
     loadedModules.add(mod.id);
     const num = mod.legacyNumber || mod.number;
     const tasks = [window.Lazy.module(num)];
-    if (window.loadScript) {
-      if (!window.IMPLEMENTATIONS_DATA) tasks.push(window.loadScript('data/implementations_code.js').catch(() => {}));
-      if (!window.CHALLENGES_DATA) tasks.push(window.loadScript('data/challenges.js').catch(() => {}));
-      if (!window.WHITEBOARD_DATA) tasks.push(window.loadScript('data/whiteboard-blueprints.js').catch(() => {}));
+    const needsBuildData = currentView === 'build' || (currentSlug && currentSlug.startsWith('build-'));
+    if (needsBuildData && window.loadScript && !window.IMPLEMENTATIONS_DATA) {
+      tasks.push(window.loadScript('data/implementations_code.js').catch(() => {}));
     }
     Promise.all(tasks).then(() => {
       // Re-render if the learner is still on a view that needs this module
@@ -1300,23 +1410,20 @@ window.App = (() => {
     }
   }
 
-  // ── Mermaid ───────────────────────────────────────────────
-  function initMermaid() {
-    const diagrams = document.querySelectorAll('.mermaid:not([data-processed])');
-    if (diagrams.length === 0) {
-      attachMermaidZoomControls();
-      return;
-    }
-
+  // ── Mermaid (Viewport-Lazy via IntersectionObserver) ──────
+  let _mermaidIo = null;
+  function renderMermaidNodes(nodes) {
+    const pending = Array.from(nodes).filter(el => el && el.isConnected && !el.hasAttribute('data-processed'));
+    if (!pending.length) return;
     window.loadMermaid().then(() => {
-      // Store original source on each element before rendering
-      diagrams.forEach(el => {
+      const active = pending.filter(el => el.isConnected && !el.hasAttribute('data-processed'));
+      if (!active.length) return;
+      active.forEach(el => {
         if (!el.getAttribute('data-original-src')) {
           el.setAttribute('data-original-src', el.textContent.trim());
         }
       });
-      // Call mermaid.run directly on the nodes (mermaid manages data-processed internally)
-      window.mermaid.run({ nodes: Array.from(diagrams) }).then(() => {
+      window.mermaid.run({ nodes: active }).then(() => {
         attachMermaidZoomControls();
       }).catch(err => {
         console.warn('Mermaid render warning:', err);
@@ -1325,6 +1432,30 @@ window.App = (() => {
     }).catch(err => {
       console.warn('Failed to load Mermaid:', err);
     });
+  }
+
+  function initMermaid() {
+    if (_mermaidIo) {
+      _mermaidIo.disconnect();
+      _mermaidIo = null;
+    }
+    const diagrams = document.querySelectorAll('.mermaid:not([data-processed])');
+    if (diagrams.length === 0) {
+      attachMermaidZoomControls();
+      return;
+    }
+    if (typeof IntersectionObserver === 'function') {
+      _mermaidIo = new IntersectionObserver(entries => {
+        if (entries.some(e => e.isIntersecting)) {
+          _mermaidIo.disconnect();
+          _mermaidIo = null;
+          renderMermaidNodes(document.querySelectorAll('.mermaid:not([data-processed])'));
+        }
+      }, { rootMargin: '280px 0px' });
+      diagrams.forEach(el => _mermaidIo.observe(el));
+    } else {
+      renderMermaidNodes(diagrams);
+    }
   }
 
   // ── Diagram Lightbox & Zoom ───────────────────────────────
@@ -1951,6 +2082,10 @@ window.App = (() => {
       const runSqlInlineBtn = target.closest('[data-action="run-sql-inline"], [data-action="edit-sql-inline"]');
       if (runSqlInlineBtn) {
         e.preventDefault();
+        if ((!window.SqlEngine || !window.TableVisualizer) && window.Lazy) {
+          window.Lazy.ensureSqlStack().then(() => runSqlInlineBtn.click()).catch(() => {});
+          return;
+        }
         const isEditAction = runSqlInlineBtn.getAttribute('data-action') === 'edit-sql-inline';
         const block = runSqlInlineBtn.closest('.code-block') || runSqlInlineBtn.closest('.sql-executable-block');
         if (block && window.TableVisualizer && typeof window.TableVisualizer.enhanceSqlCodeBlocks === 'function') {
@@ -2123,6 +2258,15 @@ window.App = (() => {
         if (dest) {
           dest.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
+        return;
+      }
+
+      const shareBtn = target.closest('[data-action="share-page"]');
+      if (shareBtn) {
+        e.preventDefault();
+        const shareUrl = shareBtn.getAttribute('data-share-url') || window.location.href;
+        const shareTitle = shareBtn.getAttribute('data-share-title') || document.title || 'SQL In Depth';
+        sharePageUrl(shareUrl, shareTitle, shareBtn);
         return;
       }
 
@@ -2874,8 +3018,128 @@ window.App = (() => {
     globalCodeLabInstance = null;
   }
 
+  let _toastTimer = null;
+  function showToast(message) {
+    let el = document.getElementById('ds-toast');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'ds-toast';
+      el.className = 'ds-toast';
+      el.setAttribute('role', 'status');
+      el.setAttribute('aria-live', 'polite');
+      document.body.appendChild(el);
+    }
+    el.textContent = message;
+    el.hidden = false;
+    el.classList.add('is-visible');
+    if (_toastTimer) clearTimeout(_toastTimer);
+    _toastTimer = setTimeout(() => {
+      el.classList.remove('is-visible');
+      setTimeout(() => { el.hidden = true; }, 180);
+    }, 2400);
+  }
+
+  function sharePageUrl(url, title, triggerBtn) {
+    const cleanUrl = url || window.location.href;
+    const isMobile = typeof window.matchMedia === 'function' && window.matchMedia('(max-width: 768px)').matches;
+    if (isMobile && navigator.share) {
+      navigator.share({ title: title || document.title, url: cleanUrl }).catch(() => {});
+      return;
+    }
+    const copyDone = () => {
+      showToast('Link copied to clipboard');
+      if (triggerBtn) {
+        const labelEl = triggerBtn.querySelector('.ds-share-btn__label');
+        if (labelEl) {
+          const orig = labelEl.textContent;
+          labelEl.textContent = 'Copied!';
+          setTimeout(() => { labelEl.textContent = orig; }, 1800);
+        }
+      }
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(cleanUrl).then(copyDone).catch(() => {
+        showToast(cleanUrl);
+      });
+    } else {
+      showToast(cleanUrl);
+    }
+  }
+
+  let _tocScrollCleanup = null;
+  function setupLessonTocScrollSpy(container) {
+    if (_tocScrollCleanup) {
+      _tocScrollCleanup();
+      _tocScrollCleanup = null;
+    }
+    if (!container) return;
+    const tocLinks = Array.from(container.querySelectorAll('.ds-toc__link[href^="#"]'));
+    if (tocLinks.length === 0) return;
+
+    const targets = tocLinks
+      .map(link => {
+        const id = link.getAttribute('href').slice(1);
+        const el = id ? document.getElementById(id) : null;
+        return el ? { link, el, id } : null;
+      })
+      .filter(Boolean);
+
+    if (targets.length === 0) return;
+
+    tocLinks.forEach(link => {
+      link.addEventListener('click', (ev) => {
+        const id = link.getAttribute('href').slice(1);
+        const dest = id ? document.getElementById(id) : null;
+        if (dest) {
+          ev.preventDefault();
+          dest.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          history.replaceState(null, '', window.location.pathname + window.location.search + '#' + id);
+        }
+      });
+    });
+
+    let ticking = false;
+    const updateActive = () => {
+      ticking = false;
+      const threshold = 120;
+      let activeItem = targets[0];
+      for (const item of targets) {
+        const rect = item.el.getBoundingClientRect();
+        if (rect.top <= threshold) {
+          activeItem = item;
+        } else {
+          break;
+        }
+      }
+      targets.forEach(item => {
+        item.link.classList.toggle('is-active', item === activeItem);
+      });
+    };
+
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(updateActive);
+      }
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    updateActive();
+    _tocScrollCleanup = () => window.removeEventListener('scroll', onScroll);
+  }
+
   function openSqlStudioModal(options) {
     const opts = options || {};
+    if ((!window.SqlEngine || !window.TableVisualizer) && window.Lazy) {
+      return window.Lazy.ensureSqlStack()
+        .then(() => {
+          if (!window.TOPIC_GUIDED_LABS && (opts.slug || opts.labId)) {
+            return window.Lazy.load('data/topic_guided_labs.js').catch(() => {});
+          }
+          return Promise.resolve();
+        })
+        .then(() => openSqlStudioModal(opts));
+    }
     let overlay = document.getElementById('global-codelab-overlay');
     if (!overlay) {
       overlay = document.createElement('div');
@@ -3354,6 +3618,8 @@ window.App = (() => {
     toggleModule,
     toggleComplete,
     toggleTheme,
+    showToast,
+    sharePageUrl,
     renderCurrentView,
     renderSidebar,
     initMermaid,

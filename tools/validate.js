@@ -555,7 +555,7 @@ if (fs.existsSync(topicBaseDir)) {
       reportError(`Empty or un-prerendered reader container in topic/${slug}/index.html`);
     }
 
-    const readerMatch = html.match(/id="reader"[^>]*>([\s\S]*?)<\/div>\s*<\/main>/);
+    const readerMatch = html.match(/id="reader"[^>]*>([\s\S]*?)<\/div>\s*(?:<footer\b[\s\S]*?<\/footer>\s*)?<\/main>/);
     if (!readerMatch) {
       emptyReaderCount++;
       reportError(`Missing #reader container in topic/${slug}/index.html`);
@@ -615,7 +615,7 @@ if (fs.existsSync(buildBaseDir)) {
       reportError(`Empty or un-prerendered reader container in build/${buildId}/index.html`);
     }
 
-    const readerMatch = html.match(/id="reader"[^>]*>([\s\S]*?)<\/div>\s*<\/main>/);
+    const readerMatch = html.match(/id="reader"[^>]*>([\s\S]*?)<\/div>\s*(?:<footer\b[\s\S]*?<\/footer>\s*)?<\/main>/);
     if (!readerMatch) {
       emptyBuildReaderCount++;
       reportError(`Missing #reader container in build/${buildId}/index.html`);
@@ -702,8 +702,8 @@ for (const relPath of allHtmlFiles) {
 
   const titleMatch = html.match(/<title>([^<]+)<\/title>/i);
   const descMatch = html.match(/<meta\s+name="description"\s+content="([^"]+)"/i);
-  const ogImgMatch = html.match(/<meta\s+property="og:image"\s+content="https:\/\/sql-in-depth\.vedgupta\.in\/assets\/og-image\.png"/i);
-  const twImgMatch = html.match(/<meta\s+name="twitter:image"\s+content="https:\/\/sql-in-depth\.vedgupta\.in\/assets\/og-image\.png"/i);
+  const ogImgMatch = html.match(/<meta\s+property="og:image"\s+content="https:\/\/sql-in-depth\.vedgupta\.in\/assets\/(og\/[a-z0-9-]+\.png|og-image\.png)"/i);
+  const twImgMatch = html.match(/<meta\s+name="twitter:image"\s+content="https:\/\/sql-in-depth\.vedgupta\.in\/assets\/(og\/[a-z0-9-]+\.png|og-image\.png)"/i);
   const h1Count = (html.match(/<h1[\s>]/gi) || []).length;
 
   if (!titleMatch) {
@@ -729,6 +729,12 @@ for (const relPath of allHtmlFiles) {
   if (!ogImgMatch || !twImgMatch) {
     reportError(`${relPath}: missing absolute og:image or twitter:image tag`);
     metaErrors++;
+  } else {
+    const ogDiskPath = path.join(__dirname, '..', 'assets', ogImgMatch[1]);
+    if (!fs.existsSync(ogDiskPath)) {
+      reportError(`${relPath}: missing OG image file on disk (${ogImgMatch[1]})`);
+      metaErrors++;
+    }
   }
 
   if (h1Count !== 1) {

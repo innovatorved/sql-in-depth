@@ -768,9 +768,12 @@ window.Renderer = (() => {
     }
 
     const reviewDate = formatReviewDate(unit.archive?.updated);
+    const promiseText = moduleContent?.promise || unit.archive?.excerpt || '';
+    const canonicalLessonUrl = `https://sql-in-depth.vedgupta.in/topic/${escapeHtml(slug)}/`;
+    const shareIconSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>';
 
-    // Build header
-    let html = `
+    // Build header & main article column
+    let articleCol = `
       <nav class="breadcrumbs" aria-label="Breadcrumb">
         <a href="/" data-nav="home">Home</a>
         <span class="breadcrumbs__sep">${icons.chevronRight}</span>
@@ -779,12 +782,13 @@ window.Renderer = (() => {
         <span class="breadcrumbs__current">${unit.title}</span>
       </nav>
 
-      <div class="lesson-header">
+      <div class="lesson-header ds-lesson-hero">
         <div class="lesson-header__badge">
           <span class="lesson-header__kind lesson-header__kind--${kindClass}">${unit.kind}</span>
           ${unit.archive?.tags?.map(t => ' <span class="tag">' + t + '</span>').join('') || ''}
         </div>
         <h1 class="lesson-header__title">${unit.title}</h1>
+        ${promiseText ? `<div class="ds-lesson-hero__promise">${escapeHtml(promiseText)}</div>` : ''}
         <div class="lesson-header__meta">
           ${(() => {
             const words = unit.archive?.wordCount || (moduleContent?.content ? moduleContent.content.replace(/<[^>]+>/g, ' ').trim().split(/\s+/).length : 0);
@@ -793,7 +797,7 @@ window.Renderer = (() => {
           <span class="lesson-header__meta-item">${icons.book} Module ${mod.number}: ${mod.title}</span>
           <span class="lesson-header__meta-item" title="Content curriculum review date">${icons.calendar} Updated ${reviewDate}</span>
         </div>
-        <div class="lesson-header__actions" style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
+        <div class="lesson-header__actions ds-lesson-hero__toolbar" style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
           <button class="completion-toggle${isCompleted ? ' completed' : ''}" data-action="toggle-complete" data-slug="${slug}">
             ${isCompleted ? icons.check + ' Completed' : icons.circle + ' Mark Complete'}
           </button>
@@ -801,29 +805,27 @@ window.Renderer = (() => {
             ▶ Run SQL Studio
           </button>
           <a href="#cheatsheet/${mod.id}" class="btn btn--secondary btn--sm" data-action="navigate-cheatsheet" data-module="${mod.id}" title="View printable cheat sheet for this module">
-            📄 Cheat Sheet
+            Cheat Sheet
           </a>
+          <button type="button" class="ds-share-btn" data-action="share-page" data-share-url="${canonicalLessonUrl}" data-share-title="${escapeHtml(unit.title)} — SQL In Depth" title="Share runnable link to this lesson">
+            ${shareIconSvg}
+            <span class="ds-share-btn__label">Share</span>
+          </button>
         </div>
       </div>`;
 
-    // Video embed (from module content)
-    if (moduleContent?.video?.youtubeId) {
-      html += renderVideoEmbed(moduleContent.video);
-      html += renderMoreVideos(moduleContent.videos);
-    }
-
-    // Intuition-first primer (plain-language mental model before the deep dive)
+    // Why It Matters & Core Idea (promoted to h2 so h1 -> h2 hierarchy has zero skipped heading levels)
     if (moduleContent?.intuition) {
-      html += `
+      articleCol += `
         <aside class="intuition">
-          <h3 class="intuition__title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>Intuition first</h3>
+          <h2 class="intuition__title" id="sec-why-it-matters"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>Why It Matters</h2>
           <div class="intuition__body">${convertMarkdownToHTML(moduleContent.intuition)}</div>
         </aside>`;
     }
 
     // Audio player
     const initialDuration = unit.archive?.audioDuration || unit.audioDuration || '--:--';
-    html += `
+    articleCol += `
       <div class="audio-player" id="audio-player-${slug}">
         <button class="audio-player__play-btn" id="audio-btn-${slug}" data-action="toggle-audio" data-slug="${slug}" aria-label="Play audio" title="Play audio">
           <svg id="audio-play-icon-${slug}" width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
@@ -841,13 +843,24 @@ window.Renderer = (() => {
         <audio id="audio-${slug}" data-src="audio/${slug}.mp3" preload="none"></audio>
       </div>`;
 
+    // Flagship Original Video Stage (100% self-hosted MP4 + WebP poster + WebVTT captions + collapsible transcript)
+    const hasFlagshipVideo = Boolean(moduleContent?.flagshipVideo?.src);
+    if (hasFlagshipVideo) {
+      articleCol += renderFlagshipVideoStage(moduleContent.flagshipVideo);
+    }
+
+    // Curated Reference Lecture tucked cleanly inside a collapsible <details> disclosure
+    if (moduleContent?.video?.youtubeId) {
+      articleCol += renderVideoEmbed(moduleContent.video);
+      articleCol += renderMoreVideos(moduleContent.videos);
+    }
+
     // Content
     let rawArticleHtml = '';
 
     if (archiveContent && archiveContent.trim().length > 100) {
       // Use authentic markdown from curriculum
       rawArticleHtml += convertMarkdownToHTML(archiveContent);
-      // If module content has complementary details (e.g. diagrams or breakdown), augment smoothly
       const isPlaceholder = moduleContent?.content?.includes('This topic is covered in depth in the curriculum archive');
       if (moduleContent?.content && !isPlaceholder && !archiveContent.includes('Real-World Usage')) {
         rawArticleHtml += '<hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--divider);">';
@@ -873,7 +886,6 @@ window.Renderer = (() => {
       );
       rawArticleHtml += bodyHtml;
     } else {
-      // Fallback
       rawArticleHtml += renderFallbackContent(unit, mod);
     }
 
@@ -898,23 +910,23 @@ window.Renderer = (() => {
     const hasQuiz = Boolean(quizHtml && quizHtml.trim());
     const hasTakeaways = Boolean(moduleContent?.keyTakeaways?.length);
 
-    html += renderTopicQuickJump(slug, headings, { hasSim, hasQuiz, hasTakeaways });
-    html += '<article class="prose">' + htmlWithIds + '</article>';
-
-    // Check yourself: unified slider with Concept Checks, Napkin Math (numeric), and Staff Trade-Off Matrix (tradeoff)
-    if (hasQuiz) html += `<div id="check-slider-${slug}">${quizHtml}</div>`;
+    articleCol += renderTopicQuickJump(slug, headings, { hasSim, hasQuiz, hasTakeaways });
+    articleCol += '<article class="prose">' + htmlWithIds + '</article>';
 
     // Interactive Visual Simulator (only if not already mounted inline via .simulator-mount)
-    if (simHtml) html += simHtml;
+    if (simHtml) articleCol += simHtml;
 
-    // Interactive Guided SQL & Relational Execution Lab Card
-    html += renderTopicCodeLabCard(slug, unit, mod, moduleContent);
+    // Interactive Guided SQL & Relational Execution Lab Card (Practice)
+    articleCol += renderTopicCodeLabCard(slug, unit, mod, moduleContent);
 
-    // Key takeaways
+    // Quick Self-Check Questions with instant feedback
+    if (hasQuiz) articleCol += `<div id="check-slider-${slug}">${quizHtml}</div>`;
+
+    // Recap & Key Takeaways
     if (hasTakeaways) {
-      html += `
+      articleCol += `
         <div class="takeaways" id="topic-takeaways-${slug}">
-          <h3 class="takeaways__title">Key Takeaways</h3>
+          <h2 class="takeaways__title">Recap &amp; Key Takeaways</h2>
           <div class="takeaways__list">
             ${moduleContent.keyTakeaways.map(t => '<div class="takeaways__item">' + t + '</div>').join('')}
           </div>
@@ -922,36 +934,83 @@ window.Renderer = (() => {
     }
 
     // Capstone builds, incident challenges, and architecture blueprints for this lesson
-    html += renderLessonBuilds(slug);
-    html += renderLessonChallenges(slug);
-    html += renderLessonBlueprints(slug);
+    articleCol += renderLessonBuilds(slug);
+    articleCol += renderLessonChallenges(slug);
+    articleCol += renderLessonBlueprints(slug);
 
     // Further reading
     if (moduleContent?.furtherReading?.length) {
-      html += `
+      articleCol += `
         <div class="further-reading">
-          <h3 class="further-reading__title">Further Reading</h3>
+          <h2 class="further-reading__title">Primary Sources &amp; Further Reading</h2>
           <div class="further-reading__list">
             ${moduleContent.furtherReading.map(r => '<a class="further-reading__link" href="' + r.url + '" target="_blank" rel="noopener">' + icons.link + ' ' + r.title + '</a>').join('')}
           </div>
         </div>`;
     } else if (unit.archive?.sources?.length) {
-      html += `
+      articleCol += `
         <div class="further-reading">
-          <h3 class="further-reading__title">Sources</h3>
+          <h2 class="further-reading__title">Primary Sources</h2>
           <div class="further-reading__list">
             ${unit.archive.sources.filter(s => s.startsWith('http')).map(s => '<a class="further-reading__link" href="' + s + '" target="_blank" rel="noopener">' + icons.link + ' ' + s.replace(/https?:\/\//, '').split('/').slice(0, 2).join('/') + '</a>').join('')}
           </div>
         </div>`;
     }
 
-    // Was this helpful / Report issue feedback bar
-    html += renderLessonFeedback(slug, unit);
+    // Feedback & Share bar + Prev/Next navigation
+    articleCol += renderLessonFeedback(slug, unit);
+    articleCol += renderLessonNav(slug, mod, part);
 
-    // Prev/Next navigation
-    html += renderLessonNav(slug, mod, part);
+    // Sticky Right-Rail TOC (visible on >= 1280px viewports)
+    const rawModProg = window.Progress?.getModuleProgress
+      ? window.Progress.getModuleProgress(mod.id)
+      : { completed: 0, total: mod.units.length };
+    const modTotal = rawModProg.total || (mod.units ? mod.units.length : 10);
+    const modCompleted = rawModProg.completed || 0;
+    const modPct = modTotal > 0 ? Math.round((modCompleted / modTotal) * 100) : 0;
 
-    return renderMathInHtml(html);
+    const tocEntries = [];
+    if (moduleContent?.intuition) tocEntries.push({ id: 'sec-why-it-matters', label: 'Why It Matters' });
+    if (hasFlagshipVideo) tocEntries.push({ id: 'sec-video-explainer', label: 'Visual Video Explainer' });
+    headings.forEach(h => {
+      tocEntries.push({ id: h.id, label: h.title.replace(/^\d+\.\s*/, '') });
+    });
+    tocEntries.push({ id: `guided-coding-practice-${slug}`, label: '3-Step SQL Practice' });
+    if (hasQuiz) tocEntries.push({ id: `check-slider-${slug}`, label: 'Self-Check Quiz' });
+    if (hasTakeaways) tocEntries.push({ id: `topic-takeaways-${slug}`, label: 'Recap & Takeaways' });
+
+    const tocAside = `
+      <aside class="ds-toc" aria-label="On this page">
+        <div class="ds-toc__heading">On this page</div>
+        <ul class="ds-toc__list">
+          ${tocEntries.map((item, idx) => `
+            <li>
+              <a class="ds-toc__link${idx === 0 ? ' is-active' : ''}" href="#${escapeHtml(item.id)}">${escapeHtml(item.label)}</a>
+            </li>
+          `).join('')}
+        </ul>
+        <div class="ds-toc__progress-card">
+          <div class="ds-toc__progress-row">
+            <span>Module ${escapeHtml(String(mod.number))}</span>
+            <span>${modCompleted}/${modTotal} done</span>
+          </div>
+          <div class="ds-toc__progress-bar" aria-hidden="true">
+            <div class="ds-toc__progress-fill" style="width:${modPct}%"></div>
+          </div>
+          <button type="button" class="ds-share-btn" style="width:100%;justify-content:center;margin-top:4px;" data-action="share-page" data-share-url="${canonicalLessonUrl}" data-share-title="${escapeHtml(unit.title)} — SQL In Depth">
+            ${shareIconSvg}
+            <span class="ds-share-btn__label">Copy lesson link</span>
+          </button>
+        </div>
+      </aside>`;
+
+    const shellHtml = `
+      <div class="ds-lesson-shell ds-lesson-shell--with-toc">
+        <div class="ds-lesson-article">${articleCol}</div>
+        ${tocAside}
+      </div>`;
+
+    return renderMathInHtml(shellHtml);
   }
 
   // Order build files: README first, then implementation, demo, tests
@@ -978,7 +1037,7 @@ window.Renderer = (() => {
     if (!builds.length) return '';
     return `
       <div class="lesson-builds">
-        <h3 class="lesson-builds__title">${icons.code} Multi-File Capstone SQL & Storage Engine Lab — Guided Implementation</h3>
+        <h2 class="lesson-builds__title">${icons.code} Multi-File Capstone SQL & Storage Engine Lab — Guided Implementation</h2>
         ${builds.map(([id, b]) => {
           const prog = window.Progress?.getBuildProgress ? window.Progress.getBuildProgress(id) : null;
           const stepCount = prog?.completedSteps?.length || 0;
@@ -1011,7 +1070,7 @@ window.Renderer = (() => {
     if (!challenges.length) return '';
     return `
       <div class="lesson-builds lesson-challenges">
-        <h3 class="lesson-builds__title">${icons.target} Debug This in Production — Incident Simulator &amp; SQL Hotfix</h3>
+        <h2 class="lesson-builds__title">${icons.target} Debug This in Production — Incident Simulator &amp; SQL Hotfix</h2>
         ${challenges.map(c => `
           <a class="lesson-builds__item" href="/challenges/${c.id}/" data-nav="challenges" data-challenge="${c.id}">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
@@ -1033,7 +1092,7 @@ window.Renderer = (() => {
     if (!bps.length) return '';
     return `
       <div class="lesson-builds lesson-blueprints">
-        <h3 class="lesson-builds__title">${icons.globe} Interactive Architecture Blueprint — Capacity Sandbox</h3>
+        <h2 class="lesson-builds__title">${icons.globe} Interactive Architecture Blueprint — Capacity Sandbox</h2>
         ${bps.map(bp => `
           <a class="lesson-builds__item" href="/sandbox/?blueprint=${bp.id}" data-nav="sandbox" data-blueprint="${bp.id}">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
@@ -1186,11 +1245,67 @@ window.Renderer = (() => {
 
 
   /**
-   * Render YouTube video embed (lazy-loaded)
+   * Render Flagship Self-Hosted Animated Explainer Video Stage (MP4 + WebP poster + WebVTT + Transcript)
+   */
+  function renderFlagshipVideoStage(fv) {
+    if (!fv?.src) return '';
+    const chapters = Array.isArray(fv.chapters) ? fv.chapters : [];
+    return `
+      <section class="ds-video-stage" id="sec-video-explainer" aria-label="${escapeHtml(fv.title || 'Visual Explainer Video')}">
+        <div class="ds-video-stage__header">
+          <div class="ds-video-stage__title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="color:var(--accent);" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+            <span>${escapeHtml(fv.title || 'Visual Explainer')}</span>
+          </div>
+          <span class="ds-pill ds-pill--accent">${escapeHtml(fv.duration || '0:50')} · CC</span>
+        </div>
+        <div class="ds-video-stage__player">
+          <video
+            controls
+            loading="lazy"
+            preload="none"
+            playsinline
+            width="${Number(fv.width) || 1280}"
+            height="${Number(fv.height) || 720}"
+            poster="${escapeHtml(fv.poster || '')}"
+          >
+            <source src="${escapeHtml(fv.src)}" type="video/mp4">
+            ${fv.captions ? `<track src="${escapeHtml(fv.captions)}" kind="captions" srclang="en" label="English" default>` : ''}
+          </video>
+        </div>
+        ${(chapters.length || fv.transcript) ? `
+          <details class="ds-video-stage__transcript">
+            <summary>Transcript &amp; scene breakdown (${chapters.length || 4} chapters)</summary>
+            <div class="ds-video-stage__transcript-body">
+              ${chapters.length
+                ? chapters.map(ch => `<p><strong>[${escapeHtml(ch.start || '0:00')}] ${escapeHtml(ch.heading || ch.step || '')}:</strong> ${escapeHtml(ch.text || '')}</p>`).join('')
+                : `<p>${escapeHtml(fv.transcript)}</p>`}
+            </div>
+          </details>
+        ` : ''}
+      </section>`;
+  }
+
+  /**
+   * Render Curated External Reference Lecture (collapsed secondary disclosure)
    */
   function renderVideoEmbed(video) {
     if (!video?.youtubeId) return '';
-    return `<div class="video-main" data-video="${escapeHtml(JSON.stringify(video))}">${renderMainVideoInner(video, false)}</div>`;
+    const ch = String(video.channel || 'Reference Lecture').trim();
+    const len = video.length || video.duration || '';
+    return `
+      <details class="ds-external-lecture">
+        <summary>
+          <span style="display:flex;align-items:center;gap:8px;min-width:0;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent);flex-shrink:0;" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="3"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none"/></svg>
+            <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><strong>Reference Lecture:</strong> ${escapeHtml(video.title || '')}</span>
+          </span>
+          <span class="ds-pill" style="flex-shrink:0;">${escapeHtml(ch)}${len ? ' · ' + escapeHtml(len) : ''} ▾</span>
+        </summary>
+        <div style="padding:0 16px 16px;">
+          <div class="video-main" data-video="${escapeHtml(JSON.stringify({ ...video, channel: ch }))}">${renderMainVideoInner({ ...video, channel: ch }, false)}</div>
+        </div>
+      </details>`;
   }
 
   // Player + caption for the main video; autoplay loads the iframe straight away (used when swapping in)
@@ -2036,19 +2151,21 @@ window.Renderer = (() => {
         <h1 class="lesson-header__title">SQL &amp; Database Internals Glossary</h1>
         <p class="hero__subtitle" style="margin-top:0.5rem;">Rigorous mathematical, asymptotic, and mechanical definitions across all 18 modules.</p>
         <div style="margin-top:1rem;">
-          <input type="text" id="glossary-filter" data-action="filter-glossary" placeholder="Filter terms (e.g. SARGable, MVCC, B+Tree, window frame, WAL)..." style="width:100%; max-width:400px; padding:0.5rem 0.75rem; background:var(--surface); border:1px solid var(--border); border-radius:6px; color:var(--fg); font-size:13px;">
+          <input type="text" id="glossary-filter" aria-label="Filter glossary terms" data-action="filter-glossary" placeholder="Filter terms (e.g. SARGable, MVCC, B+Tree, window frame, WAL)..." style="width:100%; max-width:400px; padding:0.5rem 0.75rem; background:var(--surface); border:1px solid var(--border); border-radius:6px; color:var(--fg); font-size:13px;">
         </div>
       </div>
 
       <div style="margin-top:1.5rem; display:flex; flex-direction:column; gap:0.75rem;">
     `;
 
-    for (const item of glossary) {
+    for (let gIdx = 0; gIdx < glossary.length; gIdx++) {
+      const item = glossary[gIdx];
       const defText = item.definition || item.def || '';
       const catText = item.category || item.cat || 'Algorithms';
       const compText = item.complexity ? ` · <code>${escapeHtml(item.complexity)}</code>` : '';
+      const foldCls = gIdx >= 12 ? ' ds-below-fold' : '';
       html += `
-        <div class="glossary-item" style="padding:1rem; border:1px solid var(--border); border-radius:6px; background:var(--surface);">
+        <div class="glossary-item${foldCls}" style="padding:1rem; border:1px solid var(--border); border-radius:6px; background:var(--surface);">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.25rem; gap:8px; flex-wrap:wrap;">
             <strong style="font-size:15px; color:var(--fg);">${escapeHtml(item.term)}${compText}</strong>
             <span class="badge badge--secondary" style="font-size:11px;">${escapeHtml(catText)}</span>

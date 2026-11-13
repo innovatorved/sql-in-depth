@@ -1,31 +1,33 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-product="sql" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>404 — Page Not Found | SQL In Depth</title>
   <meta name="description" content="The SQL lesson, table visualizer, or database build lab you are looking for cannot be found. Explore our 6 tracks, 180 units, interactive visualizers, and from-scratch builds.">
-  <meta property="og:image" content="https://sql-in-depth.vedgupta.in/assets/og-image.png">
-  <meta name="twitter:image" content="https://sql-in-depth.vedgupta.in/assets/og-image.png">
+  <meta property="og:image" content="https://sql-in-depth.vedgupta.in/assets/og/404.png">
+  <meta name="twitter:image" content="https://sql-in-depth.vedgupta.in/assets/og/404.png">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="robots" content="noindex, follow">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#ffffff">
+  <meta name="theme-color" content="#f7f8fa">
 
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preload" href="fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/variables.css?v=9c83c307bd">
-  <link rel="stylesheet" href="css/layout.css?v=a384f455dc">
-  <link rel="stylesheet" href="css/components.css?v=e10cd9c014">
-  <link rel="stylesheet" href="css/content.css?v=a8314bfb46">
-  <link rel="stylesheet" href="css/simulators.css?v=d890553508">
+  <link rel="stylesheet" href="design-system/tokens.css?v=2f31ca69aa">
+  <link rel="stylesheet" href="design-system/components.css?v=596f4164bb">
+  <link rel="stylesheet" href="css/variables.css?v=a60c606220">
+  <link rel="stylesheet" href="css/layout.css?v=cd1fac68d6">
+  <link rel="stylesheet" href="css/components.css?v=3d5f050e72">
+  <link rel="stylesheet" href="css/content.css?v=9fbc099df8">
+  <link rel="stylesheet" href="css/simulators.css?v=e91c9ced2a">
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=f6a6002f60"></script>
-  <script src="js/manifest.js?v=5685fdde9f"></script>
+  <script src="js/manifest.js?v=2637bb7d63"></script>
 
   <style>
     .not-found-wrapper {
@@ -214,7 +216,7 @@
 
         <!-- Quick Search Form -->
         <form class="not-found-search">
-          <input type="text" id="error-search-input" placeholder="Search 180 topics &amp; 18 builds (e.g. Window Functions, B+Tree, MVCC)…" autocomplete="off" spellcheck="false">
+          <input type="text" id="error-search-input" aria-label="Search 180 SQL topics and builds" placeholder="Search 180 topics &amp; 18 builds (e.g. Window Functions, B+Tree, MVCC)…" autocomplete="off" spellcheck="false">
           <button type="submit" class="btn btn--primary" style="padding:0 16px;">Search</button>
         </form>
 
