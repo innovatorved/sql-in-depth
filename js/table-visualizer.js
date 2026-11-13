@@ -1959,7 +1959,12 @@
         var activeSortCol = (sortState && typeof sortState.colIdx === 'number') ? sortState.colIdx : -1;
         var activeSortDir = (sortState && sortState.dir) ? sortState.dir : 'none';
 
-        var html = '<div class="sql-step-table-scroll"><table class="sql-step-table">';
+        var sortCollator = (typeof Intl !== 'undefined' && Intl.Collator)
+            ? new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
+            : null;
+        var html = '<div class="sql-step-table-scroll" role="region" aria-label="SQL step result table" tabindex="0">' +
+            '<div class="sr-only-status" role="status"></div>' +
+            '<table class="sql-step-table">';
         html += '<thead><tr>';
         if (hasRowStateBadges) {
             html += '<th scope="col" class="sql-row-state-th">Row State</th>';
@@ -1971,10 +1976,11 @@
             var isHighlighted = highlightSet[lowerCol];
             var ariaSort = (activeSortCol === colIdx && activeSortDir !== 'none')
                 ? (activeSortDir === 'asc' ? 'ascending' : 'descending')
-                : 'none';
+                : '';
             var sortIndicator = ariaSort === 'ascending' ? '↑' : (ariaSort === 'descending' ? '↓' : '↕');
-            html += '<th scope="col" aria-sort="' + ariaSort + '" class="' + (isHighlighted ? 'is-highlighted-col' : '') + '">';
-            html += '<button type="button" class="sql-sort-btn" data-sort-col="' + colIdx + '" title="Sort by ' + escapeHtml(col) + '">';
+            var ariaSortAttr = ariaSort ? (' aria-sort="' + ariaSort + '"') : '';
+            html += '<th scope="col"' + ariaSortAttr + ' class="' + (isHighlighted ? 'is-highlighted-col' : '') + '">';
+            html += '<button type="button" class="sql-sort-btn" data-sort-col="' + colIdx + '">';
             html += '<span class="sql-th-inner">';
             html += '<span>' + escapeHtml(col) + '</span>';
             if (isPk) {
@@ -2007,7 +2013,7 @@
                     var nb = typeof vb === 'number' ? vb : (typeof vb === 'string' && vb.trim() !== '' && !isNaN(Number(vb)) ? Number(vb) : NaN);
                     var cmp = (!isNaN(na) && !isNaN(nb))
                         ? (na - nb)
-                        : String(va).localeCompare(String(vb), undefined, { numeric: true, sensitivity: 'base' });
+                        : (sortCollator ? sortCollator.compare(String(va), String(vb)) : String(va).localeCompare(String(vb)));
                     if (cmp === 0) return a.origIdx - b.origIdx;
                     return activeSortDir === 'desc' ? -cmp : cmp;
                 });
@@ -2017,7 +2023,7 @@
                 var rIdx = entry.origIdx;
                 var state = (step.rowStates && step.rowStates[rIdx]) || 'normal';
                 var rowDiffs = (step.cellDiffs && step.cellDiffs[rIdx]) || null;
-                html += '<tr class="sql-step-tr is-' + escapeHtml(state) + '">';
+                html += '<tr class="sql-step-tr is-' + escapeHtml(state) + '" data-orig-idx="' + rIdx + '">';
                 if (hasRowStateBadges) {
                     var badgeHtml = '';
                     if (state === 'matched') {
@@ -2585,10 +2591,58 @@
                         if (isNaN(cIdx)) return;
                         var cur = sortByStep[activeIdx] || { colIdx: -1, dir: 'none' };
                         var nextDir = (cur.colIdx === cIdx)
-                            ? (cur.dir === 'asc' ? 'desc' : (cur.dir === 'desc' ? 'none' : 'asc'))
+                            ? (cur.dir === 'asc' ? 'desc' : 'asc')
                             : 'asc';
-                        sortByStep[activeIdx] = { colIdx: nextDir === 'none' ? -1 : cIdx, dir: nextDir };
-                        render();
+                        sortByStep[activeIdx] = { colIdx: cIdx, dir: nextDir };
+
+                        var table = sBtn.closest('table');
+                        var tbody = table && table.tBodies && table.tBodies[0];
+                        var stepData = steps[activeIdx];
+                        if (!table || !tbody || !stepData || !Array.isArray(stepData.rows) || !stepData.rows.length) return;
+
+                        var ariaDir = nextDir === 'asc' ? 'ascending' : 'descending';
+                        Array.from(table.tHead.rows[0].cells).forEach(function (th) {
+                            th.removeAttribute('aria-sort');
+                            var g = th.querySelector('.sql-sort-glyph');
+                            if (g) g.textContent = '↕';
+                        });
+                        var activeTh = sBtn.closest('th');
+                        if (activeTh) {
+                            activeTh.setAttribute('aria-sort', ariaDir);
+                            var activeGlyph = activeTh.querySelector('.sql-sort-glyph');
+                            if (activeGlyph) activeGlyph.textContent = nextDir === 'asc' ? '↑' : '↓';
+                        }
+
+                        var collator = (typeof Intl !== 'undefined' && Intl.Collator)
+                            ? new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
+                            : null;
+                        var trList = Array.from(tbody.querySelectorAll('tr[data-orig-idx]'));
+                        trList.sort(function (trA, trB) {
+                            var idxA = Number(trA.getAttribute('data-orig-idx')) || 0;
+                            var idxB = Number(trB.getAttribute('data-orig-idx')) || 0;
+                            var va = stepData.rows[idxA] ? stepData.rows[idxA][cIdx] : null;
+                            var vb = stepData.rows[idxB] ? stepData.rows[idxB][cIdx] : null;
+                            var aNull = (va === null || va === undefined);
+                            var bNull = (vb === null || vb === undefined);
+                            if (aNull && bNull) return idxA - idxB;
+                            if (aNull) return 1;
+                            if (bNull) return -1;
+                            var na = typeof va === 'number' ? va : (typeof va === 'string' && va.trim() !== '' && !isNaN(Number(va)) ? Number(va) : NaN);
+                            var nb = typeof vb === 'number' ? vb : (typeof vb === 'string' && vb.trim() !== '' && !isNaN(Number(vb)) ? Number(vb) : NaN);
+                            var cmp = (!isNaN(na) && !isNaN(nb))
+                                ? (na - nb)
+                                : (collator ? collator.compare(String(va), String(vb)) : String(va).localeCompare(String(vb)));
+                            if (cmp === 0) return idxA - idxB;
+                            return nextDir === 'desc' ? -cmp : cmp;
+                        });
+                        trList.forEach(function (tr) {
+                            if (typeof tbody.moveBefore === 'function') tbody.moveBefore(tr, null);
+                            else tbody.appendChild(tr);
+                        });
+                        var statusEl = sBtn.closest('.sql-step-table-scroll')?.querySelector('[role="status"]');
+                        if (statusEl) {
+                            statusEl.textContent = 'Sorted by ' + String(stepData.columns[cIdx] || 'column') + ', ' + ariaDir + ', ' + trList.length + ' rows';
+                        }
                     });
                 });
 

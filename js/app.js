@@ -766,6 +766,7 @@ window.App = (() => {
         }
 
         setupLessonTocScrollSpy(reader);
+        window.Lazy?.observeLazyMedia?.(reader);
 
         const activeLessonSlug = currentSlug;
         const hydrateTopicSimulator = () => {

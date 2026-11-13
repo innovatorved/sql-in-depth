@@ -2,3421 +2,865 @@
   "why-databases-exist": {
     "primary": {
       "youtubeId": "7NPIENPr-zk",
-      "title": "#01 - Course Introduction & The Relational Model (CMU Intro to Database Systems)",
+      "title": "Course Introduction & The Relational Model (CMU 15-445/645)",
       "channel": "CMU Database Group",
       "duration": "1h 14m",
+      "start": 0,
       "length": "74m",
-      "why": "Key focus timestamps: 18:20 Codd's Relational Model; 31:45 Relations & Tuples; 45:10 Declarative SQL vs Relational Algebra"
+      "why": "Prof. Andy Pavlo derives why flat CSV/JSON files fail concurrency, integrity, and durability requirements, motivating Codd's relational model."
     },
-    "companion": {
-      "youtubeId": "lvCZk3k4-34",
-      "title": "The Untold Story of Databases",
-      "channel": "CodeSource",
-      "duration": "15m 24s",
-      "length": "15m",
-      "role": "deep-dive",
-      "why": "Visual history and motivation for relational database systems replacing flat files."
-    }
+    "companion": null
   },
   "tables-rows-columns-types": {
-    "primary": {
-      "youtubeId": "FZ1yRBLe0OQ",
-      "title": "SQL Data Types Explained: INT, VARCHAR, DATE, DECIMAL | SQL Lesson 3",
-      "channel": "     The Learning Stack",
-      "duration": "7m 40s",
-      "length": "7m",
-      "why": "Core video covering Relations, Tuples, Attributes, Domains & SQL Data Types (tables-rows-columns-types): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "sBHWI9d_wF0",
-      "title": "Sql Data Types in Telugu",
-      "channel": "PythonLife",
-      "duration": "9m 43s",
-      "length": "9m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Relations, Tuples, Attributes, Domains & SQL Data Types."
-    }
+    "primary": null,
+    "companion": null
   },
   "select-projection-aliases": {
-    "primary": {
-      "youtubeId": "uEmAvzuA7u8",
-      "title": "SQL Order of Execution (Logical Explanation) | Namaste SQL | Ankit Bansal",
-      "channel": "Ankit Bansal",
-      "duration": "15m 28s",
-      "length": "15m",
-      "why": "Core video covering SELECT Projection, Expressions, Aliases & Logical Execution Order (select-projection-aliases): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "-Xmrrj7U34g",
-      "title": "SQL Order of Execution (Visually Explained) | Understanding How Queries Run",
-      "channel": "Data with Baraa",
-      "duration": "4m 4s",
-      "length": "4m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for SELECT Projection, Expressions, Aliases & Logical Execution Order."
-    }
+    "primary": null,
+    "companion": null
   },
   "where-filtering-predicates": {
-    "primary": {
-      "youtubeId": "Uiv82g1gatE",
-      "title": "When Does SARGability Matter Most?",
-      "channel": "Brent Ozar Unlimited",
-      "duration": "21m 7s",
-      "length": "21m",
-      "why": "Core video covering WHERE Clause, Comparison Operators, BETWEEN, IN, LIKE & SARGability (where-filtering-predicates): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "BIlFTFrEFOI",
-      "title": "SQL indexing best practices | How to make your database FASTER!",
-      "channel": "CockroachDB",
-      "duration": "4m 8s",
-      "length": "4m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for WHERE Clause, Comparison Operators, BETWEEN, IN, LIKE & SARGability."
-    }
+    "primary": null,
+    "companion": null
   },
   "boolean-logic-three-valued-null": {
-    "primary": {
-      "youtubeId": "u2Kdw1raQJ4",
-      "title": "Nulls and Three Valued Logic in SQL Programming",
-      "channel": "The SQL Professor",
-      "duration": "10m 28s",
-      "length": "10m",
-      "why": "Core video covering Boolean Logic, Operator Precedence & Three-Valued Logic (3VL) (boolean-logic-three-valued-null): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "p6GiE5aDgjk",
-      "title": "This weird SQL NULL logic cost me hours | SQL 3-valued logic",
-      "channel": "Just a Dev",
-      "duration": "6m 54s",
-      "length": "6m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Boolean Logic, Operator Precedence & Three-Valued Logic (3VL)."
-    }
+    "primary": null,
+    "companion": null
   },
   "null-semantics-coalesce-nullif": {
-    "primary": {
-      "youtubeId": "X_cPXHV2NQ4",
-      "title": "SQL NULL Functions | COALESCE, ISNULL, NULLIF, IS (NOT) NULL | #SQL Course 18",
-      "channel": "Data with Baraa",
-      "duration": "53m 0s",
-      "length": "53m",
-      "why": "Core video covering NULL Semantics: IS NULL, IS DISTINCT FROM, COALESCE & NULLIF (null-semantics-coalesce-nullif): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "oUzY1CbETnE",
-      "title": "Null Values in SQL - 5 tips in 14 min (IFNULL & COALESCE)",
-      "channel": "Jess Ramos | Data, AI, & Tech \u26a1\ufe0f",
-      "duration": "14m 18s",
-      "length": "14m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for NULL Semantics: IS NULL, IS DISTINCT FROM, COALESCE & NULLIF."
-    }
+    "primary": null,
+    "companion": null
   },
   "order-by-limit-offset-distinct": {
-    "primary": {
-      "youtubeId": "1eejs85vHOM",
-      "title": "Master SQL Sorting & Filtering | ORDER BY, LIMIT, DISTINCT Tutorial",
-      "channel": "The Data Girl",
-      "duration": "29m 55s",
-      "length": "29m",
-      "why": "Core video covering Sorting & Deduplication: ORDER BY, NULLS FIRST/LAST, DISTINCT & LIMIT (order-by-limit-offset-distinct): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "8nl4e6QMO0k",
-      "title": "SQL session 6 | Distinct, Order By, Limit, Like Keyword | Trendytech",
-      "channel": "Sumit Mittal",
-      "duration": "31m 56s",
-      "length": "31m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Sorting & Deduplication: ORDER BY, NULLS FIRST/LAST, DISTINCT & LIMIT."
-    }
+    "primary": null,
+    "companion": null
   },
   "case-expressions-type-casting": {
-    "primary": {
-      "youtubeId": "GHPHZ8XJxeg",
-      "title": "SQL CASE WHEN Statement (Visually Explained) | #SQL Course 20",
-      "channel": "Data with Baraa",
-      "duration": "36m 18s",
-      "length": "36m",
-      "why": "Core video covering Conditional SQL: CASE Expressions, CAST / :: & Data Cleaning (case-expressions-type-casting): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "V81Smc6xrBY",
-      "title": "SQL Triggers (Visually Explained) | Audit Logs Use Case | #SQL Course 34",
-      "channel": "Data with Baraa",
-      "duration": "11m 13s",
-      "length": "11m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Conditional SQL: CASE Expressions, CAST / :: & Data Cleaning."
-    }
+    "primary": null,
+    "companion": null
   },
   "case-stripe-ledger-precision": {
-    "primary": {
-      "youtubeId": "aADY0-KQWSA",
-      "title": "The FLOAT Mistake That Crashed a Stock Exchange | INT vs DECIMAL vs FLOAT in SQL",
-      "channel": "StructuredCS",
-      "duration": "9m 23s",
-      "length": "9m",
-      "why": "Core video covering Production Case Study: Why Floating-Point Corrupts Financial Ledgers (case-stripe-ledger-precision): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "lUdRbZDBgEE",
-      "title": "How do Floating Point Numbers Work?",
-      "channel": "Alex Mux",
-      "duration": "3m 27s",
-      "length": "3m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Production Case Study: Why Floating-Point Corrupts Financial Ledgers."
-    }
+    "primary": null,
+    "companion": null
   },
   "build-sql-query-interpreter": {
-    "primary": {
-      "youtubeId": "5Pc18ge9ohI",
-      "title": "Writing My Own Database From Scratch",
-      "channel": "Tony Saro",
-      "duration": "42m 0s",
-      "length": "42m",
-      "why": "Core video covering Hands-On Build: Mini Relational Tuple Filter & Projection Engine (build-sql-query-interpreter): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "mm3BwVOUYhI",
-      "title": "Writing A Database Engine From Scratch In C++ : 0x01 Creating the Lexer, Parser for the SQL Compiler",
-      "channel": "ary27x",
-      "duration": "5h 37m",
-      "length": "337m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Hands-On Build: Mini Relational Tuple Filter & Projection Engine."
-    }
+    "primary": null,
+    "companion": null
   },
   "create-table-ddl-anatomy": {
-    "primary": {
-      "youtubeId": "orhlgGzw_z0",
-      "title": "SQL DDL Commands || create || alter || rename || truncate || drop || DBMS | MySQL implementation",
-      "channel": "Sudhakar Atchala",
-      "duration": "15m 44s",
-      "length": "15m",
-      "why": "Core video covering CREATE TABLE, ALTER TABLE, DROP, TRUNCATE vs DELETE & Catalogs (create-table-ddl-anatomy): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "rf3cduPAkVc",
-      "title": "DDL Command in SQL | Create, Primary Key, Alter, Rename, Truncate, Drop | DDL command in One Video",
-      "channel": "Kailash Joshi Tutorials",
-      "duration": "10m 45s",
-      "length": "10m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for CREATE TABLE, ALTER TABLE, DROP, TRUNCATE vs DELETE & Catalogs."
-    }
+    "primary": null,
+    "companion": null
   },
   "primary-keys-surrogate-vs-natural": {
     "primary": {
       "youtubeId": "DHtf_46OxY8",
-      "title": "UUID vs INT: What\u2019s Better For Your Primary Key?",
+      "title": "UUID vs INT: What Is Better For Your Primary Key?",
       "channel": "Database Star",
       "duration": "9m 40s",
+      "start": 0,
       "length": "9m",
-      "why": "Core video covering Primary Keys: Composite Keys, IDENTITY & UUIDv4 vs UUIDv7 Locality (primary-keys-surrogate-vs-natural): focuses directly on practical mechanics, real-world examples, and implementation details."
+      "why": "Compares 64-bit IDENTITY keys, random UUIDv4 page splits, and time-ordered UUIDv7 locality in B+Tree indexes."
     },
-    "companion": {
-      "youtubeId": "dRR0liCuWiE",
-      "title": "Natural vs. Surrogate Keys: Making Informed Choices for Database Design",
-      "channel": "COURSE PLEASE",
-      "duration": "6m 2s",
-      "length": "6m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Primary Keys: Composite Keys, IDENTITY & UUIDv4 vs UUIDv7 Locality."
-    }
+    "companion": null
   },
   "foreign-keys-referential-integrity": {
-    "primary": {
-      "youtubeId": "DM2lAomoDrg",
-      "title": "Lec-12: Insert, Update & Delete from Foreign Key table | Referential Integrity",
-      "channel": "Gate Smashers",
-      "duration": "18m 18s",
-      "length": "18m",
-      "why": "Core video covering Foreign Keys, Parent/Child Tables & Referential Actions (CASCADE / RESTRICT) (foreign-keys-referential-integrity): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "Br2FInlVKcs",
-      "title": "Lec-14: Foreign Key\ud83d\udd11 with On Delete Cascade with Execution",
-      "channel": "Gate Smashers",
-      "duration": "5m 33s",
-      "length": "5m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Foreign Keys, Parent/Child Tables & Referential Actions (CASCADE / RESTRICT)."
-    }
+    "primary": null,
+    "companion": null
   },
   "check-unique-not-null-defaults": {
-    "primary": {
-      "youtubeId": "eriO9exZKNg",
-      "title": "NOT NULL, DEFAULT, CHECK Constraints in SQL Server (Domain Integrity in DBMS)",
-      "channel": "SQL with Manoj",
-      "duration": "16m 54s",
-      "length": "16m",
-      "why": "Core video covering Domain Integrity: CHECK, UNIQUE, NOT NULL, DEFAULT & Generated Columns (check-unique-not-null-defaults): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "o9WGbvWP2iE",
-      "title": "Working with Unique Not Null And check Constraints in SQL Server | MSSQL Training | By Mr.Sudhakar L",
-      "channel": "Naresh i Technologies",
-      "duration": "16m 9s",
-      "length": "16m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Domain Integrity: CHECK, UNIQUE, NOT NULL, DEFAULT & Generated Columns."
-    }
+    "primary": null,
+    "companion": null
   },
   "insert-bulk-loading-returning": {
-    "primary": {
-      "youtubeId": "_qhpmpBWJFA",
-      "title": "SQL INSERT Explained: Multi-Row VALUES, DEFAULT, RETURNING and INSERT ... SELECT (PostgreSQL)",
-      "channel": "Prateek Goel | GrowAsEngineers",
-      "duration": "9m 2s",
-      "length": "9m",
-      "why": "Core video covering Single & Multi-Row INSERT, INSERT ... SELECT, COPY & RETURNING (insert-bulk-loading-returning): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "osSuo0c349o",
-      "title": "SQL Upserts: INSERT ON CONFLICT, EXCLUDED, MERGE and MySQL ON DUPLICATE KEY (PostgreSQL)",
-      "channel": "Prateek Goel | GrowAsEngineers",
-      "duration": "9m 47s",
-      "length": "9m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Single & Multi-Row INSERT, INSERT ... SELECT, COPY & RETURNING."
-    }
+    "primary": null,
+    "companion": null
   },
   "upsert-on-conflict-merge": {
-    "primary": {
-      "youtubeId": "QMJYq5G42As",
-      "title": "How to perform an upsert (insert or update) operation in PostgreSQL using the INSERT ON CONFLICT.",
-      "channel": "Software Nuggets",
-      "duration": "6m 38s",
-      "length": "6m",
-      "why": "Core video covering Idempotent Writes: ON CONFLICT DO UPDATE (Upsert) & MERGE (upsert-on-conflict-merge): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "VOpIIj7jOls",
-      "title": "Postgresql Tutorials | Upsert in Postgresql | postgresql Insert on conflict | merge in postgresql",
-      "channel": "Training2SQL MSBI",
-      "duration": "12m 42s",
-      "length": "12m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Idempotent Writes: ON CONFLICT DO UPDATE (Upsert) & MERGE."
-    }
+    "primary": null,
+    "companion": null
   },
   "update-delete-safe-mutations": {
-    "primary": {
-      "youtubeId": "3FT-DL2pKOE",
-      "title": "SQL UPDATE and DELETE Safely: UPDATE FROM, DELETE USING and the Missing WHERE (PostgreSQL)",
-      "channel": "Prateek Goel | GrowAsEngineers",
-      "duration": "9m 57s",
-      "length": "9m",
-      "why": "Core video covering Safe Mutations: UPDATE, UPDATE ... FROM, DELETE & Soft-Delete Tradeoffs (update-delete-safe-mutations): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "bhnrIforc7s",
-      "title": "Intermediate SQL Tutorial | Updating/Deleting Data",
-      "channel": "Alex The Analyst",
-      "duration": "4m 36s",
-      "length": "4m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Safe Mutations: UPDATE, UPDATE ... FROM, DELETE & Soft-Delete Tradeoffs."
-    }
+    "primary": null,
+    "companion": null
   },
   "views-temp-tables-ctas": {
-    "primary": {
-      "youtubeId": "6RU6T8HKgYA",
-      "title": "SQL Subquery vs CTE vs Views vs CTAS vs TEMP | #SQL Course 32",
-      "channel": "Data with Baraa",
-      "duration": "9m 43s",
-      "length": "9m",
-      "why": "Core video covering Virtual & Ephemeral Relations: Views, Updatable Views, CTAS & Temp Tables (views-temp-tables-ctas): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "vLLkNI-vkV8",
-      "title": "SQL Views In 4 Minutes: Super Useful! Wow! Crazy! Amazing! I'm Crying Tears Of SQL Joy.",
-      "channel": "Colt Steele",
-      "duration": "4m 23s",
-      "length": "4m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Virtual & Ephemeral Relations: Views, Updatable Views, CTAS & Temp Tables."
-    }
+    "primary": null,
+    "companion": null
   },
   "case-github-zero-downtime-migrations": {
-    "primary": {
-      "youtubeId": "uc5u1bA77Dc",
-      "title": "Zero Downtime MySQL Migrations \u2014 Here's How GitHub Does It (Enter gh-ost)",
-      "channel": "The Strategic Stack with Yogi",
-      "duration": "7m 0s",
-      "length": "7m",
-      "why": "Core video covering Production Case Study: Zero-Downtime Schema Migrations (Expand & Contract) (case-github-zero-downtime-migrations): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "sJJzzypNKyw",
-      "title": "Introducing gh ost GitHub's triggerless, painless schema migrations for MySQL",
-      "channel": "All Hacking Cons",
-      "duration": "23m 6s",
-      "length": "23m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Production Case Study: Zero-Downtime Schema Migrations (Expand & Contract)."
-    }
+    "primary": null,
+    "companion": null
   },
   "build-ecommerce-schema-ddl": {
-    "primary": {
-      "youtubeId": "1HamqOuv2Cw",
-      "title": "eCommerce Database Design: Diagram & Explanation",
-      "channel": "Database Star",
-      "duration": "16m 5s",
-      "length": "16m",
-      "why": "Core video covering Hands-On Build: E-Commerce Schema with Referential Integrity & Upsert Pipeline (build-ecommerce-schema-ddl): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "yhMmeB56a20",
-      "title": "Mastering E-Commerce Database Design: A Step by Step Guide | Full Stack Developer Path | SQL",
-      "channel": "Learn Smart Coding",
-      "duration": "28m 9s",
-      "length": "28m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Hands-On Build: E-Commerce Schema with Referential Integrity & Upsert Pipeline."
-    }
+    "primary": null,
+    "companion": null
   },
   "relational-algebra-set-theory": {
-    "primary": {
-      "youtubeId": "emOw5lZFv5w",
-      "title": "Select Operation in Relational Algebra || Examples || Queries || DBMS",
-      "channel": "Sudhakar Atchala",
-      "duration": "7m 33s",
-      "length": "7m",
-      "why": "Core video covering Relational Algebra: Selection (\u03c3), Projection (\u03c0), Product (\u00d7) & Rename (\u03c1) (relational-algebra-set-theory): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "ryeGFOMZhK4",
-      "title": "relational algebra complete topic in dbms, various operations, various operators, relational algebra",
-      "channel": "NS lectures",
-      "duration": "28m 43s",
-      "length": "28m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Relational Algebra: Selection (\u03c3), Projection (\u03c0), Product (\u00d7) & Rename (\u03c1)."
-    }
+    "primary": null,
+    "companion": null
   },
   "inner-join-equi-joins": {
-    "primary": {
-      "youtubeId": "2HVMiPPuPIM",
-      "title": "SQL Joins Tutorial for Beginners - Inner Join, Left Join, Right Join, Full Outer Join",
-      "channel": "Joey Blue",
-      "duration": "18m 4s",
-      "length": "18m",
-      "why": "Core video covering INNER JOIN, Equi-Joins, ON vs USING & Foreign-Key Graph Traversal (inner-join-equi-joins): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "yMOmuFiw__Y",
-      "title": "SQL Inner Join - SQL Training Online - Quick Tips Ep29",
-      "channel": "Joey Blue",
-      "duration": "4m 48s",
-      "length": "4m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for INNER JOIN, Equi-Joins, ON vs USING & Foreign-Key Graph Traversal."
-    }
+    "primary": null,
+    "companion": null
   },
   "left-right-full-outer-joins": {
-    "primary": {
-      "youtubeId": "aY7z4HcHm5M",
-      "title": "SQL Joins Basics (Visually Explained) | INNER, LEFT, RIGHT, FULL | #SQL Course 8",
-      "channel": "Data with Baraa",
-      "duration": "40m 18s",
-      "length": "40m",
-      "why": "Core video covering Outer Joins: LEFT, RIGHT & FULL OUTER JOIN with NULL Extension (left-right-full-outer-joins): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "zGSv0VaOtR0",
-      "title": "SQL Joins: Difference Between Inner/Left/Right/Outer Joins",
-      "channel": "JomaClass",
-      "duration": "10m 51s",
-      "length": "10m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Outer Joins: LEFT, RIGHT & FULL OUTER JOIN with NULL Extension."
-    }
+    "primary": null,
+    "companion": null
   },
   "join-where-vs-on-filter-trap": {
-    "primary": {
-      "youtubeId": "f9lbm7HA7pw",
-      "title": "SQL JOIN: Condition in \u201cON\u201d vs. \u201cWHERE\"",
-      "channel": "VigyanInc Tutorials - Making the Complex Simple!",
-      "duration": "8m 55s",
-      "length": "8m",
-      "why": "Core video covering The Classic Outer Join Trap: Filtering in ON vs Filtering in WHERE (join-where-vs-on-filter-trap): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "Gvpw0qWl4bw",
-      "title": "#sql - difference between WHERE & AND clause with LEFT/RIGHT join | INNER join+WHERE=LEFT join+WHERE",
-      "channel": "Daily life of a Data Engineer",
-      "duration": "6m 21s",
-      "length": "6m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for The Classic Outer Join Trap: Filtering in ON vs Filtering in WHERE."
-    }
+    "primary": null,
+    "companion": null
   },
   "self-joins-non-equi-joins": {
-    "primary": {
-      "youtubeId": "V3xjmBi1QQE",
-      "title": "SQL SELF JOIN | UNION & UNION ALL in SQL | SQL Tutorial in Hindi 12",
-      "channel": "Rishabh Mishra",
-      "duration": "8m 19s",
-      "length": "8m",
-      "why": "Core video covering Self-Joins, Hierarchical Pairs & Non-Equi Range Joins (<, >, BETWEEN) (self-joins-non-equi-joins): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "lUiPjkOQG9w",
-      "title": "Lec-46: Equi Join operation with Example | Database Management System",
-      "channel": "Gate Smashers",
-      "duration": "14m 14s",
-      "length": "14m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Self-Joins, Hierarchical Pairs & Non-Equi Range Joins (<, >, BETWEEN)."
-    }
+    "primary": null,
+    "companion": null
   },
   "cross-join-cartesian-products": {
-    "primary": {
-      "youtubeId": "0-P0zJfMipE",
-      "title": "SQL Lesson 13: Stop Joining Tables Like This (Cartesian Products Explained)",
-      "channel": "Fun with Learning Technology",
-      "duration": "3m 32s",
-      "length": "3m",
-      "why": "Core video covering CROSS JOIN, Combinatorial Grids & Accidental Cartesian Explosions (cross-join-cartesian-products): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "_yDadvbnIJk",
-      "title": "Session 5:SQL JOINS & UNION Explained With Real Data (Beginner to Interview\u2011Ready)",
-      "channel": "TnS_AiDa_Tech",
-      "duration": "27m 59s",
-      "length": "27m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for CROSS JOIN, Combinatorial Grids & Accidental Cartesian Explosions."
-    }
+    "primary": null,
+    "companion": null
   },
   "semi-joins-anti-joins": {
     "primary": {
       "youtubeId": "GWq-_R-pkzg",
-      "title": "SQL Semi Joins and Anti Joins: EXISTS, IN, NOT EXISTS, LEFT JOIN IS NULL and NOT IN (PostgreSQL)",
+      "title": "SQL Semi Joins and Anti Joins: EXISTS, IN, NOT EXISTS, and NOT IN",
       "channel": "Prateek Goel | GrowAsEngineers",
-      "duration": "10m 30s",
+      "duration": "10m 12s",
+      "start": 0,
       "length": "10m",
-      "why": "Core video covering Relational Semi-Join (EXISTS / IN) & Anti-Join (NOT EXISTS / LEFT JOIN IS NULL) (semi-joins-anti-joins): focuses directly on practical mechanics, real-world examples, and implementation details."
+      "why": "Walks through semi-join short-circuiting and why NOT IN silently returns zero rows whenever a subquery contains NULL."
     },
-    "companion": {
-      "youtubeId": "FkydxUCwJlY",
-      "title": "Sellers with No Listings | SQL Interview Question (NOT EXISTS, Anti-Join) | GrowAsEngineers",
-      "channel": "Prateek Goel | GrowAsEngineers",
-      "duration": "7m 49s",
-      "length": "7m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Relational Semi-Join (EXISTS / IN) & Anti-Join (NOT EXISTS / LEFT JOIN IS NULL)."
-    }
+    "companion": null
   },
   "set-operations-union-intersect-except": {
-    "primary": {
-      "youtubeId": "LUSPRn2zxSo",
-      "title": "SQL SET Operators (Visually Explained) | UNION, UNION ALL, EXCEPT, INTERSECT | #SQL Course 11",
-      "channel": "Data with Baraa",
-      "duration": "48m 38s",
-      "length": "48m",
-      "why": "Core video covering Set Operations: UNION vs UNION ALL, INTERSECT & EXCEPT (set-operations-union-intersect-except): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "Uu4GfSHy3_4",
-      "title": "29-SET Operators in SQL | Union | Union All | Intersect | Except or Minus | Examples | SQL Tutorial",
-      "channel": "CodeEra",
-      "duration": "8m 30s",
-      "length": "8m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Set Operations: UNION vs UNION ALL, INTERSECT & EXCEPT."
-    }
+    "primary": null,
+    "companion": null
   },
   "case-missing-null-notin-outage": {
-    "primary": {
-      "youtubeId": "9dyRl9TIxrQ",
-      "title": "SQL IS NULL and IS NOT NULL: Why = NULL Never Matches (PostgreSQL)",
-      "channel": "Prateek Goel | GrowAsEngineers",
-      "duration": "8m 3s",
-      "length": "8m",
-      "why": "Core video covering Production Case Study: How a Single NULL in NOT IN Returned Zero Rows (case-missing-null-notin-outage): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "Bn0_QPF-AjQ",
-      "title": "Don't fall for this NULL trap!!",
-      "channel": "Ulhas Bansod",
-      "duration": "7m 38s",
-      "length": "7m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Production Case Study: How a Single NULL in NOT IN Returned Zero Rows."
-    }
+    "primary": null,
+    "companion": null
   },
   "build-multi-table-order-reconciler": {
-    "primary": {
-      "youtubeId": "AijmQ5uuwGw",
-      "title": "Automate reconciliations with Power Query | Excel Off The Grid",
-      "channel": "Excel Off The Grid",
-      "duration": "9m 37s",
-      "length": "9m",
-      "why": "Core video covering Hands-On Build: Multi-Table Order, Payment & Shipment Reconciliation Engine (build-multi-table-order-reconciler): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "CjbVRqWLfiU",
-      "title": "Bank Reconciliation Using SQL | SQL Queries for Financial Data",
-      "channel": "Fintech by CandiMentor",
-      "duration": "13m 10s",
-      "length": "13m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Hands-On Build: Multi-Table Order, Payment & Shipment Reconciliation Engine."
-    }
+    "primary": null,
+    "companion": null
   },
   "aggregate-functions-internals": {
-    "primary": {
-      "youtubeId": "jcoJuc5e3RE",
-      "title": "Basic Aggregate Functions in SQL (COUNT, SUM, AVG, MAX, and MIN)",
-      "channel": "Becoming a Data Scientist",
-      "duration": "5m 44s",
-      "length": "5m",
-      "why": "Core video covering Aggregate Internals: COUNT(*) vs COUNT(col), COUNT(DISTINCT), SUM & AVG (aggregate-functions-internals): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "Yr4pHPZCshA",
-      "title": "Lec-79: SQL Aggregate Functions - SUM, AVG(n), COUNT, MIN, MAX Functions | DBMS",
-      "channel": "Gate Smashers",
-      "duration": "11m 20s",
-      "length": "11m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Aggregate Internals: COUNT(*) vs COUNT(col), COUNT(DISTINCT), SUM & AVG."
-    }
+    "primary": null,
+    "companion": null
   },
   "group-by-execution-mechanics": {
-    "primary": {
-      "youtubeId": "_lOH7haqCFg",
-      "title": "Session 8: Aggregate operators in SQL Server: Stream and Hash aggregations",
-      "channel": "ARSLANOV",
-      "duration": "7m 46s",
-      "length": "7m",
-      "why": "Core video covering GROUP BY Execution Mechanics, HashAggregate vs GroupAggregate & Functional Dependency (group-by-execution-mechanics): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "-YFWiOycc8A",
-      "title": "SQL Server Operators: Stream Aggregate | Hash Aggregate | Sort",
-      "channel": "MS SQL DBA Tech Support",
-      "duration": "7m 36s",
-      "length": "7m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for GROUP BY Execution Mechanics, HashAggregate vs GroupAggregate & Functional Dependency."
-    }
+    "primary": null,
+    "companion": null
   },
   "having-vs-where-pipeline": {
-    "primary": {
-      "youtubeId": "dCNjUOc1cBY",
-      "title": "Having vs Where in MySQL | Beginner MySQL Series",
-      "channel": "Alex The Analyst",
-      "duration": "3m 45s",
-      "length": "3m",
-      "why": "Core video covering Pre-Filter (WHERE) vs Post-Aggregate Filter (HAVING) Pipeline (having-vs-where-pipeline): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "nNrgRVIzeHg",
-      "title": "Advanced Aggregate Functions in SQL (GROUP BY, HAVING vs. WHERE)",
-      "channel": "Becoming a Data Scientist",
-      "duration": "5m 59s",
-      "length": "5m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Pre-Filter (WHERE) vs Post-Aggregate Filter (HAVING) Pipeline."
-    }
+    "primary": null,
+    "companion": null
   },
   "conditional-aggregation-filter": {
-    "primary": {
-      "youtubeId": "b8uDi5UKs10",
-      "title": "Conditional Aggregation in SQL \u2014 Analyze Multiple Conditions in One Query",
-      "channel": "Data Rambling",
-      "duration": "5m 7s",
-      "length": "5m",
-      "why": "Core video covering Pivoting & Conditional Aggregation: SUM(CASE WHEN) & FILTER (WHERE ...) (conditional-aggregation-filter): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "GHPHZ8XJxeg",
-      "title": "SQL CASE WHEN Statement (Visually Explained) | #SQL Course 20",
-      "channel": "Data with Baraa",
-      "duration": "36m 18s",
-      "length": "36m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Pivoting & Conditional Aggregation: SUM(CASE WHEN) & FILTER (WHERE ...)."
-    }
+    "primary": null,
+    "companion": null
   },
   "string-json-array-aggregation": {
-    "primary": {
-      "youtubeId": "822cXcnsdiI",
-      "title": "SQL STRING_AGG and GROUP_CONCAT: Ordered Lists, DISTINCT, NULLs and Dialects (PostgreSQL)",
-      "channel": "Prateek Goel | GrowAsEngineers",
-      "duration": "8m 9s",
-      "length": "8m",
-      "why": "Core video covering List & Document Rollups: GROUP_CONCAT, STRING_AGG & JSON Aggregation (string-json-array-aggregation): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "1eE8xF9qJWc",
-      "title": "PostgreSQL JSON_AGG Function | JAON_AGG in PostgreSQL | JSON Aggregate Function in PostgreSQL",
-      "channel": "TSInfo Technologies",
-      "duration": "4m 7s",
-      "length": "4m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for List & Document Rollups: GROUP_CONCAT, STRING_AGG & JSON Aggregation."
-    }
+    "primary": null,
+    "companion": null
   },
   "grouping-sets-rollup-cube": {
-    "primary": {
-      "youtubeId": "2SMZD0Aw378",
-      "title": "Rollup, Cube and Grouping Sets in SQL | Advanced SQL Tutorial | Beyond Group By",
-      "channel": "Ankit Bansal",
-      "duration": "9m 10s",
-      "length": "9m",
-      "why": "Core video covering Multi-Dimensional OLAP: GROUPING SETS, ROLLUP, CUBE & GROUPING() (grouping-sets-rollup-cube): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "Ccye_H34hBo",
-      "title": "GROUPING SETS vs ROLLUP vs CUBE in SQL | Advanced SQL Tutorial with Examples",
-      "channel": "techTFQ",
-      "duration": "33m 39s",
-      "length": "33m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Multi-Dimensional OLAP: GROUPING SETS, ROLLUP, CUBE & GROUPING()."
-    }
+    "primary": null,
+    "companion": null
   },
   "join-fanout-chasm-traps": {
-    "primary": {
-      "youtubeId": "Yh4CrPHVBdE",
-      "title": "6 SQL Joins you MUST know! (Animated + Practice)",
-      "channel": "Anton Putra",
-      "duration": "9m 47s",
-      "length": "9m",
-      "why": "Core video covering The One-to-Many Join Fanout & Chasm Traps (Why SUM Double-Counts) (join-fanout-chasm-traps): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "wdz4MRlzOyE",
-      "title": "HOW TO JOIN 3 OR MORE TABLES IN SQL | TWO WAYS",
-      "channel": "Crack Concepts",
-      "duration": "4m 4s",
-      "length": "4m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for The One-to-Many Join Fanout & Chasm Traps (Why SUM Double-Counts)."
-    }
+    "primary": null,
+    "companion": null
   },
   "histograms-percentiles-medians": {
-    "primary": {
-      "youtubeId": "4Gr93tPMXeo",
-      "title": "SQL|PERCENTILE_DISC and PERCENTILE_CONT|Finding Median and Quartiles in SQL|SQL Analytical functions",
-      "channel": "Data Project Hub",
-      "duration": "13m 55s",
-      "length": "13m",
-      "why": "Core video covering Statistical SQL: Equi-Width Histograms, Percentiles & Medians (histograms-percentiles-medians): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "SGdEQoTRCIQ",
-      "title": "SQL Median and Percentiles: PERCENTILE_CONT vs PERCENTILE_DISC, WITHIN GROUP and MODE",
-      "channel": "Prateek Goel | GrowAsEngineers",
-      "duration": "10m 29s",
-      "length": "10m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Statistical SQL: Equi-Width Histograms, Percentiles & Medians."
-    }
+    "primary": null,
+    "companion": null
   },
   "case-analytics-double-counting-bug": {
     "primary": {
-      "youtubeId": "HKHEn_O3KVg",
-      "title": "SQL Fan-Out Explained | Why JOINs Double Your Financial Totals",
-      "channel": "Fintech by CandiMentor",
-      "duration": "11m 31s",
-      "length": "11m",
-      "why": "Core video covering Production Case Study: Diagnosing a 3x Revenue Over-Reporting Fanout Bug (case-analytics-double-counting-bug): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
       "youtubeId": "71MvNBJYQ84",
-      "title": "SQL Join Fan-Out: Why Joins Duplicate Rows and Inflate SUM (and How to Fix It) (PostgreSQL)",
+      "title": "SQL Join Fan-Out: Why Joins Duplicate Rows and Inflate SUM",
       "channel": "Prateek Goel | GrowAsEngineers",
-      "duration": "8m 17s",
+      "duration": "8m 18s",
+      "start": 0,
       "length": "8m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Production Case Study: Diagnosing a 3x Revenue Over-Reporting Fanout Bug."
-    }
+      "why": "Demonstrates 1:N chasm traps inflating financial aggregates and fixes them with pre-aggregated CTEs."
+    },
+    "companion": null
   },
   "build-executive-kpi-aggregation-suite": {
-    "primary": {
-      "youtubeId": "ItZlTixh6Bs",
-      "title": "What are KPIs and Metrics? | Data Fundamental for Beginners",
-      "channel": "Alex The Analyst",
-      "duration": "5m 46s",
-      "length": "5m",
-      "why": "Core video covering Hands-On Build: Multi-Dimensional Revenue, Cohort & Funnel Aggregation Suite (build-executive-kpi-aggregation-suite): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "yhbNvqy2cMg",
-      "title": "Build a Real-Time Executive Dashboard with SQL + Power BI + Email Alerts (No Code!)",
-      "channel": "KnowHow Academy",
-      "duration": "20m 1s",
-      "length": "20m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Hands-On Build: Multi-Dimensional Revenue, Cohort & Funnel Aggregation Suite."
-    }
+    "primary": null,
+    "companion": null
   },
   "scalar-row-table-subqueries": {
-    "primary": {
-      "youtubeId": "nJIEIzF7tDw",
-      "title": "Subquery in SQL | Correlated Subquery + Complete SQL Subqueries Tutorial",
-      "channel": "techTFQ",
-      "duration": "1h 10m",
-      "length": "70m",
-      "why": "Core video covering Subquery Taxonomy: Scalar, Row, Array & Derived Table Subqueries (scalar-row-table-subqueries): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "0d419Vo2Po4",
-      "title": "Lec-81: Correlated Subquery in SQL with Example | Imp for Placements, GATE, NET & SQL certification",
-      "channel": "Gate Smashers",
-      "duration": "11m 43s",
-      "length": "11m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Subquery Taxonomy: Scalar, Row, Array & Derived Table Subqueries."
-    }
+    "primary": null,
+    "companion": null
   },
   "correlated-subqueries-mechanics": {
-    "primary": {
-      "youtubeId": "0d419Vo2Po4",
-      "title": "Lec-81: Correlated Subquery in SQL with Example | Imp for Placements, GATE, NET & SQL certification",
-      "channel": "Gate Smashers",
-      "duration": "11m 43s",
-      "length": "11m",
-      "why": "Core video covering Correlated Subqueries: Outer Reference Binding & Optimizer Unnesting (correlated-subqueries-mechanics): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "QAkCknWPSqY",
-      "title": "We Learn SQL #14 | Correlated subqueries with EXISTS in SQL",
-      "channel": "We Learn SQL",
-      "duration": "3m 46s",
-      "length": "3m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Correlated Subqueries: Outer Reference Binding & Optimizer Unnesting."
-    }
+    "primary": null,
+    "companion": null
   },
   "exists-not-exists-null-safety": {
-    "primary": {
-      "youtubeId": "wA9GJZcB618",
-      "title": "Lec-75: EXIST and NOT EXIST Subqueries(part-8) | Database Management System",
-      "channel": "Gate Smashers",
-      "duration": "14m 8s",
-      "length": "14m",
-      "why": "Core video covering EXISTS & NOT EXISTS: Short-Circuit Semi-Joins & Complete NULL Safety (exists-not-exists-null-safety): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "sP6MCZ9patk",
-      "title": "SQL Subquery using EXISTS and IN - SQL Tutorial #31",
-      "channel": "Data with Baraa",
-      "duration": "10m 12s",
-      "length": "10m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for EXISTS & NOT EXISTS: Short-Circuit Semi-Joins & Complete NULL Safety."
-    }
+    "primary": null,
+    "companion": null
   },
   "lateral-joins-cross-apply": {
-    "primary": {
-      "youtubeId": "xsKJO0ncWWo",
-      "title": "SQL LATERAL Joins in PostgreSQL: Top N per Group, LEFT JOIN LATERAL ON true, unnest and Plans",
-      "channel": "Prateek Goel | GrowAsEngineers",
-      "duration": "7m 48s",
-      "length": "7m",
-      "why": "Core video covering LATERAL Subqueries (CROSS APPLY / OUTER APPLY) & Top-N-Per-Group (lateral-joins-cross-apply): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "5kskNInQGEs",
-      "title": "SQL Top N per Group and Latest Record per Entity: ROW_NUMBER, DISTINCT ON, LATERAL (PostgreSQL)",
-      "channel": "Prateek Goel | GrowAsEngineers",
-      "duration": "9m 35s",
-      "length": "9m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for LATERAL Subqueries (CROSS APPLY / OUTER APPLY) & Top-N-Per-Group."
-    }
+    "primary": null,
+    "companion": null
   },
   "common-table-expressions-with": {
-    "primary": {
-      "youtubeId": "5x1uodxEIaM",
-      "title": "SQL CTE (Common Table Expression) Visually Explained | Full Guide WITH Clause | #SQL Course 28",
-      "channel": "Data with Baraa",
-      "duration": "1h 17m",
-      "length": "77m",
-      "why": "Core video covering Common Table Expressions (WITH): Modular Multi-Stage SQL Pipelines (common-table-expressions-with): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "QNfnuK-1YYY",
-      "title": "SQL WITH Clause | How to write SQL Queries using WITH Clause | SQL CTE (Common Table Expression)",
-      "channel": "techTFQ",
-      "duration": "24m 47s",
-      "length": "24m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Common Table Expressions (WITH): Modular Multi-Stage SQL Pipelines."
-    }
+    "primary": null,
+    "companion": null
   },
   "cte-materialization-optimization-fence": {
     "primary": {
-      "youtubeId": "zvEbJWcT6JU",
-      "title": "Advanced PostgreSQL Optimization | Partitioning + BRIN + Materialized Views \u26a1 #postgresqltuning",
-      "channel": "Chirag Mahto",
-      "duration": "17m 32s",
-      "length": "17m",
-      "why": "Core video covering CTE Inlining vs Materialization: Optimization Fences & MATERIALIZED Hints (cte-materialization-optimization-fence): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
       "youtubeId": "DzhmMwXYGME",
-      "title": "SQL Subqueries vs Joins vs CTEs: How the PostgreSQL Optimizer Rewrites Them (and What Blocks It)",
+      "title": "SQL Subqueries vs Joins vs CTEs: How the PostgreSQL Optimizer Rewrites Them",
       "channel": "Prateek Goel | GrowAsEngineers",
-      "duration": "9m 26s",
+      "duration": "9m 05s",
+      "start": 0,
       "length": "9m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for CTE Inlining vs Materialization: Optimization Fences & MATERIALIZED Hints."
-    }
+      "why": "Explains PostgreSQL 12+ CTE inlining versus MATERIALIZED optimization fences and predicate pushdown."
+    },
+    "companion": null
   },
   "recursive-ctes-hierarchies": {
-    "primary": {
-      "youtubeId": "LJC8277LONg",
-      "title": "SQL WITH Clause | Clearly Explained | CTEs vs Subqueries vs Temp Tables | Recursive CTEs",
-      "channel": "Maven Analytics",
-      "duration": "13m 14s",
-      "length": "13m",
-      "why": "Core video covering Recursive CTEs (WITH RECURSIVE): Anchor, Recursive Member & Fixpoint (recursive-ctes-hierarchies): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "Rp3EcF9nx6U",
-      "title": "Recursive CTE | Recursive SQL Queries | SQL Tutorial in Hindi 17",
-      "channel": "Rishabh Mishra",
-      "duration": "16m 29s",
-      "length": "16m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Recursive CTEs (WITH RECURSIVE): Anchor, Recursive Member & Fixpoint."
-    }
+    "primary": null,
+    "companion": null
   },
   "graph-traversal-cycle-detection-sql": {
-    "primary": {
-      "youtubeId": "zjd-N-GRKLU",
-      "title": "SQL Recursive CTE Magic: Build a Bill of Materials (BOM) Hierarchy in Minutes!",
-      "channel": "BM Infotrade",
-      "duration": "3m 41s",
-      "length": "3m",
-      "why": "Core video covering Graph Traversal, Bill-of-Materials (BOM) & Cycle Detection in SQL (graph-traversal-cycle-detection-sql): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "9twcmtQj4DU",
-      "title": "G-19. Detect cycle in a directed graph using DFS | Java | C++",
-      "channel": "take U forward",
-      "duration": "17m 22s",
-      "length": "17m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Graph Traversal, Bill-of-Materials (BOM) & Cycle Detection in SQL."
-    }
+    "primary": null,
+    "companion": null
   },
   "case-recursive-org-permission-engine": {
-    "primary": {
-      "youtubeId": "Aq3sHzS1PAs",
-      "title": "How to Design Role and Permission Tables in SQL (RBAC in 3 Steps)",
-      "channel": "\ud835\udde6\ud835\ude01\ud835\uddee\ud835\uddff\ud835\uddd6\ud835\uddfc\ud835\uddf1\ud835\uddf2 \ud835\uddde\ud835\uddf5",
-      "duration": "8m 57s",
-      "length": "8m",
-      "why": "Core video covering Production Case Study: Hierarchical RBAC Permission Inheritance in SQL (case-recursive-org-permission-engine): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "jGTPMNkyP2A",
-      "title": "Role-Based Access Control(RBAC) - System Design for Data Engineers (Interview-Ready)",
-      "channel": "Harsha Guggilla",
-      "duration": "51m 5s",
-      "length": "51m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Production Case Study: Hierarchical RBAC Permission Inheritance in SQL."
-    }
+    "primary": null,
+    "companion": null
   },
   "build-hierarchical-graph-query-engine": {
-    "primary": {
-      "youtubeId": "o666k19mZwE",
-      "title": "SQL Window Functions Basics (Visually Explained) | PARTITION BY, ORDER BY, FRAME | #SQL Course 22",
-      "channel": "Data with Baraa",
-      "duration": "57m 18s",
-      "length": "57m",
-      "why": "Core video covering Hands-On Build: Bill-of-Materials & Social Graph Reachability Engine (build-hierarchical-graph-query-engine): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "B1sYDjHLGhw",
-      "title": "Create Star Schema Metric Views using SQL",
-      "channel": "Abiola David - Databricks and Microsoft MVP",
-      "duration": "21m 23s",
-      "length": "21m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Hands-On Build: Bill-of-Materials & Social Graph Reachability Engine."
-    }
+    "primary": null,
+    "companion": null
   },
   "window-functions-mental-model": {
     "primary": {
       "youtubeId": "rIcB4zMYMas",
-      "title": "SQL Window Functions | Clearly Explained | PARTITION BY, ORDER BY, ROW_NUMBER, RANK, DENSE_RANK",
+      "title": "SQL Window Functions Clearly Explained: PARTITION BY, ORDER BY & Ranking",
       "channel": "Maven Analytics",
-      "duration": "7m 52s",
+      "duration": "7m 24s",
+      "start": 0,
       "length": "7m",
-      "why": "Core video covering The Window Function Mental Model: Preserving Row Identity + Context (window-functions-mental-model): focuses directly on practical mechanics, real-world examples, and implementation details."
+      "why": "Visualizes how OVER(PARTITION BY ... ORDER BY ...) computes analytical values without collapsing detail rows."
     },
-    "companion": {
-      "youtubeId": "Ww71knvhQ-s",
-      "title": "SQL Window Function | How to write SQL Query using RANK, DENSE RANK, LEAD/LAG | SQL Queries Tutorial",
-      "channel": "techTFQ",
-      "duration": "24m 54s",
-      "length": "24m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for The Window Function Mental Model: Preserving Row Identity + Context."
-    }
+    "companion": null
   },
   "partition-by-order-by-mechanics": {
-    "primary": {
-      "youtubeId": "J07O7PEashg",
-      "title": "SQL FIRST_VALUE, LAST_VALUE and NTH_VALUE: the Default Frame Trap and IGNORE NULLS (PostgreSQL)",
-      "channel": "Prateek Goel | GrowAsEngineers",
-      "duration": "8m 21s",
-      "length": "8m",
-      "why": "Core video covering PARTITION BY, ORDER BY & The Default RANGE Frame Trap (partition-by-order-by-mechanics): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "-IOOF1FwSoM",
-      "title": "SQL window functions: rank, running totals and the ROWS vs RANGE trap",
-      "channel": "FDE Interviews",
-      "duration": "2m 58s",
-      "length": "2m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for PARTITION BY, ORDER BY & The Default RANGE Frame Trap."
-    }
+    "primary": null,
+    "companion": null
   },
   "ranking-functions-row-number-rank": {
-    "primary": {
-      "youtubeId": "cXhv4kmIzFw",
-      "title": "SQL Ranking Window Functions | ROW_NUMBER, RANK, DENSE_RANK, NTILE | #SQL Course 24",
-      "channel": "Data with Baraa",
-      "duration": "1h 4m",
-      "length": "64m",
-      "why": "Core video covering Ranking Functions: ROW_NUMBER, RANK, DENSE_RANK, NTILE & CUME_DIST (ranking-functions-row-number-rank): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "Ww71knvhQ-s",
-      "title": "SQL Window Function | How to write SQL Query using RANK, DENSE RANK, LEAD/LAG | SQL Queries Tutorial",
-      "channel": "techTFQ",
-      "duration": "24m 54s",
-      "length": "24m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Ranking Functions: ROW_NUMBER, RANK, DENSE_RANK, NTILE & CUME_DIST."
-    }
+    "primary": null,
+    "companion": null
   },
   "top-n-per-group-deduplication": {
-    "primary": {
-      "youtubeId": "uGEYx0TQHu4",
-      "title": "SQL Top-N Per Group: The Canonical Ranking Query | Ep. 26",
-      "channel": "Darshan Builds",
-      "duration": "14m 45s",
-      "length": "14m",
-      "why": "Core video covering Canonical Top-N-Per-Group, Stream Deduplication & QUALIFY (top-n-per-group-deduplication): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "5kskNInQGEs",
-      "title": "SQL Top N per Group and Latest Record per Entity: ROW_NUMBER, DISTINCT ON, LATERAL (PostgreSQL)",
-      "channel": "Prateek Goel | GrowAsEngineers",
-      "duration": "9m 35s",
-      "length": "9m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Canonical Top-N-Per-Group, Stream Deduplication & QUALIFY."
-    }
+    "primary": null,
+    "companion": null
   },
   "offset-functions-lag-lead-first-last": {
-    "primary": {
-      "youtubeId": "Jag6Eb2i-bQ",
-      "title": "SQL Value Window Functions | LEAD, LAG, FIRST_VALUE, LAST_VALUE | #SQL Course 25",
-      "channel": "Data with Baraa",
-      "duration": "45m 1s",
-      "length": "45m",
-      "why": "Core video covering Navigational Offset Functions: LAG, LEAD, FIRST_VALUE & The LAST_VALUE Trap (offset-functions-lag-lead-first-last): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "fcoAFLnOF-g",
-      "title": "first_value and last_value SQL window functions MASTER CLASS | Advance SQL",
-      "channel": "Ankit Bansal",
-      "duration": "11m 14s",
-      "length": "11m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Navigational Offset Functions: LAG, LEAD, FIRST_VALUE & The LAST_VALUE Trap."
-    }
+    "primary": null,
+    "companion": null
   },
   "window-frames-rows-range-groups": {
-    "primary": {
-      "youtubeId": "Vq9H8_wMn0k",
-      "title": "Rows Between vs Range Between in SQL Window Functions | Real Difference Explained with Examples",
-      "channel": "Ankit Bansal",
-      "duration": "15m 6s",
-      "length": "15m",
-      "why": "Core video covering Window Frames Deep Dive: ROWS vs RANGE vs GROUPS & Moving Averages (window-frames-rows-range-groups): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "P6pVqmIzymI",
-      "title": "Window FRAMES in SQL | Difference in ROWS and RANGE | SQL Intermediate Level Interview Question",
-      "channel": "Select Star",
-      "duration": "5m 10s",
-      "length": "5m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Window Frames Deep Dive: ROWS vs RANGE vs GROUPS & Moving Averages."
-    }
+    "primary": null,
+    "companion": null
   },
   "running-totals-cumulative-shares": {
-    "primary": {
-      "youtubeId": "OP2E3du_dGo",
-      "title": "SQL Pareto Analysis: Find the 20% Products Generating 80% of Total Revenue! \ud83d\udca1",
-      "channel": "Sneha Kulkarni",
-      "duration": "14m 9s",
-      "length": "14m",
-      "why": "Core video covering Running Totals, Pareto (80/20) Curves & Named WINDOW Clauses (running-totals-cumulative-shares): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "rIcB4zMYMas",
-      "title": "SQL Window Functions | Clearly Explained | PARTITION BY, ORDER BY, ROW_NUMBER, RANK, DENSE_RANK",
-      "channel": "Maven Analytics",
-      "duration": "7m 52s",
-      "length": "7m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Running Totals, Pareto (80/20) Curves & Named WINDOW Clauses."
-    }
+    "primary": null,
+    "companion": null
   },
   "gaps-and-islands-sessionization": {
-    "primary": {
-      "youtubeId": "Hnd0TRogsoM",
-      "title": "#2 SQL Interview Question | Gaps and Islands Explained Step by Step",
-      "channel": "PrepWithSid",
-      "duration": "12m 22s",
-      "length": "12m",
-      "why": "Core video covering Solving Classic Gaps and Islands, Streaks & Clickstream Sessionization (gaps-and-islands-sessionization): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "U6dewWrKCY8",
-      "title": "Find Consecutive Login Streaks in SQL | SQL Gaps and Islands Tutorial (In Hindi)",
-      "channel": "SQLForge",
-      "duration": "9m 23s",
-      "length": "9m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Solving Classic Gaps and Islands, Streaks & Clickstream Sessionization."
-    }
+    "primary": null,
+    "companion": null
   },
   "case-fintech-velocity-fraud-window": {
-    "primary": {
-      "youtubeId": "DkJakfYZZkY",
-      "title": "Fraud Detection with SQL \ud83d\udcb3 | Catch Payment Scams in Real-Time!",
-      "channel": "Krishna Verma",
-      "duration": "16m 19s",
-      "length": "16m",
-      "why": "Core video covering Production Case Study: Real-Time Sliding-Window Card Velocity Fraud Detection (case-fintech-velocity-fraud-window): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "Pf1pB6etxEQ",
-      "title": "How to Detect Fraud in Real Time Using Kafka",
-      "channel": "SWE with Vivek Bharatha",
-      "duration": "31m 11s",
-      "length": "31m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Production Case Study: Real-Time Sliding-Window Card Velocity Fraud Detection."
-    }
+    "primary": null,
+    "companion": null
   },
   "build-sessionization-retention-engine": {
-    "primary": {
-      "youtubeId": "fkLUYZZcQZo",
-      "title": "End-to-End Clickstream Data Engineering Project Explained ( Spark + AWS + SQL)",
-      "channel": "BigData Factory",
-      "duration": "6m 44s",
-      "length": "6m",
-      "why": "Core video covering Hands-On Build: Clickstream Sessionizer, Streak Tracker & Rolling Window Analyzer (build-sessionization-retention-engine): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "7mz73uXD9DA",
-      "title": "SQL for Data Analytics - Learn SQL in 4 Hours",
-      "channel": "Luke Barousse",
-      "duration": "4h 8m",
-      "length": "248m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Hands-On Build: Clickstream Sessionizer, Streak Tracker & Rolling Window Analyzer."
-    }
+    "primary": null,
+    "companion": null
   },
   "entity-relationship-modeling": {
-    "primary": {
-      "youtubeId": "xsg9BDiwiJE",
-      "title": "Entity Relationship Diagram (ERD) Tutorial - Part 1",
-      "channel": "Lucid Software",
-      "duration": "6m 10s",
-      "length": "6m",
-      "why": "Core video covering Entity-Relationship Modeling: Cardinality (1:1, 1:N, M:N) & Junction Tables (entity-relationship-modeling): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "PpT3Hh66nAM",
-      "title": "ER Model in DBMS || Entity || Attribute || Entity Set || Types of Attributes || Relationship || Degr",
-      "channel": "Sudhakar Atchala",
-      "duration": "32m 45s",
-      "length": "32m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Entity-Relationship Modeling: Cardinality (1:1, 1:N, M:N) & Junction Tables."
-    }
+    "primary": null,
+    "companion": null
   },
   "functional-dependencies-keys": {
-    "primary": {
-      "youtubeId": "YQt_kz3JgXI",
-      "title": "Finding Candidate Key | Database Management System",
-      "channel": "Edredo for Learners",
-      "duration": "4m 0s",
-      "length": "4m",
-      "why": "Core video covering Functional Dependencies (X \u2192 Y), Superkeys, Candidate Keys & Closure (functional-dependencies-keys): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "W3TZAIY-CyA",
-      "title": "HOW TO FIND SUPERKEYS AND CANDIDATE KEYS WITH EXAMPLE IN DBMS || FINDING CANDIDATE KEYS || DBMS",
-      "channel": "Sundeep Saradhi Kanthety",
-      "duration": "33m 59s",
-      "length": "33m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Functional Dependencies (X \u2192 Y), Superkeys, Candidate Keys & Closure."
-    }
+    "primary": null,
+    "companion": null
   },
   "first-normal-form-atomicity": {
-    "primary": {
-      "youtubeId": "MjzKOIydCP8",
-      "title": "First Normal Form in DBMS || 1 NF in DBMS",
-      "channel": "Sudhakar Atchala",
-      "duration": "3m 45s",
-      "length": "3m",
-      "why": "Core video covering First Normal Form (1NF): Atomic Domains & Repeating Group Anti-Patterns (first-normal-form-atomicity): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "IBEuwmYsMKI",
-      "title": "normalization in dbms | normal forms | 1nf, 2nf, 3nf, bcnf, 4nf, 5nf normal forms with examples",
-      "channel": "NS lectures",
-      "duration": "20m 54s",
-      "length": "20m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for First Normal Form (1NF): Atomic Domains & Repeating Group Anti-Patterns."
-    }
+    "primary": null,
+    "companion": null
   },
   "second-third-normal-form": {
-    "primary": {
-      "youtubeId": "O16btnzfuYU",
-      "title": "Lec 11: Second Normal Form in DBMS | 2NF in DBMS | Normalization in DBMS",
-      "channel": "Jenny's Lectures CS IT",
-      "duration": "21m 38s",
-      "length": "21m",
-      "why": "Core video covering Second & Third Normal Form (2NF & 3NF): Eliminating Partial & Transitive Dependencies (second-third-normal-form): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "IBEuwmYsMKI",
-      "title": "normalization in dbms | normal forms | 1nf, 2nf, 3nf, bcnf, 4nf, 5nf normal forms with examples",
-      "channel": "NS lectures",
-      "duration": "20m 54s",
-      "length": "20m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Second & Third Normal Form (2NF & 3NF): Eliminating Partial & Transitive Dependencies."
-    }
+    "primary": null,
+    "companion": null
   },
   "boyce-codd-fourth-fifth-normal-form": {
-    "primary": {
-      "youtubeId": "mf_PbWPo7VM",
-      "title": "Lec-30: Boyce Codd Normal Form #BCNF #DBMS #Normalization with best examples",
-      "channel": "Gate Smashers",
-      "duration": "6m 47s",
-      "length": "6m",
-      "why": "Core video covering Boyce-Codd Normal Form (BCNF), Multi-Valued (4NF) & Join Dependencies (5NF) (boyce-codd-fourth-fifth-normal-form): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "IBEuwmYsMKI",
-      "title": "normalization in dbms | normal forms | 1nf, 2nf, 3nf, bcnf, 4nf, 5nf normal forms with examples",
-      "channel": "NS lectures",
-      "duration": "20m 54s",
-      "length": "20m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Boyce-Codd Normal Form (BCNF), Multi-Valued (4NF) & Join Dependencies (5NF)."
-    }
+    "primary": null,
+    "companion": null
   },
   "update-insertion-deletion-anomalies": {
-    "primary": {
-      "youtubeId": "bJMyDzYOofw",
-      "title": "ANOMALIES IN DBMS || TYPES OF ANOMALIES || INSERT , DELETE , UPDATE ANOMALIES || DBMS || SQL",
-      "channel": "Sundeep Saradhi Kanthety",
-      "duration": "14m 41s",
-      "length": "14m",
-      "why": "Core video covering Visualizing Update, Insertion & Deletion Anomalies in Unnormalized Schemas (update-insertion-deletion-anomalies): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "5GDTIUVlHB8",
-      "title": "Lec-24: Introduction to Normalization | Insertion, Deletion & Updation Anomaly",
-      "channel": "Gate Smashers",
-      "duration": "12m 50s",
-      "length": "12m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Visualizing Update, Insertion & Deletion Anomalies in Unnormalized Schemas."
-    }
+    "primary": null,
+    "companion": null
   },
   "strategic-denormalization-tradeoffs": {
     "primary": {
-      "youtubeId": "o8HgXxqsYBc",
-      "title": "What is denormalization in RDBMS in Hindi",
-      "channel": "Engineering Digest",
-      "duration": "4m 43s",
-      "length": "4m",
-      "why": "Core video covering Strategic Denormalization: Read vs Write Amplification & Cached Counters (strategic-denormalization-tradeoffs): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
       "youtubeId": "4bTq0GdSeQs",
-      "title": "Learn Database Denormalization",
+      "title": "Learn Database Denormalization & Normal Form Tradeoffs",
       "channel": "Decomplexify",
-      "duration": "19m 7s",
+      "duration": "19m 10s",
+      "start": 0,
       "length": "19m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Strategic Denormalization: Read vs Write Amplification & Cached Counters."
-    }
+      "why": "Contrasts normalized 3NF/BCNF write integrity against selective denormalization for read-heavy latency budgets."
+    },
+    "companion": null
   },
   "schema-anti-patterns-eav-god-tables": {
-    "primary": {
-      "youtubeId": "VeYs1t3qSvA",
-      "title": "Avoid This Type of Database Design",
-      "channel": "Database Star",
-      "duration": "8m 58s",
-      "length": "8m",
-      "why": "Core video covering Schema Anti-Patterns: Entity-Attribute-Value (EAV), Polymorphic FKs & God Tables (schema-anti-patterns-eav-god-tables): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "fTt91rxsdrU",
-      "title": "Is the \"Entity Attribute Value\" (EAV) Model bad?",
-      "channel": "Tom Gillies (Duhallow Grey Geek)",
-      "duration": "3m 6s",
-      "length": "3m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Schema Anti-Patterns: Entity-Attribute-Value (EAV), Polymorphic FKs & God Tables."
-    }
+    "primary": null,
+    "companion": null
   },
   "case-shopify-multi-tenant-schema": {
-    "primary": {
-      "youtubeId": "YaSPB2uNLYg",
-      "title": "Multi-Tenant: Database Per Tenant or Shared?",
-      "channel": "CodeOpinion",
-      "duration": "8m 54s",
-      "length": "8m",
-      "why": "Core video covering Production Case Study: Multi-Tenant Schema Architecture at Scale (case-shopify-multi-tenant-schema): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "FrEP0dvAfCQ",
-      "title": "Salesforce Platform Multitenant Architecture",
-      "channel": "Salesforce Architects",
-      "duration": "2m 39s",
-      "length": "2m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Production Case Study: Multi-Tenant Schema Architecture at Scale."
-    }
+    "primary": null,
+    "companion": null
   },
   "build-normalized-booking-schema": {
-    "primary": {
-      "youtubeId": "ABwD8IYByfk",
-      "title": "What is Normalization in SQL? | Database Normalization Forms - 1NF, 2NF, 3NF, BCNF | Edureka",
-      "channel": "edureka!",
-      "duration": "12m 44s",
-      "length": "12m",
-      "why": "Core video covering Hands-On Build: Normalize a Legacy Flat Spreadsheet into a 3NF/BCNF System (build-normalized-booking-schema): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "IBEuwmYsMKI",
-      "title": "normalization in dbms | normal forms | 1nf, 2nf, 3nf, bcnf, 4nf, 5nf normal forms with examples",
-      "channel": "NS lectures",
-      "duration": "20m 54s",
-      "length": "20m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Hands-On Build: Normalize a Legacy Flat Spreadsheet into a 3NF/BCNF System."
-    }
+    "primary": null,
+    "companion": null
   },
   "oltp-vs-olap-workload-physics": {
-    "primary": {
-      "youtubeId": "rPayGxtAbG0",
-      "title": "OLTP vs OLAP Explained: Transactional vs Analytical Database Workloads",
-      "channel": "Prateek Goel | GrowAsEngineers",
-      "duration": "9m 11s",
-      "length": "9m",
-      "why": "Core video covering OLTP vs OLAP Workload Physics: Point Lookups vs Billion-Row Scans (oltp-vs-olap-workload-physics): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "DeL3dgiy6vk",
-      "title": "Lec -8 : OLAP vs OLTP | Difference between OLAP vs OLTP with Real Life Examples",
-      "channel": "Gate Smashers",
-      "duration": "7m 39s",
-      "length": "7m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for OLTP vs OLAP Workload Physics: Point Lookups vs Billion-Row Scans."
-    }
+    "primary": null,
+    "companion": null
   },
   "star-schema-facts-dimensions": {
     "primary": {
       "youtubeId": "gRE3E7VUzRU",
-      "title": "Data Modeling Tutorial: Star Schema (aka Kimball Approach)",
+      "title": "Data Modeling Tutorial: Kimball Star Schema, Facts & Dimensions",
       "channel": "Kahan Data Solutions",
-      "duration": "16m 33s",
+      "duration": "16m 08s",
+      "start": 0,
       "length": "16m",
-      "why": "Core video covering Kimball Star Schema: Fact Table Grain, Additive Measures & Conformed Dimensions (star-schema-facts-dimensions): focuses directly on practical mechanics, real-world examples, and implementation details."
+      "why": "Covers grain declaration, conformed dimensions, surrogate keys, and fact table design for analytical warehouses."
     },
-    "companion": {
-      "youtubeId": "hQvCOBv_-LE",
-      "title": "What is STAR schema | Star vs Snowflake Schema | Fact vs Dimension Table",
-      "channel": "codebasics",
-      "duration": "6m 59s",
-      "length": "6m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Kimball Star Schema: Fact Table Grain, Additive Measures & Conformed Dimensions."
-    }
+    "companion": null
   },
   "snowflake-vs-star-vs-obt": {
-    "primary": {
-      "youtubeId": "hQvCOBv_-LE",
-      "title": "What is STAR schema | Star vs Snowflake Schema | Fact vs Dimension Table",
-      "channel": "codebasics",
-      "duration": "6m 59s",
-      "length": "6m",
-      "why": "Core video covering Snowflake Schema vs Star Schema vs One Big Table (OBT) in Cloud Warehouses (snowflake-vs-star-vs-obt): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "kLpGBy6Q5BA",
-      "title": "Lec -15 : Star vs Snowflake Schema | Data Warehouse",
-      "channel": "Gate Smashers",
-      "duration": "9m 15s",
-      "length": "9m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Snowflake Schema vs Star Schema vs One Big Table (OBT) in Cloud Warehouses."
-    }
+    "primary": null,
+    "companion": null
   },
   "slowly-changing-dimensions-scd": {
-    "primary": {
-      "youtubeId": "1JswR_4XUdU",
-      "title": "Slowly Changing Dimensions (SCD)  | Types 0, 1, 2, 3, 4 Explained with Real Examples",
-      "channel": "SleekData",
-      "duration": "6m 46s",
-      "length": "6m",
-      "why": "Core video covering Slowly Changing Dimensions: SCD Type 0, 1, 2 (Effective Dates), 3 & 6 (slowly-changing-dimensions-scd): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "ejdIgYPfcV4",
-      "title": "Slowly Changing Dimensions In Data warehousing with iPhone 11 Example | SCD 1/2/3",
-      "channel": "Ankit Bansal",
-      "duration": "12m 34s",
-      "length": "12m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Slowly Changing Dimensions: SCD Type 0, 1, 2 (Effective Dates), 3 & 6."
-    }
+    "primary": null,
+    "companion": null
   },
   "bridge-tables-junk-role-dimensions": {
-    "primary": {
-      "youtubeId": "P7tAvLfiD_8",
-      "title": "How to Create a Bridge Table for Many to Many Relationships",
-      "channel": "Goodly",
-      "duration": "2m 17s",
-      "length": "2m",
-      "why": "Core video covering Role-Playing Dimensions, Junk Dimensions & Many-to-Many Bridge Tables (bridge-tables-junk-role-dimensions): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "fqrLYhkF39A",
-      "title": "How to Connect Two Fact Tables (Many-to-Many) | #Power BI Course 24",
-      "channel": "Data with Baraa",
-      "duration": "27m 33s",
-      "length": "27m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Role-Playing Dimensions, Junk Dimensions & Many-to-Many Bridge Tables."
-    }
+    "primary": null,
+    "companion": null
   },
   "temporal-tables-bitemporal-sql": {
-    "primary": {
-      "youtubeId": "91uIXGomwKs",
-      "title": "Temporal Databases Explained: Managing Time-Varying Data",
-      "channel": "CodeLucky",
-      "duration": "6m 23s",
-      "length": "6m",
-      "why": "Core video covering Temporal & Bitemporal SQL: System Time vs Valid Application Time (temporal-tables-bitemporal-sql): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "ZjsH_V5EkSk",
-      "title": "How to Use Temporal Tables in SQL Server 2016",
-      "channel": "Bert Wagner",
-      "duration": "10m 18s",
-      "length": "10m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Temporal & Bitemporal SQL: System Time vs Valid Application Time."
-    }
+    "primary": null,
+    "companion": null
   },
   "json-semi-structured-hybrid-schemas": {
-    "primary": {
-      "youtubeId": "LXa_UfdVpPc",
-      "title": "Databricks Schema Evolution Explained (Telugu) | Add Column Without Rewriting Data? \ud83d\ude32 | Ep 10",
-      "channel": "Data Dharma by Srikanth",
-      "duration": "8m 36s",
-      "length": "8m",
-      "why": "Core video covering Hybrid Relational + JSONB Schemas, Generated Columns & Schema Evolution (json-semi-structured-hybrid-schemas): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "NOYL0yRoUeo",
-      "title": "67. Databricks | Pypark | Delta: Schema Evolution - MergeSchema",
-      "channel": "Raja's Data Engineering",
-      "duration": "7m 53s",
-      "length": "7m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Hybrid Relational + JSONB Schemas, Generated Columns & Schema Evolution."
-    }
+    "primary": null,
+    "companion": null
   },
   "idempotency-audit-logs-event-tables": {
-    "primary": {
-      "youtubeId": "V81Smc6xrBY",
-      "title": "SQL Triggers (Visually Explained) | Audit Logs Use Case | #SQL Course 34",
-      "channel": "Data with Baraa",
-      "duration": "11m 13s",
-      "length": "11m",
-      "why": "Core video covering Immutable Ledger Tables, Append-Only Audit Logs & Transactional Outbox (idempotency-audit-logs-event-tables): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "Nsqu2isTwBE",
-      "title": "Oracle LogMiner: Auditing SQL REDO/UNDO & Table Access Statistics \u2013 Step-by-Step Tutorial",
-      "channel": "HowToVelan",
-      "duration": "1h 1m",
-      "length": "61m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Immutable Ledger Tables, Append-Only Audit Logs & Transactional Outbox."
-    }
+    "primary": null,
+    "companion": null
   },
   "case-airbnb-minerva-metric-layer": {
-    "primary": {
-      "youtubeId": "z0NXIRsG5Og",
-      "title": "Data Analysis using SQL | Food Manufacturing Case Study | SQL Industry Project | Sauradeep Poddar",
-      "channel": "IvyProSchool",
-      "duration": "3m 46s",
-      "length": "3m",
-      "why": "Core video covering Production Case Study: Designing a Canonical Metric Store at Petabyte Scale (case-airbnb-minerva-metric-layer): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "9TSB1o4NxwQ",
-      "title": "YoY Sales Growth Calculation in SQL | Real Business Case Study",
-      "channel": "DecodeWithRatan",
-      "duration": "11m 57s",
-      "length": "11m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Production Case Study: Designing a Canonical Metric Store at Petabyte Scale."
-    }
+    "primary": null,
+    "companion": null
   },
   "build-scd-type2-warehouse-pipeline": {
-    "primary": {
-      "youtubeId": "hQvCOBv_-LE",
-      "title": "What is STAR schema | Star vs Snowflake Schema | Fact vs Dimension Table",
-      "channel": "codebasics",
-      "duration": "6m 59s",
-      "length": "6m",
-      "why": "Core video covering Hands-On Build: Star Schema with Automated SCD Type 2 Dimension Pipeline (build-scd-type2-warehouse-pipeline): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "kii_Kukh4po",
-      "title": "SCD Type 1 and Type 2 using SQL | Implementation of Slowly Changing Dimensions",
-      "channel": "Ankit Bansal",
-      "duration": "28m 55s",
-      "length": "28m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Hands-On Build: Star Schema with Automated SCD Type 2 Dimension Pipeline."
-    }
+    "primary": null,
+    "companion": null
   },
   "calendar-tables-date-spines": {
     "primary": {
       "youtubeId": "0UCosrhH9uY",
-      "title": "SQL generate_series Explained: Calendar Tables, Filling Missing Dates, Gaps and Number Tables",
+      "title": "SQL generate_series Explained: Calendar Tables & Filling Missing Dates",
       "channel": "Prateek Goel | GrowAsEngineers",
-      "duration": "9m 10s",
+      "duration": "9m 15s",
+      "start": 0,
       "length": "9m",
-      "why": "Core video covering Calendar Tables & Date Spines: Filling Missing Zero-Activity Time Buckets (calendar-tables-date-spines): focuses directly on practical mechanics, real-world examples, and implementation details."
+      "why": "Shows how continuous date spines prevent missing zero-event days in time-series retention and revenue charts."
     },
-    "companion": {
-      "youtubeId": "XeSetBrfPd0",
-      "title": "Finding Missing Sequence Dates - Part 28 | Recursive CTE | DATEADD | Skipped Dates Using SQL",
-      "channel": "SQL With RaviMartha",
-      "duration": "6m 21s",
-      "length": "6m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Calendar Tables & Date Spines: Filling Missing Zero-Activity Time Buckets."
-    }
+    "companion": null
   },
   "cohort-retention-matrix-sql": {
-    "primary": {
-      "youtubeId": "uAdCNVfbuFk",
-      "title": "How to Calculate Churn & Retention with Cohort Analysis (SQL + Google Sheets)",
-      "channel": "mackan.sql: Senior Data Analytics & Modeling",
-      "duration": "12m 35s",
-      "length": "12m",
-      "why": "Core video covering Triangle Cohort Retention & Net Dollar Retention (NDR) Matrices in SQL (cohort-retention-matrix-sql): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "mYSqc6Funuc",
-      "title": "Cohort Analysis Explained with SQL \u2014 Retention Made Simple!",
-      "channel": "Krishna Verma",
-      "duration": "18m 44s",
-      "length": "18m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Triangle Cohort Retention & Net Dollar Retention (NDR) Matrices in SQL."
-    }
+    "primary": null,
+    "companion": null
   },
   "funnel-conversion-attribution-sql": {
-    "primary": {
-      "youtubeId": "IqUTG2U7AbU",
-      "title": "Customer Funnel Analysis \u2014 Registration to Retention | Multi-Stage CTE + Conversion Rate",
-      "channel": "Dive in Data",
-      "duration": "12m 2s",
-      "length": "12m",
-      "why": "Core video covering Multi-Step Ordered Funnel Conversion & First/Last-Touch Attribution (funnel-conversion-attribution-sql): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "p0ZAjUf1h4A",
-      "title": "This SQL Trick Shows Why Users Aren\u2019t Converting! | Funnel Analysis Using SQL",
-      "channel": "Krishna Verma",
-      "duration": "20m 46s",
-      "length": "20m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Multi-Step Ordered Funnel Conversion & First/Last-Touch Attribution."
-    }
+    "primary": null,
+    "companion": null
   },
   "interval-overlap-allen-algebra": {
-    "primary": {
-      "youtubeId": "IexN60k62jo",
-      "title": "Merge Overlapping Intervals | Brute, Optimal with Precise TC analysis",
-      "channel": "take U forward",
-      "duration": "22m 35s",
-      "length": "22m",
-      "why": "Core video covering Temporal Interval Overlap (Allen's Algebra) & Packing Contiguous Intervals (interval-overlap-allen-algebra): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "HDHQ8lAWakY",
-      "title": "L8. Non Overlapping Intervals | Greedy Algorithms Playlist",
-      "channel": "take U forward",
-      "duration": "8m 46s",
-      "length": "8m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Temporal Interval Overlap (Allen's Algebra) & Packing Contiguous Intervals."
-    }
+    "primary": null,
+    "companion": null
   },
   "pivoting-unpivoting-cross-tabs": {
-    "primary": {
-      "youtubeId": "O6mDdUIvx9k",
-      "title": "SQL Convert Rows to Columns and Columns to Rows without using Pivot Functions",
-      "channel": "Ankit Bansal",
-      "duration": "8m 54s",
-      "length": "8m",
-      "why": "Core video covering Rows to Columns & Back: Cross-Tab Pivoting and Unpivoting Patterns (pivoting-unpivoting-cross-tabs): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "XN77aowTGsw",
-      "title": "SQL Unpivot Simplified (Turn Columns into Rows)",
-      "channel": "Ryan & Matt Data Science",
-      "duration": "8m 24s",
-      "length": "8m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Rows to Columns & Back: Cross-Tab Pivoting and Unpivoting Patterns."
-    }
+    "primary": null,
+    "companion": null
   },
   "triggers-stored-procedures-udfs": {
-    "primary": {
-      "youtubeId": "AOeM7gGXirQ",
-      "title": "SQL Stored Procedures Explained with Real World Scenarios",
-      "channel": "KnowHow Academy",
-      "duration": "14m 13s",
-      "length": "14m",
-      "why": "Core video covering Database Programmability: Triggers (OLD/NEW), Stored Procedures & UDF Overhead (triggers-stored-procedures-udfs): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "09lsHOi3vP4",
-      "title": "Day 12 : SQL Views | Functions | Stored Procedure | Trigger | #learnwithdsa",
-      "channel": "Data Streams Academy",
-      "duration": "19m 57s",
-      "length": "19m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Database Programmability: Triggers (OLD/NEW), Stored Procedures & UDF Overhead."
-    }
+    "primary": null,
+    "companion": null
   },
   "materialized-views-incremental-refresh": {
-    "primary": {
-      "youtubeId": "WzkBZ0byoYE",
-      "title": "Materialized View in SQL | Faster SQL Queries using Materialized Views",
-      "channel": "techTFQ",
-      "duration": "16m 39s",
-      "length": "16m",
-      "why": "Core video covering Materialized Views, Refresh Strategies & Incremental View Maintenance (IVM) (materialized-views-incremental-refresh): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "LtRt3T05hRo",
-      "title": "42 Streaming Tables and Materialized Views in DBSQL | Background Working | Schedule data Refresh",
-      "channel": "Ease With Data",
-      "duration": "21m 15s",
-      "length": "21m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Materialized Views, Refresh Strategies & Incremental View Maintenance (IVM)."
-    }
+    "primary": null,
+    "companion": null
   },
   "sql-injection-parameterized-security": {
-    "primary": {
-      "youtubeId": "TVDoSbptOoA",
-      "title": "\ud83d\udee1\ufe0f PHP MySQL: Secure Database Queries with Prepared Statements",
-      "channel": "CodeLucky",
-      "duration": "3m 54s",
-      "length": "3m",
-      "why": "Core video covering SQL Injection AST Mechanics, Prepared Statements & Row-Level Security (RLS) (sql-injection-parameterized-security): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "WONbg6ZjiXk",
-      "title": "SQL Injection Prevention: Security Simplified",
-      "channel": "Vickie Li Dev",
-      "duration": "9m 44s",
-      "length": "9m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for SQL Injection AST Mechanics, Prepared Statements & Row-Level Security (RLS)."
-    }
+    "primary": null,
+    "companion": null
   },
   "case-double-booking-hotel-inventory": {
-    "primary": {
-      "youtubeId": "qYzaN-56wmA",
-      "title": "How to Sync Booking Calendars with iCal | Avoid Double Bookings.",
-      "channel": "Bookla - API-first scheduling and automations",
-      "duration": "7m 19s",
-      "length": "7m",
-      "why": "Core video covering Production Case Study: Preventing Concurrent Calendar Double-Bookings (case-double-booking-hotel-inventory): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "J_G-V7Ln52Y",
-      "title": "HighLevel Calendar Setup: Connect Google and Stop Double Bookings",
-      "channel": "Behind the Practice",
-      "duration": "6m 16s",
-      "length": "6m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Production Case Study: Preventing Concurrent Calendar Double-Bookings."
-    }
+    "primary": null,
+    "companion": null
   },
   "build-saas-cohort-funnel-workbench": {
-    "primary": {
-      "youtubeId": "_wmE4nHYQrs",
-      "title": "SQL Cohort Retention & Churn Analysis: SaaS Funnels | Ep. 25",
-      "channel": "Darshan Builds",
-      "duration": "15m 20s",
-      "length": "15m",
-      "why": "Core video covering Hands-On Build: Complete SaaS Analytics Engine (MRR, Cohorts & Funnels) (build-saas-cohort-funnel-workbench): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "N15XQjZ2qbE",
-      "title": "SaaS Data Modeling: Calculate Churn & Reactivation with SQL / Subscription Metrics",
-      "channel": "mackan.sql: Senior Data Analytics & Modeling",
-      "duration": "16m 3s",
-      "length": "16m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Hands-On Build: Complete SaaS Analytics Engine (MRR, Cohorts & Funnels)."
-    }
+    "primary": null,
+    "companion": null
   },
   "why-indexes-work-io-cost-model": {
-    "primary": {
-      "youtubeId": "r4u1qFg_0KE",
-      "title": "55 SQL Server Indexes: Table Scan vs Index Seek Explained",
-      "channel": "Parvesh",
-      "duration": "6m 52s",
-      "length": "6m",
-      "why": "Core video covering Why Indexes Work: Full Table Scan O(N) vs Index Seek O(log_B N) I/O Physics (why-indexes-work-io-cost-model): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "1oySBkVuvI8",
-      "title": "What is Index Scan ,Index Seek and Table Scan?||SQLSERVER #index #sqlserver",
-      "channel": "Sql Is Easy",
-      "duration": "6m 34s",
-      "length": "6m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Why Indexes Work: Full Table Scan O(N) vs Index Seek O(log_B N) I/O Physics."
-    }
+    "primary": null,
+    "companion": null
   },
   "btree-bplustree-internal-anatomy": {
     "primary": {
       "youtubeId": "aZjYr87r1b8",
-      "title": "10.2  B Trees and B+ Trees. How they are useful in Databases",
+      "title": "B-Trees and B+Trees: How They Are Useful in Databases",
       "channel": "Abdul Bari",
       "duration": "39m 41s",
+      "start": 0,
       "length": "39m",
-      "why": "Core video covering B-Tree vs B+Tree Internal Anatomy: High Fanout, Routing Keys & Leaf Links (btree-bplustree-internal-anatomy): focuses directly on practical mechanics, real-world examples, and implementation details."
+      "why": "Step-by-step derivation of high-fanout internal routing nodes, leaf-only tuple pointers, and sibling leaf range scans."
     },
-    "companion": {
-      "youtubeId": "BwUvgG29fPc",
-      "title": "Lec-117: Difference b/w B-Tree & B+Tree  in Hindi with examples",
-      "channel": "Gate Smashers",
-      "duration": "14m 57s",
-      "length": "14m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for B-Tree vs B+Tree Internal Anatomy: High Fanout, Routing Keys & Leaf Links."
-    }
+    "companion": null
   },
   "clustered-vs-secondary-indexes": {
-    "primary": {
-      "youtubeId": "_EJV_E8sopk",
-      "title": "SQL Server Indexes: Clustered vs. Non-Clustered Explained",
-      "channel": "KnowHow Academy",
-      "duration": "10m 2s",
-      "length": "10m",
-      "why": "Core video covering Clustered Indexes (InnoDB / WITHOUT ROWID) vs Heap + Secondary Index (Postgres) (clustered-vs-secondary-indexes): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "BxAj3bl00-o",
-      "title": "SQL Indexes (Visually Explained) | Clustered vs Nonclustered | #SQL Course 35",
-      "channel": "Data with Baraa",
-      "duration": "43m 10s",
-      "length": "43m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Clustered Indexes (InnoDB / WITHOUT ROWID) vs Heap + Secondary Index (Postgres)."
-    }
+    "primary": null,
+    "companion": null
   },
   "composite-indexes-leftmost-prefix": {
-    "primary": {
-      "youtubeId": "OWdxY5CH6uo",
-      "title": "Composite Indexes and Column Order: Leftmost Prefix, Equality Before Range, ORDER BY (PostgreSQL)",
-      "channel": "Prateek Goel | GrowAsEngineers",
-      "duration": "8m 32s",
-      "length": "8m",
-      "why": "Core video covering Composite Indexes (a, b, c): Leftmost Prefix Rule & Equality-Before-Range (composite-indexes-leftmost-prefix): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "XVkx3Yva-7I",
-      "title": "Why Your Database Ignores Your Composite Index (Leftmost Prefix Rule)",
-      "channel": "Aniruddha Mahamuni",
-      "duration": "5m 57s",
-      "length": "5m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Composite Indexes (a, b, c): Leftmost Prefix Rule & Equality-Before-Range."
-    }
+    "primary": null,
+    "companion": null
   },
   "covering-indexes-index-only-scans": {
-    "primary": {
-      "youtubeId": "5KOTGHVY2o8",
-      "title": "PostgreSQL Making use of Index-Only Scans and Covering Indexes 07/12",
-      "channel": "Code with Lucian",
-      "duration": "3m 12s",
-      "length": "3m",
-      "why": "Core video covering Covering Indexes, INCLUDE Columns & Index-Only Scans (Visibility Map) (covering-indexes-index-only-scans): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "Wf04Hd6lRKY",
-      "title": "Why This PostgreSQL Query Never Reads the Table (Covering Index)",
-      "channel": "Aniruddha Mahamuni",
-      "duration": "5m 2s",
-      "length": "5m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Covering Indexes, INCLUDE Columns & Index-Only Scans (Visibility Map)."
-    }
+    "primary": null,
+    "companion": null
   },
   "partial-filtered-expression-indexes": {
-    "primary": {
-      "youtubeId": "CMw2-Eo7108",
-      "title": "How to partially index a table",
-      "channel": "SQL and Database explained!",
-      "duration": "3m 43s",
-      "length": "3m",
-      "why": "Core video covering Partial (Filtered) Indexes & Functional / Expression Indexes (partial-filtered-expression-indexes): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "PU2ajABOH-w",
-      "title": "SQL Unique & Filtered Indexes (Visually Explained) | #SQL Course 37",
-      "channel": "Data with Baraa",
-      "duration": "12m 2s",
-      "length": "12m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Partial (Filtered) Indexes & Functional / Expression Indexes."
-    }
+    "primary": null,
+    "companion": null
   },
   "hash-gin-gist-brin-bloom-indexes": {
-    "primary": {
-      "youtubeId": "8s35iHLGHww",
-      "title": "How to Choose PostgreSQL Indexes: B-Tree, Hash, BRIN, GIN & GiST",
-      "channel": "JaneExplainsIT",
-      "duration": "13m 5s",
-      "length": "13m",
-      "why": "Core video covering Specialized Indexes: Hash, GIN (Inverted), GiST, BRIN (Block Range) & Bitmap (hash-gin-gist-brin-bloom-indexes): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "9eqKRT5K8hI",
-      "title": "PostgreSQL indexes. B-Tree or Hash. What is better? How it works?",
-      "channel": "JaneExplainsIT",
-      "duration": "5m 49s",
-      "length": "5m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Specialized Indexes: Hash, GIN (Inverted), GiST, BRIN (Block Range) & Bitmap."
-    }
+    "primary": null,
+    "companion": null
   },
   "index-bloat-write-amplification-traps": {
-    "primary": {
-      "youtubeId": "m-nO91y5K_4",
-      "title": "The Cost of Indexes: Storage, Write Amplification, HOT Updates and Over-Indexing (PostgreSQL)",
-      "channel": "Prateek Goel | GrowAsEngineers",
-      "duration": "6m 42s",
-      "length": "6m",
-      "why": "Core video covering When Indexes Hurt: Write Amplification, Page Splits & Selectivity Thresholds (index-bloat-write-amplification-traps): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "amcqdWqi_1Q",
-      "title": "Index Tuning \u2013 Page Splits & Fragmentation (by Amit Bansal)",
-      "channel": "SQLMaestros",
-      "duration": "28m 8s",
-      "length": "28m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for When Indexes Hurt: Write Amplification, Page Splits & Selectivity Thresholds."
-    }
+    "primary": null,
+    "companion": null
   },
   "case-slack-composite-index-incident": {
-    "primary": {
-      "youtubeId": "d2xoxmlcCBM",
-      "title": "Oracle SQL Tuning Case Study 18 - Table Access By Index RowId",
-      "channel": "Virsess !!!",
-      "duration": "4m 14s",
-      "length": "4m",
-      "why": "Core video covering Production Case Study: How Reordering Two Index Columns Cut Latency by 99.4% (case-slack-composite-index-incident): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "GNShMhwQBiA",
-      "title": "Oracle SQL Tuning Case Study 7 - Multiple same Column Predicates",
-      "channel": "Virsess !!!",
-      "duration": "7m 2s",
-      "length": "7m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Production Case Study: How Reordering Two Index Columns Cut Latency by 99.4%."
-    }
+    "primary": null,
+    "companion": null
   },
   "build-btree-index-advisor": {
-    "primary": {
-      "youtubeId": "jjwTWXOzGyw",
-      "title": "How Database Indexes Work (B-Tree, Full Scan & Query Planner Explained)",
-      "channel": "The Internals",
-      "duration": "4m 14s",
-      "length": "4m",
-      "why": "Core video covering Hands-On Build: B+Tree Page Simulator & Automated Workload Index Advisor (build-btree-index-advisor): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "aZjYr87r1b8",
-      "title": "10.2  B Trees and B+ Trees. How they are useful in Databases",
-      "channel": "Abdul Bari",
-      "duration": "39m 41s",
-      "length": "39m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Hands-On Build: B+Tree Page Simulator & Automated Workload Index Advisor."
-    }
+    "primary": null,
+    "companion": null
   },
   "life-of-a-sql-query-pipeline": {
-    "primary": {
-      "youtubeId": "-Xmrrj7U34g",
-      "title": "SQL Order of Execution (Visually Explained) | Understanding How Queries Run",
-      "channel": "Data with Baraa",
-      "duration": "4m 4s",
-      "length": "4m",
-      "why": "Core video covering Life of a SQL Query: Parser, Binder, Logical Plan, Cost Optimizer & Executor (life-of-a-sql-query-pipeline): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "uvACOp4WFR4",
-      "title": "Understanding SQL Query Execution - What Happens When You Run A SQL Command",
-      "channel": "Seattle Data Guy",
-      "duration": "8m 32s",
-      "length": "8m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Life of a SQL Query: Parser, Binder, Logical Plan, Cost Optimizer & Executor."
-    }
+    "primary": null,
+    "companion": null
   },
   "reading-explain-and-explain-analyze": {
-    "primary": {
-      "youtubeId": "qBw4azMp8KY",
-      "title": "SQL EXPLAIN & EXPLAIN ANALYZE: Query Execution Plans | Ep. 30",
-      "channel": "Darshan Builds",
-      "duration": "15m 17s",
-      "length": "15m",
-      "why": "Core video covering Mastering EXPLAIN & EXPLAIN ANALYZE: Cost Units, Actual Rows, Loops & Buffers (reading-explain-and-explain-analyze): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "EXeK0uqQ200",
-      "title": "Confirming Query Optimization In SQL | EXPLAIN And EXPLAIN ANALYZE | Understanding SQL Performance",
-      "channel": "Select Star",
-      "duration": "6m 1s",
-      "length": "6m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Mastering EXPLAIN & EXPLAIN ANALYZE: Cost Units, Actual Rows, Loops & Buffers."
-    }
+    "primary": null,
+    "companion": null
   },
   "table-statistics-histograms-cardinality": {
-    "primary": {
-      "youtubeId": "TJRyzXlfBfM",
-      "title": "How is SQL Server Statistics Histogram Computation Used by The Query Optimizer \u2013 Part 1 (by Amit)",
-      "channel": "SQLMaestros",
-      "duration": "8m 21s",
-      "length": "8m",
-      "why": "Core video covering Table Statistics (ANALYZE): Null Fraction, NDV, Most Common Values & Histograms (table-statistics-histograms-cardinality): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "X_cPXHV2NQ4",
-      "title": "SQL NULL Functions | COALESCE, ISNULL, NULLIF, IS (NOT) NULL | #SQL Course 18",
-      "channel": "Data with Baraa",
-      "duration": "53m 0s",
-      "length": "53m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Table Statistics (ANALYZE): Null Fraction, NDV, Most Common Values & Histograms."
-    }
+    "primary": null,
+    "companion": null
   },
   "selectivity-estimation-correlated-columns": {
-    "primary": {
-      "youtubeId": "G_veFSzP1xk",
-      "title": "Independence Assumption mathematical model in the Cardinality Estimator",
-      "channel": "SQLMaestros",
-      "duration": "5m 32s",
-      "length": "5m",
-      "why": "Core video covering Selectivity Math, Independence Assumption Failures & Extended Statistics (selectivity-estimation-correlated-columns): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "6z8TFLy3g74",
-      "title": "SQL Server Update Statistics with Full Scan",
-      "channel": "SQLMaestros",
-      "duration": "11m 25s",
-      "length": "11m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Selectivity Math, Independence Assumption Failures & Extended Statistics."
-    }
+    "primary": null,
+    "companion": null
   },
   "scan-operators-seq-index-bitmap": {
-    "primary": {
-      "youtubeId": "L6AIfcLvlGo",
-      "title": "What Is a Database Index? Seq Scan vs Index Scan on 200,000 Rows (PostgreSQL EXPLAIN)",
-      "channel": "Prateek Goel | GrowAsEngineers",
-      "duration": "7m 8s",
-      "length": "7m",
-      "why": "Core video covering Physical Scan Operators: Seq Scan, Index Scan, Index-Only & Bitmap Heap Scan (scan-operators-seq-index-bitmap): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "ZxqfSDND5bg",
-      "title": "PostgreSQL Index Scan vs Index-Only Scan | Real Examples, Performance Tips & EXPLAIN ANALYZE Guide",
-      "channel": "Dev Portal",
-      "duration": "19m 33s",
-      "length": "19m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Physical Scan Operators: Seq Scan, Index Scan, Index-Only & Bitmap Heap Scan."
-    }
+    "primary": null,
+    "companion": null
   },
   "sargability-functions-on-columns": {
     "primary": {
-      "youtubeId": "MbohOixk7Yo",
-      "title": "SARGability and Selectivity in SQL Server (by Amit Bansal)",
-      "channel": "SQLMaestros",
-      "duration": "18m 0s",
-      "length": "18m",
-      "why": "Core video covering SARGability: Why Functions, Arithmetic & Implicit Casts on Columns Defeat Indexes (sargability-functions-on-columns): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
       "youtubeId": "So9ABjTqs4A",
-      "title": "Statistics 09 - Scans, Seeks, and Sargability",
+      "title": "Statistics, Scans, Seeks, and SARGability",
       "channel": "Brent Ozar Unlimited",
-      "duration": "8m 50s",
+      "duration": "8m 22s",
+      "start": 0,
       "length": "8m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for SARGability: Why Functions, Arithmetic & Implicit Casts on Columns Defeat Indexes."
-    }
+      "why": "Shows why wrapping indexed columns in functions defeats B+Tree seeks and forces full scans."
+    },
+    "companion": null
   },
   "or-conditions-in-lists-union-rewrites": {
-    "primary": {
-      "youtubeId": "w1Xu4HFsIik",
-      "title": "Optimizing SQL Queries  | Tips for More Efficient Queries | Hindi",
-      "channel": "DataEngineering360",
-      "duration": "22m 12s",
-      "length": "22m",
-      "why": "Core video covering Optimizing OR Predicates, Large IN Lists, BitmapOr & UNION ALL Rewrites (or-conditions-in-lists-union-rewrites): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "1DRZ4P7UaqQ",
-      "title": "Union Vs Union All | With Examples | Prerequisites for Union and Union All | Performance Comparison",
-      "channel": "SQL With RaviMartha",
-      "duration": "11m 18s",
-      "length": "11m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Optimizing OR Predicates, Large IN Lists, BitmapOr & UNION ALL Rewrites."
-    }
+    "primary": null,
+    "companion": null
   },
   "sorting-spill-to-disk-top-n-heapsort": {
-    "primary": {
-      "youtubeId": "nJ6FdAIr_6g",
-      "title": "L-3.18: Heap sort with Example | Heapify Method",
-      "channel": "Gate Smashers",
-      "duration": "13m 38s",
-      "length": "13m",
-      "why": "Core video covering Physical Sorting: QuickSort, Bounded Top-N Heap Sort, Incremental Sort & Disk Spills (sorting-spill-to-disk-top-n-heapsort): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "dbuq9IqEm2U",
-      "title": "8. SORTING | MERGE SORT | QUICK SORT | HEAP SORT | One Shot | Data Structure Aktu | 2017 to 2025",
-      "channel": "Multi Atoms Plus",
-      "duration": "2h 22m",
-      "length": "142m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Physical Sorting: QuickSort, Bounded Top-N Heap Sort, Incremental Sort & Disk Spills."
-    }
+    "primary": null,
+    "companion": null
   },
   "case-stale-statistics-plan-flip": {
-    "primary": {
-      "youtubeId": "O7AzUDogXsw",
-      "title": "SQL Execution Plans (Visually Explained) | SQL Hints | #SQL Course 40",
-      "channel": "Data with Baraa",
-      "duration": "32m 16s",
-      "length": "32m",
-      "why": "Core video covering Production Case Study: Anatomy of a Query Plan Flip from Stale Statistics (case-stale-statistics-plan-flip): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "AZ29DXaJ1Ts",
-      "title": "SQL Project | SQL Case Study to SOLVE and PRACTICE SQL Queries | 20+ SQL Problems",
-      "channel": "techTFQ",
-      "duration": "34m 53s",
-      "length": "34m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Production Case Study: Anatomy of a Query Plan Flip from Stale Statistics."
-    }
+    "primary": null,
+    "companion": null
   },
   "build-visual-explain-plan-analyzer": {
-    "primary": {
-      "youtubeId": "n3_OSv6JbMs",
-      "title": "DB2 Explain Plan: Read It and Fix Slow Queries",
-      "channel": "Topictrick",
-      "duration": "13m 31s",
-      "length": "13m",
-      "why": "Core video covering Hands-On Build: Interactive EXPLAIN Plan Bottleneck Detector & Query Rewriter (build-visual-explain-plan-analyzer): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "O7AzUDogXsw",
-      "title": "SQL Execution Plans (Visually Explained) | SQL Hints | #SQL Course 40",
-      "channel": "Data with Baraa",
-      "duration": "32m 16s",
-      "length": "32m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Hands-On Build: Interactive EXPLAIN Plan Bottleneck Detector & Query Rewriter."
-    }
+    "primary": null,
+    "companion": null
   },
   "nested-loop-join-indexed-nlj": {
-    "primary": {
-      "youtubeId": "rT4eI3p3tVk",
-      "title": "Query Processing: Nested-Loop joins and Merge join",
-      "channel": "Fundamentals of database systems",
-      "duration": "16m 16s",
-      "length": "16m",
-      "why": "Core video covering Nested Loop Join: Naive O(N\u00d7M) vs Block Nested Loop vs Indexed NLJ (nested-loop-join-indexed-nlj): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "JGgwD05gM2A",
-      "title": "010 block nested loop join index based nexted loop join",
-      "channel": "dbislab",
-      "duration": "13m 6s",
-      "length": "13m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Nested Loop Join: Naive O(N\u00d7M) vs Block Nested Loop vs Indexed NLJ."
-    }
+    "primary": null,
+    "companion": null
   },
   "hash-join-build-probe-grace": {
-    "primary": {
-      "youtubeId": "pJWCwfv983Q",
-      "title": "How do nested loop, hash, and merge joins work? Databases for Developers Performance #7",
-      "channel": "The Magic of SQL",
-      "duration": "15m 54s",
-      "length": "15m",
-      "why": "Core video covering Hash Join Internals: In-Memory Build/Probe Phases, Skew & Grace Hash Disk Spills (hash-join-build-probe-grace): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "GRONctC_Uh0",
-      "title": "Lecture 11 Part 10 Grace Hash Animation",
-      "channel": "CS186Berkeley",
-      "duration": "3m 40s",
-      "length": "3m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Hash Join Internals: In-Memory Build/Probe Phases, Skew & Grace Hash Disk Spills."
-    }
+    "primary": null,
+    "companion": null
   },
   "sort-merge-join-zipper-mechanics": {
-    "primary": {
-      "youtubeId": "HyZtBGXLN00",
-      "title": "14.416 Sort-Merge Join, Co-Grouping",
-      "channel": "Prof. Dr. Jens Dittrich, Big Data Analytics",
-      "duration": "18m 31s",
-      "length": "18m",
-      "why": "Core video covering Sort-Merge Join: Dual Sorted Streams, Zipper Merge & Duplicate Rewinding (sort-merge-join-zipper-mechanics): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "5d9JuBX7kVA",
-      "title": "Spark Sort Merge Join: Efficient Data Joining : Spark SQL interview questions",
-      "channel": "Data Savvy",
-      "duration": "2m 40s",
-      "length": "2m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Sort-Merge Join: Dual Sorted Streams, Zipper Merge & Duplicate Rewinding."
-    }
+    "primary": null,
+    "companion": null
   },
   "join-order-search-dynamic-programming": {
-    "primary": {
-      "youtubeId": "52qpVS9yUVo",
-      "title": "SQL Joins & Set Operations | INNER, LEFT, SELF, UNION + Interview Questions",
-      "channel": "Sumit Mittal",
-      "duration": "5h 1m",
-      "length": "301m",
-      "why": "Core video covering Join Ordering Search Space (N!): Selinger Dynamic Programming & Left-Deep vs Bushy Trees (join-order-search-dynamic-programming): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "xFw_RVg6a94",
-      "title": "Adaptive Join Order Optimization using Search Space Linearization",
-      "channel": "University of Waterloo Data Systems Group",
-      "duration": "58m 3s",
-      "length": "58m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Join Ordering Search Space (N!): Selinger Dynamic Programming & Left-Deep vs Bushy Trees."
-    }
+    "primary": null,
+    "companion": null
   },
   "predicate-pushdown-projection-pruning": {
-    "primary": {
-      "youtubeId": "oR9dgwHP6-Y",
-      "title": "Predicate Pushdown, Projection Pruning and Constant Folding in PostgreSQL Plans",
-      "channel": "Prateek Goel | GrowAsEngineers",
-      "duration": "7m 47s",
-      "length": "7m",
-      "why": "Core video covering Logical Plan Rewrites: Predicate Pushdown, Projection Pruning & Join Elimination (predicate-pushdown-projection-pruning): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "RzMC15RfeTw",
-      "title": "Predicate/Projection Pushdown || Static/Dynamic Partition Pruning",
-      "channel": "Data Engineering With Ram",
-      "duration": "20m 2s",
-      "length": "20m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Logical Plan Rewrites: Predicate Pushdown, Projection Pruning & Join Elimination."
-    }
+    "primary": null,
+    "companion": null
   },
   "subquery-unnesting-semi-anti-physical": {
-    "primary": {
-      "youtubeId": "zy89zKipsQg",
-      "title": "SQL SEMI and ANTI Joins",
-      "channel": "Bill Wallis",
-      "duration": "12m 23s",
-      "length": "12m",
-      "why": "Core video covering Subquery Unnesting: Physical Hash Semi-Join & Merge Anti-Join Operators (subquery-unnesting-semi-anti-physical): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "GWq-_R-pkzg",
-      "title": "SQL Semi Joins and Anti Joins: EXISTS, IN, NOT EXISTS, LEFT JOIN IS NULL and NOT IN (PostgreSQL)",
-      "channel": "Prateek Goel | GrowAsEngineers",
-      "duration": "10m 30s",
-      "length": "10m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Subquery Unnesting: Physical Hash Semi-Join & Merge Anti-Join Operators."
-    }
+    "primary": null,
+    "companion": null
   },
   "execution-models-volcano-vectorized": {
     "primary": {
-      "youtubeId": "jKX4rDpGdmI",
-      "title": "Query Execution Engines: Volcano Iterator Model, Vectorized Batch Processing (MonetDB/X100, DuckD...",
-      "channel": "Sankalp Thakur",
-      "duration": "1h 9m",
-      "length": "69m",
-      "why": "Core video covering Execution Models: Volcano Iterator (Next) vs Vectorized Batches vs LLVM JIT (execution-models-volcano-vectorized): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
       "youtubeId": "hGwa6_VXbZc",
-      "title": "DB2 \u2014 Chapter #13 \u2014 Video #76 \u2014 Volcano iterator model (open/next/close)",
-      "channel": "Database Systems Research Group at U T\u00fcbingen",
-      "duration": "31m 26s",
+      "title": "Volcano Iterator Execution Model (open / next / close)",
+      "channel": "Database Systems Research Group at U Tübingen",
+      "duration": "31m 14s",
+      "start": 0,
       "length": "31m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Execution Models: Volcano Iterator (Next) vs Vectorized Batches vs LLVM JIT."
-    }
+      "why": "University lecture tracing tuple-at-a-time Volcano iterators versus modern vectorized batch execution."
+    },
+    "companion": null
   },
   "parallel-query-execution-workers": {
-    "primary": {
-      "youtubeId": "yzW5cqI0uZs",
-      "title": "SESSION: Parallel Query Execution (Paul White)",
-      "channel": "PASS Data Community Summit",
-      "duration": "1h 14m",
-      "length": "74m",
-      "why": "Core video covering Parallel Query Execution: Parallel Seq Scan, Parallel Hash Join & Gather Nodes (parallel-query-execution-workers): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "pJWCwfv983Q",
-      "title": "How do nested loop, hash, and merge joins work? Databases for Developers Performance #7",
-      "channel": "The Magic of SQL",
-      "duration": "15m 54s",
-      "length": "15m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Parallel Query Execution: Parallel Seq Scan, Parallel Hash Join & Gather Nodes."
-    }
+    "primary": null,
+    "companion": null
   },
   "case-hash-join-oom-work-mem-spill": {
-    "primary": {
-      "youtubeId": "pJWCwfv983Q",
-      "title": "How do nested loop, hash, and merge joins work? Databases for Developers Performance #7",
-      "channel": "The Magic of SQL",
-      "duration": "15m 54s",
-      "length": "15m",
-      "why": "Core video covering Production Case Study: Diagnosing Multi-Gigabyte Hash Join Temp File Spills (case-hash-join-oom-work-mem-spill): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "59C8c7p_hII",
-      "title": "Hash Match Join Internals in SQL Server",
-      "channel": "Bert Wagner",
-      "duration": "5m 37s",
-      "length": "5m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Production Case Study: Diagnosing Multi-Gigabyte Hash Join Temp File Spills."
-    }
+    "primary": null,
+    "companion": null
   },
   "build-physical-join-execution-engine": {
-    "primary": {
-      "youtubeId": "pJWCwfv983Q",
-      "title": "How do nested loop, hash, and merge joins work? Databases for Developers Performance #7",
-      "channel": "The Magic of SQL",
-      "duration": "15m 54s",
-      "length": "15m",
-      "why": "Core video covering Hands-On Build: Implement & Benchmark Nested Loop, Hash Join & Sort-Merge Join (build-physical-join-execution-engine): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "-htbah3eCYg",
-      "title": "How nested loop, hash, and merge joins work.",
-      "channel": "Arpit Bhayani",
-      "duration": "11m 7s",
-      "length": "11m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Hands-On Build: Implement & Benchmark Nested Loop, Hash Join & Sort-Merge Join."
-    }
+    "primary": null,
+    "companion": null
   },
   "acid-properties-under-the-hood": {
-    "primary": {
-      "youtubeId": "GAe5oB742dw",
-      "title": "ACID Properties in Databases With Examples",
-      "channel": "ByteByteGo",
-      "duration": "4m 57s",
-      "length": "4m",
-      "why": "Core video covering ACID Under the Hood: Atomicity (Undo), Consistency, Isolation & Durability (WAL) (acid-properties-under-the-hood): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "0OYFsJ1-1YA",
-      "title": "ACID properties in SQL server | Atomicity, Consistency, Isolation and Durability | SQL interview Q&A",
-      "channel": "Right to Learn @BK",
-      "duration": "15m 55s",
-      "length": "15m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for ACID Under the Hood: Atomicity (Undo), Consistency, Isolation & Durability (WAL)."
-    }
+    "primary": null,
+    "companion": null
   },
   "transaction-lifecycle-savepoints": {
-    "primary": {
-      "youtubeId": "GOQVlrQohtM",
-      "title": "MySQL: AUTOCOMMIT, COMMIT, ROLLBACK",
-      "channel": "Bro Code",
-      "duration": "2m 37s",
-      "length": "2m",
-      "why": "Core video covering Transaction Lifecycle: BEGIN, COMMIT, ROLLBACK, SAVEPOINT & Autocommit Hazards (transaction-lifecycle-savepoints): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "OSfcmmoQWgU",
-      "title": "6.  What is Transaction Control Language? Using COMMIT, ROLLBACK and SAVEPOINT commands in MySQL.",
-      "channel": "Everything Computerized (CA)",
-      "duration": "7m 34s",
-      "length": "7m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Transaction Lifecycle: BEGIN, COMMIT, ROLLBACK, SAVEPOINT & Autocommit Hazards."
-    }
+    "primary": null,
+    "companion": null
   },
   "read-phenomena-dirty-nonrepeatable-phantom": {
-    "primary": {
-      "youtubeId": "TbrCdiE53So",
-      "title": "Isolation + Dirty Read, Non-Repeatable Read And Phantom Read | Concurrency series - Video 3",
-      "channel": "Kartikeya Sharma",
-      "duration": "6m 40s",
-      "length": "6m",
-      "why": "Core video covering Read Anomalies: Dirty Reads, Non-Repeatable Reads & Phantom Reads Visualized (read-phenomena-dirty-nonrepeatable-phantom): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "ch65WIjhF4M",
-      "title": "Topic 06, Part 05 - Dirty Reads, Inconsistent Reads, and Phantom Reads",
-      "channel": "Dr. Daniel Soper",
-      "duration": "6m 1s",
-      "length": "6m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Read Anomalies: Dirty Reads, Non-Repeatable Reads & Phantom Reads Visualized."
-    }
+    "primary": null,
+    "companion": null
   },
   "write-anomalies-lost-update-write-skew": {
-    "primary": {
-      "youtubeId": "eym48yrObhY",
-      "title": "Write Skew and Phantom Writes | Systems Design Interview: 0 to 1 with Google Software Engineer",
-      "channel": "Jordan has no life",
-      "duration": "6m 38s",
-      "length": "6m",
-      "why": "Core video covering Write Anomalies: Dirty Writes, Lost Updates, Read Skew & Write Skew (write-anomalies-lost-update-write-skew): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "c6yflIvnmaY",
-      "title": "Lost Updates and Write Skew: SELECT FOR UPDATE, REPEATABLE READ and SERIALIZABLE (PostgreSQL)",
-      "channel": "Prateek Goel | GrowAsEngineers",
-      "duration": "10m 45s",
-      "length": "10m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Write Anomalies: Dirty Writes, Lost Updates, Read Skew & Write Skew."
-    }
+    "primary": null,
+    "companion": null
   },
   "read-uncommitted-read-committed": {
-    "primary": {
-      "youtubeId": "S-z3uuhdUew",
-      "title": "Read committed snapshot isolation level in sql server",
-      "channel": "kudvenkat",
-      "duration": "6m 58s",
-      "length": "6m",
-      "why": "Core video covering READ UNCOMMITTED & READ COMMITTED: Statement-Level Snapshots in Practice (read-uncommitted-read-committed): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "-gxyut1VLcs",
-      "title": "Isolation Levels in Database Management Systems",
-      "channel": "Edredo for Learners",
-      "duration": "10m 20s",
-      "length": "10m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for READ UNCOMMITTED & READ COMMITTED: Statement-Level Snapshots in Practice."
-    }
+    "primary": null,
+    "companion": null
   },
   "repeatable-read-snapshot-isolation": {
-    "primary": {
-      "youtubeId": "TbrCdiE53So",
-      "title": "Isolation + Dirty Read, Non-Repeatable Read And Phantom Read | Concurrency series - Video 3",
-      "channel": "Kartikeya Sharma",
-      "duration": "6m 40s",
-      "length": "6m",
-      "why": "Core video covering REPEATABLE READ & Snapshot Isolation (SI): First-Committer-Wins & Write Skew (repeatable-read-snapshot-isolation): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "uFYyQTzW2cg",
-      "title": "Snapshot Isolation and Read Committed Snapshot Isolation: Two Important Differences in SQL Server",
-      "channel": "Erik Darling (Erik Darling Data)",
-      "duration": "19m 47s",
-      "length": "19m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for REPEATABLE READ & Snapshot Isolation (SI): First-Committer-Wins & Write Skew."
-    }
+    "primary": null,
+    "companion": null
   },
   "serializable-2pl-vs-ssi": {
-    "primary": {
-      "youtubeId": "1pUaEDNLWi4",
-      "title": "Lec-102: 2 Phase Locking(2PL) Protocol in Transaction Concurrency Control | DBMS",
-      "channel": "Gate Smashers",
-      "duration": "9m 53s",
-      "length": "9m",
-      "why": "Core video covering True Serializability: Strict Two-Phase Locking (2PL) vs Serializable Snapshot Isolation (SSI) (serializable-2pl-vs-ssi): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "94C0V7f2zm4",
-      "title": "Lec-100:Shared Exclusive Locking Protocol with Example | Concurrency Control | DBMS | Part-1",
-      "channel": "Gate Smashers",
-      "duration": "6m 43s",
-      "length": "6m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for True Serializability: Strict Two-Phase Locking (2PL) vs Serializable Snapshot Isolation (SSI)."
-    }
+    "primary": null,
+    "companion": null
   },
   "optimistic-vs-pessimistic-concurrency": {
     "primary": {
-      "youtubeId": "bCpO4qd5Z-I",
-      "title": "Concurrent Lost Updates in Spring Boot JPA: Optimistic, Pessimistic & Atomic DB Locks",
-      "channel": "The Java Loom",
-      "duration": "6m 40s",
-      "length": "6m",
-      "why": "Core video covering Optimistic Concurrency (Compare-and-Swap Version) vs Pessimistic SELECT FOR UPDATE (optimistic-vs-pessimistic-concurrency): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
       "youtubeId": "I8IlO0hCSgY",
-      "title": "Pessimistic concurrency control vs Optimistic concurrency control in Database Systems Explained",
+      "title": "Pessimistic vs Optimistic Concurrency Control in Database Systems",
       "channel": "Hussein Nasser",
-      "duration": "16m 1s",
+      "duration": "16m 30s",
+      "start": 0,
       "length": "16m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Optimistic Concurrency (Compare-and-Swap Version) vs Pessimistic SELECT FOR UPDATE."
-    }
+      "why": "Analyses lock contention, retry storms, and throughput crossovers between SELECT FOR UPDATE and version-checked OCC."
+    },
+    "companion": null
   },
   "case-fintech-double-spend-race-condition": {
-    "primary": {
-      "youtubeId": "GInajRNW8Co",
-      "title": "DP-800 Episode 2: Fabrikam Healthcare Case Study (DAB, Ledger, Concurrency Trap & CI/CD)",
-      "channel": "MSExamLab",
-      "duration": "13m 32s",
-      "length": "13m",
-      "why": "Core video covering Production Case Study: Exploiting & Fixing a Concurrent Balance Double-Spend (case-fintech-double-spend-race-condition): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "rpxFQAagGfg",
-      "title": "ISO 20022 Payment Case Study | Duplicate Payment Recall & Return Explained End-to-End",
-      "channel": "Analyst After Hours",
-      "duration": "36m 6s",
-      "length": "36m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Production Case Study: Exploiting & Fixing a Concurrent Balance Double-Spend."
-    }
+    "primary": null,
+    "companion": null
   },
   "build-transaction-anomaly-simulator": {
-    "primary": {
-      "youtubeId": "WRL-5hSl4kM",
-      "title": "SQL #85 - Concurrency Problems [By Mosh Hamedani]",
-      "channel": "Coding Codes",
-      "duration": "7m 25s",
-      "length": "7m",
-      "why": "Core video covering Hands-On Build: Dual-Session Concurrency Anomaly & Isolation Verifier (build-transaction-anomaly-simulator): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "TWv2jpmxaf8",
-      "title": "sql server concurrent transactions",
-      "channel": "kudvenkat",
-      "duration": "7m 33s",
-      "length": "7m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Hands-On Build: Dual-Session Concurrency Anomaly & Isolation Verifier."
-    }
+    "primary": null,
+    "companion": null
   },
   "multi-version-concurrency-control-mvcc": {
-    "primary": {
-      "youtubeId": "5Sy97Uzvj90",
-      "title": "TOP-4 databases MVCC architectures explained",
-      "channel": "PAVLOG",
-      "duration": "5m 10s",
-      "length": "5m",
-      "why": "Core video covering MVCC Architecture: Why Readers Never Block Writers and Writers Never Block Readers (multi-version-concurrency-control-mvcc): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "CzUG2AUIPuo",
-      "title": "How Can Thousands of People Read the Same Database Row at Once?",
-      "channel": "System Internals",
-      "duration": "11m 27s",
-      "length": "11m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for MVCC Architecture: Why Readers Never Block Writers and Writers Never Block Readers."
-    }
+    "primary": null,
+    "companion": null
   },
   "tuple-headers-xmin-xmax-visibility": {
     "primary": {
       "youtubeId": "AveRgUrC7FM",
-      "title": "Postgres System Columns Explained (ctid, xmin,xmax)",
+      "title": "Postgres System Columns Explained (ctid, xmin, xmax)",
       "channel": "Hussein Nasser",
-      "duration": "26m 28s",
+      "duration": "26m 12s",
+      "start": 0,
       "length": "26m",
-      "why": "Core video covering Tuple Headers Under the Microscope: xmin, xmax, ctid & Infomask Hint Bits (tuple-headers-xmin-xmax-visibility): focuses directly on practical mechanics, real-world examples, and implementation details."
+      "why": "Live inspection of PostgreSQL physical tuple headers, MVCC version chains, and snapshot visibility rules."
     },
-    "companion": {
-      "youtubeId": "-cDSR229tM4",
-      "title": "MVCC Explained: Row Versions, xmin/xmax, Snapshots, Dead Tuples and VACUUM (PostgreSQL)",
-      "channel": "Prateek Goel | GrowAsEngineers",
-      "duration": "8m 2s",
-      "length": "8m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Tuple Headers Under the Microscope: xmin, xmax, ctid & Infomask Hint Bits."
-    }
+    "companion": null
   },
   "transaction-snapshots-visibility-rules": {
-    "primary": {
-      "youtubeId": "qDAiFqIw0fc",
-      "title": "PostgreSQL MVCC Snapshots: xmin, xmax, pg_current_snapshot and Version Visibility",
-      "channel": "Prateek Goel | GrowAsEngineers",
-      "duration": "8m 40s",
-      "length": "8m",
-      "why": "Core video covering Transaction Snapshots (xmin:xmax:xip_list) & Tuple Visibility Resolution (transaction-snapshots-visibility-rules): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "s6TlDvFXJpY",
-      "title": "PostgreSQL Tuple Visibility Rules",
-      "channel": "Praveen Somisetty",
-      "duration": "47m 54s",
-      "length": "47m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Transaction Snapshots (xmin:xmax:xip_list) & Tuple Visibility Resolution."
-    }
+    "primary": null,
+    "companion": null
   },
   "row-level-locks-for-update-skip-locked": {
-    "primary": {
-      "youtubeId": "Ab_fHdtyE8E",
-      "title": "SQL Locks and Deadlocks: FOR UPDATE, SKIP LOCKED, NOWAIT, Optimistic vs Pessimistic (PostgreSQL)",
-      "channel": "Prateek Goel | GrowAsEngineers",
-      "duration": "8m 31s",
-      "length": "8m",
-      "why": "Core video covering Row-Level Locks: FOR UPDATE, FOR NO KEY UPDATE, FOR SHARE, NOWAIT & SKIP LOCKED (row-level-locks-for-update-skip-locked): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "m6-63kpttQk",
-      "title": "The Skip Locked feature in Postgres 9.5",
-      "channel": "PG Casts by Hashrocket",
-      "duration": "3m 37s",
-      "length": "3m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Row-Level Locks: FOR UPDATE, FOR NO KEY UPDATE, FOR SHARE, NOWAIT & SKIP LOCKED."
-    }
+    "primary": null,
+    "companion": null
   },
   "table-locks-intention-locks-ddl-hazards": {
-    "primary": {
-      "youtubeId": "tBocTKQhx60",
-      "title": "Lock Escalation in SQL SERVER | By SQL Training | By SQL",
-      "channel": "Sql Training Sessions",
-      "duration": "12m 49s",
-      "length": "12m",
-      "why": "Core video covering Table Lock Hierarchy, Intention Locks & Why ALTER TABLE Stalls Traffic (table-locks-intention-locks-ddl-hazards): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "9lmPOTv-pDc",
-      "title": "What are the different locking modes present in SQL | SQL Server Locking modes | SQL interview Q&A",
-      "channel": "Right to Learn @BK",
-      "duration": "20m 43s",
-      "length": "20m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Table Lock Hierarchy, Intention Locks & Why ALTER TABLE Stalls Traffic."
-    }
+    "primary": null,
+    "companion": null
   },
   "gap-locks-next-key-locks-innodb": {
-    "primary": {
-      "youtubeId": "CFNEF-Rc9T8",
-      "title": "Master MySQL Locks: Record Lock, Next-Key Lock, Gap Lock, and More Explained",
-      "channel": "Stockoverflow",
-      "duration": "7m 23s",
-      "length": "7m",
-      "why": "Core video covering Preventing Phantoms with Locks: Record Locks, Gap Locks & Next-Key Locks (gap-locks-next-key-locks-innodb): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "94C0V7f2zm4",
-      "title": "Lec-100:Shared Exclusive Locking Protocol with Example | Concurrency Control | DBMS | Part-1",
-      "channel": "Gate Smashers",
-      "duration": "6m 43s",
-      "length": "6m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Preventing Phantoms with Locks: Record Locks, Gap Locks & Next-Key Locks."
-    }
+    "primary": null,
+    "companion": null
   },
   "deadlocks-wait-for-graphs-detection": {
-    "primary": {
-      "youtubeId": "AGZr5LaiyMg",
-      "title": "deadlock detection  part 1 |  wait for graph | Resource allocation graph",
-      "channel": "Sudhakar Atchala",
-      "duration": "3m 56s",
-      "length": "3m",
-      "why": "Core video covering Deadlocks: Wait-For Graph Cycles, Lock Ordering & Deadlock Detection (deadlocks-wait-for-graphs-detection): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "Nt5dZIlK_ms",
-      "title": "deadlock detection with out a cycle in wait for graph",
-      "channel": "Thaduri Suneetha",
-      "duration": "2m 36s",
-      "length": "2m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Deadlocks: Wait-For Graph Cycles, Lock Ordering & Deadlock Detection."
-    }
+    "primary": null,
+    "companion": null
   },
   "dead-tuples-bloat-autovacuum-txid-wraparound": {
-    "primary": {
-      "youtubeId": "HmkyvSfdM0o",
-      "title": "PostgreSQL VACUUM explained: MVCC, dead tuples, table bloat and autovacuum",
-      "channel": "Prepare-sh",
-      "duration": "11m 7s",
-      "length": "11m",
-      "why": "Core video covering Dead Tuples, Table Bloat, Autovacuum, Free Space Map & XID Wraparound (dead-tuples-bloat-autovacuum-txid-wraparound): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "JuqsyiLOv8o",
-      "title": "PostgreSQL VACUUM FULL vs pg_repack vs Autovacuum | Stop Table Bloat #vacuum #postgresql",
-      "channel": "Knowledge with Satish",
-      "duration": "17m 4s",
-      "length": "17m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Dead Tuples, Table Bloat, Autovacuum, Free Space Map & XID Wraparound."
-    }
+    "primary": null,
+    "companion": null
   },
   "case-sentry-transaction-id-wraparound": {
-    "primary": {
-      "youtubeId": "wnXWXyBfKTc",
-      "title": "Postgres Transaction ID Wraparound: The Real Scaling Killer",
-      "channel": "Exploded View",
-      "duration": "8m 51s",
-      "length": "8m",
-      "why": "Core video covering Production Case Study: Anatomy of a Transaction ID (XID) Wraparound Outage (case-sentry-transaction-id-wraparound): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "kScMl-9LiSQ",
-      "title": "pg_stat_statements, Transaction ID Wraparound, Consultant Knowledge, CitusCon | Scaling Postgres 265",
-      "channel": "Scaling Postgres",
-      "duration": "16m 48s",
-      "length": "16m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Production Case Study: Anatomy of a Transaction ID (XID) Wraparound Outage."
-    }
+    "primary": null,
+    "companion": null
   },
   "build-mvcc-snapshot-storage-engine": {
-    "primary": {
-      "youtubeId": "-cDSR229tM4",
-      "title": "MVCC Explained: Row Versions, xmin/xmax, Snapshots, Dead Tuples and VACUUM (PostgreSQL)",
-      "channel": "Prateek Goel | GrowAsEngineers",
-      "duration": "8m 2s",
-      "length": "8m",
-      "why": "Core video covering Hands-On Build: Multi-Version Tuple Store with Snapshot Isolation & Vacuum GC (build-mvcc-snapshot-storage-engine): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "9NVu17LjPSA",
-      "title": "Snapshot isolation level in sql server",
-      "channel": "kudvenkat",
-      "duration": "9m 15s",
-      "length": "9m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Hands-On Build: Multi-Version Tuple Store with Snapshot Isolation & Vacuum GC."
-    }
+    "primary": null,
+    "companion": null
   },
   "slotted-page-layout-8kb-anatomy": {
-    "primary": {
-      "youtubeId": "haz2h7_xFDk",
-      "title": "How databases store data on disk?",
-      "channel": "Architecture Weekly",
-      "duration": "10m 36s",
-      "length": "10m",
-      "why": "Core video covering Inside an 8KB Slotted Database Page: Header, Line Pointers, Tuples & TOAST (slotted-page-layout-8kb-anatomy): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "rYBqTl0w9lU",
-      "title": "Introduction to Slotted Pages in Database Systems",
-      "channel": "ankush",
-      "duration": "17m 37s",
-      "length": "17m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Inside an 8KB Slotted Database Page: Header, Line Pointers, Tuples & TOAST."
-    }
+    "primary": null,
+    "companion": null
   },
   "heap-files-hot-updates-fillfactor": {
-    "primary": {
-      "youtubeId": "DdltBjWVnz8",
-      "title": "HOT updates | Postgres.FM 020 | #PostgreSQL #Postgres podcast",
-      "channel": "PostgresTV",
-      "duration": "34m 41s",
-      "length": "34m",
-      "why": "Core video covering Heap Files, Index Write Amplification, PostgreSQL HOT Updates & fillfactor (heap-files-hot-updates-fillfactor): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "r6rN8NMLgKY",
-      "title": "PostgreSQL Internals - Heap Only Tuple and Index-Only Scans",
-      "channel": "Landon Wilkins",
-      "duration": "13m 40s",
-      "length": "13m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Heap Files, Index Write Amplification, PostgreSQL HOT Updates & fillfactor."
-    }
+    "primary": null,
+    "companion": null
   },
   "buffer-pool-clock-sweep-lru-k": {
-    "primary": {
-      "youtubeId": "vRY5f6kWCmU",
-      "title": "PostgreSQL Buffer Pool Internals: Usage Counts, Clock Sweep, Dirty Pages and the OS Cache",
-      "channel": "Prateek Goel | GrowAsEngineers",
-      "duration": "8m 15s",
-      "length": "8m",
-      "why": "Core video covering Buffer Pool Manager: Pin Counts, Dirty Pages, Clock-Sweep & LRU-K Eviction (buffer-pool-clock-sweep-lru-k): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "SQIVN1DT36Y",
-      "title": "Buffer Pool Management, Page Replacement Policies, and Modern Asynchronous I/O: Pin Counts, Scan ...",
-      "channel": "Sankalp Thakur",
-      "duration": "1h 5m",
-      "length": "65m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Buffer Pool Manager: Pin Counts, Dirty Pages, Clock-Sweep & LRU-K Eviction."
-    }
+    "primary": null,
+    "companion": null
   },
   "write-ahead-logging-wal-lsn": {
-    "primary": {
-      "youtubeId": "wI4hKwl1Cn4",
-      "title": "How does the database guarantee reliability using write-ahead logging?",
-      "channel": "Arpit Bhayani",
-      "duration": "22m 5s",
-      "length": "22m",
-      "why": "Core video covering Write-Ahead Logging (WAL), Log Sequence Numbers (LSN) & Group Commit (write-ahead-logging-wal-lsn): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "CedEy54pe3g",
-      "title": "#21 - Write-Ahead Logging + Shadow Paging (CMU Intro to Database Systems)",
-      "channel": "CMU Database Group",
-      "duration": "1h 21m",
-      "length": "81m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Write-Ahead Logging (WAL), Log Sequence Numbers (LSN) & Group Commit."
-    }
+    "primary": null,
+    "companion": null
   },
   "checkpoints-dirty-page-flushing": {
-    "primary": {
-      "youtubeId": "Mz7lH4Vwsmk",
-      "title": "\ud83d\udca1How SQL Server Writes Data: Dirty Pages, Checkpoints & \ud83c\udfafLazy Writer (Easy Explanation)\ud83d\udd25#sqlserver",
-      "channel": "AzureSQLChamp",
-      "duration": "1h 25m",
-      "length": "85m",
-      "why": "Core video covering Checkpoints, Dirty Page Flushing & Torn-Page Protection (Full Page Writes) (checkpoints-dirty-page-flushing): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "Aa2mEkMUkNU",
-      "title": "\ud83d\udd25SQL Server Memory Secrets: Clean Pages, Dirty Pages, Checkpoints & Lazy Writer Explained #sqlserver",
-      "channel": "AzureSQLChamp",
-      "duration": "1h 53m",
-      "length": "113m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Checkpoints, Dirty Page Flushing & Torn-Page Protection (Full Page Writes)."
-    }
+    "primary": null,
+    "companion": null
   },
   "aries-crash-recovery-analysis-redo-undo": {
     "primary": {
       "youtubeId": "yVpzHdAP0TY",
-      "title": "#21 - Database Recovery with ARIES (CMU Intro to Database Systems)",
+      "title": "Database Crash Recovery with ARIES (CMU 15-445/645)",
       "channel": "CMU Database Group",
       "duration": "1h 12m",
+      "start": 0,
       "length": "72m",
-      "why": "Core video covering ARIES Crash Recovery: Steal/No-Force Policy, Analysis, Redo & Undo Passes (aries-crash-recovery-analysis-redo-undo): focuses directly on practical mechanics, real-world examples, and implementation details."
+      "why": "Covers steal/no-force buffer management, LSNs, and the Analysis, Redo, and Undo phases of ARIES recovery."
     },
-    "companion": {
-      "youtubeId": "csWHS0SLTtM",
-      "title": "21: Database Recovery via ARIES",
-      "channel": "Immanuel Trummer",
-      "duration": "50m 36s",
-      "length": "50m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for ARIES Crash Recovery: Steal/No-Force Policy, Analysis, Redo & Undo Passes."
-    }
+    "companion": null
   },
   "lsm-trees-memtable-sstable-compaction": {
-    "primary": {
-      "youtubeId": "pMbwXa43Gxg",
-      "title": "SSTables & LSM Trees: The Secret Behind Fast Database Writes",
-      "channel": "Arpit Vaish",
-      "duration": "10m 10s",
-      "length": "10m",
-      "why": "Core video covering LSM-Trees (RocksDB / Cassandra): MemTable, Immutable SSTables, Bloom Filters & Compaction (lsm-trees-memtable-sstable-compaction): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "hdk1Y9rsVxE",
-      "title": "LSM Trees: MemTable, SSTable, and Compaction EXPLAINED",
-      "channel": "CodingKernel",
-      "duration": "11m 34s",
-      "length": "11m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for LSM-Trees (RocksDB / Cassandra): MemTable, Immutable SSTables, Bloom Filters & Compaction."
-    }
+    "primary": null,
+    "companion": null
   },
   "btree-vs-lsm-read-write-space-amplification": {
-    "primary": {
-      "youtubeId": "a3T6N_kMs0k",
-      "title": "FAST '22 - Closing the B+-tree vs. LSM-tree Write Amplification Gap on Modern Storage Hardware...",
-      "channel": "USENIX",
-      "duration": "13m 4s",
-      "length": "13m",
-      "why": "Core video covering The RUM Conjecture: B+Tree vs LSM-Tree Read, Write & Space Amplification (btree-vs-lsm-read-write-space-amplification): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "I6jB0nM9SKU",
-      "title": "The Secret Sauce Behind NoSQL: LSM Tree",
-      "channel": "ByteByteGo",
-      "duration": "7m 34s",
-      "length": "7m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for The RUM Conjecture: B+Tree vs LSM-Tree Read, Write & Space Amplification."
-    }
+    "primary": null,
+    "companion": null
   },
   "case-uber-postgres-to-mysql-storage": {
-    "primary": {
-      "youtubeId": "_E43l5EbNI4",
-      "title": "Opening Old Wounds - Why Uber Engineering Switched from Postgres to MySQL",
-      "channel": "Hussein Nasser",
-      "duration": "47m 14s",
-      "length": "47m",
-      "why": "Core video covering Production Case Study: PostgreSQL Heap+ctid vs MySQL InnoDB Clustered Storage (case-uber-postgres-to-mysql-storage): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "vx5uT-8x0p4",
-      "title": "Why Uber Abandoned Postgres for MySQL (Here\u2019s What Broke)",
-      "channel": "Yako Tech",
-      "duration": "3m 22s",
-      "length": "3m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Production Case Study: PostgreSQL Heap+ctid vs MySQL InnoDB Clustered Storage."
-    }
+    "primary": null,
+    "companion": null
   },
   "build-slotted-page-wal-engine": {
-    "primary": {
-      "youtubeId": "7R7Ex0YkaNw",
-      "title": "How to build a Durable Write Ahead Log in Go | Segmentation, Auto Recovery, Checksums",
-      "channel": "Jyotinder Singh",
-      "duration": "19m 7s",
-      "length": "19m",
-      "why": "Core video covering Hands-On Build: 8KB Slotted Page + Write-Ahead Log Crash Recovery Simulator (build-slotted-page-wal-engine): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "MHAzvg3uEDA",
-      "title": "Write-Ahead Logging (WAL) Explained: The Key to Distributed Data Integrity",
-      "channel": "aloneguid",
-      "duration": "3m 2s",
-      "length": "3m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Hands-On Build: 8KB Slotted Page + Write-Ahead Log Crash Recovery Simulator."
-    }
+    "primary": null,
+    "companion": null
   },
   "columnar-storage-layout-parquet": {
-    "primary": {
-      "youtubeId": "XNrsRVMfj1c",
-      "title": "Episode 2: Row vs Column Store",
-      "channel": "Databases Demystified",
-      "duration": "6m 9s",
-      "length": "6m",
-      "why": "Core video covering Row-Store (NSM) vs Column-Store (DSM) & Apache Parquet PAX Hybrid Layout (columnar-storage-layout-parquet): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "1MnvuNg33pA",
-      "title": "What is a Columnar Database? (vs. Row-oriented Database)",
-      "channel": "Anton Putra",
-      "duration": "8m 19s",
-      "length": "8m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Row-Store (NSM) vs Column-Store (DSM) & Apache Parquet PAX Hybrid Layout."
-    }
+    "primary": null,
+    "companion": null
   },
   "columnar-compression-rle-dictionary-delta": {
-    "primary": {
-      "youtubeId": "X7EwyAv8WIw",
-      "title": "L10: Column-Oriented Storage | Run-Length Encoding, Dictionary Encoding and Data Compression",
-      "channel": "Aarchi Gandhi",
-      "duration": "10m 39s",
-      "length": "10m",
-      "why": "Core video covering Columnar Compression: Run-Length (RLE), Dictionary, Bit-Packing & Delta Encoding (columnar-compression-rle-dictionary-delta): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "QvPi21mBBjc",
-      "title": "OCR A Level Computer Science H446 \u2013 1.3.1 Compression: Run Length Encoding & Dictionary Coding",
-      "channel": "Mr Bs Computer Science & Business",
-      "duration": "8m 14s",
-      "length": "8m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Columnar Compression: Run-Length (RLE), Dictionary, Bit-Packing & Delta Encoding."
-    }
+    "primary": null,
+    "companion": null
   },
   "late-materialization-simd-vectorization": {
     "primary": {
       "youtubeId": "yU1S8gwjGEw",
-      "title": "S2024 #06 - Vectorized Query Execution Using SIMD (CMU Advanced Database Systems)",
+      "title": "Vectorized Query Execution Using SIMD (CMU Advanced Database Systems)",
       "channel": "CMU Database Group",
       "duration": "1h 18m",
+      "start": 0,
       "length": "78m",
-      "why": "Core video covering Late Materialization & SIMD Vectorized Execution on Compressed Columns (late-materialization-simd-vectorization): focuses directly on practical mechanics, real-world examples, and implementation details."
+      "why": "Deep dive into columnar selection vectors, late materialization, and SIMD predicate evaluation."
     },
-    "companion": {
-      "youtubeId": "FrspnYbFSxQ",
-      "title": "08 - Vectorized Query Execution with SIMD (CMU Advanced Databases / Spring 2023)",
-      "channel": "CMU Database Group",
-      "duration": "1h 15m",
-      "length": "75m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Late Materialization & SIMD Vectorized Execution on Compressed Columns."
-    }
+    "companion": null
   },
   "zone-maps-min-max-pruning-bloom": {
-    "primary": {
-      "youtubeId": "s8Z8Gex7VFw",
-      "title": "Dynamic Partition Pruning: How It Works (And When It Doesn\u2019t)",
-      "channel": "Afaque Ahmad",
-      "duration": "20m 33s",
-      "length": "20m",
-      "why": "Core video covering Zone Maps (Min/Max Skipping Indexes), Partition Pruning & Z-Order Clustering (zone-maps-min-max-pruning-bloom): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "xz9M6iLDbLM",
-      "title": "SNF Partition-Pruning.",
-      "channel": "EDventurous Minds",
-      "duration": "4m 50s",
-      "length": "4m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Zone Maps (Min/Max Skipping Indexes), Partition Pruning & Z-Order Clustering."
-    }
+    "primary": null,
+    "companion": null
   },
   "embedded-olap-duckdb-architecture": {
-    "primary": {
-      "youtubeId": "qt1Ft3XH8d4",
-      "title": "What is vectorized query execution?",
-      "channel": "Firebolt",
-      "duration": "6m 12s",
-      "length": "6m",
-      "why": "Core video covering Embedded Analytical SQL (DuckDB): Morsel-Driven Parallelism & Out-of-Core Execution (embedded-olap-duckdb-architecture): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "xBBU213nEts",
-      "title": "pg_duckdb - PostgreSQL and DuckDB in one query engine",
-      "channel": "BugBytes",
-      "duration": "13m 57s",
-      "length": "13m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Embedded Analytical SQL (DuckDB): Morsel-Driven Parallelism & Out-of-Core Execution."
-    }
+    "primary": null,
+    "companion": null
   },
   "realtime-olap-clickhouse-mergetree": {
-    "primary": {
-      "youtubeId": "dnWqYjrlV1g",
-      "title": "How Primary Keys Work in ClickHouse",
-      "channel": "ClickHouse",
-      "duration": "4m 13s",
-      "length": "4m",
-      "why": "Core video covering Real-Time OLAP (ClickHouse): Sparse Primary Indexes & MergeTree Engines (realtime-olap-clickhouse-mergetree): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "_w3zQg695c0",
-      "title": "Merge-time computation | Why is ClickHouse fast? (Part 3)",
-      "channel": "ClickHouse",
-      "duration": "2m 5s",
-      "length": "2m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Real-Time OLAP (ClickHouse): Sparse Primary Indexes & MergeTree Engines."
-    }
+    "primary": null,
+    "companion": null
   },
   "cloud-warehouses-snowflake-bigquery": {
-    "primary": {
-      "youtubeId": "8Qqt0hGTsbQ",
-      "title": "#2 Snowflake Architecture in depth || How Snowflake works",
-      "channel": "Cloudlearningyard",
-      "duration": "19m 30s",
-      "length": "19m",
-      "why": "Core video covering Cloud Data Warehouses (Snowflake & BigQuery): Disaggregated Storage & Compute (cloud-warehouses-snowflake-bigquery): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "4CYNxisz3d0",
-      "title": "NSDI '20 - Building An Elastic Query Engine on Disaggregated Storage",
-      "channel": "USENIX",
-      "duration": "19m 58s",
-      "length": "19m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Cloud Data Warehouses (Snowflake & BigQuery): Disaggregated Storage & Compute."
-    }
+    "primary": null,
+    "companion": null
   },
   "open-table-formats-iceberg-delta": {
-    "primary": {
-      "youtubeId": "TsmhRZElPvM",
-      "title": "Apache Iceberg: What It Is and Why Everyone\u2019s Talking About It.",
-      "channel": "Confluent Developer",
-      "duration": "13m 50s",
-      "length": "13m",
-      "why": "Core video covering Open Lakehouse Table Formats (Apache Iceberg & Delta Lake): ACID on Object Storage (open-table-formats-iceberg-delta): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "LRqmFX6mOM0",
-      "title": "Next Big Thing for Data Engineers - Open Table Formats \ud83d\ude80 (Apache Iceberg, Hudi, Delta Tables)",
-      "channel": "Darshil Parmar",
-      "duration": "14m 6s",
-      "length": "14m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Open Lakehouse Table Formats (Apache Iceberg & Delta Lake): ACID on Object Storage."
-    }
+    "primary": null,
+    "companion": null
   },
   "case-cloudflare-clickhouse-log-analytics": {
-    "primary": {
-      "youtubeId": "TX4_7eUhP6U",
-      "title": "Realtime DNS Analytics at Cloudflare with #ClickHouse",
-      "channel": "Percona",
-      "duration": "10m 8s",
-      "length": "10m",
-      "why": "Core video covering Production Case Study: Querying Millions of HTTP Events/Sec with Columnar MergeTree (case-cloudflare-clickhouse-log-analytics): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "3waDYancX_c",
-      "title": "ClickStack: Unified Observability with ClickHouse for High-Cardinality Logs, Metrics & Traces",
-      "channel": "ClickHouse",
-      "duration": "5m 48s",
-      "length": "5m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Production Case Study: Querying Millions of HTTP Events/Sec with Columnar MergeTree."
-    }
+    "primary": null,
+    "companion": null
   },
   "build-columnar-compression-query-engine": {
-    "primary": {
-      "youtubeId": "acLKQVPumcw",
-      "title": "Oracle Exadata Hybrid Columnar Compression",
-      "channel": "Oracle Video",
-      "duration": "3m 22s",
-      "length": "3m",
-      "why": "Core video covering Hands-On Build: Columnar RLE/Dictionary Encoder with Zone-Map Predicate Pushdown (build-columnar-compression-query-engine): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "U83BwYJhi9A",
-      "title": "Oracle Exadata: Hybrid Columnar Compression (HCC) Introduction",
-      "channel": "SkillBuilders",
-      "duration": "2m 3s",
-      "length": "2m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Hands-On Build: Columnar RLE/Dictionary Encoder with Zone-Map Predicate Pushdown."
-    }
+    "primary": null,
+    "companion": null
   },
   "single-leader-replication-sync-async": {
-    "primary": {
-      "youtubeId": "jSjUXU0dEbg",
-      "title": "Physical vs Logical Replication in PostgreSQL | Explained by Ankush Sir",
-      "channel": "Learnomate Technologies",
-      "duration": "5m 26s",
-      "length": "5m",
-      "why": "Core video covering Single-Leader Replication: Physical WAL Streaming vs Logical Replication & Sync/Async (single-leader-replication-sync-async): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "OvSzLjkMmQo",
-      "title": "PostgreSQL Logical Replication Guide",
-      "channel": "Code with Lucian",
-      "duration": "25m 5s",
-      "length": "25m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Single-Leader Replication: Physical WAL Streaming vs Logical Replication & Sync/Async."
-    }
+    "primary": null,
+    "companion": null
   },
   "read-replicas-consistency-models": {
-    "primary": {
-      "youtubeId": "BaluKlE2Gdk",
-      "title": "Read Replicas and Replication Lag: Read-Your-Writes, Failover | System Design Masterclass",
-      "channel": "Prateek Goel | GrowAsEngineers",
-      "duration": "19m 7s",
-      "length": "19m",
-      "why": "Core video covering Scaling Reads with Replicas: Read-Your-Writes, Monotonic Reads & Lag Anomalies (read-replicas-consistency-models): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "UA-0B1BFGPE",
-      "title": "Read Replicas & Database Replication | Replication Lag, Consistency & Quorum",
-      "channel": "Jasmeen Kaur",
-      "duration": "7m 3s",
-      "length": "7m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Scaling Reads with Replicas: Read-Your-Writes, Monotonic Reads & Lag Anomalies."
-    }
+    "primary": null,
+    "companion": null
   },
   "failover-split-brain-fencing-tokens": {
-    "primary": {
-      "youtubeId": "KirT6z418KM",
-      "title": "Fencing Tokens & Split-Brain Explained: Keeping Data Safe from Old Leaders",
-      "channel": "M. Atoar Rahman",
-      "duration": "4m 38s",
-      "length": "4m",
-      "why": "Core video covering Automated High-Availability Failover, Split-Brain Hazards & Fencing Tokens (failover-split-brain-fencing-tokens): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "g6oa7ggiWrs",
-      "title": "Split-Brain Resolution in Distributed Systems: Fencing & Quorum Explained",
-      "channel": "CodeLucky",
-      "duration": "5m 12s",
-      "length": "5m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Automated High-Availability Failover, Split-Brain Hazards & Fencing Tokens."
-    }
+    "primary": null,
+    "companion": null
   },
   "declarative-table-partitioning": {
-    "primary": {
-      "youtubeId": "oJj-pltxBUM",
-      "title": "PostgreSQL Partitioning Tutorial",
-      "channel": "Code with Lucian",
-      "duration": "11m 43s",
-      "length": "11m",
-      "why": "Core video covering Declarative Table Partitioning (Range, List, Hash) & Instant Retention Drops (declarative-table-partitioning): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "BvyOJuik8FA",
-      "title": "Hash Partitioning vs Range Partitioning | Spark Interview questions",
-      "channel": "Data Savvy",
-      "duration": "4m 25s",
-      "length": "4m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Declarative Table Partitioning (Range, List, Hash) & Instant Retention Drops."
-    }
+    "primary": null,
+    "companion": null
   },
   "horizontal-sharding-routing-keys": {
-    "primary": {
-      "youtubeId": "zaRkONvyGr8",
-      "title": "What is CONSISTENT HASHING and Where is it used?",
-      "channel": "Gaurav Sen",
-      "duration": "10m 50s",
-      "length": "10m",
-      "why": "Core video covering Horizontal Sharding (Vitess / Citus): Shard Keys, Consistent Hashing & Scatter-Gather (horizontal-sharding-routing-keys): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "UF9Iqmg94tk",
-      "title": "Consistent Hashing | Algorithms You Should Know #1",
-      "channel": "ByteByteGo",
-      "duration": "8m 4s",
-      "length": "8m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Horizontal Sharding (Vitess / Citus): Shard Keys, Consistent Hashing & Scatter-Gather."
-    }
+    "primary": null,
+    "companion": null
   },
   "distributed-transactions-2pc-saga": {
     "primary": {
       "youtubeId": "DOFflggE_0Q",
-      "title": "Distributed Transactions Explained: 2 Phase Commit vs Saga Pattern",
+      "title": "Distributed Transactions Explained: Two-Phase Commit vs Saga Pattern",
       "channel": "Hello Interview",
-      "duration": "14m 46s",
+      "duration": "14m 19s",
+      "start": 0,
       "length": "14m",
-      "why": "Core video covering Distributed Transactions: Two-Phase Commit (2PC) Blocking vs Saga Pattern (distributed-transactions-2pc-saga): focuses directly on practical mechanics, real-world examples, and implementation details."
+      "why": "Contrasts coordinator blocking in atomic 2PC against compensating transactions and idempotency in Sagas."
     },
-    "companion": {
-      "youtubeId": "b3bPtDFG-Lg",
-      "title": "\ud83d\ude80 Distributed Transactions Explained | 2PC & Saga Pattern | EP-10",
-      "channel": "Java Techie",
-      "duration": "31m 12s",
-      "length": "31m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Distributed Transactions: Two-Phase Commit (2PC) Blocking vs Saga Pattern."
-    }
+    "companion": null
   },
   "distributed-sql-spanner-cockroachdb": {
-    "primary": {
-      "youtubeId": "k5BR9m8o9ec",
-      "title": "The Raft Protocol explained via SQL database | CockroachDB | consensus protocol",
-      "channel": "CockroachDB",
-      "duration": "3m 7s",
-      "length": "3m",
-      "why": "Core video covering Distributed NewSQL Internals (Spanner & CockroachDB): Raft Ranges, TrueTime & HLC (distributed-sql-spanner-cockroachdb): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "MibIJ_RdoXU",
-      "title": "How CockroachDB Solved the Problem Traditional SQL Couldn\u2019t",
-      "channel": "Source Compiler",
-      "duration": "29m 59s",
-      "length": "29m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Distributed NewSQL Internals (Spanner & CockroachDB): Raft Ranges, TrueTime & HLC."
-    }
+    "primary": null,
+    "companion": null
   },
   "connection-pooling-pgbouncer-proxies": {
-    "primary": {
-      "youtubeId": "kepFVxnFLs4",
-      "title": "What is a pooling Mode in Postgresql | Pgbouncer Pooling modes | pgbouncer-02",
-      "channel": "mynoteoracledba",
-      "duration": "4m 53s",
-      "length": "4m",
-      "why": "Core video covering Connection Pooling Architecture: Process-Per-Connection Overhead & PgBouncer Modes (connection-pooling-pgbouncer-proxies): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "Vq34xPYZwXg",
-      "title": "Database Connection Pooling: Why It Matters? Essential OS-Level Insights",
-      "channel": "Denis Magda",
-      "duration": "5m 26s",
-      "length": "5m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Connection Pooling Architecture: Process-Per-Connection Overhead & PgBouncer Modes."
-    }
+    "primary": null,
+    "companion": null
   },
   "case-figma-postgres-horizontal-sharding": {
-    "primary": {
-      "youtubeId": "kSxpnPcg_t0",
-      "title": "How Figma Scaled Postgres 100x Without Downtime | Sharding Explained",
-      "channel": "System Design Lab by VG",
-      "duration": "10m 9s",
-      "length": "10m",
-      "why": "Core video covering Production Case Study: Evolving from a Single Postgres Primary to Sharded Clusters (case-figma-postgres-horizontal-sharding): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "tXkWbJo4nlo",
-      "title": "THE way to scale a database (sharding MySQL and Postgres)",
-      "channel": "Ben Dicken",
-      "duration": "14m 36s",
-      "length": "14m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Production Case Study: Evolving from a Single Postgres Primary to Sharded Clusters."
-    }
+    "primary": null,
+    "companion": null
   },
   "build-sharded-query-router": {
-    "primary": {
-      "youtubeId": "vccwdhfqIrI",
-      "title": "Consistent Hashing: Easy Explanation for System Design Interviews",
-      "channel": "Hello Interview",
-      "duration": "7m 14s",
-      "length": "7m",
-      "why": "Core video covering Hands-On Build: Consistent-Hash Shard Router with Partition Pruning & Scatter-Gather (build-sharded-query-router): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "zaRkONvyGr8",
-      "title": "What is CONSISTENT HASHING and Where is it used?",
-      "channel": "Gaurav Sen",
-      "duration": "10m 50s",
-      "length": "10m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Hands-On Build: Consistent-Hash Shard Router with Partition Pruning & Scatter-Gather."
-    }
+    "primary": null,
+    "companion": null
   },
   "keyset-cursor-pagination-vs-offset": {
-    "primary": {
-      "youtubeId": "XHQ8QhslXS0",
-      "title": "Pagination Optimization: Keyset vs Offset",
-      "channel": "ByteDistrict",
-      "duration": "5m 4s",
-      "length": "5m",
-      "why": "Core video covering Keyset (Seek) Cursor Pagination vs Why OFFSET 100000 Destroys Latency (keyset-cursor-pagination-vs-offset): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "SRZ1GD0Cf4g",
-      "title": "Keyset Seeking vs. Offset Pagination: B-Trees to Relay | KaaS-84",
-      "channel": "Last Mile Developer",
-      "duration": "8m 47s",
-      "length": "8m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Keyset (Seek) Cursor Pagination vs Why OFFSET 100000 Destroys Latency."
-    }
+    "primary": null,
+    "companion": null
   },
   "solving-n-plus-one-orm-queries": {
-    "primary": {
-      "youtubeId": "zwF5ADW6eKs",
-      "title": "Interview Q&A | Hibernate N+1 Problem & Fix - The Bug You Didn\u2019t Know You Had @Javatechie",
-      "channel": "Java Techie",
-      "duration": "14m 30s",
-      "length": "14m",
-      "why": "Core video covering Eliminating ORM N+1 Query Storms: Batching, Eager Joins & JSON Aggregation (solving-n-plus-one-orm-queries): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "Kx8-gSnNbnw",
-      "title": "\ud83d\udd34 N+1 Query Problem | Fix this in your backend Project | Backend Challenge Series",
-      "channel": "Learn Code With Durgesh",
-      "duration": "33m 47s",
-      "length": "33m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Eliminating ORM N+1 Query Storms: Batching, Eager Joins & JSON Aggregation."
-    }
+    "primary": null,
+    "companion": null
   },
   "full-text-search-trigrams-inverted-index": {
-    "primary": {
-      "youtubeId": "8-XfXuvplpg",
-      "title": "Postgres Fuzzy Search in Python with pg_trgm: Fix Typos and Name Matching",
-      "channel": "Professor Py: Information Retrieval with Python",
-      "duration": "7m 51s",
-      "length": "7m",
-      "why": "Core video covering Full-Text & Fuzzy Search: Why LIKE '%term%' Fails vs Trigrams (pg_trgm) & BM25 (full-text-search-trigrams-inverted-index): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "JtXHTQUKPLM",
-      "title": "5mins of Postgres E6: Optimizing Postgres Text Search with Trigrams and GiST indexes",
-      "channel": "pganalyze",
-      "duration": "5m 22s",
-      "length": "5m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Full-Text & Fuzzy Search: Why LIKE '%term%' Fails vs Trigrams (pg_trgm) & BM25."
-    }
+    "primary": null,
+    "companion": null
   },
   "queue-processing-skip-locked-patterns": {
-    "primary": {
-      "youtubeId": "Ab_fHdtyE8E",
-      "title": "SQL Locks and Deadlocks: FOR UPDATE, SKIP LOCKED, NOWAIT, Optimistic vs Pessimistic (PostgreSQL)",
-      "channel": "Prateek Goel | GrowAsEngineers",
-      "duration": "8m 31s",
-      "length": "8m",
-      "why": "Core video covering High-Throughput Transactional Job Queues in SQL with FOR UPDATE SKIP LOCKED (queue-processing-skip-locked-patterns): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "m6-63kpttQk",
-      "title": "The Skip Locked feature in Postgres 9.5",
-      "channel": "PG Casts by Hashrocket",
-      "duration": "3m 37s",
-      "length": "3m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for High-Throughput Transactional Job Queues in SQL with FOR UPDATE SKIP LOCKED."
-    }
+    "primary": null,
+    "companion": null
   },
   "bulk-ingestion-batching-unlogged-tables": {
-    "primary": {
-      "youtubeId": "-2G1e56onYo",
-      "title": "Batch insert millions of rows in PostgreSQL fast",
-      "channel": "ByteDistrict",
-      "duration": "6m 44s",
-      "length": "6m",
-      "why": "Core video covering High-Speed Bulk Ingestion: Multi-Row Batches, Index Drop/Rebuild, UNLOGGED & COPY (bulk-ingestion-batching-unlogged-tables): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "v-KzKa0g7js",
-      "title": "Optimizing bulk loads in Postgres, and how COPY helps with cache performance",
-      "channel": "pganalyze",
-      "duration": "6m 32s",
-      "length": "6m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for High-Speed Bulk Ingestion: Multi-Row Batches, Index Drop/Rebuild, UNLOGGED & COPY."
-    }
+    "primary": null,
+    "companion": null
   },
   "pg-stat-statements-slow-query-triage": {
     "primary": {
       "youtubeId": "U8UGTyJp-K4",
-      "title": "Postgres In Production | Special Series | Deep Dive into pg_stat_statements (Part 1)",
+      "title": "Deep Dive into pg_stat_statements for Production Slow Query Triage",
       "channel": "pganalyze",
-      "duration": "10m 39s",
+      "duration": "10m 25s",
+      "start": 0,
       "length": "10m",
-      "why": "Core video covering Production Query Telemetry: pg_stat_statements, Total vs Mean Time & Buffer Hit Ratio (pg-stat-statements-slow-query-triage): focuses directly on practical mechanics, real-world examples, and implementation details."
+      "why": "Practical triage workflow ranking production SQL workload bottlenecks by total_exec_time, mean latency, and shared buffer misses."
     },
-    "companion": {
-      "youtubeId": "uTzqhkiYHFw",
-      "title": "Configuring PostgreSQL for Logging & Query Optimization Ft Ryan Booz  | January 13th 2026 |",
-      "channel": "Prairie Postgres",
-      "duration": "1h 33m",
-      "length": "93m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Production Query Telemetry: pg_stat_statements, Total vs Mean Time & Buffer Hit Ratio."
-    }
+    "companion": null
   },
   "lock-contention-zero-downtime-ddl": {
-    "primary": {
-      "youtubeId": "mr_J5v398Qo",
-      "title": "Zero-downtime migrations | Postgres.FM 048 | #PostgreSQL #Postgres podcast",
-      "channel": "PostgresTV",
-      "duration": "31m 32s",
-      "length": "31m",
-      "why": "Core video covering Zero-Downtime Production DDL: CREATE INDEX CONCURRENTLY, lock_timeout & NOT VALID (lock-contention-zero-downtime-ddl): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "5Z1WyxnlUa0",
-      "title": "The One-Line Migration That Took Down Production for Six Hours",
-      "channel": "The Merge Log",
-      "duration": "8m 8s",
-      "length": "8m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Zero-Downtime Production DDL: CREATE INDEX CONCURRENTLY, lock_timeout & NOT VALID."
-    }
+    "primary": null,
+    "companion": null
   },
   "backup-pitr-wal-archiving-drills": {
-    "primary": {
-      "youtubeId": "_-mUpfQRwp0",
-      "title": "PostgreSQL 18 Point-in-Time Recovery (PITR) Setup | Physical Backup & WAL Archiving on Two Servers",
-      "channel": "Chirag Mahto",
-      "duration": "26m 57s",
-      "length": "26m",
-      "why": "Core video covering Backups & Point-in-Time Recovery (PITR): Logical Dumps vs Base Backup + WAL Replay (backup-pitr-wal-archiving-drills): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "TX-o5NbR3gE",
-      "title": "Point-in-Time Recovery (PITR) guide using Physical Backup and WAL archiving in PostgreSQL Two Server",
-      "channel": "Chirag Mahto",
-      "duration": "21m 22s",
-      "length": "21m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Backups & Point-in-Time Recovery (PITR): Logical Dumps vs Base Backup + WAL Replay."
-    }
+    "primary": null,
+    "companion": null
   },
   "case-gitlab-database-incident-postmortem": {
-    "primary": {
-      "youtubeId": "tLdRBsuvVKc",
-      "title": "Dev Deletes Entire Production Database, Chaos Ensues",
-      "channel": "Kevin Fang",
-      "duration": "10m 20s",
-      "length": "10m",
-      "why": "Core video covering Production Case Study: Lessons from High-Severity Database Outages & Recovery Drills (case-gitlab-database-incident-postmortem): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "_ULKoZJil0M",
-      "title": "GitLab Deleted Its Database. The Backups Were Nobody's Job.",
-      "channel": "Root Cause",
-      "duration": "10m 27s",
-      "length": "10m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Production Case Study: Lessons from High-Severity Database Outages & Recovery Drills."
-    }
+    "primary": null,
+    "companion": null
   },
   "build-production-sql-tuning-clinic": {
-    "primary": {
-      "youtubeId": "FoTMJFZ4wwg",
-      "title": "6 Query Tuning Techniques - Solve 75% SQL Server Performance Problems (by Amit Bansal)",
-      "channel": "SQLMaestros",
-      "duration": "1h 37m",
-      "length": "97m",
-      "why": "Core video covering Hands-On Build: End-to-End Slow Query Diagnostic & Optimization Clinic (100x Speedup) (build-production-sql-tuning-clinic): focuses directly on practical mechanics, real-world examples, and implementation details."
-    },
-    "companion": {
-      "youtubeId": "xuxgxdbCPnY",
-      "title": "SQL Query Optimization and performance tuning tips | SQL Tutorial for Beginners | SQL Interview tips",
-      "channel": "The Engineer's Desk",
-      "duration": "8m 21s",
-      "length": "8m",
-      "role": "deep-dive",
-      "why": "Companion lecture exploring advanced trade-offs, internal mechanics, and architecture for Hands-On Build: End-to-End Slow Query Diagnostic & Optimization Clinic (100x Speedup)."
-    }
+    "primary": null,
+    "companion": null
   }
 }
