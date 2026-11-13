@@ -112,7 +112,7 @@
   - Add accessible sortable result tables (`aria-sort`), CSV export, collapsible mobile schema browser, visual **`EXPLAIN` plan tree**, integrated **Challenges mode**, and compressed **Shareable Query URLs** (`?q=...`). Fix `table-visualizer.js` clause parser bug.
 
 ### P1 — Content Experience, Visual Learning, Flagship Videos & Curation
-- **[P1-1] Fanout-Caliber Lesson Template & Prose Cleanup (`js/renderer.js` + `data/content/m01..m18.js`)**:
+- **[P1-1] Editorial Lesson Template & Prose Cleanup (`js/renderer.js` + `data/content/m01..m18.js`)**:
   - Restructure every lesson into: *Header & One-Line Promise -> Why It Matters & Core Idea -> Visual Explanation -> Worked Runnable Example -> Common Mistakes -> Guided Practice -> Self-Check Quiz -> Recap & Next Step*.
   - Fix all grammatical splice defects across `m01..m18.js`, eliminate desktop/mobile horizontal overflow, and upgrade duplicated M01 diagrams into topic-specific interactive visuals.
 - **[P1-2] Video Quality Review (`data/topic_videos.json`)**:

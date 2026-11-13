@@ -1,6 +1,6 @@
 # Third-Party Licenses & Asset Provenance (`docs/licenses.md`)
 
-Every library, font, runtime, and media asset shipped or used by `sql-in-depth` uses a permissive open-source license (**MIT**, **Apache-2.0**, **BSD**, **SIL OFL-1.1**, or **CC0**) or is **100% original work** authored for this repository. Zero text, code, illustrations, videos, layouts, or brand assets from `fanout.sh` or any proprietary source are included.
+Every library, font, runtime, and media asset shipped or used by `sql-in-depth` uses a permissive open-source license (**MIT**, **Apache-2.0**, **BSD**, **SIL OFL-1.1**, or **CC0**) or is **100% original work** authored for this repository. Zero text, code, illustrations, videos, layouts, or brand assets from any third-party or proprietary source are included.
 
 ---
 

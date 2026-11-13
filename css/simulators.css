@@ -11,7 +11,7 @@
 .badge-oexp {
   display: inline-block;
   font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace);
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 600;
   padding: 2px 8px;
   border-radius: 999px;
@@ -68,12 +68,12 @@
   width: 100%;
   border-collapse: collapse;
   margin: 0;
-  font-size: 13.5px;
+  font-size: 13px;
 }
 
 .complexity-matrix th {
   background: rgba(255, 255, 255, 0.03);
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -116,7 +116,7 @@
 .invariant-box h4,
 .hardware-box h4 {
   margin: 0 0 0.5rem 0;
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.01em;
   display: flex;
@@ -214,7 +214,7 @@
   border: 1px solid var(--border-subtle, #2e2e34);
   text-align: center;
   font-family: var(--font-mono, monospace);
-  font-size: 12.5px;
+  font-size: 13px;
   transition: all 0.2s ease;
   position: relative;
 }
@@ -248,7 +248,7 @@
 
 .dsa-sim__cell-idx {
   display: block;
-  font-size: 10px;
+  font-size: 11px;
   color: var(--fg-faint, #71717a);
   margin-bottom: 2px;
 }
@@ -260,7 +260,7 @@
 
 .dsa-sim__cell-tag {
   display: block;
-  font-size: 9.5px;
+  font-size: 11px;
   margin-top: 2px;
   color: #818cf8;
 }
@@ -280,7 +280,7 @@
 }
 
 .dsa-sim__metric-label {
-  font-size: 10.5px;
+  font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--fg-faint, #71717a);
@@ -321,7 +321,7 @@
 }
 
 .dsa-sim__custom-label {
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 600;
   color: #a5b4fc;
   font-family: var(--font-mono, monospace);
@@ -332,7 +332,7 @@
   flex: 1 1 220px;
   min-width: 160px;
   padding: 5px 10px;
-  font-size: 12.5px;
+  font-size: 13px;
   font-family: var(--font-mono, monospace);
   color: var(--fg-primary, #f4f4f5);
   background: var(--bg-primary, #09090b);
@@ -368,7 +368,7 @@
   gap: 4px;
   min-height: 32px;
   padding: 5px 10px;
-  font-size: 11.5px;
+  font-size: 12px;
   font-family: var(--font-mono, monospace);
   border-radius: 6px;
   border: 1px solid var(--border-subtle, #3f3f46);
@@ -423,7 +423,7 @@
   padding: 2px 7px;
   margin-right: 6px;
   border-radius: 999px;
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   background: rgba(16, 185, 129, 0.16);
   color: #34d399;
@@ -454,7 +454,7 @@
 }
 
 .sql-tviz__title {
-  font-size: 14.5px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--fg-primary, #f4f4f5);
   display: flex;
@@ -464,7 +464,7 @@
 
 .sql-tviz__badge {
   font-family: var(--font-mono, monospace);
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 600;
   padding: 2px 8px;
   border-radius: 999px;
@@ -493,7 +493,7 @@
   padding: 5px 10px;
   border-radius: 6px;
   font-family: var(--font-mono, monospace);
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--fg-muted, #a1a1aa);
   background: var(--bg-primary, #09090b);
@@ -526,7 +526,7 @@
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  font-size: 10px;
+  font-size: 11px;
   background: rgba(255, 255, 255, 0.08);
 }
 
@@ -636,7 +636,7 @@
 .sql-null-pill {
   display: inline-block;
   padding: 1px 5px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   border-radius: 4px;
   background: rgba(245, 158, 11, 0.15);
@@ -649,7 +649,7 @@
 .sql-fk-badge,
 .sql-idx-badge {
   display: inline-block;
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 700;
   padding: 1px 4px;
   border-radius: 3px;
@@ -697,7 +697,7 @@
 .sql-explain-op {
   padding: 2px 7px;
   border-radius: 4px;
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -748,7 +748,7 @@
   border: none;
   border-bottom: 1px solid var(--border-subtle, #27272a);
   font-family: var(--font-mono, monospace);
-  font-size: 12.5px;
+  font-size: 13px;
   line-height: 1.55;
   resize: vertical;
   outline: none;
@@ -761,7 +761,7 @@
 
 .invariant-box__title {
   margin: 0 0 0.5rem 0;
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--accent);
   letter-spacing: 0.01em;
@@ -867,7 +867,7 @@
 .sql-null-badge {
   display: inline-block;
   padding: 1px 5px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   border-radius: 4px;
   background: rgba(245, 158, 11, 0.15);
@@ -878,7 +878,7 @@
 
 .col-badge--pk {
   display: inline-block;
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 700;
   padding: 1px 4px;
   border-radius: 3px;
@@ -892,7 +892,7 @@
   display: inline-block;
   padding: 2px 7px;
   border-radius: 4px;
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   background: rgba(99, 102, 241, 0.18);
   color: #a5b4fc;
@@ -921,8 +921,10 @@
   align-items: center;
   border-radius: 6px;
   overflow: hidden;
-  border: 1px solid rgba(99, 102, 241, 0.35);
-  background: rgba(9, 9, 11, 0.7);
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--border);
+  background: var(--bg-alt);
 }
 
 .sql-engine-btn {
@@ -931,23 +933,24 @@
   gap: 5px;
   padding: 3px 8px;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 500;
   font-family: var(--font-mono, monospace);
   background: transparent;
-  color: var(--text-muted, #a1a1aa);
+  color: var(--fg-muted);
   border: none;
+  border-radius: 4px;
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease;
 }
 
 .sql-engine-btn:hover {
-  color: var(--text-primary, #f4f4f5);
-  background: rgba(255, 255, 255, 0.05);
+  color: var(--fg);
 }
 
 .sql-engine-btn.is-active {
-  background: rgba(99, 102, 241, 0.25);
-  color: #c7d2fe;
+  background: var(--surface);
+  color: var(--fg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
 .sql-engine-dot {
@@ -965,18 +968,18 @@
 .sql-viz-reset-btn {
   padding: 3px 9px;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 500;
   border-radius: 5px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--text-secondary, #d4d4d8);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--fg-muted);
   cursor: pointer;
 }
 
 .sql-viz-reset-btn:hover {
-  background: rgba(239, 68, 68, 0.14);
-  border-color: rgba(239, 68, 68, 0.4);
-  color: #fca5a5;
+  background: var(--error-bg);
+  border-color: var(--error-border);
+  color: var(--error);
 }
 
 .sql-subtables-grid {
@@ -1001,7 +1004,7 @@
   background: rgba(99, 102, 241, 0.12);
   border-bottom: 1px solid rgba(99, 102, 241, 0.22);
   font-family: var(--font-mono, monospace);
-  font-size: 11.5px;
+  font-size: 12px;
 }
 
 .sql-subtable-name {
@@ -1010,7 +1013,7 @@
 }
 
 .sql-subtable-meta {
-  font-size: 10.5px;
+  font-size: 11px;
   color: var(--text-muted, #a1a1aa);
 }
 
@@ -1138,7 +1141,7 @@
   padding: 3px 10px;
   border-radius: 999px;
   font-family: var(--font-mono, monospace);
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 600;
   color: #93c5fd;
   background: rgba(59, 130, 246, 0.14);
@@ -1146,7 +1149,7 @@
 }
 
 .sql-exec-status-hint {
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--text-secondary, #94a3b8);
 }
 
@@ -1241,7 +1244,7 @@
   flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 8px;
-  font-size: 11.5px;
+  font-size: 12px;
   color: #94a3b8;
 }
 
@@ -1310,31 +1313,31 @@
 .sql-viz-loading {
   padding: 16px 18px;
   font-family: var(--font-mono, monospace);
-  font-size: 12.5px;
-  color: #93c5fd;
-  background: rgba(15, 23, 42, 0.6);
+  font-size: 13px;
+  color: var(--fg-muted);
+  background: var(--bg-alt);
 }
 
 .sql-viz-panel {
   display: flex;
   flex-direction: column;
-  background: #090d16;
-  border-top: 1px solid rgba(148, 163, 184, 0.14);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
 }
 
 .sql-viz-panel.is-error {
-  border-top: 2px solid rgba(239, 68, 68, 0.55);
-  background: rgba(24, 10, 14, 0.9);
+  border-top: 2px solid var(--error-border);
+  background: var(--surface);
 }
 
 .sql-viz-error-msg {
   margin: 0;
   padding: 12px 16px;
   font-family: var(--font-mono, monospace);
-  font-size: 12.5px;
-  color: #fca5a5;
+  font-size: 13px;
+  color: var(--error);
   white-space: pre-wrap;
-  background: rgba(239, 68, 68, 0.08);
+  background: var(--error-bg);
 }
 
 .sql-viz-header {
@@ -1344,8 +1347,8 @@
   flex-wrap: wrap;
   gap: 10px;
   padding: 9px 14px;
-  background: rgba(15, 23, 42, 0.85);
-  border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
 }
 
 .sql-viz-title-wrap {
@@ -1367,15 +1370,15 @@
 }
 
 .sql-viz-badge.is-ok {
-  background: rgba(16, 185, 129, 0.16);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.38);
+  background: var(--success-bg);
+  color: var(--success);
+  border: 1px solid var(--success-border);
 }
 
 .sql-viz-badge.is-error {
-  background: rgba(239, 68, 68, 0.18);
-  color: #f87171;
-  border: 1px solid rgba(239, 68, 68, 0.42);
+  background: var(--error-bg);
+  color: var(--error);
+  border: 1px solid var(--error-border);
 }
 
 .sql-viz-dataset {
@@ -1383,11 +1386,11 @@
   align-items: center;
   gap: 5px;
   font-family: var(--font-mono, monospace);
-  font-size: 11.5px;
-  color: #cbd5e1;
+  font-size: 12px;
+  color: var(--fg-muted);
   padding: 2px 8px;
   border-radius: 6px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-alt);
 }
 
 /* 9-Stage Clause Execution Stepper Bar */
@@ -1397,16 +1400,16 @@
   flex-wrap: wrap;
   gap: 6px;
   padding: 9px 14px;
-  background: #060911;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+  background: var(--bg-alt);
+  border-bottom: 1px solid var(--border);
 }
 
 .sql-pipeline-label {
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #94a3b8;
+  color: var(--fg-faint);
   margin-right: 4px;
 }
 
@@ -1416,42 +1419,47 @@
   gap: 6px;
   padding: 4px 10px;
   border-radius: 6px;
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  background: rgba(15, 23, 42, 0.85);
-  color: #cbd5e1;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--fg-muted);
   font-family: var(--font-mono, monospace);
-  font-size: 11.5px;
+  font-size: 12px;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .sql-pipeline-step:hover {
-  border-color: rgba(99, 102, 241, 0.55);
-  color: #ffffff;
-  background: rgba(30, 41, 59, 0.95);
+  border-color: var(--border-strong);
+  color: var(--fg);
+  background: var(--surface-hover);
 }
 
 .sql-pipeline-step.is-active {
-  background: rgba(79, 70, 229, 0.25);
-  border-color: #6366f1;
-  color: #e0e7ff;
-  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.4);
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-fg);
+  box-shadow: none;
 }
 
 .sql-pipeline-clause {
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .sql-pipeline-count {
-  font-size: 10.5px;
+  font-size: 11px;
   padding: 1px 5px;
   border-radius: 4px;
-  background: rgba(255, 255, 255, 0.08);
-  color: #a5b4fc;
+  background: var(--bg-alt);
+  color: var(--fg-muted);
+}
+
+.sql-pipeline-step.is-active .sql-pipeline-count {
+  background: rgba(127, 127, 127, 0.22);
+  color: inherit;
 }
 
 .sql-pipeline-arrow {
-  color: #64748b;
+  color: var(--fg-faint);
   font-size: 12px;
   user-select: none;
 }
@@ -1464,26 +1472,26 @@
   flex-wrap: wrap;
   gap: 10px;
   padding: 8px 14px;
-  background: rgba(30, 41, 59, 0.45);
-  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
-  font-size: 12.5px;
-  color: #e2e8f0;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--fg-prose);
 }
 
 .sql-step-explainer-text strong {
-  color: #38bdf8;
+  color: var(--ember);
   font-family: var(--font-mono, monospace);
   margin-right: 4px;
 }
 
 .sql-step-code-pill {
   font-family: var(--font-mono, monospace);
-  font-size: 11.5px;
+  font-size: 12px;
   padding: 3px 8px;
   border-radius: 5px;
-  background: rgba(9, 13, 22, 0.85);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  color: #93c5fd;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  color: var(--fg);
   max-width: 100%;
   overflow-x: auto;
 }
@@ -1491,7 +1499,7 @@
 /* Output Result Table & Columns */
 .sql-step-table-container {
   padding: 0;
-  background: #090d16;
+  background: var(--surface);
 }
 
 .sql-step-table-scroll {
@@ -1507,7 +1515,7 @@
   font-family: var(--font-mono, 'JetBrains Mono', monospace);
   font-size: 12px;
   text-align: left;
-  color: #e2e8f0;
+  color: var(--fg);
 }
 
 .sql-step-table thead th {
@@ -1515,17 +1523,17 @@
   top: 0;
   z-index: 2;
   padding: 8px 12px;
-  background: #111827;
-  color: #f8fafc;
-  font-weight: 700;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.28);
-  border-right: 1px solid rgba(148, 163, 184, 0.12);
+  background: var(--bg-alt);
+  color: var(--fg-muted);
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border-subtle);
   white-space: nowrap;
 }
 
 .sql-step-table thead th.is-highlighted-col {
-  background: rgba(56, 189, 248, 0.16);
-  color: #7dd3fc;
+  background: var(--ember-muted);
+  color: var(--ember);
 }
 
 .sql-th-inner {
@@ -1538,7 +1546,7 @@
   display: inline-block;
   padding: 1px 5px;
   border-radius: 4px;
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.03em;
 }
@@ -1550,27 +1558,27 @@
 }
 
 .sql-col-key-badge.is-fk {
-  background: rgba(99, 102, 241, 0.22);
-  color: #a5b4fc;
-  border: 1px solid rgba(99, 102, 241, 0.45);
+  background: var(--info-muted);
+  color: var(--info);
+  border: 1px solid var(--info-border);
 }
 
 .sql-step-table tbody tr {
-  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  border-bottom: 1px solid var(--border-subtle);
   transition: background 0.12s ease;
 }
 
 .sql-step-table tbody tr:nth-child(even) {
-  background: rgba(255, 255, 255, 0.018);
+  background: transparent;
 }
 
 .sql-step-table tbody tr:hover {
-  background: rgba(56, 189, 248, 0.08);
+  background: var(--surface-hover);
 }
 
 .sql-step-table td {
-  padding: 7px 12px;
-  border-right: 1px solid rgba(148, 163, 184, 0.08);
+  padding: 8px 12px;
+  border-right: 1px solid var(--border-subtle);
   white-space: nowrap;
   max-width: 340px;
   overflow: hidden;
@@ -1578,21 +1586,21 @@
 }
 
 .sql-step-table td.is-highlighted-cell {
-  background: rgba(56, 189, 248, 0.07);
+  background: var(--ember-muted);
 }
 
 .sql-num-val {
-  color: #a5b4fc;
+  color: var(--syn-fn);
   font-variant-numeric: tabular-nums;
 }
 
 .sql-step-table tr.is-matched td {
-  background: rgba(16, 185, 129, 0.11);
+  background: color-mix(in srgb, var(--success) 5%, transparent);
 }
 
 .sql-step-table tr.is-filtered td {
-  background: rgba(239, 68, 68, 0.07);
-  color: #94a3b8;
+  background: var(--error-bg);
+  color: var(--fg-faint);
   text-decoration: line-through;
   opacity: 0.6;
 }
@@ -1605,59 +1613,59 @@
   display: inline-block;
   padding: 2px 7px;
   border-radius: 999px;
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   white-space: nowrap;
 }
 
 .sql-row-badge.is-kept {
-  background: rgba(16, 185, 129, 0.2);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.4);
+  background: var(--success-bg);
+  color: var(--success);
+  border: 1px solid var(--success-border);
 }
 
 .sql-row-badge.is-pruned {
-  background: rgba(239, 68, 68, 0.18);
-  color: #f87171;
-  border: 1px solid rgba(239, 68, 68, 0.35);
+  background: var(--error-bg);
+  color: var(--error);
+  border: 1px solid var(--error-border);
 }
 
 .sql-row-badge.is-null-padded {
-  background: rgba(245, 158, 11, 0.2);
-  color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.4);
+  background: var(--warning-bg);
+  color: var(--warning);
+  border: 1px solid var(--warning-border);
 }
 
 .sql-row-badge.is-cte-anchor {
-  background: rgba(56, 189, 248, 0.2);
-  color: #38bdf8;
+  background: var(--info-bg);
+  color: var(--info);
 }
 
 .sql-row-badge.is-cte-recursive {
-  background: rgba(168, 85, 247, 0.2);
-  color: #c084fc;
+  background: var(--ember-muted);
+  color: var(--ember);
 }
 
 .sql-empty-row-cell,
 .sql-viz-empty {
   padding: 16px;
   text-align: center;
-  color: #94a3b8;
+  color: var(--fg-muted);
   font-style: italic;
 }
 
 /* EXPLAIN QUERY PLAN Tree Footer */
 .sql-explain-box {
   padding: 10px 14px;
-  background: #060911;
-  border-top: 1px solid rgba(148, 163, 184, 0.16);
+  background: var(--bg-alt);
+  border-top: 1px solid var(--border);
   font-family: var(--font-mono, monospace);
-  font-size: 11.5px;
+  font-size: 12px;
 }
 
 .sql-explain-title {
-  font-weight: 700;
-  color: #a5b4fc;
+  font-weight: 600;
+  color: var(--fg-muted);
   margin-bottom: 6px;
   font-size: 11px;
   text-transform: uppercase;
@@ -1676,25 +1684,25 @@
   gap: 8px;
   padding: 4px 8px;
   border-radius: 5px;
-  background: rgba(15, 23, 42, 0.7);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  color: #cbd5e1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--fg-prose);
 }
 
 .sql-explain-node.is-index {
-  border-color: rgba(16, 185, 129, 0.35);
-  background: rgba(16, 185, 129, 0.08);
-  color: #d1fae5;
+  border-color: var(--success-border);
+  background: var(--success-bg);
+  color: var(--success);
 }
 
 .sql-explain-node.is-scan {
-  border-color: rgba(245, 158, 11, 0.35);
-  background: rgba(245, 158, 11, 0.08);
+  border-color: var(--warning-border);
+  background: var(--warning-bg);
 }
 
 .sql-explain-node-id {
-  color: #64748b;
-  font-weight: 700;
+  color: var(--fg-faint);
+  font-weight: 600;
 }
 
 /* Light theme overrides for SQL Runner & Output Table */
@@ -1733,44 +1741,8 @@
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
-[data-theme="light"] .sql-viz-panel,
-[data-theme="light"] .sql-step-table-container,
 [data-theme="light"] .sql-inline-output-wrap {
   background: #ffffff;
-}
-
-[data-theme="light"] .sql-viz-header,
-[data-theme="light"] .sql-pipeline-bar,
-[data-theme="light"] .sql-explain-box {
-  background: #f8fafc;
-  border-color: #e2e8f0;
-}
-
-[data-theme="light"] .sql-step-explainer {
-  background: #f1f5f9;
-  color: #1e293b;
-  border-bottom-color: #e2e8f0;
-}
-
-[data-theme="light"] .sql-step-code-pill {
-  background: #ffffff;
-  color: #1d4ed8;
-  border-color: #cbd5e1;
-}
-
-[data-theme="light"] .sql-step-table {
-  color: #0f172a;
-}
-
-[data-theme="light"] .sql-step-table thead th {
-  background: #f1f5f9;
-  color: #0f172a;
-  border-bottom-color: #cbd5e1;
-  border-right-color: #e2e8f0;
-}
-
-[data-theme="light"] .sql-step-table td {
-  border-right-color: #f1f5f9;
 }
 
 /* Additional SQL Table Output, Badges, Responsive Studio Layout & Light Theme Support */
@@ -1804,7 +1776,7 @@
   display: inline-block;
   padding: 1px 5px;
   border-radius: 4px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   background: var(--warning-muted);
   color: var(--warning);
@@ -1816,7 +1788,7 @@
   align-items: center;
   padding: 1px 5px;
   border-radius: 4px;
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 700;
   font-family: var(--font-mono, monospace);
   background: rgba(99, 102, 241, 0.16);
@@ -1842,23 +1814,6 @@
   }
 }
 
-[data-theme="light"] .sql-pipeline-step {
-  background: #ffffff;
-  color: #334155;
-  border-color: #cbd5e1;
-}
-
-[data-theme="light"] .sql-pipeline-step:hover {
-  background: #f1f5f9;
-  color: #0f172a;
-}
-
-[data-theme="light"] .sql-pipeline-step.is-active {
-  background: #eff6ff;
-  border-color: #2563eb;
-  color: #1d4ed8;
-}
-
 [data-theme="light"] .sql-step-count {
   background: #e2e8f0;
   color: #1e293b;
@@ -1873,28 +1828,6 @@
   background: #f1f5f9;
   color: #0f172a;
   border-bottom-color: #cbd5e1;
-}
-
-[data-theme="light"] .sql-explain-node {
-  background: #ffffff;
-  color: #1e293b;
-  border: 1px solid #cbd5e1;
-}
-
-[data-theme="light"] .sql-explain-node.is-index {
-  background: #ecfdf5;
-  color: #065f46;
-  border-color: #10b981;
-}
-
-[data-theme="light"] .sql-explain-node.is-scan {
-  background: #fffbeb;
-  color: #92400e;
-  border-color: #f59e0b;
-}
-
-[data-theme="light"] .sql-num-val {
-  color: #2563eb;
 }
 
 /* Light theme overrides for Interactive Simulators, Callout Boxes & SQL Visualizers (F13) */
@@ -2027,8 +1960,8 @@
 
 [data-theme="light"] .sql-inline-workbench__editor,
 [data-theme="light"] .sql-tviz {
-  background: #ffffff;
-  color: #0f172a;
-  border-color: #cbd5e1;
+  background: var(--surface);
+  color: var(--fg);
+  border-color: var(--border);
 }
 

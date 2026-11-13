@@ -60,9 +60,9 @@ window.Search = (() => {
       { slug: 'graph', title: 'Interactive Visual SQL & Database Roadmap', kind: 'roadmap', moduleTitle: 'Interactive Dependency DAG & Career Paths', tags: ['roadmap', 'dag', 'graph', 'career', 'paths'] },
       { slug: 'paths', title: 'Database Engineering & Analytics Career Paths', kind: 'roadmap', moduleTitle: '5 Curated Engineering Tracks', tags: ['roadmap', 'career', 'paths', 'tracks', 'dba', 'data-engineer'] },
       { slug: '', title: 'Production Database Incident & Slow-Query Challenges', kind: 'challenge', moduleTitle: '12 Hands-On DB Outage Simulators', tags: ['challenges', 'incidents', 'outage', 'troubleshooting', 'sre', 'dba'] },
-      { slug: 'overview', title: 'Learner Dashboard, XP & Streak Hub', kind: 'dashboard', moduleTitle: 'Gamified Progress & Study Hub', tags: ['dashboard', 'xp', 'streak', 'progress'] },
-      { slug: 'srs', title: 'Spaced Repetition (SRS) SQL Flashcard Deck', kind: 'dashboard', moduleTitle: 'SM-2 Active Recall Flashcards', tags: ['srs', 'flashcards', 'spaced', 'repetition', 'review', 'dashboard'] },
-      { slug: 'toolkit', title: 'SQL & Storage Engine Reference Toolkit (I/O Cost Model, Page Latency & Index Trade-Off Matrix)', kind: 'dashboard', moduleTitle: 'B+Tree / I/O Cost Calculator, Storage Latency Explorer & Staff DB Decision Matrix', tags: ['toolkit', 'latency', 'numbers', 'capacity', 'calculator', 'btree', 'page', 'tradeoff', 'matrix', 'dashboard'] },
+      { slug: 'overview', title: 'Your learning progress', kind: 'dashboard', moduleTitle: 'Continue where you left off', tags: ['dashboard', 'progress', 'continue', 'streak'] },
+      { slug: 'srs', title: 'Flashcards for review', kind: 'dashboard', moduleTitle: 'Spaced repetition', tags: ['srs', 'flashcards', 'spaced', 'repetition', 'review'] },
+      { slug: 'notes', title: 'Your notes and bookmarks', kind: 'dashboard', moduleTitle: 'Saved lessons', tags: ['notes', 'bookmarks', 'saved'] },
       { slug: '', title: 'Interactive SQL Workbench, Schema ERD & Clause Visualizer Sandbox', kind: 'sandbox', moduleTitle: 'Live Browser WASM SQLite Engine & Step-by-Step Table Visualizer', tags: ['sandbox', 'sql', 'workbench', 'schema', 'visualizer', 'explain', 'wasm'] }
     ];
     for (const v of ecosystemViews) {

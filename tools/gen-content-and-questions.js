@@ -1328,7 +1328,7 @@ ${mermaidBlock}
 <div class="simulator-mount" data-sim="sim-${slug}"></div>
 
 <h2>4. Live WASM SQL Lab, Clause-by-Clause Visualizer &amp; Automated Test Checker</h2>
-<p>Execute, edit, and test the production SQL query below directly in your browser using the embedded WebAssembly SQLite 3 engine. Click <strong>▶ Run Query</strong> to execute, <strong>🔍 Step Clauses</strong> to inspect the live intermediate table after <code>FROM/JOIN</code>, <code>WHERE</code>, <code>GROUP BY</code>, <code>HAVING</code>, <code>WINDOW</code>, <code>SELECT</code>, and <code>ORDER BY</code>, or <strong>✓ Check SQL Tests</strong> to run automated relational assertions against the reference result:</p>
+<p>Execute, edit, and test the production SQL query below directly in your browser using the embedded WebAssembly SQLite 3 engine. Click <strong>▶ Run Query</strong> to execute, <strong>Step Clauses</strong> to inspect the live intermediate table after <code>FROM/JOIN</code>, <code>WHERE</code>, <code>GROUP BY</code>, <code>HAVING</code>, <code>WINDOW</code>, <code>SELECT</code>, and <code>ORDER BY</code>, or <strong>✓ Check SQL Tests</strong> to run automated relational assertions against the reference result:</p>
 <pre><code class="language-sql">${sqlSnippet}</code></pre>
 
 <h2>5. Cross-Engine Dialect &amp; Cost Comparison Matrix</h2>

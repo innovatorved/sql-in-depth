@@ -13,13 +13,13 @@
 
   --ds-text-2xs: 0.6875rem; /* 11px — compact badges & mono counters */
   --ds-text-xs:  0.75rem;   /* 12px — metadata, table labels */
-  --ds-text-sm:  0.8438rem; /* 13.5px — UI controls, sidebar items, dense code */
+  --ds-text-sm:  0.8125rem; /* 13px — UI controls, sidebar items, dense code */
   --ds-text-base: 0.9375rem;/* 15px — cards, compact UI copy */
-  --ds-text-prose: 1rem;    /* 16px — primary long-form lesson reading */
-  --ds-text-lg:  1.125rem;  /* 18px — lead/promise copy, h3 */
-  --ds-text-xl:  1.375rem;  /* 22px — lesson h2 */
-  --ds-text-2xl: 1.75rem;   /* 28px — section headers */
-  --ds-text-3xl: 2.125rem;  /* 34px — lesson h1 */
+  --ds-text-prose: 0.9375rem;/* 15px — primary long-form lesson reading */
+  --ds-text-lg:  1.0625rem; /* 17px — lead copy, h3 */
+  --ds-text-xl:  1.25rem;   /* 20px — lesson h2 */
+  --ds-text-2xl: 1.5rem;    /* 24px — section headers */
+  --ds-text-3xl: 1.75rem;   /* 28px — lesson h1 */
   --ds-text-4xl: 2.75rem;   /* 44px — hero display */
 
   --ds-leading-tight:   1.16;
@@ -71,26 +71,26 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Light Theme — Warm-Cool Daylight Paper (Fanout-caliber calm hierarchy)
+   Light Theme — Warm Neutral Paper (calm, ink-first hierarchy)
    ═══════════════════════════════════════════════════════════════════════════ */
 :root,
 [data-theme="light"] {
-  --ds-canvas:          #F7F8FA; /* Subtle architectural paper ground */
-  --ds-canvas-subtle:   #F1F3F7; /* Secondary well / gutter */
+  --ds-canvas:          #F7F7F5; /* Warm paper ground */
+  --ds-canvas-subtle:   #F1F1EE; /* Secondary well / gutter */
   --ds-surface:         #FFFFFF; /* Crisp elevated card surface */
-  --ds-surface-hover:   #F4F6FA;
-  --ds-surface-active:  #EAEFF6;
-  --ds-topbar-bg:       rgba(247, 248, 250, 0.88);
+  --ds-surface-hover:   #F5F5F2;
+  --ds-surface-active:  #ECEBE7;
+  --ds-topbar-bg:       rgba(247, 247, 245, 0.88);
 
-  --ds-border:          #E2E6EE; /* 1px crisp structural hairline */
-  --ds-border-strong:   #CBD2DF;
-  --ds-divider:         #EAECEF;
+  --ds-border:          #E6E4DF; /* 1px crisp structural hairline */
+  --ds-border-strong:   #D3D0C9;
+  --ds-divider:         #EDECE8;
 
-  /* WCAG AA Verified Ink Scale (>= 4.8:1 on #FFFFFF and #F7F8FA) */
-  --ds-ink:             #0F172A; /* 17.4:1 */
-  --ds-ink-prose:       #1E293B; /* 14.1:1 */
-  --ds-ink-muted:       #475569; /* 7.3:1 */
-  --ds-ink-faint:       #526075; /* 5.9:1 — passes AA even for 12px text */
+  /* WCAG AA Verified Ink Scale (>= 4.8:1 on #FFFFFF and #F7F7F5) */
+  --ds-ink:             #1A1917; /* 17.2:1 */
+  --ds-ink-prose:       #2E2C29; /* 13.9:1 */
+  --ds-ink-muted:       #5C5853; /* 7.0:1 */
+  --ds-ink-faint:       #6E6A64; /* 5.4:1 — passes AA even for 12px text */
   --ds-ink-inverse:     #FFFFFF;
 
   /* Semantic Status Palette (Light) */
@@ -106,43 +106,45 @@
   --ds-danger-bg:       #FEF3F2;
   --ds-danger-border:   #FECDCA;
 
-  --ds-info:            #175CD3;
-  --ds-info-bg:         #EFF8FF;
-  --ds-info-border:     #B2DDFF;
+  --ds-info:            #0E7490;
+  --ds-info-bg:         #ECFAFC;
+  --ds-info-border:     #A5E4EE;
 
   /* Elevation (used only on floating overlays; resting cards use 1px border) */
-  --ds-shadow-overlay:  0 12px 32px -4px rgba(15, 23, 42, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.06);
-  --ds-shadow-pop:      0 4px 14px rgba(15, 23, 42, 0.08);
+  --ds-shadow-overlay:  0 12px 32px -4px rgba(26, 25, 23, 0.12), 0 4px 12px -2px rgba(26, 25, 23, 0.06);
+  --ds-shadow-pop:      0 4px 14px rgba(26, 25, 23, 0.08);
 
-  /* Default Product Accent: SQL In Depth — Precision Cobalt (WCAG AA >= 5.4:1 on #E9F1FF & #FFFFFF) */
-  --brand-accent:        #0B53D6;
-  --brand-accent-hover:  #0043CE;
-  --brand-accent-soft:   rgba(11, 83, 214, 0.09);
-  --brand-accent-border: rgba(11, 83, 214, 0.28);
+  /* Default Product Accent: SQL In Depth — Ink actions + Ember highlight (WCAG AA >= 5.2:1 on #FFFFFF) */
+  --brand-accent:        #1A1917;
+  --brand-accent-hover:  #34312D;
+  --brand-accent-soft:   rgba(26, 25, 23, 0.06);
+  --brand-accent-border: rgba(26, 25, 23, 0.20);
   --brand-accent-ink:    #FFFFFF;
+  --brand-ember:         #C2410C;
+  --brand-ember-soft:    rgba(194, 65, 12, 0.08);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Dark Theme — Deep Slate Ink (Zero #000000 OLED glare)
+   Dark Theme — Neutral Charcoal (Zero #000000 OLED glare, no blue cast)
    ═══════════════════════════════════════════════════════════════════════════ */
 [data-theme="dark"] {
-  --ds-canvas:          #0B0E14; /* Calm deep slate ground */
-  --ds-canvas-subtle:   #0F141D; /* Sidebar & code gutter ground */
-  --ds-surface:         #131924; /* Elevated card surface */
-  --ds-surface-hover:   #192130;
-  --ds-surface-active:  #212B3D;
-  --ds-topbar-bg:       rgba(11, 14, 20, 0.88);
+  --ds-canvas:          #0F0F10; /* Calm charcoal ground */
+  --ds-canvas-subtle:   #141415; /* Sidebar & code gutter ground */
+  --ds-surface:         #18181A; /* Elevated card surface */
+  --ds-surface-hover:   #1F1F22;
+  --ds-surface-active:  #28282B;
+  --ds-topbar-bg:       rgba(15, 15, 16, 0.86);
 
-  --ds-border:          #222B3A;
-  --ds-border-strong:   #334155;
-  --ds-divider:         #1A2230;
+  --ds-border:          #27272A;
+  --ds-border-strong:   #3A3A3E;
+  --ds-divider:         #202023;
 
-  /* WCAG AA Verified Ink Scale (>= 5.1:1 on #0B0E14 and #131924) */
-  --ds-ink:             #F1F5F9; /* 16.2:1 */
-  --ds-ink-prose:       #CBD5E1; /* 11.8:1 */
-  --ds-ink-muted:       #94A3B8; /* 6.4:1 */
-  --ds-ink-faint:       #8899B0; /* 5.3:1 — passes AA on dark cards */
-  --ds-ink-inverse:     #0B0E14;
+  /* WCAG AA Verified Ink Scale (>= 5.3:1 on #0F0F10 and #18181A) */
+  --ds-ink:             #F4F4F5; /* 17.0:1 */
+  --ds-ink-prose:       #D4D4D8; /* 12.6:1 */
+  --ds-ink-muted:       #A1A1AA; /* 7.4:1 */
+  --ds-ink-faint:       #8E8E97; /* 5.6:1 — passes AA on dark cards */
+  --ds-ink-inverse:     #0F0F10;
 
   /* Semantic Status Palette (Dark) */
   --ds-success:         #34D399;
@@ -157,19 +159,21 @@
   --ds-danger-bg:       rgba(239, 68, 68, 0.11);
   --ds-danger-border:   rgba(248, 113, 113, 0.32);
 
-  --ds-info:            #60A5FA;
-  --ds-info-bg:         rgba(59, 130, 246, 0.11);
-  --ds-info-border:     rgba(96, 165, 250, 0.30);
+  --ds-info:            #67D3E3;
+  --ds-info-bg:         rgba(103, 211, 227, 0.10);
+  --ds-info-border:     rgba(103, 211, 227, 0.30);
 
   --ds-shadow-overlay:  0 16px 40px rgba(0, 0, 0, 0.55);
   --ds-shadow-pop:      0 6px 18px rgba(0, 0, 0, 0.42);
 
-  /* Default Product Accent (Dark): SQL Precision Cobalt */
-  --brand-accent:        #58A6FF;
-  --brand-accent-hover:  #79B8FF;
-  --brand-accent-soft:   rgba(88, 166, 255, 0.13);
-  --brand-accent-border: rgba(88, 166, 255, 0.34);
-  --brand-accent-ink:    #09111E;
+  /* Default Product Accent (Dark): Ink actions + Ember highlight */
+  --brand-accent:        #F4F4F5;
+  --brand-accent-hover:  #FFFFFF;
+  --brand-accent-soft:   rgba(244, 244, 245, 0.08);
+  --brand-accent-border: rgba(244, 244, 245, 0.22);
+  --brand-accent-ink:    #111113;
+  --brand-ember:         #FB923C;
+  --brand-ember-soft:    rgba(251, 146, 60, 0.12);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -212,7 +216,7 @@
    Global Browser Surfaces, Focus Ring & Reduced Motion
    ═══════════════════════════════════════════════════════════════════════════ */
 ::selection {
-  background: var(--brand-accent-soft);
+  background: var(--brand-ember-soft);
   color: var(--ds-ink);
 }
 

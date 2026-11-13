@@ -87,8 +87,8 @@
     _challengeDrafts: {},
     _solvedChallengesKey: 'sql_in_depth_solved_challenges_v1',
     _sqlStudioQuery: [
-      '-- Interactive SQL & Table Studio (PostgreSQL 18 WASM & SQLite 3 WASM)',
-      '-- Press Cmd/Ctrl+Enter or click "▶ Execute SQL" to run & visualize each relational clause',
+      '-- Revenue by customer tier and country',
+      '-- Press Ctrl/Cmd + Enter to run, or "Step through" to see each clause',
       'SELECT c.tier,',
       '       c.country,',
       '       COUNT(DISTINCT c.customer_id) AS customers,',
@@ -948,47 +948,138 @@
               fkTarget = colItem.fk ? String(colItem.fk) : '';
             }
             return (
-              '<div class="sql-studio-col-item sql-studio-col-item--clickable" data-insert-col="' + escapeHtml(colName) + '" title="Click to insert ' + escapeHtml(colName) + ' into SQL editor" style="display:flex;justify-content:space-between;align-items:center;gap:4px;padding:2px 6px;font-size:0.73rem;font-family:var(--font-mono);color:var(--fg-muted);cursor:pointer;">' +
-                '<span><strong style="color:var(--fg);">' + escapeHtml(colName) + '</strong>' +
-                  (isPk ? ' <span class="col-badge col-badge--pk wb-col-badge wb-col-badge--pk" style="font-size:0.62rem;padding:0 4px;">PK</span>' : '') +
-                  (fkTarget ? ' <span class="col-badge col-badge--fk wb-col-badge wb-col-badge--fk" style="font-size:0.62rem;padding:0 4px;" title="Foreign Key → ' + escapeHtml(fkTarget) + '">FK→' + escapeHtml(fkTarget) + '</span>' : '') +
-                '</span>' +
-                '<span style="color:var(--fg-faint);font-size:0.68rem;">' + escapeHtml(colType) + '</span>' +
-              '</div>'
+              '<button type="button" class="schema-col sql-studio-col-item sql-studio-col-item--clickable" data-insert-col="' + escapeHtml(colName) + '" title="Insert ' + escapeHtml(colName) + ' into the editor">' +
+                '<span class="schema-col__name">' + escapeHtml(colName) + '</span>' +
+                (isPk ? '<span class="col-badge col-badge--pk wb-col-badge wb-col-badge--pk">PK</span>' : '') +
+                (fkTarget ? '<span class="col-badge col-badge--fk wb-col-badge wb-col-badge--fk" title="References ' + escapeHtml(fkTarget) + '">FK</span>' : '') +
+                '<span class="schema-col__type">' + escapeHtml(String(colType).toLowerCase()) + '</span>' +
+              '</button>'
             );
           }).join('');
 
+          var rowCount = t.rowCount || (Array.isArray(t.rows) ? t.rows.length : 0);
+          var colNamesForFilter = cols.map(function(colItem) {
+            if (typeof colItem === 'string') return colItem.trim().split(/\s+/)[0] || '';
+            return (colItem && colItem.name) || '';
+          }).join(' ').toLowerCase();
           return (
-            '<div class="sql-schema-table-item" style="margin-bottom:6px;border:1px solid var(--border);border-radius:6px;background:var(--bg);overflow:hidden;">' +
-              '<div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);padding:4px 8px;gap:6px;">' +
-                '<button type="button" data-sql-preview-table="' + escapeHtml(t.name) + '" data-sql-preview-ds="' + escapeHtml(dsKey) + '" style="flex:1;display:flex;justify-content:space-between;align-items:center;padding:2px 0;background:transparent;border:none;color:var(--fg);font-family:var(--font-mono);font-size:0.78rem;font-weight:600;cursor:pointer;text-align:left;" title="Click to preview SELECT * FROM ' + escapeHtml(t.name) + ' LIMIT 15;">' +
-                  '<span>' + escapeHtml(t.name) + '</span>' +
-                  '<span style="font-size:0.68rem;color:var(--fg-muted);font-weight:400;">' + (t.rowCount || (Array.isArray(t.rows) ? t.rows.length : 0)) + ' rows</span>' +
-                '</button>' +
-                '<button type="button" class="wb-insert-table-btn" data-insert-table="' + escapeHtml(t.name) + '" title="Insert table name ' + escapeHtml(t.name) + ' into SQL editor" aria-label="Insert table ' + escapeHtml(t.name) + '">+ Insert</button>' +
+            '<div class="schema-table sql-schema-table-item" data-table-name="' + escapeHtml(String(t.name || '').toLowerCase()) + '" data-table-cols="' + escapeHtml(colNamesForFilter) + '">' +
+              '<details class="schema-table__details">' +
+                '<summary class="schema-table__summary" title="Show columns of ' + escapeHtml(t.name) + '">' +
+                  '<span class="schema-table__chevron" aria-hidden="true"></span>' +
+                  '<span class="schema-table__name">' + escapeHtml(t.name) + '</span>' +
+                  '<span class="schema-table__rows">' + rowCount + '</span>' +
+                '</summary>' +
+                '<div class="schema-table__cols">' + colsHtml + '</div>' +
+              '</details>' +
+              '<div class="schema-table__actions">' +
+                '<button type="button" class="schema-action" data-sql-preview-table="' + escapeHtml(t.name) + '" data-sql-preview-ds="' + escapeHtml(dsKey) + '" title="Run SELECT * FROM ' + escapeHtml(t.name) + ' LIMIT 15" aria-label="Preview rows of ' + escapeHtml(t.name) + '">Preview</button>' +
+                '<button type="button" class="schema-action wb-insert-table-btn" data-insert-table="' + escapeHtml(t.name) + '" title="Insert ' + escapeHtml(t.name) + ' into the editor" aria-label="Insert table ' + escapeHtml(t.name) + '">Insert</button>' +
               '</div>' +
-              '<div style="padding:4px 4px 6px;border-top:1px solid var(--border);">' + colsHtml + '</div>' +
             '</div>'
           );
         }).join('');
 
         return (
-          '<details class="sql-schema-ds-group" ' + (isCurrentDs ? 'open' : '') + ' style="margin-bottom:8px;border:1px solid var(--border);border-radius:6px;background:var(--surface);padding:6px 8px;">' +
-            '<summary style="cursor:pointer;font-size:0.78rem;font-weight:600;color:var(--fg);display:flex;justify-content:space-between;align-items:center;padding:2px 0;">' +
-              '<span>' + escapeHtml(ds.title || dsKey) + '</span>' +
-              '<span style="font-size:0.68rem;font-family:var(--font-mono);color:var(--fg-muted);font-weight:400;">' + tables.length + ' tables</span>' +
+          '<details class="schema-ds sql-schema-ds-group" ' + (isCurrentDs ? 'open' : '') + '>' +
+            '<summary class="schema-ds__summary">' +
+              '<span class="schema-ds__title">' + escapeHtml(ds.title || dsKey) + '</span>' +
+              '<span class="schema-ds__meta">' + tables.length + ' tables</span>' +
             '</summary>' +
-            '<div style="margin-top:6px;">' + tablesHtml + '</div>' +
+            '<div class="schema-ds__tables">' + tablesHtml + '</div>' +
           '</details>'
         );
       }).join('');
     },
 
+    _applySchemaFilter: function(rawQuery) {
+      if (!this._container) return;
+      var list = this._container.querySelector('#wb-sql-schema-sidebar');
+      if (!list) return;
+      var q = String(rawQuery || '').trim().toLowerCase();
+      var anyMatch = false;
+      list.querySelectorAll('.schema-ds').forEach(function(dsEl) {
+        var dsHasMatch = false;
+        dsEl.querySelectorAll('.schema-table').forEach(function(tEl) {
+          var name = tEl.getAttribute('data-table-name') || '';
+          var cols = tEl.getAttribute('data-table-cols') || '';
+          var isMatch = !q || name.indexOf(q) !== -1 || cols.indexOf(q) !== -1;
+          tEl.hidden = !isMatch;
+          if (isMatch) dsHasMatch = true;
+        });
+        dsEl.hidden = !dsHasMatch;
+        if (q && dsHasMatch) dsEl.open = true;
+        if (dsHasMatch) anyMatch = true;
+      });
+      var emptyEl = this._container.querySelector('.studio-schema__empty');
+      if (emptyEl) emptyEl.hidden = anyMatch;
+    },
+
+    _initStudioSplitter: function() {
+      if (!this._container) return;
+      var work = this._container.querySelector('.studio-work');
+      var handle = work ? work.querySelector('.studio-splitter') : null;
+      var editorPane = work ? work.querySelector('.studio-pane--editor') : null;
+      if (!handle || !editorPane) return;
+      var storageKey = 'sqlStudio.editorHeight';
+      var minEditor = 180;
+      var minResults = 160;
+
+      var apply = function(px) {
+        var total = work.getBoundingClientRect().height;
+        var maxEditor = Math.max(minEditor, total - minResults);
+        var h = Math.round(Math.min(Math.max(px, minEditor), maxEditor));
+        work.style.setProperty('--studio-editor-h', h + 'px');
+        handle.setAttribute('aria-valuenow', String(h));
+        return h;
+      };
+      var save = function(h) {
+        try { root.localStorage.setItem(storageKey, String(h)); } catch (err) { /* storage unavailable */ }
+      };
+
+      var saved = NaN;
+      try { saved = parseInt(root.localStorage.getItem(storageKey) || '', 10); } catch (err) { saved = NaN; }
+      if (!isNaN(saved)) apply(saved);
+
+      handle.addEventListener('pointerdown', function(e) {
+        if (e.button !== 0) return;
+        e.preventDefault();
+        var startY = e.clientY;
+        var startH = editorPane.getBoundingClientRect().height;
+        var lastH = startH;
+        handle.setPointerCapture(e.pointerId);
+        work.classList.add('is-resizing');
+        var onMove = function(ev) { lastH = apply(startH + (ev.clientY - startY)); };
+        var onEnd = function() {
+          handle.removeEventListener('pointermove', onMove);
+          handle.removeEventListener('pointerup', onEnd);
+          handle.removeEventListener('pointercancel', onEnd);
+          work.classList.remove('is-resizing');
+          save(lastH);
+        };
+        handle.addEventListener('pointermove', onMove);
+        handle.addEventListener('pointerup', onEnd);
+        handle.addEventListener('pointercancel', onEnd);
+      });
+
+      handle.addEventListener('keydown', function(e) {
+        if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
+        e.preventDefault();
+        var cur = editorPane.getBoundingClientRect().height;
+        save(apply(cur + (e.key === 'ArrowDown' ? 32 : -32)));
+      });
+
+      handle.addEventListener('dblclick', function() {
+        work.style.removeProperty('--studio-editor-h');
+        try { root.localStorage.removeItem(storageKey); } catch (err) { /* storage unavailable */ }
+      });
+    },
+
     _buildSavedHistoryOptionsHtml: function() {
-      if (!root.TableVisualizer) return '<option value="">Saved &amp; History (0)</option>';
+      if (!root.TableVisualizer) return '<option value="">History</option>';
       var saved = typeof root.TableVisualizer.getSavedQueries === 'function' ? root.TableVisualizer.getSavedQueries() : [];
       var history = typeof root.TableVisualizer.getQueryHistory === 'function' ? root.TableVisualizer.getQueryHistory() : [];
-      var html = '<option value="">Saved (' + saved.length + ') &amp; History (' + history.length + ')</option>';
+      var html = '<option value="">History · ' + (saved.length + history.length) + '</option>';
       if (saved.length > 0) {
         html += '<optgroup label="Saved Queries">';
         saved.forEach(function(item) {
@@ -1061,6 +1152,9 @@
       if (!chalId) return;
       var map = this._getSolvedChallengesMap();
       map[chalId] = Date.now();
+      if (root.Progress && typeof root.Progress.markComplete === 'function') {
+        try { root.Progress.markComplete('challenge:' + chalId); } catch (err) { /* progress store unavailable */ }
+      }
       try {
         if (root.localStorage) {
           root.localStorage.setItem(this._solvedChallengesKey, JSON.stringify(map));
@@ -1218,18 +1312,31 @@
       var challengesList = this._getChallengesList();
       var solvedCount = challengesList.filter(function(c) { return Boolean(solvedMap[c.id]); }).length;
 
+      var activeMode = this._activeWorkbenchMode;
+      var modeTab = function(mode, label, extra) {
+        var isActive = activeMode === mode;
+        return '<button type="button" role="tab" aria-selected="' + isActive + '" class="studio-tabs__tab' + (isActive ? ' is-active' : '') + '" data-workbench-mode="' + mode + '">' +
+          label + (extra ? '<span class="studio-tabs__count">' + extra + '</span>' : '') +
+        '</button>';
+      };
       var modeSwitcherHtml =
-        '<div class="wb-mode-switcher" role="tablist" aria-label="SQL Workbench Mode Switcher">' +
-          '<button type="button" role="tab" aria-selected="' + (this._activeWorkbenchMode === 'sql-studio') + '" class="eco-btn eco-btn--sm ' + (this._activeWorkbenchMode === 'sql-studio' ? 'eco-btn--primary' : '') + '" data-workbench-mode="sql-studio">' +
-            'SQL Playground' +
-          '</button>' +
-          '<button type="button" role="tab" aria-selected="' + (this._activeWorkbenchMode === 'sql-challenges') + '" class="eco-btn eco-btn--sm ' + (this._activeWorkbenchMode === 'sql-challenges' ? 'eco-btn--primary' : '') + '" data-workbench-mode="sql-challenges">' +
-            'SQL Challenges (' + solvedCount + '/' + (challengesList.length || 12) + ')' +
-          '</button>' +
-          '<button type="button" role="tab" aria-selected="' + (this._activeWorkbenchMode === 'architecture-canvas') + '" class="eco-btn eco-btn--sm ' + (this._activeWorkbenchMode === 'architecture-canvas' ? 'eco-btn--primary' : '') + '" data-workbench-mode="architecture-canvas">' +
-            'Architecture Canvas' +
-          '</button>' +
+        '<div class="studio-tabs wb-mode-switcher" role="tablist" aria-label="Studio mode">' +
+          modeTab('sql-studio', 'Playground') +
+          modeTab('sql-challenges', 'Challenges', solvedCount + '/' + (challengesList.length || 12)) +
+          modeTab('architecture-canvas', 'Architecture') +
         '</div>';
+      var isMacPlatform = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent || '');
+      var runKbdHtml = '<kbd class="studio-kbd">' + (isMacPlatform ? '⌘' : 'Ctrl') + ' ↵</kbd>';
+      var engineSelectHtml =
+        '<label class="studio-engine">' +
+          '<span class="studio-engine__dot" aria-hidden="true"></span>' +
+          '<select id="wb-sql-engine-select" class="studio-select studio-select--bare" aria-label="SQL engine">' +
+            '<option value="postgres" ' + (this._sqlStudioEngine === 'postgres' ? 'selected' : '') + '>PostgreSQL 18</option>' +
+            '<option value="sqlite" ' + (this._sqlStudioEngine === 'sqlite' ? 'selected' : '') + '>SQLite 3.46</option>' +
+          '</select>' +
+        '</label>';
+      var splitterHtml =
+        '<div class="studio-splitter" role="separator" aria-orientation="horizontal" aria-label="Resize editor and results" tabindex="0" title="Drag to resize · double-click to reset"></div>';
 
       if (this._activeWorkbenchMode === 'sql-challenges') {
         if (challengesList.length === 0 && root.Lazy && typeof root.Lazy.load === 'function') {
@@ -1258,10 +1365,10 @@
           : (cf.buggyCode || cf.solutionCode || '');
         var isSolved = Boolean(solvedMap[activeChal.id]);
         var hintsHtml = Array.isArray(activeChal.invariants) && activeChal.invariants.length > 0
-          ? '<ul style="margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:4px;">' +
+          ? '<ul class="studio-hints__list">' +
               activeChal.invariants.map(function(h) { return '<li>' + escapeHtml(h) + '</li>'; }).join('') +
             '</ul>'
-          : '<p style="margin:6px 0 0;">' + escapeHtml(cf.summary || activeChal.summary || '') + '</p>';
+          : '<p class="studio-hints__text">' + escapeHtml(cf.summary || activeChal.summary || '') + '</p>';
 
         var chalOptionsHtml = challengesList.map(function(ch, idx) {
           var doneMark = solvedMap[ch.id] ? '✓ ' : '';
@@ -1270,69 +1377,89 @@
           '</option>';
         }).join('');
 
+        var difficultyLabel = String(activeChal.difficulty || 'medium').toLowerCase();
+        var chalIndex = Math.max(0, challengesList.findIndex(function(c) { return c.id === activeChal.id; }));
+        var chalTotal = challengesList.length || 1;
+        var solvedPct = Math.round((solvedCount / chalTotal) * 100);
         this._container.innerHTML =
-          '<div class="view-canvas sandbox-view sandbox-view--clean">' +
-            '<header class="wb-sandbox-topbar">' +
-              '<div class="wb-sandbox-brand">' +
-                '<h1 class="view-title wb-sandbox-title">SQL Challenges</h1>' +
-                '<span class="wb-sandbox-meta">' + solvedCount + ' / ' + challengesList.length + ' Solved · Auto-Checked</span>' +
+          '<div class="view-canvas sql-studio studio-app studio-app--challenges">' +
+            '<header class="studio-toolbar">' +
+              '<div class="studio-toolbar__group">' +
+                '<h1 class="studio-title">SQL Studio</h1>' +
                 modeSwitcherHtml +
               '</div>' +
-              '<div class="wb-sandbox-controls">' +
-                '<label class="wb-ctrl-field">' +
-                  '<span>Challenge</span>' +
-                  '<select id="wb-challenge-select" aria-label="Select SQL challenge" class="eco-search-input wb-ctrl-select" style="max-width:340px;">' +
-                    chalOptionsHtml +
-                  '</select>' +
-                '</label>' +
-                '<label class="wb-ctrl-field">' +
-                  '<span>Engine</span>' +
-                  '<select id="wb-sql-engine-select" class="eco-search-input wb-ctrl-select">' +
-                    '<option value="postgres" ' + (this._sqlStudioEngine === 'postgres' ? 'selected' : '') + '>PostgreSQL 18 (WASM)</option>' +
-                    '<option value="sqlite" ' + (this._sqlStudioEngine === 'sqlite' ? 'selected' : '') + '>SQLite 3.46 (WASM)</option>' +
-                  '</select>' +
-                '</label>' +
+              '<div class="studio-toolbar__group studio-toolbar__group--end">' +
+                engineSelectHtml +
               '</div>' +
             '</header>' +
-            '<main class="view-body" id="sandbox-mount-target">' +
-              '<div class="wb-challenge-shell" style="display:flex;flex-direction:column;gap:14px;max-width:1180px;margin:0 auto;padding:12px 0;">' +
-                '<section class="wb-editor-card" style="gap:10px;">' +
-                  '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">' +
-                    '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
-                      '<span class="eco-pill eco-pill--accent">' + escapeHtml(activeChal.category || 'SQL Challenge') + '</span>' +
-                      '<span class="eco-pill">Dataset: ' + escapeHtml(chalDs) + '</span>' +
-                      '<span class="eco-pill">' + escapeHtml(String(activeChal.difficulty || 'medium').toUpperCase()) + '</span>' +
-                      (isSolved ? '<span class="ds-badge ds-badge--success" id="wb-chal-solved-pill">✓ Solved</span>' : '<span class="ds-badge" id="wb-chal-solved-pill">Unsolved</span>') +
-                    '</div>' +
-                    '<button type="button" class="eco-btn eco-btn--sm" data-chal-action="share-challenge">Share Challenge</button>' +
+            '<main class="studio-body studio-body--challenge" id="sandbox-mount-target">' +
+              '<aside class="studio-panel studio-brief" aria-label="Challenge brief">' +
+                '<div class="studio-panel__head studio-brief__nav">' +
+                  '<button type="button" class="studio-icon-btn" data-chal-action="prev" aria-label="Previous challenge" title="Previous challenge"' + (chalIndex === 0 ? ' disabled' : '') + '>‹</button>' +
+                  '<select id="wb-challenge-select" aria-label="Select SQL challenge" class="studio-select studio-select--flush">' +
+                    chalOptionsHtml +
+                  '</select>' +
+                  '<button type="button" class="studio-icon-btn" data-chal-action="next" aria-label="Next challenge" title="Next challenge"' + (chalIndex >= chalTotal - 1 ? ' disabled' : '') + '>›</button>' +
+                '</div>' +
+                '<div class="studio-panel__scroll studio-brief__body">' +
+                  '<div class="studio-progress" title="' + solvedCount + ' of ' + chalTotal + ' challenges solved">' +
+                    '<span class="studio-progress__label">Challenge ' + (chalIndex + 1) + ' of ' + chalTotal + '</span>' +
+                    '<span class="studio-progress__value">' + solvedCount + ' solved</span>' +
+                    '<span class="studio-progress__track"><span class="studio-progress__fill" style="width:' + solvedPct + '%"></span></span>' +
                   '</div>' +
-                  '<h2 style="margin:0;font-size:1.12rem;font-weight:650;color:var(--fg);">' + escapeHtml(cf.title || activeChal.title) + '</h2>' +
-                  '<p style="margin:0;font-size:0.9rem;color:var(--fg-muted);line-height:1.55;">' + escapeHtml(cf.summary || activeChal.subtitle || '') + '</p>' +
-                  '<details class="sql-lab-hint-details" style="margin-top:2px;">' +
-                    '<summary style="cursor:pointer;font-size:0.82rem;font-weight:600;color:var(--accent);">Show Relational Hints &amp; Invariants</summary>' +
-                    '<div style="font-size:0.83rem;color:var(--fg-muted);line-height:1.55;padding-top:4px;">' + hintsHtml + '</div>' +
+                  '<h2 class="studio-brief__title">' + escapeHtml(cf.title || activeChal.title) + '</h2>' +
+                  '<div class="studio-brief__meta">' +
+                    '<span class="studio-tag studio-tag--' + escapeHtml(difficultyLabel) + '">' + escapeHtml(difficultyLabel) + '</span>' +
+                    '<span class="studio-tag">' + escapeHtml(activeChal.category || 'SQL Challenge') + '</span>' +
+                    (isSolved ? '<span class="studio-tag studio-tag--solved" id="wb-chal-solved-pill">✓ Solved</span>' : '<span class="studio-tag" id="wb-chal-solved-pill">Unsolved</span>') +
+                  '</div>' +
+                  '<p class="studio-brief__summary">' + escapeHtml(cf.summary || activeChal.subtitle || '') + '</p>' +
+                  '<div class="studio-brief__task">' +
+                    '<span class="studio-label">Your task</span>' +
+                    '<p>Fix the starter query in the editor so its output matches the expected result, then press <strong>Check answer</strong>.</p>' +
+                  '</div>' +
+                  '<details class="studio-hints sql-lab-hint-details">' +
+                    '<summary class="studio-hints__summary">Stuck? Show hints</summary>' +
+                    '<div class="studio-hints__body">' + hintsHtml + '</div>' +
                   '</details>' +
-                '</section>' +
-                '<section class="wb-editor-card">' +
-                  '<div class="wb-editor-toolbar">' +
-                    '<div class="wb-editor-toolbar__left">' +
-                      '<button type="button" class="eco-btn eco-btn--sm eco-btn--primary" data-chal-action="check">Run &amp; Check Solution (Cmd+Enter)</button>' +
-                      '<button type="button" class="eco-btn eco-btn--sm" data-chal-action="run-only">Run Preview</button>' +
-                      '<button type="button" class="eco-btn eco-btn--sm" data-chal-action="explain">Explain Plan</button>' +
-                    '</div>' +
-                    '<div class="wb-editor-toolbar__right">' +
-                      '<button type="button" class="eco-btn eco-btn--sm" data-chal-action="format">Format</button>' +
-                      '<button type="button" class="eco-btn eco-btn--sm" data-chal-action="reset">Reset Buggy Starter</button>' +
-                      '<button type="button" class="eco-btn eco-btn--sm" data-chal-action="reveal">Reveal Solution</button>' +
+                  '<dl class="studio-brief__facts">' +
+                    '<div><dt>Dataset</dt><dd><code>' + escapeHtml(chalDs) + '</code></dd></div>' +
+                  '</dl>' +
+                '</div>' +
+                '<div class="studio-panel__foot">' +
+                  '<button type="button" class="studio-btn studio-btn--ghost" data-chal-action="share-challenge">Share challenge</button>' +
+                '</div>' +
+              '</aside>' +
+              '<section class="studio-work wb-sql-main">' +
+                '<div class="studio-pane studio-pane--editor studio-editor">' +
+                  '<div class="studio-pane__bar">' +
+                    '<span class="studio-file-tab">solution.sql</span>' +
+                    '<div class="studio-pane__actions">' +
+                      '<button type="button" class="studio-btn studio-btn--ghost" data-chal-action="explain" title="Show the query plan">Explain</button>' +
+                      '<button type="button" class="studio-btn" data-chal-action="run-only" title="Run without checking">Run</button>' +
+                      '<button type="button" class="studio-btn studio-btn--primary" data-chal-action="check">Check answer ' + runKbdHtml + '</button>' +
                     '</div>' +
                   '</div>' +
-                  '<textarea class="sql-studio-editor sql-inline-workbench__editor" id="wb-challenge-editor" aria-label="SQL challenge editor" spellcheck="false" rows="9">' + escapeHtml(draftSql) + '</textarea>' +
-                  '<div id="wb-challenge-verdict" style="display:none;padding:10px 14px;border-radius:6px;font-size:0.84rem;"></div>' +
-                '</section>' +
-                '<div id="wb-challenge-visualizer-slot"></div>' +
-              '</div>' +
+                  '<div class="studio-pane__editor">' +
+                    '<textarea class="sql-studio-editor sql-inline-workbench__editor" id="wb-challenge-editor" aria-label="SQL challenge editor" spellcheck="false" rows="9">' + escapeHtml(draftSql) + '</textarea>' +
+                  '</div>' +
+                  '<div id="wb-challenge-verdict" class="studio-verdict" hidden></div>' +
+                  '<div class="studio-pane__foot">' +
+                    '<div class="studio-pane__tools">' +
+                      '<button type="button" class="studio-btn studio-btn--ghost" data-chal-action="format">Format</button>' +
+                      '<button type="button" class="studio-btn studio-btn--ghost" data-chal-action="reset">Reset starter</button>' +
+                      '<button type="button" class="studio-btn studio-btn--ghost" data-chal-action="reveal">Reveal solution</button>' +
+                    '</div>' +
+                  '</div>' +
+                '</div>' +
+                splitterHtml +
+                '<div class="studio-pane studio-pane--results">' +
+                  '<div id="wb-challenge-visualizer-slot" class="studio-results"></div>' +
+                '</div>' +
+              '</section>' +
             '</main>' +
           '</div>';
+        this._initStudioSplitter();
 
         var chalEditor = this._container.querySelector('#wb-challenge-editor');
         var chalSlot = this._container.querySelector('#wb-challenge-visualizer-slot');
@@ -1351,10 +1478,9 @@
           });
           if (onlyPreview) return;
           if (chalVerdict) {
-            chalVerdict.style.display = 'block';
-            chalVerdict.style.border = '1px solid var(--border-strong)';
-            chalVerdict.style.background = 'var(--bg-alt)';
-            chalVerdict.textContent = 'Checking result set against expected relational output…';
+            chalVerdict.hidden = false;
+            chalVerdict.className = 'studio-verdict is-checking';
+            chalVerdict.textContent = 'Checking your result against the expected output…';
           }
           root.TableVisualizer.verifyQueryAgainstReference(curVal, cf.solutionCode, {
             datasetId: chalDs,
@@ -1365,23 +1491,19 @@
               self._markChallengeSolved(activeChal.id);
               var pill = self._container ? self._container.querySelector('#wb-chal-solved-pill') : null;
               if (pill) {
-                pill.className = 'ds-badge ds-badge--success';
+                pill.className = 'studio-tag studio-tag--solved';
                 pill.textContent = '✓ Solved';
               }
-              chalVerdict.style.border = '1px solid var(--success)';
-              chalVerdict.style.background = 'var(--success-muted)';
+              chalVerdict.className = 'studio-verdict is-pass';
               chalVerdict.innerHTML =
-                '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">' +
-                  '<strong style="color:var(--success);">✓ Challenge Solved! (' + vRes.passedCount + '/' + vRes.totalCount + ' checks passed)</strong>' +
-                  '<button type="button" class="eco-btn eco-btn--sm" data-chal-action="share-solved">Share Solved Query</button>' +
-                '</div>';
+                '<strong>✓ Solved — ' + vRes.passedCount + ' of ' + vRes.totalCount + ' checks passed</strong>' +
+                '<button type="button" class="studio-btn studio-btn--ghost" data-chal-action="share-solved">Share solution</button>';
             } else {
               var failed = (vRes && vRes.checks || []).find(function(c) { return !c.passed; });
-              chalVerdict.style.border = '1px solid var(--error)';
-              chalVerdict.style.background = 'var(--error-muted)';
+              chalVerdict.className = 'studio-verdict is-fail';
               chalVerdict.innerHTML =
-                '<strong style="color:var(--error);">✗ Not solved yet (' + ((vRes && vRes.passedCount) || 0) + '/' + ((vRes && vRes.totalCount) || 4) + ' checks):</strong> ' +
-                '<span style="color:var(--fg);">' + escapeHtml(failed ? (failed.name + ' — ' + failed.detail) : 'Output tuples differ from expected solution.') + '</span>';
+                '<strong>Not yet — ' + ((vRes && vRes.passedCount) || 0) + ' of ' + ((vRes && vRes.totalCount) || 4) + ' checks passed.</strong> ' +
+                '<span>' + escapeHtml(failed ? (failed.name + ' — ' + failed.detail) : 'Your output rows differ from the expected result.') + '</span>';
             }
           });
         };
@@ -1399,7 +1521,7 @@
 
       if (this._activeWorkbenchMode === 'sql-studio') {
         var templates = this._getSqlStudioTemplates();
-        var templateOptionsHtml = '<option value="">Load example query...</option>' +
+        var templateOptionsHtml = '<option value="">Examples</option>' +
           templates.map(function(t) {
             return '<option value="' + escapeHtml(t.id) + '">' + escapeHtml(t.label) + '</option>';
           }).join('');
@@ -1407,108 +1529,109 @@
         var schemaExplorerHtml = this._renderSqlStudioSchemaExplorer();
         var isDesktopViewport = !(root.innerWidth && root.innerWidth < 860);
         var practiceChipsHtml = (root.TableVisualizer && Array.isArray(root.TableVisualizer.SQL_PRACTICE_CHIPS))
-          ? '<div class="sql-practice-bar" id="wb-sql-practice-bar">' +
-              '<span class="sql-practice-bar__label" style="font-size:0.72rem;color:var(--fg-muted);font-family:var(--font-mono);margin-right:4px;">Insert clause:</span>' +
+          ? '<div class="sql-practice-bar studio-snippets" id="wb-sql-practice-bar" role="group" aria-label="Insert a clause">' +
+              '<span class="studio-label">Insert</span>' +
               root.TableVisualizer.SQL_PRACTICE_CHIPS.map(function(c) {
                 return '<button type="button" class="sql-practice-chip" data-wb-sql-chip="' + escapeHtml(c.id) + '" data-sql-chip="' + escapeHtml(c.id) + '" title="Insert ' + escapeHtml(c.label) + ' clause">' + escapeHtml(c.label) + '</button>';
               }).join('') +
             '</div>'
           : '';
 
+        var dsOption = function(value, label) {
+          return '<option value="' + value + '" ' + (self._sqlStudioDatasetId === value ? 'selected' : '') + '>' + label + '</option>';
+        };
+
         this._container.innerHTML =
-          '<div class="view-canvas sandbox-view sandbox-view--clean">' +
-            '<header class="wb-sandbox-topbar">' +
-              '<div class="wb-sandbox-brand">' +
-                '<h1 class="view-title wb-sandbox-title">SQL Sandbox</h1>' +
-                '<span class="wb-sandbox-meta">5 Datasets · 26 Tables</span>' +
+          '<div class="view-canvas sql-studio studio-app studio-app--playground">' +
+            '<header class="studio-toolbar">' +
+              '<div class="studio-toolbar__group">' +
+                '<h1 class="studio-title">SQL Studio</h1>' +
                 modeSwitcherHtml +
               '</div>' +
-              '<div class="wb-sandbox-controls">' +
-                '<label class="wb-ctrl-field">' +
-                  '<span>Engine</span>' +
-                  '<select id="wb-sql-engine-select" class="eco-search-input wb-ctrl-select">' +
-                    '<option value="postgres" ' + (this._sqlStudioEngine === 'postgres' ? 'selected' : '') + '>PostgreSQL 18 (WASM)</option>' +
-                    '<option value="sqlite" ' + (this._sqlStudioEngine === 'sqlite' ? 'selected' : '') + '>SQLite 3.46 (WASM)</option>' +
-                  '</select>' +
-                '</label>' +
-                '<label class="wb-ctrl-field">' +
-                  '<span>Dataset</span>' +
-                  '<select id="wb-sql-dataset-select" class="eco-search-input wb-ctrl-select">' +
-                    '<option value="__unified__" ' + (this._sqlStudioDatasetId === '__unified__' ? 'selected' : '') + '>All 5 Datasets (Unified)</option>' +
-                    '<option value="ecommerce" ' + (this._sqlStudioDatasetId === 'ecommerce' ? 'selected' : '') + '>E-Commerce &amp; Orders</option>' +
-                    '<option value="org_hr" ' + (this._sqlStudioDatasetId === 'org_hr' ? 'selected' : '') + '>Org Hierarchy &amp; HR</option>' +
-                    '<option value="fintech_ledger" ' + (this._sqlStudioDatasetId === 'fintech_ledger' ? 'selected' : '') + '>Fintech Ledger</option>' +
-                    '<option value="saas_telemetry" ' + (this._sqlStudioDatasetId === 'saas_telemetry' ? 'selected' : '') + '>SaaS Telemetry</option>' +
-                    '<option value="social_graph" ' + (this._sqlStudioDatasetId === 'social_graph' ? 'selected' : '') + '>Social Graph</option>' +
-                  '</select>' +
-                '</label>' +
-                '<label class="wb-ctrl-field">' +
-                  '<span>Examples</span>' +
-                  '<select id="wb-sql-template-select" class="eco-search-input wb-ctrl-select">' +
-                    templateOptionsHtml +
-                  '</select>' +
-                '</label>' +
-                '<label class="wb-ctrl-field">' +
-                  '<span>Saved</span>' +
-                  '<select id="wb-sql-saved-history-select" data-sql-ide-role="saved-history-select" aria-label="Saved Queries and Query History" class="eco-search-input wb-ctrl-select">' +
-                    this._buildSavedHistoryOptionsHtml() +
-                  '</select>' +
-                '</label>' +
+              '<div class="studio-toolbar__group studio-toolbar__group--end">' +
+                engineSelectHtml +
+                '<span class="studio-toolbar__sep" aria-hidden="true"></span>' +
+                '<button type="button" class="studio-btn studio-btn--ghost" data-sql-studio-action="reset-db" title="Restore every table to its original rows">Reset data</button>' +
               '</div>' +
             '</header>' +
-            '<main class="view-body" id="sandbox-mount-target">' +
-              '<div class="sandbox-workspace wb-sql-workspace">' +
-                '<aside class="sandbox-palette wb-schema-sidebar">' +
-                  '<details class="wb-schema-drawer" ' + (isDesktopViewport ? 'open' : '') + '>' +
-                    '<summary class="sandbox-palette__header wb-schema-sidebar__header wb-schema-drawer__summary">' +
-                      '<div>' +
-                        '<h3 class="inspector-subtitle" style="display:inline;">Schema Browser</h3>' +
-                        '<span class="sandbox-palette__hint" style="display:block;">Click table to preview · + Insert or column to insert</span>' +
-                      '</div>' +
-                      '<span class="wb-schema-drawer__chevron" aria-hidden="true">▾</span>' +
-                    '</summary>' +
-                    '<div id="wb-sql-schema-sidebar">' + schemaExplorerHtml + '</div>' +
-                  '</details>' +
-                '</aside>' +
-                '<section class="sandbox-canvas-wrapper wb-sql-main">' +
-                  '<div class="wb-editor-card">' +
-                    '<div class="wb-editor-toolbar">' +
-                      '<div class="wb-editor-toolbar__left">' +
-                        '<button type="button" class="eco-btn eco-btn--sm eco-btn--primary" data-sql-studio-action="execute">Run Query (Cmd+Enter)</button>' +
-                        '<button type="button" class="eco-btn eco-btn--sm" data-sql-studio-action="step-clauses">Step Clauses</button>' +
-                        '<button type="button" class="eco-btn eco-btn--sm" data-sql-studio-action="explain">Explain Plan</button>' +
-                      '</div>' +
-                      '<div class="wb-editor-toolbar__right">' +
-                        '<button type="button" class="eco-btn eco-btn--sm" data-wb-ide-action="format" data-sql-ide-action="format">Format</button>' +
-                        '<button type="button" class="eco-btn eco-btn--sm" data-wb-ide-action="copy" data-sql-ide-action="copy">Copy</button>' +
-                        '<button type="button" class="eco-btn eco-btn--sm" data-wb-ide-action="share-query" data-sql-ide-action="share-query">Share Link</button>' +
-                        '<button type="button" class="eco-btn eco-btn--sm" data-sql-studio-action="reset-db">Reset DB</button>' +
-                        '<details class="wb-tools-menu">' +
-                          '<summary class="eco-btn eco-btn--sm">Save / Export</summary>' +
-                          '<div class="wb-tools-popover sql-studio-saved-panel">' +
-                            '<div class="wb-tools-popover__row">' +
-                              '<input type="text" id="wb-sql-save-title-input" data-sql-ide-role="save-title-input" placeholder="Query name..." aria-label="Query title" class="wb-save-input" />' +
-                              '<button type="button" class="eco-btn eco-btn--sm" data-wb-ide-action="save-query" data-sql-ide-action="save-query">Save</button>' +
-                              '<button type="button" class="eco-btn eco-btn--sm" data-wb-ide-action="delete-saved" data-sql-ide-action="delete-saved">Delete Saved</button>' +
+            '<main class="studio-body studio-body--playground" id="sandbox-mount-target">' +
+              '<aside class="studio-panel studio-explorer wb-schema-sidebar" aria-label="Database schema">' +
+                '<div class="studio-panel__head studio-explorer__head">' +
+                  '<select id="wb-sql-dataset-select" class="studio-select studio-select--flush" aria-label="Dataset">' +
+                    dsOption('__unified__', 'All datasets') +
+                    dsOption('ecommerce', 'E-commerce &amp; orders') +
+                    dsOption('org_hr', 'Org hierarchy &amp; HR') +
+                    dsOption('fintech_ledger', 'Fintech ledger') +
+                    dsOption('saas_telemetry', 'SaaS telemetry') +
+                    dsOption('social_graph', 'Social graph') +
+                  '</select>' +
+                  '<input type="search" id="wb-sql-schema-filter" class="studio-input studio-input--search" placeholder="Filter tables or columns" aria-label="Filter tables or columns" autocomplete="off" spellcheck="false" value="' + escapeHtml(this._schemaFilter || '') + '" />' +
+                '</div>' +
+                '<details class="wb-schema-drawer studio-schema" ' + (isDesktopViewport ? 'open' : '') + '>' +
+                  '<summary class="wb-schema-drawer__summary studio-schema__summary">' +
+                    '<span class="studio-label">Tables</span>' +
+                    '<span class="studio-schema__count">5 datasets · 26 Tables</span>' +
+                    '<span class="wb-schema-drawer__chevron" aria-hidden="true"></span>' +
+                  '</summary>' +
+                  '<div id="wb-sql-schema-sidebar" class="studio-schema__list">' + schemaExplorerHtml + '</div>' +
+                  '<p class="studio-schema__empty" hidden>No tables or columns match.</p>' +
+                '</details>' +
+                '<p class="studio-panel__foot studio-hint">Click a column to insert it. Hover a table to preview its rows.</p>' +
+              '</aside>' +
+              '<section class="studio-work wb-sql-main">' +
+                '<div class="studio-pane studio-pane--editor studio-editor">' +
+                  '<div class="studio-pane__bar">' +
+                    '<span class="studio-file-tab">query.sql</span>' +
+                    '<select id="wb-sql-template-select" class="studio-select studio-select--compact" aria-label="Load an example query">' +
+                      templateOptionsHtml +
+                    '</select>' +
+                    '<select id="wb-sql-saved-history-select" data-sql-ide-role="saved-history-select" aria-label="Saved queries and history" class="studio-select studio-select--compact">' +
+                      this._buildSavedHistoryOptionsHtml() +
+                    '</select>' +
+                    '<div class="studio-pane__actions">' +
+                      '<button type="button" class="studio-btn studio-btn--ghost" data-sql-studio-action="explain" title="Show the query plan">Explain</button>' +
+                      '<button type="button" class="studio-btn" data-sql-studio-action="step-clauses" title="Walk through the query one clause at a time">Step through</button>' +
+                      '<button type="button" class="studio-btn studio-btn--primary" data-sql-studio-action="execute" title="Run query">Run ' + runKbdHtml + '</button>' +
+                    '</div>' +
+                  '</div>' +
+                  '<div class="studio-pane__editor">' +
+                    '<textarea class="sql-studio-editor sql-inline-workbench__editor" id="wb-sql-studio-editor" aria-label="SQL Playground query editor" spellcheck="false" rows="8">' + escapeHtml(this._sqlStudioQuery) + '</textarea>' +
+                  '</div>' +
+                  '<div class="studio-pane__foot">' +
+                    practiceChipsHtml +
+                    '<div class="studio-pane__tools">' +
+                        '<button type="button" class="studio-btn studio-btn--ghost" data-wb-ide-action="format" data-sql-ide-action="format">Format</button>' +
+                        '<button type="button" class="studio-btn studio-btn--ghost" data-wb-ide-action="copy" data-sql-ide-action="copy">Copy</button>' +
+                        '<button type="button" class="studio-btn studio-btn--ghost" data-wb-ide-action="share-query" data-sql-ide-action="share-query">Share</button>' +
+                        '<details class="wb-tools-menu studio-menu">' +
+                          '<summary class="studio-btn studio-btn--ghost" aria-label="More actions">More</summary>' +
+                          '<div class="wb-tools-popover studio-menu__panel sql-studio-saved-panel">' +
+                            '<span class="studio-label">Save query</span>' +
+                            '<div class="studio-menu__row">' +
+                              '<input type="text" id="wb-sql-save-title-input" data-sql-ide-role="save-title-input" placeholder="Name this query" aria-label="Query title" class="studio-input" />' +
+                              '<button type="button" class="studio-btn" data-wb-ide-action="save-query" data-sql-ide-action="save-query">Save</button>' +
                             '</div>' +
-                            '<div class="wb-tools-popover__row">' +
-                              '<span class="wb-tools-popover__label">Export:</span>' +
-                              '<button type="button" class="eco-btn eco-btn--sm" data-wb-ide-action="export-sql" data-sql-ide-action="export-sql">.sql</button>' +
-                              '<button type="button" class="eco-btn eco-btn--sm" data-wb-ide-action="export-csv" data-sql-ide-action="export-csv">.csv</button>' +
-                              '<button type="button" class="eco-btn eco-btn--sm" data-wb-ide-action="export-json" data-sql-ide-action="export-json">.json</button>' +
+                            '<button type="button" class="studio-menu__item" data-wb-ide-action="delete-saved" data-sql-ide-action="delete-saved">Delete selected saved query</button>' +
+                            '<span class="studio-label">Export</span>' +
+                            '<div class="studio-menu__row">' +
+                              '<button type="button" class="studio-btn" data-wb-ide-action="export-sql" data-sql-ide-action="export-sql">.sql</button>' +
+                              '<button type="button" class="studio-btn" data-wb-ide-action="export-csv" data-sql-ide-action="export-csv">.csv</button>' +
+                              '<button type="button" class="studio-btn" data-wb-ide-action="export-json" data-sql-ide-action="export-json">.json</button>' +
                             '</div>' +
                           '</div>' +
                         '</details>' +
-                      '</div>' +
                     '</div>' +
-                    '<textarea class="sql-studio-editor sql-inline-workbench__editor" id="wb-sql-studio-editor" aria-label="SQL Playground query editor" spellcheck="false" rows="8">' + escapeHtml(this._sqlStudioQuery) + '</textarea>' +
-                    practiceChipsHtml +
                   '</div>' +
-                  '<div id="wb-sql-studio-visualizer-slot"></div>' +
-                '</section>' +
-              '</div>' +
+                '</div>' +
+                splitterHtml +
+                '<div class="studio-pane studio-pane--results">' +
+                  '<div id="wb-sql-studio-visualizer-slot" class="studio-results"></div>' +
+                '</div>' +
+              '</section>' +
             '</main>' +
           '</div>';
+        this._initStudioSplitter();
+        if (this._schemaFilter) this._applySchemaFilter(this._schemaFilter);
 
         var topEditor = this._container.querySelector('#wb-sql-studio-editor');
         if (topEditor && root.TableVisualizer && typeof root.TableVisualizer.enhanceTextareaToIde === 'function') {
@@ -2132,7 +2255,16 @@
           var cEd = container.querySelector('#wb-challenge-editor');
           var activeCh = self._getChallengesList().find(function(c) { return c.id === self._activeChallengeId; });
           var cfObj = (activeCh && activeCh.codeFix) || {};
-          if (cAct === 'check' && typeof self._runChallengeCheck === 'function') {
+          if (cAct === 'prev' || cAct === 'next') {
+            var chList = self._getChallengesList();
+            var curIdx = chList.findIndex(function(c) { return c.id === self._activeChallengeId; });
+            var nextCh = chList[curIdx + (cAct === 'next' ? 1 : -1)];
+            if (nextCh) {
+              if (cEd) self._challengeDrafts[self._activeChallengeId] = cEd.value;
+              self._activeChallengeId = nextCh.id;
+              self.render();
+            }
+          } else if (cAct === 'check' && typeof self._runChallengeCheck === 'function') {
             self._runChallengeCheck(false, false);
           } else if (cAct === 'run-only' && typeof self._runChallengeCheck === 'function') {
             self._runChallengeCheck(true, false);
@@ -2197,6 +2329,7 @@
             if (dsSel) dsSel.value = previewDs;
             var sidebarEl = container.querySelector('#wb-sql-schema-sidebar');
             if (sidebarEl) sidebarEl.innerHTML = self._renderSqlStudioSchemaExplorer();
+            if (self._schemaFilter) self._applySchemaFilter(self._schemaFilter);
           }
           if (tblName) {
             self._sqlStudioQuery = 'SELECT * FROM ' + tblName + ' LIMIT 15;';
@@ -2722,6 +2855,12 @@
 
       // 3. Input handler for Inspector fields & Capacity Estimator fields
       container.addEventListener('input', function(e) {
+        if (e.target.id === 'wb-sql-schema-filter') {
+          self._schemaFilter = e.target.value;
+          self._applySchemaFilter(e.target.value);
+          return;
+        }
+
         // Node Name edit
         var nodeNameInp = e.target.closest('[data-inspect-node-name]');
         if (nodeNameInp) {

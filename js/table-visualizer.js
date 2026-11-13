@@ -2186,22 +2186,22 @@
             container.innerHTML =
                 '<div class="sql-studio-inline-workbench" style="display:flex;flex-direction:column;gap:10px;padding:12px;background:var(--bg-elevated);">' +
                     '<div class="sql-lab-editor-box" style="display:flex;flex-direction:column;gap:8px;">' +
-                        '<div class="sql-ide-header-bar" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:0.76rem;color:var(--fg-muted);padding:0 2px;">' +
+                        '<div class="sql-ide-header-bar" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--fg-muted);padding:0 2px;">' +
                             '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
                                 '<span style="font-family:var(--font-mono,monospace);color:var(--accent,#38bdf8);font-weight:700;">query.sql · Live SQL IDE</span>' +
                                 '<span>Shortcut: Cmd/Ctrl + Enter to Run · Tab to Indent</span>' +
                             '</div>' +
                             '<div class="sql-studio-saved-panel" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">' +
-                                '<select class="sql-studio-saved-select" data-sql-ide-role="saved-history-select" aria-label="Saved Queries and History" style="background:var(--bg-surface);color:var(--fg);border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:0.74rem;max-width:260px;">' +
+                                '<select class="sql-studio-saved-select" data-sql-ide-role="saved-history-select" aria-label="Saved Queries and History" style="background:var(--bg-surface);color:var(--fg);border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:12px;max-width:260px;">' +
                                     buildSavedAndHistorySelectOptionsHtml() +
                                 '</select>' +
-                                '<input type="text" data-sql-ide-role="save-title-input" placeholder="Query name..." aria-label="Saved query title" style="background:var(--bg-surface);color:var(--fg);border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:0.74rem;width:125px;" />' +
+                                '<input type="text" data-sql-ide-role="save-title-input" placeholder="Query name..." aria-label="Saved query title" style="background:var(--bg-surface);color:var(--fg);border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:12px;width:125px;" />' +
                                 '<button type="button" class="sql-exec-btn is-secondary" data-sql-ide-action="save-query" title="Save current SQL query to browser storage">Save Query</button>' +
                                 '<button type="button" class="sql-exec-btn is-secondary" data-sql-ide-action="delete-saved" title="Delete selected saved query">Delete</button>' +
                             '</div>' +
                         '</div>' +
                         buildPracticeChipsHtml() +
-                        '<textarea class="sql-live-editor sql-inline-textarea" aria-label="SQL query editor" rows="7" spellcheck="false" style="width:100%;font-family:var(--font-mono,monospace);font-size:0.85rem;padding:10px 12px;border-radius:8px;background:var(--bg-surface);color:var(--fg);border:1px solid var(--border-subtle,rgba(148,163,184,0.28));">' + escapeHtml(sql) + '</textarea>' +
+                        '<textarea class="sql-live-editor sql-inline-textarea" aria-label="SQL query editor" rows="7" spellcheck="false" style="width:100%;font-family:var(--font-mono,monospace);font-size:13px;padding:10px 12px;border-radius:8px;background:var(--bg-surface);color:var(--fg);border:1px solid var(--border-subtle,rgba(148,163,184,0.28));">' + escapeHtml(sql) + '</textarea>' +
                         '<div class="sql-lab-actions" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">' +
                             '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">' +
                                 '<button type="button" class="sql-exec-btn is-primary" data-inline-viz-action="run">Run Query</button>' +
@@ -2222,7 +2222,7 @@
                             '</div>' +
                         '</div>' +
                     '</div>' +
-                    '<div class="sql-inline-verify-banner" style="display:none;padding:12px 14px;border-radius:8px;font-size:0.83rem;"></div>' +
+                    '<div class="sql-inline-verify-banner" style="display:none;padding:12px 14px;border-radius:8px;font-size:13px;"></div>' +
                     '<div class="sql-inline-viz-stage"></div>' +
                 '</div>';
             var ed = container.querySelector('.sql-live-editor');
@@ -2391,7 +2391,7 @@
                 verifyBanner.style.border = vRes.passed ? '1px solid rgba(16,185,129,0.45)' : '1px solid rgba(239,68,68,0.45)';
                 verifyBanner.innerHTML =
                     '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">' +
-                        '<strong style="font-size:0.9rem;color:' + (vRes.passed ? '#10b981' : '#ef4444') + ';">' +
+                        '<strong style="font-size:14px;color:' + (vRes.passed ? '#10b981' : '#ef4444') + ';">' +
                             (vRes.passed ? '✓ All Relational SQL Assertions Passed (' + vRes.passedCount + '/' + vRes.totalCount + ')' : '✗ SQL Verification Checks (' + (vRes.passedCount || 0) + '/' + (vRes.totalCount || 4) + ' Passed)') +
                         '</strong>' +
                         '<span style="font-size:0.75rem;color:var(--fg-muted);">Dataset: ' + escapeHtml(datasetId || 'ecommerce') + '</span>' +
@@ -2767,10 +2767,10 @@
                         '<button type="button" class="btn btn--secondary btn--sm" id="global-codelab-close-btn">← Back to Lesson</button>' +
                         '<div>' +
                             '<div style="display:flex;align-items:center;gap:8px;">' +
-                                '<span style="background:var(--info-muted);color:var(--info);padding:2px 8px;border-radius:999px;font-size:0.72rem;font-weight:700;">SQL STUDIO</span>' +
-                                '<strong style="font-size:0.98rem;color:var(--fg);">' + escapeHtml(titleText) + '</strong>' +
+                                '<span style="background:var(--info-muted);color:var(--info);padding:2px 8px;border-radius:999px;font-size:12px;font-weight:700;">SQL STUDIO</span>' +
+                                '<strong style="font-size:15px;color:var(--fg);">' + escapeHtml(titleText) + '</strong>' +
                             '</div>' +
-                            '<div style="font-size:0.78rem;color:var(--fg-muted);margin-top:2px;">Dataset: ' + escapeHtml(dsInfo.title || dsId) + '</div>' +
+                            '<div style="font-size:12px;color:var(--fg-muted);margin-top:2px;">Dataset: ' + escapeHtml(dsInfo.title || dsId) + '</div>' +
                         '</div>' +
                     '</div>' +
                 '</div>' +

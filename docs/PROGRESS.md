@@ -31,7 +31,7 @@ Verified via headless Chrome Mobile Lighthouse (`formFactor: "mobile"`) against 
 
 ## Completed Milestones (All Done)
 
-- [x] **Phase 0.1 — `fanout.sh` Product Teardown**: Live desktop + mobile inspection of `fanout.sh` structure, visual/interactive pedagogy, video explainers, navigation, shareability, and mobile ergonomics documented in [fanout-teardown.md](research/fanout-teardown.md).
+- [x] **Phase 0.1 — Learning UX Product Teardown**: Desktop + mobile study of interactive course structure, visual/interactive pedagogy, video explainers, navigation, shareability, and mobile ergonomics documented in [learning-ux-teardown.md](research/learning-ux-teardown.md).
 - [x] **Phase 0.2 — Modern Web & Frontend Design Craft**: Established product design direction in [PRODUCT.md](../PRODUCT.md) (`Impeccable` craft floor: zero `[]` anti-pattern findings; `Modern Web Guidance` patterns for native `<details>` disclosures, `loading="lazy"` `<video>` with explicit dimensions, `content-visibility: auto` + `contain-intrinsic-size`, and accessible `aria-sort` sortable tables).
 - [x] **Phase 0.3 — Strict Copyright & Permissive License Inventory**: Verified 100% original prose, code, SVG diagrams, social cards, and programmatic videos, with permissive third-party licenses (`MIT`, `Apache-2.0`, `OFL-1.1`) cataloged in [licenses.md](licenses.md) and [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md).
 - [x] **Phase 0.4 — Baseline Audit & Architectural Decisions**: Captured baseline screenshots and P0/P1/P2 findings in [audit.md](research/audit.md), and logged ADR-001 through ADR-008 in [DECISIONS.md](../DECISIONS.md).

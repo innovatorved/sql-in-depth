@@ -295,10 +295,10 @@ window.Renderer = (() => {
           <div><div class="hero__stat-value">${stats.tracks || 6}</div><div class="hero__stat-label">Tracks</div></div>
           <div><div class="hero__stat-value">${stats.units}</div><div class="hero__stat-label">Topics</div></div>
           <div><div class="hero__stat-value">${pct}%</div><div class="hero__stat-label">Complete</div></div>
-          <div><div class="hero__stat-value" style="color: ${streak > 0 ? '#f97316' : 'inherit'};">${streak} 🔥</div><div class="hero__stat-label">Day Streak</div></div>
+          <div><div class="hero__stat-value">${streak}</div><div class="hero__stat-label">Day Streak</div></div>
         </div>
         <div style="margin-top: 1.25rem; display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
-          <a href="/glossary/" class="btn btn--sm btn--primary">📖 Glossary</a>
+          <a href="/glossary/" class="btn btn--sm btn--primary">Glossary</a>
         </div>
       </div>`;
 
@@ -578,21 +578,21 @@ window.Renderer = (() => {
           <div class="topic-quick-jump__pills">
             <span class="topic-quick-jump__label">Jump to:</span>
             <a class="topic-quick-jump__pill topic-quick-jump__pill--primary" href="#guided-coding-practice-${safeSlug}" data-action="quick-jump" data-target="guided-coding-practice-${safeSlug}">
-              <span>💻 SQL & Engine Lab</span>
+              <span>SQL lab</span>
             </a>
             ${opts.hasSim ? `
               <a class="topic-quick-jump__pill" href="#topic-simulator-${safeSlug}" data-action="quick-jump" data-target="topic-simulator-${safeSlug}">
-                <span>⚡ Simulator</span>
+                <span>Simulator</span>
               </a>
             ` : ''}
             ${opts.hasQuiz ? `
               <a class="topic-quick-jump__pill" href="#check-slider-${safeSlug}" data-action="quick-jump" data-target="check-slider-${safeSlug}">
-                <span>🧠 Concept Check</span>
+                <span>Concept check</span>
               </a>
             ` : ''}
             ${opts.hasTakeaways ? `
               <a class="topic-quick-jump__pill" href="#topic-takeaways-${safeSlug}" data-action="quick-jump" data-target="topic-takeaways-${safeSlug}">
-                <span>📌 Key Takeaways</span>
+                <span>Key takeaways</span>
               </a>
             ` : ''}
           </div>
@@ -639,7 +639,7 @@ window.Renderer = (() => {
         <div class="build-lab-card__top">
           <div class="build-lab-card__intro">
             <div class="build-lab-card__eyebrow">
-              <span>Interactive 3-Step Guided SQL Lab &amp; Step-by-Step Table Visualizer (PostgreSQL 18 WASM &amp; SQLite 3 WASM)</span>
+              <span>Guided SQL lab · 3 steps · runs in your browser</span>
               <span class="build-lab-card__progress">${totalSteps} Guided Steps + Progressive Hints</span>
               ${steps.length ? `
                 <button type="button" class="build-lab-card__collapse-btn" data-action="toggle-lab-steps" aria-expanded="true" title="Collapse or expand guided coding steps">
@@ -651,10 +651,10 @@ window.Renderer = (() => {
             <h2 class="build-lab-card__title">${escapeHtml(labTitle)}</h2>
             <p class="build-lab-card__desc">${formatInlineCode(labSummary)}</p>
             <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;">
-              <span class="badge">⏱ Target Time: <code>${escapeHtml(comp.time || 'O(N log N)')}</code></span>
-              <span class="badge">💾 Auxiliary Space: <code>${escapeHtml(comp.space || 'O(N)')}</code></span>
-              <span class="badge">🧭 Pattern: ${escapeHtml(comp.pattern || mod?.title || 'Relational Invariants')}</span>
-              ${lab.datasetId ? `<span class="badge">🗄️ Dataset: <code>${escapeHtml(lab.datasetId)}</code></span>` : ''}
+              <span class="badge">Target time: <code>${escapeHtml(comp.time || 'O(N log N)')}</code></span>
+              <span class="badge">Extra space: <code>${escapeHtml(comp.space || 'O(N)')}</code></span>
+              <span class="badge">Pattern: ${escapeHtml(comp.pattern || mod?.title || 'Relational Invariants')}</span>
+              ${lab.datasetId ? `<span class="badge">Dataset: <code>${escapeHtml(lab.datasetId)}</code></span>` : ''}
             </div>
           </div>
           <div class="build-lab-card__cta-col">
@@ -690,7 +690,7 @@ window.Renderer = (() => {
                   <div class="build-lab-step-card__concept">${formatInlineCode(s.instructions || 'Write and verify the SQL query in `query.sql`.')}</div>
                   ${s.hint ? `
                     <details class="quiz-hint-details">
-                      <summary>💡 Progressive SQL Hint (Step ${idx + 1})</summary>
+                      <summary>Show hint for step ${idx + 1}</summary>
                       <pre><code>${escapeHtml(s.hint)}</code></pre>
                     </details>
                   ` : ''}
@@ -1053,7 +1053,7 @@ window.Renderer = (() => {
               ${badgeHtml}
             </div>
             ${b.summary ? `<span class="lesson-builds__summary">${escapeHtml(b.summary)}</span>` : ''}
-            <span class="lesson-builds__cta">${icons.terminal} Open Guided SQL &amp; Engine Lab (PostgreSQL 18 WASM, SQLite 3 &amp; Step-by-Step Relational Table Visualizer) →</span>
+            <span class="lesson-builds__cta">${icons.terminal} Open guided lab →</span>
           </a>`;
         }).join('')}
       </div>`;
@@ -1440,10 +1440,10 @@ window.Renderer = (() => {
     // Phase 2: Process block-level markdown syntax (code blocks & inline code are safely extracted)
     html = html
       // GitHub alerts / blockquote callouts
-      .replace(/^>\s*\[!NOTE\]\s*(.*)$/gm, '<div class="callout callout--note"><div class="callout__title">ℹ️ Note</div><p>$1</p></div>')
-      .replace(/^>\s*\[!TIP\]\s*(.*)$/gm, '<div class="callout callout--tip"><div class="callout__title">💡 Tip</div><p>$1</p></div>')
-      .replace(/^>\s*\[!WARNING\]\s*(.*)$/gm, '<div class="callout callout--warn"><div class="callout__title">⚠️ Warning</div><p>$1</p></div>')
-      .replace(/^>\s*\[!IMPORTANT\]\s*(.*)$/gm, '<div class="callout callout--danger"><div class="callout__title">❗ Important</div><p>$1</p></div>')
+      .replace(/^>\s*\[!NOTE\]\s*(.*)$/gm, '<div class="callout callout--note"><div class="callout__title">Note</div><p>$1</p></div>')
+      .replace(/^>\s*\[!TIP\]\s*(.*)$/gm, '<div class="callout callout--tip"><div class="callout__title">Tip</div><p>$1</p></div>')
+      .replace(/^>\s*\[!WARNING\]\s*(.*)$/gm, '<div class="callout callout--warn"><div class="callout__title">Warning</div><p>$1</p></div>')
+      .replace(/^>\s*\[!IMPORTANT\]\s*(.*)$/gm, '<div class="callout callout--danger"><div class="callout__title">Important</div><p>$1</p></div>')
       .replace(/^>\s*(.*)$/gm, '<blockquote><p>$1</p></blockquote>')
       // Headers
       .replace(/^#### (.+)$/gm, '<h4>$1</h4>')
@@ -1600,7 +1600,7 @@ window.Renderer = (() => {
 
     html += `
       <div class="callout callout--note">
-        <div class="callout__title">📚 Content Loading</div>
+        <div class="callout__title">Content coming soon</div>
         <p>Detailed content for this topic is being prepared. In the meantime, explore the module overview and related topics in Module ${mod.number}: ${mod.title}.</p>
       </div>`;
 
@@ -1624,10 +1624,10 @@ window.Renderer = (() => {
           </div>
           <div class="lesson-feedback__actions">
             <button type="button" class="btn btn--sm btn--outline lesson-feedback__btn" data-action="feedback-vote" data-slug="${slug}" data-vote="yes">
-              👍 Helpful
+              Helpful
             </button>
             <button type="button" class="btn btn--sm btn--outline lesson-feedback__btn" data-action="feedback-vote" data-slug="${slug}" data-vote="no">
-              👎 Needs work
+              Needs work
             </button>
             <a href="${issueUrl}" target="_blank" rel="noopener noreferrer" class="btn btn--sm btn--outline lesson-feedback__btn" title="Open an issue on GitHub">
               ${icons.github} Report an issue
@@ -2236,10 +2236,10 @@ window.Renderer = (() => {
         <p class="hero__subtitle" style="margin-top:0.5rem;">${escapeHtml(targetMod.summary)}</p>
         <div class="lesson-header__actions" style="margin-top:1rem;">
           <button class="btn btn--sm btn--primary" data-action="window-print">
-            🖨️ Print / Save as PDF
+            Print or save as PDF
           </button>
           <a href="/topic/${targetMod.units[0]?.slug}/" class="btn btn--sm btn--secondary">
-            📖 Open Module ${targetMod.number} Lessons
+            Open module ${targetMod.number} lessons
           </a>
         </div>
       </div>
@@ -2255,7 +2255,7 @@ window.Renderer = (() => {
           <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; margin-bottom:0.65rem;">
             <div>
               <h3 style="font-size:16px; margin:0; color:var(--fg);">${escapeHtml(unit.title)}</h3>
-              ${unit.complexity ? `<div style="margin-top:4px;font-size:11.5px;font-family:var(--font-mono);color:var(--info);">⏱ Complexity: ${escapeHtml(unit.complexity)}</div>` : ''}
+              ${unit.complexity ? `<div style="margin-top:4px;font-size:12px;font-family:var(--font-mono);color:var(--info);">⏱ Complexity: ${escapeHtml(unit.complexity)}</div>` : ''}
             </div>
             <div style="display:flex; align-items:center; gap:8px;">
               <button type="button" class="btn btn--secondary btn--sm" data-open-topic-lab="${escapeHtml(unit.slug)}" data-lab-mode="guided">▶ Launch SQL Lab</button>
@@ -2264,7 +2264,7 @@ window.Renderer = (() => {
           </div>
           ${takeaways.length ? `
             <div style="font-size:11px; font-weight:700; letter-spacing:0.05em; color:var(--fg-muted); margin-bottom:0.35rem;">KEY SQL INVARIANTS &amp; TAKEAWAYS:</div>
-            <ul style="margin:0; padding-left:1.25rem; font-size:13.5px; color:var(--fg-prose); line-height:1.6;">
+            <ul style="margin:0; padding-left:1.25rem; font-size:13px; color:var(--fg-prose); line-height:1.6;">
               ${takeaways.map(t => `<li style="margin-bottom:0.25rem;">${escapeHtml(t)}</li>`).join('')}
             </ul>
           ` : '<p style="font-size:12px; color:var(--fg-muted); margin:0;">Interactive SQL Lab and clause walkthrough available in lesson.</p>'}

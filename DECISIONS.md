@@ -63,10 +63,10 @@ All product, UX, engineering, and infrastructure ambiguities encountered during 
   3. `inner-join-equi-joins` (*Physical Join Algorithms: Nested Loop, Hash & Sort-Merge*)
   4. `btree-bplustree-internal-anatomy` (*Inside a B+Tree Index Lookup: O(log_B N) Page Hops*)
   5. `multi-version-concurrency-control-mvcc` (*MVCC Snapshot Isolation: Readers Never Block Writers*)
-- **Why**: Produces 100% original, cohesive, dark-slate diagrammatic videos matching `fanout.sh`'s visual polish without third-party YouTube ad clutter, clickbait thumbnails, or heavy React/Remotion runtime bloat. Keeping each video `45s–70s` at crisp vector bitrates keeps git repository size lean (`< 4 MB` total across all 5 videos) while loading zero bytes until the learner clicks Play (`preload="none"`).
+- **Why**: Produces 100% original, cohesive, dark-slate diagrammatic videos that match the site's own visual language without third-party YouTube ad clutter, clickbait thumbnails, or heavy React/Remotion runtime bloat. Keeping each video `45s–70s` at crisp vector bitrates keeps git repository size lean (`< 4 MB` total across all 5 videos) while loading zero bytes until the learner clicks Play (`preload="none"`).
 - **Alternatives Rejected**:
   - *Remotion full dependency tree*: Adds Chromium/React heavyweight dependencies (`~300 MB` `node_modules`) for deterministic 2D technical animations that pure Canvas/SVG + `ffmpeg` renders faster and cleaner.
-  - *Animations-only with no video/narration*: Misses the multi-modal spoken walkthrough experience highlighted in Phase 4 (`fanout.sh` video explainers with captions).
+  - *Animations-only with no video/narration*: Misses the multi-modal spoken walkthrough experience highlighted in Phase 4 (captioned video explainers).
   - *External YouTube embeds as primary hero media*: Hurts visual trust, injects clickbait thumbnails above the fold, and breaks offline/privacy guarantees. Curated English YouTube lectures are retained strictly as optional secondary reference links below the core lesson.
 
 ---

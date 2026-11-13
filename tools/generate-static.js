@@ -128,7 +128,12 @@ context.window.addEventListener = () => {};
 context.window.removeEventListener = () => {};
 
 try {
-  const katex = require('katex');
+  let katex;
+  try {
+    katex = require('katex');
+  } catch (_) {
+    katex = require(path.join(__dirname, '..', 'js', 'vendor', 'katex', 'katex.min.js'));
+  }
   context.window.katex = katex;
   context.katex = katex;
 } catch (err) {

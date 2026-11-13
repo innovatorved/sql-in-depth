@@ -68,6 +68,38 @@
   // Safety fallback for background tabs
   setTimeout(startDeferredScripts, 2500);
 
+  // Shared Mermaid palette (also used by the theme toggle in app.js).
+  window.getMermaidThemeVariables = function (isDark) {
+    return {
+      darkMode: isDark,
+      background: isDark ? '#0a0a0a' : '#ffffff',
+      primaryColor: isDark ? '#18181b' : '#fafaf9',
+      primaryTextColor: isDark ? '#f4f4f5' : '#1a1917',
+      primaryBorderColor: isDark ? '#3f3f46' : '#d6d3d1',
+      lineColor: isDark ? '#71717a' : '#a8a29e',
+      secondaryColor: isDark ? '#111113' : '#f5f5f4',
+      tertiaryColor: isDark ? '#27272a' : '#e7e5e4',
+      mainBkg: isDark ? '#18181b' : '#fafaf9',
+      nodeBorder: isDark ? '#3f3f46' : '#d6d3d1',
+      clusterBkg: isDark ? '#111113' : '#ffffff',
+      clusterBorder: isDark ? '#27272a' : '#e7e5e4',
+      textColor: isDark ? '#e4e4e7' : '#292524',
+      edgeLabelBackground: isDark ? '#0a0a0a' : '#ffffff',
+      actorBkg: isDark ? '#18181b' : '#fafaf9',
+      actorBorder: isDark ? '#3f3f46' : '#d6d3d1',
+      actorTextColor: isDark ? '#f4f4f5' : '#1a1917',
+      signalColor: isDark ? '#a1a1aa' : '#57534e',
+      signalTextColor: isDark ? '#e4e4e7' : '#292524',
+      noteBkgColor: isDark ? '#27272a' : '#f5f5f4',
+      noteBorderColor: isDark ? '#3f3f46' : '#d6d3d1',
+      noteTextColor: isDark ? '#e4e4e7' : '#292524',
+      attributeBackgroundColorOdd: isDark ? '#18181b' : '#ffffff',
+      attributeBackgroundColorEven: isDark ? '#111113' : '#fafaf9',
+      fontFamily: '"Geist", -apple-system, sans-serif',
+      fontSize: '13px'
+    };
+  };
+
   // On-demand Mermaid Diagram Loader (Pinned version 10.9.8 with SRI integrity hash)
   window.loadMermaid = function () {
     if (window.mermaid) return Promise.resolve();
@@ -84,32 +116,7 @@
           startOnLoad: false,
           securityLevel: 'loose',
           theme: 'base',
-          themeVariables: {
-            darkMode: isDark,
-            background: isDark ? '#0b0e14' : '#ffffff',
-            primaryColor: isDark ? '#131924' : '#f7f8fa',
-            primaryTextColor: isDark ? '#e6edf3' : '#111827',
-            primaryBorderColor: isDark ? '#334155' : '#cbd5e1',
-            lineColor: isDark ? '#8b98ad' : '#64748b',
-            secondaryColor: isDark ? '#0b0e14' : '#f0f3f7',
-            tertiaryColor: isDark ? '#1b2332' : '#e2e6ed',
-            mainBkg: isDark ? '#131924' : '#f7f8fa',
-            nodeBorder: isDark ? '#334155' : '#cbd5e1',
-            clusterBkg: isDark ? '#0b0e14' : '#ffffff',
-            clusterBorder: isDark ? '#232c3d' : '#e2e6ed',
-            textColor: isDark ? '#e6edf3' : '#111827',
-            edgeLabelBackground: isDark ? '#0b0e14' : '#ffffff',
-            actorBkg: isDark ? '#131924' : '#f7f8fa',
-            actorBorder: isDark ? '#334155' : '#cbd5e1',
-            actorTextColor: isDark ? '#e6edf3' : '#111827',
-            signalColor: isDark ? '#8b98ad' : '#4b5563',
-            signalTextColor: isDark ? '#e6edf3' : '#111827',
-            noteBkgColor: isDark ? '#1b2332' : '#f0f3f7',
-            noteBorderColor: isDark ? '#334155' : '#cbd5e1',
-            noteTextColor: isDark ? '#e6edf3' : '#111827',
-            fontFamily: '"Geist", -apple-system, sans-serif',
-            fontSize: '13px'
-          }
+          themeVariables: window.getMermaidThemeVariables(isDark)
         });
         resolve();
       };

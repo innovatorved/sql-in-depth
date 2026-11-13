@@ -24581,7 +24581,7 @@ int main() {
           : this.lastRunDurationMs;
         if (typeof ms === 'number' && !Number.isNaN(ms)) {
           durEl.style.display = 'inline-flex';
-          durEl.textContent = `⚡ ${ms.toFixed(1)}ms`;
+          durEl.textContent = `${ms.toFixed(1)} ms`;
         } else {
           durEl.style.display = 'none';
         }
@@ -27110,7 +27110,7 @@ int main() {
         rowsHtml = `
           <tr>
             <td colspan="7" style="text-align:center;padding:32px;color:var(--cl-fg-muted);">
-              ${traces.length === 0 ? 'No network requests recorded yet. Run a demo, click "⚡ Load Test", or run `hey -n 50 http://localhost:3000` in the terminal.' : 'No network requests match the active filters.'}
+              ${traces.length === 0 ? 'No network requests recorded yet. Run a demo, click "Load test", or run `hey -n 50 http://localhost:3000` in the terminal.' : 'No network requests match the active filters.'}
             </td>
           </tr>
         `;
@@ -27224,7 +27224,7 @@ int main() {
               <span class="codelab-slo-val">${p99Ms} ms</span>
             </div>
             <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
-              <button type="button" class="codelab-btn codelab-btn--sm codelab-btn--primary" data-cl-action="run-quick-loadtest" title="Run 50 concurrent requests (hey -n 50 -c 10) against active server">⚡ Load Test (50 reqs)</button>
+              <button type="button" class="codelab-btn codelab-btn--sm codelab-btn--primary" data-cl-action="run-quick-loadtest" title="Run 50 concurrent requests (hey -n 50 -c 10) against active server">Load test (50 requests)</button>
             </div>
           </div>
           ${topologyHtml}

@@ -65,7 +65,10 @@ window.App = (() => {
   }
 
   function toggleDesktopSidebar(forceCollapsed) {
-    if (window.innerWidth <= 900 && sidebarOpen) {
+    const isOverlaySidebar = window.innerWidth <= 900 ||
+      document.body.classList.contains('view-landing') ||
+      document.body.classList.contains('view-ecosystem');
+    if (isOverlaySidebar && sidebarOpen) {
       closeSidebar();
       return;
     }
@@ -458,7 +461,7 @@ window.App = (() => {
       const qIdx = str.indexOf('?');
       const params = qIdx >= 0 ? new URLSearchParams(str.slice(qIdx)) : null;
       const sub = str.split('?')[0].replace(/^\/sandbox\/?/, '').replace(/\/+$/, '');
-      navigateToSandbox(sub || params?.get('blueprint') || null, event);
+      navigateToSandbox(sub || params?.get('blueprint') || null, event, qIdx >= 0 ? str.slice(qIdx) : '');
       return;
     }
     history.pushState(null, '', str);
@@ -556,12 +559,13 @@ window.App = (() => {
     window.scrollTo(0, 0);
   }
 
-  function navigateToSandbox(blueprintId, event) {
+  function navigateToSandbox(blueprintId, event, search) {
     if (event && (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0)) return;
     if (event) event.preventDefault();
     const targetPath = blueprintId ? `/sandbox/${blueprintId}` : '/sandbox';
-    if (window.location.pathname !== targetPath || window.location.hash) {
-      history.pushState(null, '', targetPath);
+    const targetSearch = typeof search === 'string' ? search : '';
+    if (window.location.pathname !== targetPath || window.location.search !== targetSearch || window.location.hash) {
+      history.pushState(null, '', targetPath + targetSearch);
     }
     currentView = 'sandbox';
     currentSlug = blueprintId || null;
@@ -626,6 +630,7 @@ window.App = (() => {
     document.body.classList.toggle('view-landing', currentView === 'home' && !!window.Landing);
     document.body.classList.toggle('view-build', currentView === 'build');
     document.body.classList.toggle('view-ecosystem', isEcosystemView);
+    document.body.classList.toggle('view-dashboard', currentView === 'dashboard');
 
     // Highlight active topbar link
     document.querySelectorAll('.topbar__link[data-nav], .topbar__nav-link[data-nav]').forEach(link => {
@@ -686,7 +691,7 @@ window.App = (() => {
 
       case 'dashboard':
         if ((!window.DashboardController || !window.SRS_CARDS_DATA) && window.Lazy) {
-          reader.innerHTML = '<div class="prose"><p style="padding:2rem 0;color:var(--fg-muted);">Loading Study Dashboard &amp; Spaced-Repetition Deck…</p></div>';
+          reader.innerHTML = '<div class="prose"><p style="padding:2rem 0;color:var(--fg-muted);">Loading your progress…</p></div>';
           window.Lazy.loadAll(['data/srs-cards.js', 'data/challenges.js', 'js/dashboard.js']).then(() => {
             if (currentView === 'dashboard') renderCurrentView();
           });
@@ -697,7 +702,7 @@ window.App = (() => {
           activeDashboard = true;
         }
         if (window.Analytics) {
-          window.Analytics.trackPageView('Learner Study Hub & SRS Flashcards | SQL In Depth', '/dashboard', window.location.href);
+          window.Analytics.trackPageView('Your learning | SQL In Depth', '/dashboard', window.location.href);
         }
         break;
 
@@ -851,7 +856,8 @@ window.App = (() => {
         }
 
         initMermaid();
-        if (!isPrerendered && window.Lazy && reader.textContent.includes('$')) {
+        const hasUntypesetMath = Boolean(reader.querySelector('.katex-inline-math:not(:has(.katex)), .katex-display-math:not(:has(.katex))'));
+        if (window.Lazy && (hasUntypesetMath || (!isPrerendered && reader.textContent.includes('$')))) {
           window.Lazy.ensureKatex().then(() => renderMathOnPage(reader)).catch(() => {});
         } else {
           renderMathOnPage(reader);
@@ -1315,6 +1321,7 @@ window.App = (() => {
       sidebar.classList.add('open');
       sidebarOpen = true;
     }
+    document.getElementById('sidebar-overlay')?.classList.add('open');
   }
 
   function closeSidebar() {
@@ -1323,6 +1330,7 @@ window.App = (() => {
       sidebar.classList.remove('open');
       sidebarOpen = false;
     }
+    document.getElementById('sidebar-overlay')?.classList.remove('open');
   }
 
   // ── Theme ─────────────────────────────────────────────────
@@ -1350,32 +1358,7 @@ window.App = (() => {
       window.mermaid.initialize({
         startOnLoad: false,
         theme: 'base', // base honours themeVariables; 'default'/'dark' override them
-        themeVariables: {
-          darkMode: next === 'dark',
-          background: next === 'dark' ? '#0a0a0a' : '#ffffff',
-          primaryColor: next === 'dark' ? '#171717' : '#fafafa',
-          primaryTextColor: next === 'dark' ? '#ffffff' : '#0a0a0a',
-          primaryBorderColor: next === 'dark' ? '#404040' : '#d4d4d4',
-          lineColor: next === 'dark' ? '#737373' : '#a1a1a1',
-          secondaryColor: next === 'dark' ? '#0a0a0a' : '#f5f5f5',
-          tertiaryColor: next === 'dark' ? '#262626' : '#e5e5e5',
-          mainBkg: (next === 'dark') ? '#171717' : '#fafafa',
-          nodeBorder: (next === 'dark') ? '#404040' : '#d4d4d4',
-          clusterBkg: (next === 'dark') ? '#0a0a0a' : '#ffffff',
-          clusterBorder: (next === 'dark') ? '#262626' : '#e5e5e5',
-          textColor: (next === 'dark') ? '#e5e5e5' : '#262626',
-          edgeLabelBackground: (next === 'dark') ? '#0a0a0a' : '#ffffff',
-          actorBkg: (next === 'dark') ? '#171717' : '#fafafa',
-          actorBorder: (next === 'dark') ? '#404040' : '#d4d4d4',
-          actorTextColor: (next === 'dark') ? '#ffffff' : '#0a0a0a',
-          signalColor: (next === 'dark') ? '#a1a1a1' : '#525252',
-          signalTextColor: (next === 'dark') ? '#e5e5e5' : '#262626',
-          noteBkgColor: (next === 'dark') ? '#262626' : '#f5f5f5',
-          noteBorderColor: (next === 'dark') ? '#404040' : '#d4d4d4',
-          noteTextColor: (next === 'dark') ? '#e5e5e5' : '#262626',
-          fontFamily: '"Geist", -apple-system, sans-serif',
-          fontSize: '13px'
-        }
+        themeVariables: window.getMermaidThemeVariables(next === 'dark')
       });
       // Restore original source and remove data-processed so Mermaid re-renders cleanly
       document.querySelectorAll('.mermaid[data-original-src]').forEach(el => {
@@ -1824,6 +1807,14 @@ window.App = (() => {
     const hamburger = document.getElementById('hamburger-btn');
     if (hamburger) {
       hamburger.addEventListener('click', () => {
+        const body = document.body;
+        const hasDockedSidebar = window.innerWidth > 900 &&
+          !body.classList.contains('view-landing') &&
+          !body.classList.contains('view-ecosystem');
+        if (hasDockedSidebar && body.classList.contains('sidebar-collapsed')) {
+          toggleDesktopSidebar(false);
+          return;
+        }
         sidebarOpen ? closeSidebar() : openSidebar();
       });
     }
@@ -1940,7 +1931,7 @@ window.App = (() => {
         else if (nav === 'roadmap') navigateToRoadmap(navEl.dataset.tab);
         else if (nav === 'challenges') navigateToChallenges(navEl.dataset.challenge);
         else if (nav === 'dashboard') navigateToDashboard(navEl.dataset.tab);
-        else if (nav === 'sandbox') navigateToSandbox(navEl.dataset.blueprint);
+        else if (nav === 'sandbox') navigateToSandbox(navEl.dataset.blueprint, undefined, navEl.dataset.search || '');
         else if (nav === 'glossary') navigateToGlossary();
         return;
       }
@@ -2609,7 +2600,7 @@ window.App = (() => {
                 <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--fg-muted);margin-bottom:8px;">Guided Engine Steps</div>
                 <div style="display:flex;flex-direction:column;gap:6px;">
                   ${steps.map((s, idx) => `
-                    <button type="button" data-cl-step="${idx}" style="text-align:left;padding:8px 10px;border-radius:6px;border:1px solid ${idx === activeStepIdx ? 'var(--info)' : 'var(--border)'};background:${idx === activeStepIdx ? 'var(--info-bg)' : 'var(--surface)'};color:var(--fg);font-size:0.78rem;cursor:pointer;">
+                    <button type="button" data-cl-step="${idx}" style="text-align:left;padding:8px 10px;border-radius:6px;border:1px solid ${idx === activeStepIdx ? 'var(--info)' : 'var(--border)'};background:${idx === activeStepIdx ? 'var(--info-bg)' : 'var(--surface)'};color:var(--fg);font-size:12px;cursor:pointer;">
                       <div style="font-weight:700;color:var(--info);">Step ${idx + 1}</div>
                       <div>${escapeHtml(s.title || `Step ${idx + 1}`)}</div>
                     </button>
@@ -2619,7 +2610,7 @@ window.App = (() => {
             </aside>
             <div style="display:flex;flex-direction:column;min-height:0;padding:14px;gap:10px;">
               ${step ? `
-                <div style="padding:10px 12px;background:var(--info-bg);border:1px solid var(--info-border);border-radius:8px;font-size:0.82rem;color:var(--fg);">
+                <div style="padding:10px 12px;background:var(--info-bg);border:1px solid var(--info-border);border-radius:8px;font-size:13px;color:var(--fg);">
                   <strong>${escapeHtml(step.title || '')}</strong>
                   <div style="color:var(--fg-muted);margin-top:2px;">${formatInlineBackticks(step.concept || step.explanation || step.instructions || '')}</div>
                 </div>
@@ -2829,7 +2820,7 @@ window.App = (() => {
                 ${isPk ? ' <span class="col-badge col-badge--pk">PK</span>' : ''}
                 ${fkRef ? ` <span class="col-badge col-badge--fk" title="Foreign Key → ${escapeHtml(fkRef)}">FK → ${escapeHtml(fkRef)}</span>` : ''}
               </span>
-              <span style="color:var(--fg-faint);font-size:10px;">${escapeHtml(cType)}</span>
+              <span style="color:var(--fg-faint);font-size:11px;">${escapeHtml(cType)}</span>
             </div>
           `;
         }).join('');
@@ -2837,7 +2828,7 @@ window.App = (() => {
           <div class="sql-inline-schema-card">
             <button type="button" class="sql-inline-schema-card__head" data-lab-preview-table="${escapeHtml(t.name)}" title="Click to preview SELECT * FROM ${escapeHtml(t.name)} LIMIT 15;">
               <span>▤ ${escapeHtml(t.name)}</span>
-              <span style="font-size:10.5px;color:var(--fg-muted);font-weight:400;">${rowCnt} rows</span>
+              <span style="font-size:11px;color:var(--fg-muted);font-weight:400;">${rowCnt} rows</span>
             </button>
             <div class="sql-inline-schema-card__cols">${colsHtml}</div>
           </div>
@@ -2847,11 +2838,11 @@ window.App = (() => {
       host.innerHTML = `
         <div class="sql-guided-step-bar" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:12px 16px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:10px 10px 0 0;margin-top:8px;">
           <div style="flex:1;min-width:240px;">
-            <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--info);margin-bottom:2px;">
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--info);margin-bottom:2px;">
               Active Step ${activeStepIdx + 1} of ${steps.length || 1} · Dataset: <code>${escapeHtml(dsObj ? (dsObj.title || datasetId) : datasetId)}</code>
             </div>
             <div style="font-size:0.95rem;font-weight:600;color:var(--fg);">${escapeHtml(step.title || '')}</div>
-            <div style="font-size:0.83rem;color:var(--fg-muted);margin-top:2px;">${formatInlineBackticks(step.instructions || step.concept || '')}</div>
+            <div style="font-size:13px;color:var(--fg-muted);margin-top:2px;">${formatInlineBackticks(step.instructions || step.concept || '')}</div>
           </div>
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
             ${steps.length > 1 ? `
@@ -2873,7 +2864,7 @@ window.App = (() => {
             <div class="sql-inline-schema-grid">${schemaCardsHtml}</div>
           </details>
         ` : ''}
-        <div class="sql-guided-step-hint" style="display:none;padding:10px 16px;background:var(--info-bg);border-left:3px solid var(--info);border-right:1px solid var(--border);font-size:0.83rem;color:var(--fg);">
+        <div class="sql-guided-step-hint" style="display:none;padding:10px 16px;background:var(--info-bg);border-left:3px solid var(--info);border-right:1px solid var(--border);font-size:13px;color:var(--fg);">
           <strong>Hint:</strong> ${formatInlineBackticks(step.hint || 'Inspect the intermediate tables produced by each SQL clause.')}
         </div>
         <div class="sql-guided-visualizer-mount" style="border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;overflow:hidden;"></div>
@@ -3182,7 +3173,7 @@ window.App = (() => {
       }
       sampleList.forEach((sq, idx) => {
         const label = typeof sq === 'string' ? `Sample Query ${idx + 1}` : (sq.title || sq.label || `Sample Query ${idx + 1}`);
-        html += `<option value="sample-${idx}">📋 ${escapeHtml(label)}</option>`;
+        html += `<option value="sample-${idx}">${escapeHtml(label)}</option>`;
       });
       return html;
     }
@@ -3196,20 +3187,20 @@ window.App = (() => {
             </button>
             <div>
               <div style="display:flex;align-items:center;gap:8px;">
-                <span class="global-codelab-badge" style="background:var(--info-muted);color:var(--info);padding:2px 8px;border-radius:999px;font-size:0.72rem;font-weight:700;">SQL STUDIO</span>
-                <strong style="font-size:0.98rem;color:var(--fg);">${escapeHtml(title)}</strong>
+                <span class="global-codelab-badge" style="background:var(--info-muted);color:var(--info);padding:2px 8px;border-radius:999px;font-size:12px;font-weight:700;">SQL STUDIO</span>
+                <strong style="font-size:15px;color:var(--fg);">${escapeHtml(title)}</strong>
               </div>
-              <div style="font-size:0.78rem;color:var(--fg-muted);margin-top:2px;">${escapeHtml(summary)}</div>
+              <div style="font-size:12px;color:var(--fg-muted);margin-top:2px;">${escapeHtml(summary)}</div>
             </div>
           </div>
           <div class="global-codelab-topbar-right" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-            <label style="font-size:0.78rem;color:var(--fg-muted);display:flex;align-items:center;gap:6px;">
+            <label style="font-size:12px;color:var(--fg-muted);display:flex;align-items:center;gap:6px;">
               Query / Solution:
               <select id="sql-studio-modal-query-select" data-role="modal-query-select" aria-label="Load Topic Query / Solution" style="background:var(--bg);color:var(--fg);border:1px solid var(--border-strong);border-radius:6px;padding:4px 8px;font-size:0.8rem;max-width:240px;">
                 ${buildQueryPresetOptionsHtml()}
               </select>
             </label>
-            <label style="font-size:0.78rem;color:var(--fg-muted);display:flex;align-items:center;gap:6px;">
+            <label style="font-size:12px;color:var(--fg-muted);display:flex;align-items:center;gap:6px;">
               Dataset:
               <select id="sql-studio-modal-dataset" data-role="modal-dataset" style="background:var(--bg);color:var(--fg);border:1px solid var(--border-strong);border-radius:6px;padding:4px 8px;font-size:0.8rem;">
                 <option value="__unified__" ${activeDatasetId === '__unified__' ? 'selected' : ''}>All 5 Datasets (Unified Sandbox)</option>
@@ -3219,7 +3210,7 @@ window.App = (() => {
                 }).join('')}
               </select>
             </label>
-            <label style="font-size:0.78rem;color:var(--fg-muted);display:flex;align-items:center;gap:6px;">
+            <label style="font-size:12px;color:var(--fg-muted);display:flex;align-items:center;gap:6px;">
               Engine:
               <select id="sql-studio-modal-engine" data-role="modal-engine" style="background:var(--bg);color:var(--fg);border:1px solid var(--border-strong);border-radius:6px;padding:4px 8px;font-size:0.8rem;">
                 <option value="sqlite" ${activeEngine === 'sqlite' ? 'selected' : ''}>SQLite 3 (WASM)</option>
@@ -3234,7 +3225,7 @@ window.App = (() => {
         <div style="display:grid;grid-template-columns:280px 1fr;flex:1;min-height:0;overflow:hidden;">
           <aside id="sql-studio-modal-schema" style="border-right:1px solid var(--border);background:var(--bg-alt);padding:14px;overflow-y:auto;">
             <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--fg-muted);margin-bottom:10px;">Schema &amp; PK/FK Explorer</div>
-            <div id="sql-studio-modal-schema-list" style="font-size:0.82rem;color:var(--fg);"></div>
+            <div id="sql-studio-modal-schema-list" style="font-size:13px;color:var(--fg);"></div>
           </aside>
 
           <main style="display:flex;flex-direction:column;min-height:0;overflow-y:auto;padding:16px;gap:14px;">
@@ -3294,10 +3285,10 @@ window.App = (() => {
             <div style="margin-bottom:10px;padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;">
               <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;" data-preview-table="${escapeHtml(t.name)}" title="Click to preview SELECT * FROM ${escapeHtml(t.name)} LIMIT 15;">
                 <strong style="color:var(--info);font-family:var(--font-mono,monospace);">▤ ${escapeHtml(t.name)}</strong>
-                <span style="font-size:0.72rem;color:var(--fg-muted);">${rowCnt ? `${rowCnt} rows` : 'SELECT *'}</span>
+                <span style="font-size:12px;color:var(--fg-muted);">${rowCnt ? `${rowCnt} rows` : 'SELECT *'}</span>
               </div>
               ${Array.isArray(t.columns) ? `
-                <div style="margin-top:6px;display:flex;flex-direction:column;gap:3px;font-size:0.74rem;color:var(--fg-muted);font-family:var(--font-mono,monospace);">
+                <div style="margin-top:6px;display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--fg-muted);font-family:var(--font-mono,monospace);">
                   ${t.columns.map(c => {
                     if (typeof c === 'string') {
                       const colToken = c.split(/\s+/)[0] || c;

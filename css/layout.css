@@ -25,6 +25,8 @@ body {
   text-rendering: optimizeLegibility;
   min-height: 100vh;
   overflow-x: clip;
+  /* Keeps .main's top margin inside body so pages don't gain a phantom topbar-height scroll */
+  display: flow-root;
 }
 
 a { color: inherit; text-decoration: none; }
@@ -98,7 +100,7 @@ ul, ol { list-style: none; }
   display: grid;
   place-items: center;
   color: var(--accent-fg);
-  font-size: 10.5px;
+  font-size: 11px;
   font-family: var(--font-mono);
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -200,6 +202,20 @@ ul, ol { list-style: none; }
   font-variant-numeric: tabular-nums;
   color: var(--fg-muted);
   font-weight: var(--weight-medium);
+  text-decoration: none;
+  transition: background var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+
+a.topbar__progress-pill:hover,
+body.view-dashboard .topbar__progress-pill {
+  background: var(--surface-hover);
+  border-color: var(--border-strong);
+  color: var(--fg);
+}
+
+a.topbar__progress-pill:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
 }
 
 .topbar__progress-ring {
@@ -325,7 +341,7 @@ ul, ol { list-style: none; }
 
 .module-group__number {
   font-family: var(--font-mono);
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: var(--weight-semibold);
   color: var(--fg-muted);
   min-width: 24px;

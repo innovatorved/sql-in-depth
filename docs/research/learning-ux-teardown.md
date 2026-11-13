@@ -1,12 +1,12 @@
-# Product Teardown: `fanout.sh` & Modern Interactive Learning UX
+# Product Teardown: Modern Interactive Learning UX
 
-> **Scope & Copyright Notice**: This teardown documents *product principles, structural ergonomics, information architecture, and interaction patterns* observed across `https://fanout.sh/` (Home, Course Overviews, Lesson Pages, and Interactive Labs) alongside modern documentation and code-playground best practices. Zero text, code, illustrations, videos, or brand assets from `fanout.sh` are reused in `sql-in-depth`. All implementations in this repository are 100% original.
+> **Scope & Copyright Notice**: This teardown documents *product principles, structural ergonomics, information architecture, and interaction patterns* common to well-regarded interactive engineering courses (home pages, course overviews, lesson pages, and interactive labs) alongside modern documentation and code-playground best practices. No third-party text, code, illustrations, videos, or brand assets are reused in `sql-in-depth`. All implementations in this repository are 100% original.
 
 ---
 
 ## 1. How a Topic / Lesson Page Is Structured
 
-Live inspection of `fanout.sh` course lessons (`/ai-engineering/lessons/what-ai-engineering-is`, `/system/systems`) and overviews (`/ai-engineering/overview`, `/system/overview`) reveals a disciplined, low-cognitive-load reading architecture:
+Strong interactive course lessons and overviews share a disciplined, low-cognitive-load reading architecture:
 
 ### Page Shell & Hierarchy
 - **Minimal Top Utility Chrome**: Rather than stacking multiple noisy toolbars, lesson pages dedicate almost the entire viewport to a collapsible curriculum rail on the left and a focused reading column in the center.
@@ -27,10 +27,10 @@ Live inspection of `fanout.sh` course lessons (`/ai-engineering/lessons/what-ai-
 
 ## 2. Turning Dense Technical Topics into Visual & Interactive Explanations
 
-`fanout.sh` avoids passive textbook prose through three repeatable mechanisms:
+The best interactive courses avoid passive textbook prose through three repeatable mechanisms:
 
 1. **"Systems You Can Touch" (Micro-Simulators & Labs)**:
-   - Rather than static screenshots of formulas or architectures, `/labs` (`Math Decoder`, latency/throughput simulators, token visualizers) expose 2–4 high-leverage sliders or inputs with **instant deterministic state updates**.
+   - Rather than static screenshots of formulas or architectures, labs (formula decoders, latency/throughput simulators, token visualizers) expose 2–4 high-leverage sliders or inputs with **instant deterministic state updates**.
    - Every lab carries an explicit **`On device`** execution badge signaling zero server round-trips and safe experimentation.
 2. **State-Transition & Signal-Flow Diagrams**:
    - Diagrams show *before -> transformation -> after* (e.g., request fanout, memory layout, queue saturation) with crisp monospace labels on edges and nodes rather than decorative clip-art.
@@ -60,7 +60,7 @@ Live inspection of `fanout.sh` course lessons (`/ai-engineering/lessons/what-ai-
 
 ## 4. Generated Videos: Style, Length, Captions & Placement
 
-Inspection of lesson video blocks on `fanout.sh` reveals why they feel cohesive rather than bolted-on:
+Lesson videos feel cohesive rather than bolted-on when they follow these rules:
 
 - **Placement**: Positioned cleanly at the top of the lesson flow (or toggled via the lesson media header) inside a **16:9 dark-slate diagrammatic stage** with rounded corners (`12px`) and a `1px` border — never raw YouTube iframes with noisy red play buttons, channel avatars, "Watch Later" clutter, or clickbait yellow text thumbnails.
 - **Visual Style**: Motion-graphic technical explainers built from the same typography (`Sans` + `Mono`), dark slate canvas, node-link animations, and step-by-step highlights as the page's own diagrams.
@@ -72,7 +72,7 @@ Inspection of lesson video blocks on `fanout.sh` reveals why they feel cohesive 
 ## 5. What Makes a Page Highly Shareable
 
 1. **Dedicated Social Cards (`1200×630` Open Graph & Twitter `summary_large_image`)**:
-   - Custom high-contrast OG cards featuring the exact page/course title, module badge, domain watermark, and clean typographic layout (`og-everything-google-l7-mapped.png`), making links stand out in Slack, Discord, X/Twitter, Hacker News, and LinkedIn feeds.
+   - Custom high-contrast OG cards featuring the exact page/course title, module badge, domain watermark, and clean typographic layout, making links stand out in Slack, Discord, X/Twitter, Hacker News, and LinkedIn feeds.
 2. **Clean, Self-Descriptive URLs**:
    - Semantic slugs (`/topic/btree-bplustree-internal-anatomy/`, `/sandbox/?q=...`) with trailing-slash canonical consistency and zero opaque IDs.
 3. **Zero-Friction Share Affordances**:

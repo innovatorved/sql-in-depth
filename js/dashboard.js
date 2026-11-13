@@ -1,6 +1,6 @@
 /**
  * SQL in Depth — Learner Dashboard & Study Hub Controller
- * Handles /dashboard view: Gamification stats, SRS flashcards queue, notes, bookmarks, and export/import.
+ * Handles /dashboard view: learning progress, spaced-repetition flashcards, notes, bookmarks, and export/import.
  */
 (function(root) {
   'use strict';
@@ -81,7 +81,12 @@
         if (cat !== 'all' && c.category !== cat) return false;
         if (!prog || typeof prog.getSrsState !== 'function') return true;
         var st = prog.getSrsState(c.id);
-        if (!st || !st.dueAt) return true;
+        if (!st) {
+          // Cards only enter the queue once their lesson has been completed.
+          var lesson = c.unitSlug || c.slug || c.topicSlug;
+          return Boolean(lesson && prog.isCompleted && prog.isCompleted(lesson));
+        }
+        if (!st.dueAt) return true;
         return st.dueAt <= nowIso;
       });
     },
@@ -142,28 +147,23 @@
     render: function() {
       if (!this._container) return;
 
-      var prog = root.Progress;
-      var xp = prog && prog.getXP ? prog.getXP() : 0;
-      var streak = prog && prog.getStreak ? prog.getStreak() : { current: 0, longest: 0 };
+      var self = this;
+      var tab = function(id, label) {
+        var isActive = self._activeTab === id;
+        return '<button type="button" class="view-tab ' + (isActive ? 'active' : '') + '" data-dash-tab="' + id + '" role="tab" aria-selected="' + isActive + '">' + label + '</button>';
+      };
 
       this._container.innerHTML =
         '<div class="view-canvas dashboard-view">' +
-          '<header class="view-header">' +
-            '<div class="view-header__top">' +
-              '<div class="view-header__content">' +
-                '<div class="view-badge-row">' +
-                  '<span class="eco-pill eco-pill--accent">' + xp + ' Total XP</span>' +
-                  '<span class="eco-pill">' + (streak.current || 0) + ' Day Streak</span>' +
-                '</div>' +
-                '<h1 class="view-title">Learner Dashboard &amp; Study Hub</h1>' +
-                '<p class="view-subtitle">Track your mastery streak, review SuperMemo SM-2 spaced-repetition flashcards, and manage study notes.</p>' +
-              '</div>' +
-              '<div class="view-tabs" role="tablist">' +
-                '<button class="view-tab ' + (this._activeTab === 'overview' ? 'active' : '') + '" data-dash-tab="overview" role="tab" aria-selected="' + (this._activeTab === 'overview') + '">Overview &amp; XP</button>' +
-                '<button class="view-tab ' + (this._activeTab === 'srs' ? 'active' : '') + '" data-dash-tab="srs" role="tab" aria-selected="' + (this._activeTab === 'srs') + '">SRS Flashcards</button>' +
-                '<button class="view-tab ' + (this._activeTab === 'toolkit' ? 'active' : '') + '" data-dash-tab="toolkit" role="tab" aria-selected="' + (this._activeTab === 'toolkit') + '">Reference &amp; Capacity Toolkit</button>' +
-                '<button class="view-tab ' + (this._activeTab === 'notes' ? 'active' : '') + '" data-dash-tab="notes" role="tab" aria-selected="' + (this._activeTab === 'notes') + '">Notes &amp; Bookmarks</button>' +
-              '</div>' +
+          '<header class="view-header dash-header">' +
+            '<div class="view-header__content">' +
+              '<h1 class="view-title">Your learning</h1>' +
+              '<p class="view-subtitle">Pick up where you left off, see how far you have come, and review what you have learned so it sticks.</p>' +
+            '</div>' +
+            '<div class="view-tabs" role="tablist" aria-label="Dashboard sections">' +
+              tab('overview', 'Overview') +
+              tab('srs', 'Flashcards') +
+              tab('notes', 'Notes &amp; bookmarks') +
             '</div>' +
           '</header>' +
           '<main class="view-body" id="dashboard-mount-target">' +
@@ -181,113 +181,96 @@
 
     _renderOverviewTab: function() {
       var prog = root.Progress;
-      var xp = prog && prog.getXP ? prog.getXP() : 0;
+      var isDone = function(key) { return Boolean(prog && prog.isCompleted && prog.isCompleted(key)); };
       var streak = prog && prog.getStreak ? prog.getStreak() : { current: 0, longest: 0 };
-      var timeSpent = prog && prog.getTimeSpent ? prog.getTimeSpent() : { formatted: '0m' };
-      var completedCount = prog && prog.getCompletedCount ? prog.getCompletedCount() : 0;
-      var totalUnits = prog && prog.getTotalUnits ? prog.getTotalUnits() : 200;
-      var pct = prog && prog.getPercentage ? prog.getPercentage() : 0;
       var deck = this._getDueDeck();
+
+      var modules = [];
+      var allUnits = [];
+      ((root.CURRICULUM_DATA && root.CURRICULUM_DATA.parts) || []).forEach(function(part) {
+        (part.modules || []).forEach(function(mod) {
+          var units = mod.units || [];
+          var done = units.filter(function(u) { return isDone(u.slug); }).length;
+          modules.push({ id: mod.id, title: mod.title || mod.id, done: done, total: units.length, firstSlug: units[0] && units[0].slug });
+          units.forEach(function(u) { allUnits.push({ slug: u.slug, title: u.title, moduleTitle: mod.title || '' }); });
+        });
+      });
+      var lessonsDone = allUnits.filter(function(u) { return isDone(u.slug); }).length;
+      var lessonsTotal = allUnits.length;
+      var lessonPct = lessonsTotal ? Math.round((lessonsDone / lessonsTotal) * 100) : 0;
+
+      var lastSlug = prog && prog.getLastVisited ? prog.getLastVisited() : null;
+      var lastUnit = lastSlug ? allUnits.find(function(u) { return u.slug === lastSlug; }) : null;
+      var nextUnit = (lastUnit && !isDone(lastUnit.slug))
+        ? lastUnit
+        : allUnits.find(function(u) { return !isDone(u.slug); });
 
       var challenges = (root.CHALLENGES_DATA && Array.isArray(root.CHALLENGES_DATA.challenges))
         ? root.CHALLENGES_DATA.challenges
         : (Array.isArray(root.CHALLENGES_DATA) ? root.CHALLENGES_DATA : []);
-      var solvedChallenges = challenges.filter(function(c) {
-        return prog && prog.isCompleted && (prog.isCompleted('challenge:' + c.id) || prog.isCompleted(c.id));
-      }).length;
+      var studioSolved = {};
+      try { studioSolved = JSON.parse((root.localStorage && root.localStorage.getItem('sql_in_depth_solved_challenges_v1')) || '{}') || {}; } catch (e) { studioSolved = {}; }
+      var isSolved = function(c) { return isDone('challenge:' + c.id) || isDone(c.id) || Boolean(studioSolved[c.id]); };
+      var solvedChallenges = challenges.filter(isSolved).length;
+      var nextChallenge = challenges.find(function(c) { return !isSolved(c); });
 
-      var blueprints = (root.WHITEBOARD_DATA && Array.isArray(root.WHITEBOARD_DATA.blueprints))
-        ? root.WHITEBOARD_DATA.blueprints
-        : (Array.isArray(root.WHITEBOARD_BLUEPRINTS) ? root.WHITEBOARD_BLUEPRINTS : []);
-      var blueprintCount = blueprints.length || 10;
+      var stat = function(label, value, sub) {
+        return '<div class="dash-stat"><span class="dash-stat__label">' + label + '</span><strong class="dash-stat__value">' + value + '</strong><span class="dash-stat__sub">' + sub + '</span></div>';
+      };
 
-      var buildSlugs = root.IMPLEMENTATIONS_DATA ? Object.keys(root.IMPLEMENTATIONS_DATA) : [];
-      var totalBuilds = buildSlugs.length || 20;
-      var completedBuilds = buildSlugs.filter(function(slug) {
-        if (!prog) return false;
-        if (prog.getBuildProgress) {
-          var bp = prog.getBuildProgress(slug);
-          if (bp && bp.completed) return true;
-        }
-        return prog.isCompleted && (prog.isCompleted('build:' + slug) || prog.isCompleted(slug));
-      }).length;
+      var resuming = Boolean(lastUnit && nextUnit === lastUnit);
+      var continueHtml = nextUnit
+        ? '<section class="dash-continue">' +
+            '<span class="dash-eyebrow">' + (resuming ? 'Continue where you left off' : (lessonsDone === 0 ? 'Start here' : 'Up next')) + '</span>' +
+            '<h2 class="dash-continue__title">' + escapeHtml(nextUnit.title) + '</h2>' +
+            '<p class="dash-continue__module">' + escapeHtml(nextUnit.moduleTitle) + '</p>' +
+            '<a class="dash-btn dash-btn--primary" href="/topic/' + escapeHtml(nextUnit.slug) + '/" data-open-topic="' + escapeHtml(nextUnit.slug) + '">' + (resuming ? 'Continue lesson' : 'Start lesson') + '</a>' +
+          '</section>'
+        : '<section class="dash-continue"><span class="dash-eyebrow">All lessons complete</span><h2 class="dash-continue__title">You finished every lesson.</h2><p class="dash-continue__module">Keep your knowledge fresh with flashcards and challenges.</p></section>';
 
-      var paths = (root.ROADMAP_DATA && (root.ROADMAP_DATA.careerPaths || root.ROADMAP_DATA.paths)) || [];
-      var pathsHtml = paths.map(function(p) {
-        var steps = p.steps || [];
-        var done = 0;
-        steps.forEach(function(s) {
-          if (prog && prog.isCompleted && (prog.isCompleted(s.slug || s.id) || prog.isCompleted('challenge:' + s.id) || prog.isCompleted('sandbox:' + s.id) || prog.isCompleted('build:' + s.slug))) {
-            done++;
-          }
-        });
-        var pPct = steps.length > 0 ? Math.round((done / steps.length) * 100) : 0;
+      var modulesHtml = modules.map(function(m, i) {
+        var mPct = m.total ? Math.round((m.done / m.total) * 100) : 0;
         return (
-          '<div class="dash-path-row">' +
-            '<div class="dash-path-info">' +
-              '<strong>' + escapeHtml(p.title) + '</strong>' +
-              '<span>' + done + ' / ' + steps.length + ' steps (' + pPct + '%)</span>' +
-            '</div>' +
-            '<div class="eco-progress-bar"><div class="eco-progress-fill" style="width:' + pPct + '%"></div></div>' +
-          '</div>'
+          '<li class="dash-module' + (m.total && m.done === m.total ? ' is-complete' : '') + '">' +
+            '<a href="/topic/' + escapeHtml(m.firstSlug || '') + '/" data-open-topic="' + escapeHtml(m.firstSlug || '') + '">' +
+              '<span class="dash-module__num">' + String(i + 1).padStart(2, '0') + '</span>' +
+              '<span class="dash-module__title">' + escapeHtml(m.title) + '</span>' +
+              '<span class="dash-module__count">' + m.done + '/' + m.total + '</span>' +
+              '<span class="dash-module__bar"><span style="width:' + mPct + '%"></span></span>' +
+            '</a>' +
+          '</li>'
         );
       }).join('');
 
+      var nextSteps = [];
+      if (deck.length > 0) {
+        nextSteps.push('<li><div><strong>Review ' + deck.length + ' flashcard' + (deck.length === 1 ? '' : 's') + '</strong><p>A few minutes of recall now makes lessons stick.</p></div><button type="button" class="dash-btn" data-dash-tab="srs">Review</button></li>');
+      }
+      if (nextChallenge) {
+        var chalSearch = '?mode=challenges&challenge=' + encodeURIComponent(nextChallenge.id);
+        nextSteps.push('<li><div><strong>Try a challenge</strong><p>' + escapeHtml((nextChallenge.codeFix && nextChallenge.codeFix.title) || nextChallenge.title) + '</p></div><a class="dash-btn" href="/sandbox/' + escapeHtml(chalSearch) + '" data-nav="sandbox" data-search="' + escapeHtml(chalSearch) + '">Solve</a></li>');
+      }
+      nextSteps.push('<li><div><strong>Experiment freely</strong><p>Run any query against sample data in SQL Studio.</p></div><button type="button" class="dash-btn" data-dash-nav="sandbox">Open Studio</button></li>');
+
       return (
-        '<div class="dashboard-overview-grid">' +
-          '<div class="eco-grid eco-grid--4 dash-kpi-row">' +
-            '<div class="eco-card dash-kpi-card">' +
-              '<span class="kpi-label">Active Streak</span>' +
-              '<strong class="kpi-val" id="dash-streak-val">' + (streak.current || 0) + ' Days</strong>' +
-              '<span class="kpi-sub">Longest: ' + (streak.longest || 0) + ' days</span>' +
-            '</div>' +
-            '<div class="eco-card dash-kpi-card">' +
-              '<span class="kpi-label">Experience Points</span>' +
-              '<strong class="kpi-val" id="dash-xp-val">' + xp.toLocaleString() + ' XP</strong>' +
-              '<span class="kpi-sub">' + completedBuilds + '/' + totalBuilds + ' Build Labs Completed</span>' +
-            '</div>' +
-            '<div class="eco-card dash-kpi-card">' +
-              '<span class="kpi-label">Curriculum Mastery</span>' +
-              '<strong class="kpi-val" id="dash-completion-val">' + pct + '%</strong>' +
-              '<span class="kpi-sub">' + completedCount + ' of ' + totalUnits + ' items completed</span>' +
-            '</div>' +
-            '<div class="eco-card dash-kpi-card">' +
-              '<span class="kpi-label">Total Study Time</span>' +
-              '<strong class="kpi-val" id="dash-time-val">' + escapeHtml(timeSpent.formatted || '0m') + '</strong>' +
-              '<span class="kpi-sub">' + solvedChallenges + '/12 Challenges · ' + blueprintCount + ' Blueprints</span>' +
+        '<div class="dash-overview">' +
+          '<div class="dash-top">' +
+            continueHtml +
+            '<div class="dash-stats">' +
+              stat('Lessons', lessonsDone + '<span>/' + lessonsTotal + '</span>', lessonPct + '% of the course') +
+              stat('Challenges', solvedChallenges + '<span>/' + challenges.length + '</span>', solvedChallenges ? 'solved in SQL Studio' : 'none solved yet') +
+              stat('Flashcards due', String(deck.length), deck.length ? 'ready to review' : (lessonsDone ? 'all caught up' : 'unlocked as you finish lessons')) +
+              stat('Streak', String(streak.current || 0) + '<span> days</span>', 'best: ' + (streak.longest || 0) + ' days') +
             '</div>' +
           '</div>' +
-
-          '<div class="eco-grid eco-grid--2" style="margin-top:24px;">' +
-            '<section class="eco-card">' +
-              '<h2 class="eco-card__title">Career Path Progress</h2>' +
-              '<p class="eco-card__desc">Your real-time completion across the 5 role-based engineering tracks.</p>' +
-              '<div class="dash-paths-stack">' + pathsHtml + '</div>' +
-              '<div style="margin-top:16px;">' +
-                '<button class="eco-btn eco-btn--sm" data-dash-nav="roadmap">Explore Full Visual Roadmap →</button>' +
-              '</div>' +
+          '<div class="dash-columns">' +
+            '<section class="dash-panel">' +
+              '<div class="dash-panel__head"><h2>Course progress</h2><button type="button" class="dash-link" data-dash-nav="roadmap">View roadmap</button></div>' +
+              '<ol class="dash-modules">' + modulesHtml + '</ol>' +
             '</section>' +
-            '<section class="eco-card">' +
-              '<h2 class="eco-card__title">Recommended Next Actions</h2>' +
-              '<p class="eco-card__desc">High-impact engineering exercises queued for your current mastery level.</p>' +
-              '<div class="recommended-actions-list">' +
-                '<div class="rec-action-item">' +
-                  '<div><strong>Spaced Repetition Queue</strong><p>' + deck.length + ' flashcards ready for active recall review.</p></div>' +
-                  '<button class="eco-btn eco-btn--sm eco-btn--primary" data-dash-tab="srs">Review Cards →</button>' +
-                '</div>' +
-                '<div class="rec-action-item">' +
-                  '<div><strong>Reference &amp; Capacity Toolkit</strong><p>Interactive Napkin-Math Calculator, Hardware Latency Numbers &amp; Trade-Off Matrix.</p></div>' +
-                  '<button class="eco-btn eco-btn--sm" data-dash-tab="toolkit">Open Toolkit →</button>' +
-                '</div>' +
-                '<div class="rec-action-item">' +
-                  '<div><strong>Incident Troubleshooting Simulators</strong><p>' + (12 - solvedChallenges) + ' production outage scenarios with CodeLab hotfixes.</p></div>' +
-                  '<button class="eco-btn eco-btn--sm" data-dash-nav="challenges">Open Challenges →</button>' +
-                '</div>' +
-                '<div class="rec-action-item">' +
-                  '<div><strong>Interactive Architecture Sandbox</strong><p>Model multi-tab system topologies across ' + blueprintCount + ' blueprints &amp; run live rubric audits.</p></div>' +
-                  '<button class="eco-btn eco-btn--sm" data-dash-nav="sandbox">Launch Sandbox →</button>' +
-                '</div>' +
-              '</div>' +
+            '<section class="dash-panel">' +
+              '<div class="dash-panel__head"><h2>Suggested next</h2></div>' +
+              '<ul class="dash-next">' + nextSteps.join('') + '</ul>' +
             '</section>' +
           '</div>' +
         '</div>'
@@ -315,11 +298,16 @@
       }).join('');
 
       if (deck.length === 0) {
+        var filtered = (this._srsCategoryFilter || 'all') !== 'all';
+        var prog = root.Progress;
+        var anyStarted = Boolean(prog && prog.getSrsState) &&
+          (root.SRS_CARDS_DATA || []).some(function(c) { return Boolean(prog.getSrsState(c.id)); });
         return (
           '<div class="srs-empty-state eco-card">' +
-            '<h2>All Due Flashcards Reviewed</h2>' +
-            '<p>You have completed all due cards in this category for today.</p>' +
-            '<button class="eco-btn eco-btn--primary" data-srs-reset-filter="true">Show All Categories</button>' +
+            (anyStarted
+              ? '<h2>All caught up</h2><p>No cards are due right now. Come back later, or finish another lesson to add its cards.</p>'
+              : '<h2>No flashcards yet</h2><p>Each lesson you complete adds its flashcards here, so you can review them over the following days and remember what you learned.</p>') +
+            (filtered ? '<button class="eco-btn eco-btn--primary" data-srs-reset-filter="true">Show all categories</button>' : '') +
           '</div>'
         );
       }
@@ -331,9 +319,8 @@
         '<div class="srs-review-container">' +
           '<div class="eco-controls-bar">' +
             '<div class="srs-stats-row">' +
-              '<span class="eco-pill eco-pill--accent">Due Queue: ' + deck.length + ' cards</span>' +
-              '<span class="eco-pill">Reviewed This Session: ' + this._reviewedTodayCount + '</span>' +
-              '<span class="eco-pill">Card ' + (idx + 1) + ' of ' + deck.length + '</span>' +
+              '<span class="eco-pill">Card ' + (idx + 1) + ' of ' + deck.length + ' due</span>' +
+              '<span class="eco-pill">' + this._reviewedTodayCount + ' reviewed this session</span>' +
             '</div>' +
             '<select class="knob-select" id="srs-category-select" style="max-width:320px;">' + catOptions + '</select>' +
           '</div>' +
@@ -345,24 +332,24 @@
               '<span class="eco-pill">' + escapeHtml((card.type || 'concept').toUpperCase()) + '</span>' +
             '</div>' +
             '<div class="srs-flashcard__prompt">' +
-              '<div class="card-side-label">QUESTION / PROMPT</div>' +
+              '<div class="card-side-label">Question</div>' +
               '<h3>' + escapeHtml(card.prompt) + '</h3>' +
             '</div>' +
             (this._cardFlipped ? (
               '<div class="srs-flashcard__answer" id="srs-card-answer">' +
-                '<div class="card-side-label">ARCHITECTURAL ANSWER</div>' +
+                '<div class="card-side-label">Answer</div>' +
                 '<p>' + escapeHtml(card.answer) + '</p>' +
               '</div>'
             ) : (
               '<div class="srs-flashcard__flip-cta">' +
-                '<button class="eco-btn eco-btn--primary eco-btn--lg" id="srs-flip-btn" data-srs-flip="true">Reveal Answer (Space / Click)</button>' +
+                '<button class="eco-btn eco-btn--primary eco-btn--lg" id="srs-flip-btn" data-srs-flip="true">Show answer</button>' +
               '</div>'
             )) +
           '</div>' +
 
           (this._cardFlipped ? (
             '<div class="srs-rating-bar" id="srs-rating-controls">' +
-              '<span class="rating-prompt">Rate recall difficulty (SuperMemo SM-2):</span>' +
+              '<span class="rating-prompt">How well did you remember it?</span>' +
               '<div class="srs-rating-buttons">' +
                 '<button class="eco-btn srs-btn--again" data-srs-rate="1">Again (1m)</button>' +
                 '<button class="eco-btn srs-btn--hard" data-srs-rate="3">Hard (1d)</button>' +

@@ -31,19 +31,19 @@
   <link rel="preload" href="fonts/geist-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
 
   <!-- Stylesheets: Shared Design System + Self-Hosted KaTeX + Product Styles -->
-  <link rel="stylesheet" href="design-system/tokens.css?v=2f31ca69aa">
-  <link rel="stylesheet" href="design-system/components.css?v=596f4164bb">
+  <link rel="stylesheet" href="design-system/tokens.css?v=3bc26075fb">
+  <link rel="stylesheet" href="design-system/components.css?v=606a179125">
   <link rel="stylesheet" href="css/vendor/katex/katex.min.css?v=83121916c0" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/variables.css?v=a60c606220">
-  <link rel="stylesheet" href="css/layout.css?v=cd1fac68d6">
-  <link rel="stylesheet" href="css/components.css?v=3d5f050e72">
-  <link rel="stylesheet" href="css/content.css?v=9fbc099df8">
-  <link rel="stylesheet" href="css/landing.css?v=c2378509cf" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/simulators.css?v=e91c9ced2a" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/variables.css?v=b32198442b">
+  <link rel="stylesheet" href="css/layout.css?v=0dc598dfac">
+  <link rel="stylesheet" href="css/components.css?v=4450289dec">
+  <link rel="stylesheet" href="css/content.css?v=f28f40e024">
+  <link rel="stylesheet" href="css/landing.css?v=8c43435edd" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/simulators.css?v=283a35f45b" media="print" onload="this.media='all'">
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=f6a6002f60"></script>
-  <script src="js/manifest.js?v=2637bb7d63"></script>
+  <script src="js/manifest.js?v=ec151c5627"></script>
 
   <script type="application/ld+json">
 {
@@ -94,18 +94,17 @@
       <nav class="topbar__nav" aria-label="Primary navigation">
         <a href="/roadmap" class="topbar__nav-link" data-nav="roadmap">Roadmap</a>
         <a href="/challenges" class="topbar__nav-link" data-nav="challenges">Challenges</a>
-        <a href="/dashboard" class="topbar__nav-link" data-nav="dashboard">Dashboard</a>
         <a href="/sandbox" class="topbar__nav-link" data-nav="sandbox">SQL Studio</a>
         <a href="/glossary/" class="topbar__nav-link" data-nav="glossary">Glossary</a>
       </nav>
 
-      <div class="topbar__progress-pill" id="progress-pill" title="Overall progress">
+      <a href="/dashboard" class="topbar__progress-pill" id="progress-pill" data-nav="dashboard" title="Your learning progress" aria-label="Your learning progress">
         <svg class="topbar__progress-ring" viewBox="0 0 20 20">
           <circle class="track" cx="10" cy="10" r="8"/>
           <circle class="fill" cx="10" cy="10" r="8" stroke-dasharray="50.27" stroke-dashoffset="50.27" id="progress-ring-fill"/>
         </svg>
         <span id="progress-text">0%</span>
-      </div>
+      </a>
 
       <a href="https://github.com/innovatorved/sql-in-depth" target="_blank" rel="noopener noreferrer" class="topbar__btn topbar__btn--github" id="github-repo-btn" aria-label="GitHub Repository" title="GitHub Repository" data-repo-placement="topbar">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
@@ -868,21 +867,21 @@
           <div class="topic-quick-jump__pills">
             <span class="topic-quick-jump__label">Jump to:</span>
             <a class="topic-quick-jump__pill topic-quick-jump__pill--primary" href="#guided-coding-practice-partition-by-order-by-mechanics" data-action="quick-jump" data-target="guided-coding-practice-partition-by-order-by-mechanics">
-              <span>💻 SQL & Engine Lab</span>
+              <span>SQL lab</span>
             </a>
             
               <a class="topic-quick-jump__pill" href="#topic-simulator-partition-by-order-by-mechanics" data-action="quick-jump" data-target="topic-simulator-partition-by-order-by-mechanics">
-                <span>⚡ Simulator</span>
+                <span>Simulator</span>
               </a>
             
             
               <a class="topic-quick-jump__pill" href="#check-slider-partition-by-order-by-mechanics" data-action="quick-jump" data-target="check-slider-partition-by-order-by-mechanics">
-                <span>🧠 Concept Check</span>
+                <span>Concept check</span>
               </a>
             
             
               <a class="topic-quick-jump__pill" href="#topic-takeaways-partition-by-order-by-mechanics" data-action="quick-jump" data-target="topic-takeaways-partition-by-order-by-mechanics">
-                <span>📌 Key Takeaways</span>
+                <span>Key takeaways</span>
               </a>
             
           </div>
@@ -1009,10 +1008,10 @@ flowchart LR
               </div>
               <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
                 <button type="button" class="dsa-sim__audio-btn is-on" data-role="sfx-toggle" title="Toggle Step Sound Effects (Web Audio Synth)">
-                  🔊 SFX On
+                  Sound on
                 </button>
                 <button type="button" class="dsa-sim__audio-btn is-on" data-role="voice-toggle" title="Toggle Step Voice Narration (Speech Synthesis)">
-                  🗣️ Voice On
+                  Voice on
                 </button>
                 <span class="badge-onlogn">OVER (PARTITION BY ...)</span>
               </div>
@@ -1032,7 +1031,7 @@ flowchart LR
               <button type="button" class="btn btn--sm" data-role="reset" title="Reset">↺ Reset</button>
               <label style="font-size:12px;color:var(--fg-muted);display:inline-flex;align-items:center;gap:4px;margin-left:auto;">
                 Speed
-                <select class="simulator-card__input sim-select" data-role="speed" style="padding:3px 6px;font-size:11.5px;">
+                <select class="simulator-card__input sim-select" data-role="speed" style="padding:3px 6px;font-size:12px;">
                   <option value="1200">0.5×</option>
                   <option value="750" selected>1×</option>
                   <option value="380">2×</option>
@@ -1061,12 +1060,12 @@ flowchart LR
 
             <div class="invariant-box" style="margin:0 0 0.75rem 0;padding:0.6rem 0.9rem;">
               <div style="margin:0 0 0.25rem 0;font-size:12px;font-weight:600;color:var(--fg);">Invariant &amp; State</div>
-              <div data-role="invariant" style="font-size:12.5px;font-family:var(--font-mono,monospace);color:var(--fg-primary);">Relation initialized with 5 tuples across schema (row_id, dept, salary, row_num, rank_dense, frame_running_sum) — preset: ROWS vs RANGE Frame on Tied Order Timestamps.</div>
+              <div data-role="invariant" style="font-size:13px;font-family:var(--font-mono,monospace);color:var(--fg-primary);">Relation initialized with 5 tuples across schema (row_id, dept, salary, row_num, rank_dense, frame_running_sum) — preset: ROWS vs RANGE Frame on Tied Order Timestamps.</div>
             </div>
             <div class="dsa-sim__stage" data-role="stage">
       <div class="dsa-sim__visual-canvas">
         <div class="dsa-sim__visual-label">
-          <span>🧭 Live Hash Ring &amp; Bucket Probe Telemetry — Window Function Partitioning, Ranking &amp; Sliding Frame (ROWS vs RANGE) Stepper</span>
+          <span>Hash buckets · Window Function Partitioning, Ranking &amp; Sliding Frame (ROWS vs RANGE) Stepper</span>
           <span class="dsa-sim__legend">
             <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:#3b82f6"></span>Probe</span>
             <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:#f59e0b"></span>Collision/Swap</span>
@@ -1137,14 +1136,14 @@ flowchart LR
       </div>
     
       <div style="border:1px solid var(--border-color,#27272a);border-radius:8px;overflow:hidden;margin:6px 0;background:var(--bg-secondary,rgba(24,24,27,0.45));">
-        <div style="padding:5px 10px;background:var(--bg-tertiary,rgba(39,39,42,0.6));border-bottom:1px solid var(--border-color,#27272a);font-size:11.5px;font-weight:700;font-family:var(--font-mono,monospace);display:flex;justify-content:space-between;align-items:center;">
-          <span>📋 Window Function Partitioning, Ranking &amp; Sliding Frame (ROWS vs RANGE) Stepper — Initial Relation State</span>
-          <span style="font-size:10.5px;color:var(--fg-muted);font-weight:500;">5 row(s)</span>
+        <div style="padding:5px 10px;background:var(--bg-tertiary,rgba(39,39,42,0.6));border-bottom:1px solid var(--border-color,#27272a);font-size:12px;font-weight:700;font-family:var(--font-mono,monospace);display:flex;justify-content:space-between;align-items:center;">
+          <span>Window Function Partitioning, Ranking &amp; Sliding Frame (ROWS vs RANGE) Stepper — Initial Relation State</span>
+          <span style="font-size:11px;color:var(--fg-muted);font-weight:500;">5 row(s)</span>
         </div>
         <div style="overflow-x:auto;">
           <table style="width:100%;border-collapse:collapse;">
             <thead><tr><th style="padding:5px 8px;text-align:left;border-bottom:1px solid var(--border-color,#27272a);font-size:11px;color:var(--fg-muted);font-family:var(--font-mono,monospace);">row_id</th><th style="padding:5px 8px;text-align:left;border-bottom:1px solid var(--border-color,#27272a);font-size:11px;color:var(--fg-muted);font-family:var(--font-mono,monospace);">dept</th><th style="padding:5px 8px;text-align:left;border-bottom:1px solid var(--border-color,#27272a);font-size:11px;color:var(--fg-muted);font-family:var(--font-mono,monospace);">salary</th><th style="padding:5px 8px;text-align:left;border-bottom:1px solid var(--border-color,#27272a);font-size:11px;color:var(--fg-muted);font-family:var(--font-mono,monospace);">row_num</th><th style="padding:5px 8px;text-align:left;border-bottom:1px solid var(--border-color,#27272a);font-size:11px;color:var(--fg-muted);font-family:var(--font-mono,monospace);">rank_dense</th><th style="padding:5px 8px;text-align:left;border-bottom:1px solid var(--border-color,#27272a);font-size:11px;color:var(--fg-muted);font-family:var(--font-mono,monospace);">frame_running_sum</th><th style="padding:5px 8px;text-align:left;border-bottom:1px solid var(--border-color,#27272a);font-size:11px;color:var(--fg-muted);font-family:var(--font-mono,monospace);">State</th></tr></thead>
-            <tbody><tr style="background:rgba(59,130,246,0.12);border-left:3px solid #3b82f6;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">1</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">Core DB</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">$190k</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">1</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">1 / 1</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">$190k</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:10.5px;font-weight:700;font-family:var(--font-mono,monospace);color:#3b82f6;">CURSOR START</td></tr><tr style="background:transparent;border-left:3px solid transparent;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">2</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">Core DB</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">$190k</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">2</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">1 / 1</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">$380k (RANGE includes peer!)</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);"></td></tr><tr style="background:transparent;border-left:3px solid transparent;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">3</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">Core DB</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">$165k</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">3</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">3 / 2</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">$545k</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);"></td></tr><tr style="background:transparent;border-left:3px solid transparent;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">4</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">Storage</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">$210k</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">1</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">1 / 1</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">$210k</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);"></td></tr><tr style="background:transparent;border-left:3px solid transparent;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">5</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">Storage</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">$180k</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">2</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">2 / 2</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">$390k</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);"></td></tr></tbody>
+            <tbody><tr style="background:rgba(59,130,246,0.12);border-left:3px solid #3b82f6;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">1</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">Core DB</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">$190k</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">1</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">1 / 1</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">$190k</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11px;font-weight:700;font-family:var(--font-mono,monospace);color:#3b82f6;">CURSOR START</td></tr><tr style="background:transparent;border-left:3px solid transparent;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">2</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">Core DB</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">$190k</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">2</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">1 / 1</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">$380k (RANGE includes peer!)</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);"></td></tr><tr style="background:transparent;border-left:3px solid transparent;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">3</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">Core DB</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">$165k</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">3</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">3 / 2</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">$545k</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);"></td></tr><tr style="background:transparent;border-left:3px solid transparent;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">4</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">Storage</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">$210k</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">1</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">1 / 1</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">$210k</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);"></td></tr><tr style="background:transparent;border-left:3px solid transparent;"><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">5</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">Storage</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">$180k</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">2</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">2 / 2</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">$390k</td><td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);"></td></tr></tbody>
           </table>
         </div>
       </div>
@@ -1177,7 +1176,7 @@ flowchart LR
         </div>
 
 <h2 id="topic-sec-4">Worked Runnable Example</h2>
-<p>Execute, edit, and test the production SQL query below directly in your browser using the embedded WebAssembly SQLite 3 engine. Click <strong>▶ Run Query</strong> to execute, <strong>🔍 Step Clauses</strong> to inspect the live intermediate table after <code>FROM/JOIN</code>, <code>WHERE</code>, <code>GROUP BY</code>, <code>HAVING</code>, <code>WINDOW</code>, <code>SELECT</code>, and <code>ORDER BY</code>, or <strong>✓ Check SQL Tests</strong> to run automated relational assertions against the reference result:</p>
+<p>Execute, edit, and test the production SQL query below directly in your browser using the embedded WebAssembly SQLite 3 engine. Click <strong>▶ Run Query</strong> to execute, <strong>Step Clauses</strong> to inspect the live intermediate table after <code>FROM/JOIN</code>, <code>WHERE</code>, <code>GROUP BY</code>, <code>HAVING</code>, <code>WINDOW</code>, <code>SELECT</code>, and <code>ORDER BY</code>, or <strong>✓ Check SQL Tests</strong> to run automated relational assertions against the reference result:</p>
 <div class="code-block code-block--collapsible"><div class="code-block__header" data-action="toggle-code-header"><div style="display:flex;align-items:center;gap:8px;"><span class="code-block__lang">SQL · WASM</span><span class="code-block__lines-chip">23 lines</span></div><div style="display:flex;align-items:center;gap:6px;"><button type="button" class="code-block__copy" data-action="copy-code" title="Copy code to clipboard">Copy</button><button type="button" class="code-block__copy code-block__toggle-btn" data-action="toggle-code" aria-expanded="true" title="Expand or collapse code block">
       <span class="code-block__toggle-text">Collapse</span>
       <span class="code-block__chevron">▲</span>
@@ -1281,7 +1280,7 @@ flowchart LR
         <div class="build-lab-card__top">
           <div class="build-lab-card__intro">
             <div class="build-lab-card__eyebrow">
-              <span>Interactive 3-Step Guided SQL Lab &amp; Step-by-Step Table Visualizer (PostgreSQL 18 WASM &amp; SQLite 3 WASM)</span>
+              <span>Guided SQL lab · 3 steps · runs in your browser</span>
               <span class="build-lab-card__progress">3 Guided Steps + Progressive Hints</span>
               
                 <button type="button" class="build-lab-card__collapse-btn" data-action="toggle-lab-steps" aria-expanded="true" title="Collapse or expand guided coding steps">
@@ -1293,10 +1292,10 @@ flowchart LR
             <h2 class="build-lab-card__title">PARTITION BY, ORDER BY &amp; The Default RANGE Frame Trap — Interactive Guided SQL Lab</h2>
             <p class="build-lab-card__desc">How window partitioning and sorting work under the hood, and why adding ORDER BY silently changes the default frame to RANGE UNBOUNDED PRECEDING.</p>
             <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;">
-              <span class="badge">⏱ Target Time: <code>O(M log M) window partition sort</code></span>
-              <span class="badge">💾 Auxiliary Space: <code>O(W) sliding 3-row frame state</code></span>
-              <span class="badge">🧭 Pattern: Window Functions &amp; Analytical SQL Mastery · window-order</span>
-              <span class="badge">🗄️ Dataset: <code>fintech_ledger</code></span>
+              <span class="badge">Target time: <code>O(M log M) window partition sort</code></span>
+              <span class="badge">Extra space: <code>O(W) sliding 3-row frame state</code></span>
+              <span class="badge">Pattern: Window Functions &amp; Analytical SQL Mastery · window-order</span>
+              <span class="badge">Dataset: <code>fintech_ledger</code></span>
             </div>
           </div>
           <div class="build-lab-card__cta-col">
@@ -1328,7 +1327,7 @@ flowchart LR
                   <div class="build-lab-step-card__concept">Refine the starter <code>cards</code> query in <code>query.sql</code> to convert <code>daily_limit_cents</code> into <code>daily_limit_usd</code> and join account owners.</div>
                   
                     <details class="quiz-hint-details">
-                      <summary>💡 Progressive SQL Hint (Step 1)</summary>
+                      <summary>Show hint for step 1</summary>
                       <pre><code>-- Step 1 Solution (partition-by-order-by-mechanics): Issued cards enriched with account owner &amp; USD limit
 SELECT
   c.card_id,
@@ -1362,7 +1361,7 @@ ORDER BY c.daily_limit_cents DESC, c.card_id ASC;</code></pre>
                   <div class="build-lab-step-card__concept">Complete the grouped card spend query in <code>query.sql</code> to compute <code>txn_count</code> and <code>total_spend_usd</code>.</div>
                   
                     <details class="quiz-hint-details">
-                      <summary>💡 Progressive SQL Hint (Step 2)</summary>
+                      <summary>Show hint for step 2</summary>
                       <pre><code>-- Step 2 Solution (partition-by-order-by-mechanics): Aggregated card spend vs daily limit utilization
 SELECT
   c.card_id,
@@ -1398,7 +1397,7 @@ ORDER BY total_spend_usd DESC;</code></pre>
                   <div class="build-lab-step-card__concept">Execute the sliding-window card velocity query in <code>query.sql</code> and inspect the window frame results.</div>
                   
                     <details class="quiz-hint-details">
-                      <summary>💡 Progressive SQL Hint (Step 3)</summary>
+                      <summary>Show hint for step 3</summary>
                       <pre><code>-- Dataset: fintech_ledger | PARTITION BY, ORDER BY &amp; The Default RANGE Frame Trap (partition-by-order-by-mechanics) — Sliding 3-Txn Card Velocity Window
 SELECT
   txn_id,
@@ -1631,7 +1630,7 @@ ORDER BY card_id ASC, txn_ts ASC;</code></pre>
               
             </div>
             <span class="lesson-builds__summary">An analytical window function engine implementing LAG()-based clickstream sessionization, ROW_NUMBER() date-difference islands for consecutive activity streaks, and ROWS vs RANGE sliding window frames.</span>
-            <span class="lesson-builds__cta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg> Open Guided SQL &amp; Engine Lab (PostgreSQL 18 WASM, SQLite 3 &amp; Step-by-Step Relational Table Visualizer) →</span>
+            <span class="lesson-builds__cta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg> Open guided lab →</span>
           </a>
       </div>
         <div class="further-reading">
@@ -1648,10 +1647,10 @@ ORDER BY card_id ASC, txn_ts ASC;</code></pre>
           </div>
           <div class="lesson-feedback__actions">
             <button type="button" class="btn btn--sm btn--outline lesson-feedback__btn" data-action="feedback-vote" data-slug="partition-by-order-by-mechanics" data-vote="yes">
-              👍 Helpful
+              Helpful
             </button>
             <button type="button" class="btn btn--sm btn--outline lesson-feedback__btn" data-action="feedback-vote" data-slug="partition-by-order-by-mechanics" data-vote="no">
-              👎 Needs work
+              Needs work
             </button>
             <a href="https://github.com/innovatorved/sql-in-depth/issues/new?title=%5BFeedback%5D%20PARTITION%20BY%2C%20ORDER%20BY%20%26%20The%20Default%20RANGE%20Frame%20Trap&labels=feedback,curriculum&body=%23%23%23%20Topic%3A%20PARTITION%20BY%2C%20ORDER%20BY%20%26%20The%20Default%20RANGE%20Frame%20Trap%0A**URL%3A**%20https%3A%2F%2Fsql-in-depth.vedgupta.in%2Ftopic%2Fpartition-by-order-by-mechanics%2F%0A%0A%23%23%23%20Feedback%20%2F%20Correction%3A%0A" target="_blank" rel="noopener noreferrer" class="btn btn--sm btn--outline lesson-feedback__btn" title="Open an issue on GitHub">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg> Report an issue
@@ -1815,12 +1814,12 @@ ORDER BY card_id ASC, txn_ts ASC;</code></pre>
   <script type="text/plain" data-defer src="js/lazy.js?v=683e461abe"></script>
   <script type="text/plain" data-defer src="js/analytics.js?v=a1ffee77a9"></script>
   <script type="text/plain" data-defer src="js/progress.js?v=20e4822556"></script>
-  <script type="text/plain" data-defer src="js/search.js?v=dcc9d6ddf1"></script>
+  <script type="text/plain" data-defer src="js/search.js?v=cfb7464ca7"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
-  <script type="text/plain" data-defer src="js/renderer.js?v=5dc09229eb"></script>
+  <script type="text/plain" data-defer src="js/renderer.js?v=d4cbd1df69"></script>
   <script type="text/plain" data-defer src="js/landing.js?v=df71db4b82"></script>
   <script type="text/plain" data-defer src="js/quiz.js?v=5b300d9b3d"></script>
-  <script type="text/plain" data-defer src="js/app.js?v=87520d0da2"></script>
+  <script type="text/plain" data-defer src="js/app.js?v=690ab491f1"></script>
 
   <!-- Route-Scoped Lazy Scripts (stamped & loaded on demand via window.Lazy) -->
   <script type="text/plain" data-lazy src="data/datasets.js?v=259e5934af"></script>
@@ -1829,14 +1828,15 @@ ORDER BY card_id ASC, txn_ts ASC;</code></pre>
   <script type="text/plain" data-lazy src="data/srs-cards.js?v=fabc47dd9c"></script>
   <script type="text/plain" data-lazy src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
   <script type="text/plain" data-lazy src="data/implementations_code.js?v=fce884f8a8"></script>
+
   <script type="text/plain" data-lazy src="data/topic_guided_labs.js?v=2a57d85494"></script>
   <script type="text/plain" data-lazy src="data/projects.js?v=2280ac085f"></script>
   <script type="text/plain" data-lazy src="data/glossary.js?v=4f6c79a4e0"></script>
   <script type="text/plain" data-lazy src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>
   <script type="text/plain" data-lazy src="js/sql-engine.js?v=ef30cfbffa"></script>
   <script type="text/plain" data-lazy src="js/vendor/cm6-sql.js?v=74bd776b7d"></script>
-  <script type="text/plain" data-lazy src="js/table-visualizer.js?v=0e6dff7e2e"></script>
-  <script type="text/plain" data-lazy src="js/simulators.js?v=246783bcbb"></script>
+  <script type="text/plain" data-lazy src="js/table-visualizer.js?v=984a25ac84"></script>
+  <script type="text/plain" data-lazy src="js/simulators.js?v=da56d0b088"></script>
   <script type="text/plain" data-lazy src="js/simulators-relational.js?v=32c1358d02"></script>
   <script type="text/plain" data-lazy src="js/simulators-analytical.js?v=50d950f3b6"></script>
   <script type="text/plain" data-lazy src="js/simulators-modeling.js?v=1962947dcb"></script>
@@ -1846,12 +1846,12 @@ ORDER BY card_id ASC, txn_ts ASC;</code></pre>
   <script type="text/plain" data-lazy src="js/vendor/katex/katex.min.js?v=6d481709e3"></script>
   <script type="text/plain" data-lazy src="js/vendor/katex/auto-render.min.js?v=82dca94048"></script>
   <script type="text/plain" data-lazy src="js/roadmap.js?v=cebfb7e32c"></script>
-  <script type="text/plain" data-lazy src="js/challenges.js?v=b7d29d3d83"></script>
-  <script type="text/plain" data-lazy src="js/dashboard.js?v=d411d5a9bb"></script>
-  <script type="text/plain" data-lazy src="js/sandbox.js?v=f757a170b3"></script>
+  <script type="text/plain" data-lazy src="js/challenges.js?v=ca25055a91"></script>
+  <script type="text/plain" data-lazy src="js/dashboard.js?v=fcb1621a2e"></script>
+  <script type="text/plain" data-lazy src="js/sandbox.js?v=facac2594d"></script>
   <script type="text/plain" data-lazy src="js/topic-codelab.js?v=49fccccd99"></script>
 
   <!-- App bootstrap & deferred script loader -->
-  <script src="js/bootstrap.js?v=c0171d8e5a"></script>
+  <script src="js/bootstrap.js?v=d3a0b262be"></script>
 </body>
 </html>

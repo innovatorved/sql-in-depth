@@ -628,7 +628,7 @@ window.Simulators = (() => {
       if (val > best) best = val;
       seen.push(i);
       const isHit = val === target;
-      const tags = { [i]: isHit ? `🎯 == ${target}` : `curr (${val})` };
+      const tags = { [i]: isHit ? `match = ${target}` : `curr (${val})` };
       if (i > 0) tags[i - 1] = 'done';
 
       out.push({
@@ -925,7 +925,7 @@ window.Simulators = (() => {
     return `
       <div class="dsa-sim__visual-canvas">
         <div class="dsa-sim__visual-label">
-          <span>📊 Live Magnitude &amp; Pointer Stage — ${esc(title)}</span>
+          <span>Array view · ${esc(title)}</span>
           <span class="dsa-sim__legend">
             <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:#3b82f6"></span>Active</span>
             <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:#8b5cf6"></span>Pivot</span>
@@ -989,7 +989,7 @@ window.Simulators = (() => {
     return `
       <div class="dsa-sim__visual-canvas">
         <div class="dsa-sim__visual-label">
-          <span>🌳 Live 2D Hierarchical Tree Topology — ${esc(title)}</span>
+          <span>Tree view · ${esc(title)}</span>
           <span class="dsa-sim__legend">
             <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:#3b82f6"></span>Visited/Active</span>
             <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:#8b5cf6"></span>Pivot/Root</span>
@@ -1065,7 +1065,7 @@ window.Simulators = (() => {
     return `
       <div class="dsa-sim__visual-canvas">
         <div class="dsa-sim__visual-label">
-          <span>🧭 Live Hash Ring &amp; Bucket Probe Telemetry — ${esc(title)}</span>
+          <span>Hash buckets · ${esc(title)}</span>
           <span class="dsa-sim__legend">
             <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:#3b82f6"></span>Probe</span>
             <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:#f59e0b"></span>Collision/Swap</span>
@@ -1145,7 +1145,7 @@ window.Simulators = (() => {
     return `
       <div class="dsa-sim__visual-canvas">
         <div class="dsa-sim__visual-label">
-          <span>🔗 Live Pointer &amp; State Transition Graph — ${esc(title)}</span>
+          <span>State graph · ${esc(title)}</span>
           <span class="dsa-sim__legend">
             <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:#3b82f6"></span>Active Pointer</span>
             <span class="dsa-sim__legend-item"><span class="dsa-sim__legend-dot" style="background:#8b5cf6"></span>Jump/Transition</span>
@@ -1217,10 +1217,10 @@ window.Simulators = (() => {
               </div>
               <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
                 <button type="button" class="dsa-sim__audio-btn ${sfxOn ? 'is-on' : ''}" data-role="sfx-toggle" title="Toggle Step Sound Effects (Web Audio Synth)">
-                  ${sfxOn ? '🔊 SFX On' : '🔇 SFX Off'}
+                  ${sfxOn ? 'Sound on' : 'Sound off'}
                 </button>
                 <button type="button" class="dsa-sim__audio-btn ${voiceOn ? 'is-on' : ''}" data-role="voice-toggle" title="Toggle Step Voice Narration (Speech Synthesis)">
-                  ${voiceOn ? '🗣️ Voice On' : '🗣️ Voice Off'}
+                  ${voiceOn ? 'Voice on' : 'Voice off'}
                 </button>
                 <span class="${esc(badgeClass)}">${esc(config.badge || 'Interactive')}</span>
               </div>
@@ -1240,7 +1240,7 @@ window.Simulators = (() => {
               <button type="button" class="btn btn--sm" data-role="reset" title="Reset">↺ Reset</button>
               <label style="font-size:12px;color:var(--fg-muted);display:inline-flex;align-items:center;gap:4px;margin-left:auto;">
                 Speed
-                <select class="simulator-card__input sim-select" data-role="speed" style="padding:3px 6px;font-size:11.5px;">
+                <select class="simulator-card__input sim-select" data-role="speed" style="padding:3px 6px;font-size:12px;">
                   <option value="1200">0.5×</option>
                   <option value="750" selected>1×</option>
                   <option value="380">2×</option>
@@ -1266,7 +1266,7 @@ window.Simulators = (() => {
                 ▶ Run Custom
               </button>
               <button type="button" class="btn btn--secondary btn--sm" data-role="randomize" title="Generate random input values and run">
-                🎲 Randomize
+                Randomize
               </button>
             </div>`}
 
@@ -1285,7 +1285,7 @@ window.Simulators = (() => {
 
             <div class="invariant-box" style="margin:0 0 0.75rem 0;padding:0.6rem 0.9rem;">
               <div style="margin:0 0 0.25rem 0;font-size:12px;font-weight:600;color:var(--fg);">Invariant &amp; State</div>
-              <div data-role="invariant" style="font-size:12.5px;font-family:var(--font-mono,monospace);color:var(--fg-primary);">${f0.invariant || 'Invariant holds.'}</div>
+              <div data-role="invariant" style="font-size:13px;font-family:var(--font-mono,monospace);color:var(--fg-primary);">${f0.invariant || 'Invariant holds.'}</div>
             </div>
             <div class="dsa-sim__stage" data-role="stage">${f0.stageHtml}</div>
             <div class="dsa-sim__metrics" data-role="metrics">
@@ -1337,11 +1337,11 @@ window.Simulators = (() => {
           const vOn = sound.isVoiceOn();
           if (elSfxToggle) {
             elSfxToggle.classList.toggle('is-on', sOn);
-            elSfxToggle.textContent = sOn ? '🔊 SFX On' : '🔇 SFX Off';
+            elSfxToggle.textContent = sOn ? 'Sound on' : 'Sound off';
           }
           if (elVoiceToggle) {
             elVoiceToggle.classList.toggle('is-on', vOn);
-            elVoiceToggle.textContent = vOn ? '🗣️ Voice On' : '🗣️ Voice Off';
+            elVoiceToggle.textContent = vOn ? 'Voice on' : 'Voice off';
           }
         }
 
@@ -1386,7 +1386,7 @@ window.Simulators = (() => {
             const logsUpToNow = frames.slice(0, idx + 1).map((fr, i) => {
               const isLatest = i === idx;
               const pill = (isLatest && isSpeakingNow)
-                ? `<span class="dsa-sim__voice-pill">🎙️ Speaking</span> `
+                ? `<span class="dsa-sim__voice-pill">Speaking</span> `
                 : '';
               return `<div style="${isLatest ? 'font-weight:600;color:var(--fg-primary);' : 'opacity:0.8;'}">${pill}${esc(`[Step ${i + 1}] ${fr.log || ''}`)}</div>`;
             });
@@ -1646,13 +1646,13 @@ window.Simulators = (() => {
         const val = Array.isArray(r) ? r[cIdx] : r[col];
         const isNull = val === null || val === undefined || val === 'NULL';
         const disp = isNull
-          ? `<span style="display:inline-block;padding:1px 5px;border-radius:4px;background:rgba(245,158,11,0.18);color:#f59e0b;font-size:10px;font-weight:700;">NULL</span>`
+          ? `<span style="display:inline-block;padding:1px 5px;border-radius:4px;background:rgba(245,158,11,0.18);color:#f59e0b;font-size:11px;font-weight:700;">NULL</span>`
           : esc(val);
-        return `<td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11.5px;font-family:var(--font-mono,monospace);">${disp}</td>`;
+        return `<td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:12px;font-family:var(--font-mono,monospace);">${disp}</td>`;
       }).join('');
 
       const tagHtml = rowTags[rIdx]
-        ? `<td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:10.5px;font-weight:700;font-family:var(--font-mono,monospace);color:${isMatch ? '#10b981' : isWarn ? '#f59e0b' : isPivot ? '#8b5cf6' : '#3b82f6'};">${esc(rowTags[rIdx])}</td>`
+        ? `<td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);font-size:11px;font-weight:700;font-family:var(--font-mono,monospace);color:${isMatch ? '#10b981' : isWarn ? '#f59e0b' : isPivot ? '#8b5cf6' : '#3b82f6'};">${esc(rowTags[rIdx])}</td>`
         : (Object.keys(rowTags).length ? `<td style="padding:5px 8px;border-bottom:1px solid var(--border-subtle,#1f1f23);"></td>` : '');
 
       return `<tr style="background:${bg};border-left:${borderLeft};">${tds}${tagHtml}</tr>`;
@@ -1664,9 +1664,9 @@ window.Simulators = (() => {
 
     return `
       <div style="border:1px solid var(--border-color,#27272a);border-radius:8px;overflow:hidden;margin:6px 0;background:var(--bg-secondary,rgba(24,24,27,0.45));">
-        <div style="padding:5px 10px;background:var(--bg-tertiary,rgba(39,39,42,0.6));border-bottom:1px solid var(--border-color,#27272a);font-size:11.5px;font-weight:700;font-family:var(--font-mono,monospace);display:flex;justify-content:space-between;align-items:center;">
-          <span>📋 ${esc(title)}</span>
-          <span style="font-size:10.5px;color:var(--fg-muted);font-weight:500;">${rows.length} row(s)</span>
+        <div style="padding:5px 10px;background:var(--bg-tertiary,rgba(39,39,42,0.6));border-bottom:1px solid var(--border-color,#27272a);font-size:12px;font-weight:700;font-family:var(--font-mono,monospace);display:flex;justify-content:space-between;align-items:center;">
+          <span>${esc(title)}</span>
+          <span style="font-size:11px;color:var(--fg-muted);font-weight:500;">${rows.length} row(s)</span>
         </div>
         <div style="overflow-x:auto;">
           <table style="width:100%;border-collapse:collapse;">

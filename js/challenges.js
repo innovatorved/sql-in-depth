@@ -88,8 +88,27 @@
     },
 
     isChallengeSolved: function(id) {
-      if (!root.Progress || typeof root.Progress.isCompleted !== 'function') return false;
-      return root.Progress.isCompleted('challenge:' + id) || root.Progress.isCompleted(id);
+      if (root.Progress && typeof root.Progress.isCompleted === 'function') {
+        if (root.Progress.isCompleted('challenge:' + id) || root.Progress.isCompleted(id)) return true;
+      }
+      try {
+        var studioMap = JSON.parse((root.localStorage && root.localStorage.getItem('sql_in_depth_solved_challenges_v1')) || '{}');
+        return Boolean(studioMap && studioMap[id]);
+      } catch (e) {
+        return false;
+      }
+    },
+
+    _studioSearch: function(id) {
+      return '?mode=challenges&challenge=' + encodeURIComponent(id);
+    },
+
+    _openInStudio: function(id) {
+      if (root.App && typeof root.App.navigateToSandbox === 'function') {
+        root.App.navigateToSandbox(null, undefined, this._studioSearch(id));
+      } else if (root.location) {
+        root.location.href = '/sandbox/' + this._studioSearch(id);
+      }
     },
 
     render: function() {
@@ -97,20 +116,25 @@
       var activeCh = this._activeChallengeId ? this._findChallenge(this._activeChallengeId) : null;
 
       if (activeCh) {
-        this._container.innerHTML = this._renderWorkspace(activeCh);
-      } else {
+        var self = this;
+        var redirectId = activeCh.id;
+        this._activeChallengeId = null;
         this._container.innerHTML = this._renderDirectory();
+        if (root.history && typeof root.history.replaceState === 'function') {
+          root.history.replaceState(null, '', '/challenges');
+        }
+        root.setTimeout(function() { self._openInStudio(redirectId); }, 0);
+        return;
       }
+      this._container.innerHTML = this._renderDirectory();
     },
 
     _renderDirectory: function() {
       var challenges = this._getChallenges();
       var solvedCount = 0;
-      var totalXp = 0;
       var self = this;
 
       challenges.forEach(function(c) {
-        totalXp += (c.xp || 100);
         if (self.isChallengeSolved(c.id)) solvedCount++;
       });
 
@@ -120,94 +144,97 @@
       var filtered = challenges.filter(function(c) {
         if (diff !== 'all' && c.difficulty !== diff) return false;
         if (!q) return true;
-        var hay = (c.title + ' ' + c.category + ' ' + c.difficulty + ' ' + (c.symptoms || []).join(' ')).toLowerCase();
+        var hay = (c.title + ' ' + c.category + ' ' + c.difficulty + ' ' + (c.subtitle || '') + ' ' + ((c.codeFix && c.codeFix.title) || '')).toLowerCase();
         return hay.indexOf(q) !== -1;
       });
 
+      var levelLabel = { easy: 'Beginner', medium: 'Intermediate', hard: 'Advanced', insane: 'Expert' };
       var tiers = [
-        { key: 'all', label: 'All Incidents (' + challenges.length + ')' },
-        { key: 'easy', label: 'Easy' },
-        { key: 'medium', label: 'Medium' },
-        { key: 'hard', label: 'Hard' },
-        { key: 'insane', label: 'Insane' }
+        { key: 'all', label: 'All' },
+        { key: 'easy', label: levelLabel.easy },
+        { key: 'medium', label: levelLabel.medium },
+        { key: 'hard', label: levelLabel.hard },
+        { key: 'insane', label: levelLabel.insane }
       ];
 
       var filterHtml = tiers.map(function(t) {
-        return '<button class="eco-filter-pill ' + (diff === t.key ? 'active' : '') + '" data-challenge-tier="' + t.key + '">' + escapeHtml(t.label) + '</button>';
+        var count = t.key === 'all' ? challenges.length : challenges.filter(function(c) { return c.difficulty === t.key; }).length;
+        if (t.key !== 'all' && count === 0) return '';
+        return '<button type="button" class="chal-filter' + (diff === t.key ? ' is-active' : '') + '" data-challenge-tier="' + t.key + '" aria-pressed="' + (diff === t.key) + '">' +
+          escapeHtml(t.label) + ' <span class="chal-filter__count">' + count + '</span>' +
+        '</button>';
       }).join('');
 
-      var formatErrRate = function(val, fallback) {
-        if (val == null || val === '') return fallback || 'High';
-        if (typeof val === 'string') {
-          return val.indexOf('%') !== -1 ? val : (val + '%');
+      var lessonTitle = function(slug) {
+        var data = root.CURRICULUM_DATA;
+        if (!data || !Array.isArray(data.parts)) return '';
+        for (var p = 0; p < data.parts.length; p++) {
+          var mods = data.parts[p].modules || [];
+          for (var m = 0; m < mods.length; m++) {
+            var units = mods[m].units || [];
+            for (var u = 0; u < units.length; u++) {
+              if (units[u].slug === slug) return units[u].title || '';
+            }
+          }
         }
-        var num = Number(val);
-        if (Number.isNaN(num)) return String(val);
-        if (num > 0 && num <= 1) return (num * 100).toFixed(1).replace(/\.0$/, '') + '%';
-        return Math.round(num * 10) / 10 + '%';
+        return '';
       };
 
-      var formatLatency = function(val, fallback) {
-        if (val == null || val === '') return fallback || 'Degraded';
-        if (typeof val === 'string') {
-          return /ms|s$/i.test(val.trim()) ? val : (val + 'ms');
-        }
-        return val + 'ms';
-      };
-
-      var cardsHtml = filtered.map(function(c) {
+      var rowsHtml = filtered.map(function(c) {
         var solved = self.isChallengeSolved(c.id);
-        var tierClass = 'tier--' + c.difficulty;
-        var errPct = formatErrRate(c.metricsAndLogs && c.metricsAndLogs.errorRate, 'High');
-        var p99 = formatLatency(c.metricsAndLogs && c.metricsAndLogs.latencyP99, 'Degraded');
-
+        var number = challenges.indexOf(c) + 1;
+        var title = (c.codeFix && c.codeFix.title) || c.title;
+        var lessonSlug = Array.isArray(c.relatedSlugs) && c.relatedSlugs.length > 0 ? c.relatedSlugs[0] : '';
+        var lessonName = lessonSlug ? lessonTitle(lessonSlug) : '';
         return (
-          '<article class="eco-card challenge-card ' + (solved ? 'challenge-card--solved' : '') + '" data-challenge-card="' + escapeHtml(c.id) + '">' +
-            '<div class="view-badge-row">' +
-              '<span class="eco-pill ' + tierClass + '">' + escapeHtml(c.difficulty.toUpperCase()) + '</span>' +
-              '<span class="eco-pill">' + escapeHtml(c.category) + '</span>' +
-              '<span class="eco-pill">+' + (c.xp || 100) + ' XP</span>' +
-              (solved ? '<span class="eco-pill eco-pill--success">✓ Resolved</span>' : '<span class="eco-pill eco-pill--danger">● Active Outage</span>') +
+          '<li class="chal-row' + (solved ? ' is-solved' : '') + '">' +
+            '<span class="chal-row__num" aria-hidden="true">' + (solved ? '✓' : String(number).padStart(2, '0')) + '</span>' +
+            '<div class="chal-row__main">' +
+              '<h2 class="chal-row__title">' +
+                '<a href="/sandbox/' + escapeHtml(self._studioSearch(c.id)) + '" data-nav="sandbox" data-search="' + escapeHtml(self._studioSearch(c.id)) + '">' + escapeHtml(title) + '</a>' +
+              '</h2>' +
+              '<p class="chal-row__desc">' + escapeHtml(c.subtitle || c.summary || '') + '</p>' +
+              '<div class="chal-row__meta">' +
+                '<span class="chal-level chal-level--' + escapeHtml(c.difficulty) + '">' + escapeHtml(levelLabel[c.difficulty] || c.difficulty) + '</span>' +
+                '<span>' + escapeHtml(c.category || '') + '</span>' +
+                '<span>~' + (c.estimatedMinutes || 15) + ' min</span>' +
+                (lessonName
+                  ? '<a class="chal-row__lesson" href="/topic/' + escapeHtml(lessonSlug) + '/" data-nav="topic" data-slug="' + escapeHtml(lessonSlug) + '">Learn first: ' + escapeHtml(lessonName) + '</a>'
+                  : '') +
+              '</div>' +
             '</div>' +
-            '<h3 class="eco-card__title">' + escapeHtml(c.title) + '</h3>' +
-            '<p class="eco-card__desc">' + escapeHtml((c.symptoms && c.symptoms[0]) || c.slaImpact || '') + '</p>' +
-            '<div class="challenge-card__telemetry-preview">' +
-              '<div class="telemetry-mini"><span>Error Rate</span><strong>' + escapeHtml(errPct) + '</strong></div>' +
-              '<div class="telemetry-mini"><span>P99 Latency</span><strong>' + escapeHtml(p99) + '</strong></div>' +
-              '<div class="telemetry-mini"><span>Est. Time</span><strong>' + (c.estimatedMinutes || 15) + 'm</strong></div>' +
-            '</div>' +
-            '<div class="eco-card__footer">' +
-              '<button class="eco-btn eco-btn--primary" data-enter-challenge="' + escapeHtml(c.id) + '">' +
-                (solved ? 'Review Incident Room →' : 'Enter Incident Room →') +
-              '</button>' +
-            '</div>' +
-          '</article>'
+            '<a class="chal-row__cta" href="/sandbox/' + escapeHtml(self._studioSearch(c.id)) + '" data-nav="sandbox" data-search="' + escapeHtml(self._studioSearch(c.id)) + '">' +
+              (solved ? 'Review' : 'Solve') +
+            '</a>' +
+          '</li>'
         );
       }).join('');
 
+      var pct = challenges.length ? Math.round((solvedCount / challenges.length) * 100) : 0;
+
       return (
-        '<div class="view-canvas challenges-view">' +
-          '<header class="view-header">' +
-            '<div class="view-header__top">' +
-              '<div class="view-header__content">' +
-                '<div class="view-badge-row">' +
-                  '<span class="eco-pill eco-pill--danger">Live Production Simulators</span>' +
-                  '<span class="eco-pill">' + solvedCount + ' / ' + challenges.length + ' Incidents Resolved</span>' +
-                  '<span class="eco-pill">' + totalXp + ' Total XP Available</span>' +
-                '</div>' +
-                '<h1 class="view-title">Production Incident &amp; Troubleshooting Challenges</h1>' +
-                '<p class="view-subtitle">Hands-on break/fix outage scenarios. Inspect live telemetry, diagnose root causes, tune infrastructure knobs, and restore SLOs.</p>' +
-              '</div>' +
-            '</div>' +
-            '<div class="eco-controls-bar">' +
-              '<input type="search" class="eco-search-input" id="challenges-search-input" placeholder="Search incidents by symptom, NOT IN, B+Tree, MVCC, deadlock, vacuum…" value="' + escapeHtml(this._searchQuery) + '" />' +
-              '<div class="eco-filter-group">' + filterHtml + '</div>' +
+        '<div class="view-canvas challenges-view chal-page">' +
+          '<header class="chal-hero">' +
+            '<h1 class="view-title">SQL Challenges</h1>' +
+            '<p class="view-subtitle">Each challenge is a small, real-world bug in a SQL query. Fix the starter query in SQL Studio and the checker tells you the moment your result is correct.</p>' +
+            '<ol class="chal-steps" aria-label="How challenges work">' +
+              '<li><span>1</span>Read the problem</li>' +
+              '<li><span>2</span>Fix the query in SQL Studio</li>' +
+              '<li><span>3</span>Check your answer</li>' +
+            '</ol>' +
+            '<div class="chal-progress" role="group" aria-label="Your progress">' +
+              '<div class="chal-progress__text"><strong>' + solvedCount + ' of ' + challenges.length + '</strong> solved</div>' +
+              '<div class="chal-progress__track"><span style="width:' + pct + '%"></span></div>' +
             '</div>' +
           '</header>' +
+          '<div class="chal-controls">' +
+            '<input type="search" class="chal-search" id="challenges-search-input" placeholder="Search by topic, e.g. NULL, JOIN, window" aria-label="Search challenges" value="' + escapeHtml(this._searchQuery) + '" />' +
+            '<div class="chal-filters" role="group" aria-label="Filter by level">' + filterHtml + '</div>' +
+          '</div>' +
           '<main class="view-body" id="challenges-mount-target">' +
-            '<div class="eco-grid eco-grid--3">' +
-              (cardsHtml || '<div class="eco-empty">No incident challenges match your filter.</div>') +
-            '</div>' +
+            (rowsHtml
+              ? '<ol class="chal-list">' + rowsHtml + '</ol>'
+              : '<p class="chal-empty">No challenges match. Try a different word or level.</p>') +
           '</main>' +
         '</div>'
       );
