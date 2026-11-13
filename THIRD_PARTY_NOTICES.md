@@ -1,28 +1,42 @@
 # Third-Party Notices & Licensing Disclosures
 
-This project incorporates, links to, or interfaces with the following third-party libraries, fonts, and external specifications:
+This project incorporates, links to, or interfaces with the following permissively licensed open-source libraries and fonts. See [docs/licenses.md](docs/licenses.md) for the complete provenance table.
 
 ---
 
-## 1. Client-Side Libraries & Runtime Dependencies
+## 1. Client-Side Runtimes & UI Dependencies
 
-### Mermaid.js
+### `sql.js` (SQLite 3 WebAssembly)
+- **License:** MIT License (SQLite engine is Public Domain)
+- **Copyright:** (c) `sql.js` contributors & Alon Zakai
+- **Usage:** In-browser SQLite 3 WASM query execution inside `js/sql-worker.js` and `js/vendor/sql-wasm.*`.
+
+### `@electric-sql/pglite` (PostgreSQL 18 WebAssembly)
+- **License:** Apache License 2.0 (PostgreSQL is licensed under the PostgreSQL License)
+- **Copyright:** (c) ElectricDB Limited & PostgreSQL Global Development Group
+- **Usage:** On-demand in-browser PostgreSQL 18.6 WASM engine (`js/vendor/pglite/`).
+
+### CodeMirror 6 (`@codemirror/*` & `@lezer/highlight`)
 - **License:** MIT License
-- **Copyright:** (c) 2014 - 2026 Knut Sveidqvist and contributors
-- **Usage:** Dynamic diagram rendering via CDN (`https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs`).
+- **Copyright:** (c) 2018–2026 Marijn Haverbeke and contributors
+- **Usage:** Accessible SQL editor, schema-aware autocomplete, syntax highlighting, and error diagnostics (`js/vendor/cm6-sql.js`).
 
-### `@innovatorved/code-lab` (`v0.3.1`)
+### KaTeX (`v0.16.11`)
 - **License:** MIT License
-- **Copyright:** (c) 2026 Ved Gupta (`https://github.com/innovatorved/code-lab`)
-- **Usage:** Interactive browser-native IDE, POSIX shell, public GitHub repository cloner, modular language & guided lab extensions (`js`, `ts`, `cpp`, `python`, `guided-lab`), and Web Worker Node.js/Bun/C++20/Python 3.12 WebAssembly runtime loaded via CDN (`https://cdn.jsdelivr.net/npm/@innovatorved/code-lab@0.3.1/` with an `https://unpkg.com/@innovatorved/code-lab@0.3.1/` fallback).
+- **Copyright:** (c) 2013–2026 Khan Academy and contributors
+- **Usage:** Self-hosted relational algebra and query-cost math rendering (`css/vendor/katex/`, `js/vendor/katex/`).
 
-### Geist Fonts
+### Geist & Geist Mono Fonts
 - **License:** SIL Open Font License 1.1
 - **Copyright:** (c) 2023 Vercel, Inc.
-- **Usage:** Webfonts packaged locally under `fonts/geist-latin.woff2`.
+- **Usage:** Self-hosted webfonts (`fonts/geist-latin.woff2`, `fonts/geist-mono-latin.woff2`).
+
+### Mermaid.js & `@innovatorved/code-lab`
+- **License:** MIT License
+- **Usage:** On-demand architecture diagrams and capstone storage-engine build IDE.
 
 ---
 
-## 2. Public Papers & Standards Attribution
+## 2. Public Papers & Database Standards Attribution
 
-The architectural mechanisms described across lessons (such as Raft, Dynamo, LSM-Trees, Paxos, and SWIM) are descriptions of published computer science algorithms. Technical summaries, diagrams, and code implementations are original works licensed under the repository's MIT License.
+The relational algebra formalisms, storage architectures, and concurrency mechanisms taught across the curriculum (Codd's Relational Model, System R cost estimation, B+Trees, ARIES write-ahead logging, and PostgreSQL/SQLite MVCC) reference published database systems literature. All prose explanations, interactive visualizers, flagship explainer videos, and synthetic SQL datasets are original works licensed under the repository's MIT License.

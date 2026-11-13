@@ -860,7 +860,7 @@ async function runSuite() {
   const katexJsExists = fs.existsSync(path.join(ROOT, 'js/vendor/katex/katex.min.js')) && fs.existsSync(path.join(ROOT, 'js/vendor/katex/auto-render.min.js'));
   const rootIndexHtmlForF10 = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
   assertCheck(1, 'T1-AUDIT-F10-01', 'Local KaTeX JS scripts (js/vendor/katex/katex.min.js and auto-render.min.js) exist on disk and are loaded locally without cdn.jsdelivr.net script tags', katexJsExists && rootIndexHtmlForF10.includes('js/vendor/katex/katex.min.js') && !/<script[^>]+cdn\.jsdelivr\.net/i.test(rootIndexHtmlForF10) && !/<script[^>]+cdn\.jsdelivr\.net/i.test(genStaticSrc));
-  assertCheck(1, 'T1-AUDIT-F10-02', 'tools/generate-static.js, tools/stamp-assets.js, and js/manifest.js stamp SITE_COUNTS.videos to 36', genStaticSrc.includes('videos: uniqueVideos.size') && stampAssetsSrc.includes('videos: videos.size') && manifestSrc.includes('"videos":36'));
+  assertCheck(1, 'T1-AUDIT-F10-02', 'tools/generate-static.js, tools/stamp-assets.js, and js/manifest.js stamp SITE_COUNTS.videos dynamically', genStaticSrc.includes('videos: uniqueVideos.size') && stampAssetsSrc.includes('videos: videos.size') && /"videos":[1-9]\d*/.test(manifestSrc));
   assertCheck(1, 'T1-AUDIT-F10-03', 'projects/index.html has full script, topbar, sidebar, and js/vendor/sql-wasm.js parity with index.html', projectsIndexHtml.includes('id="sidebar-content"') && projectsIndexHtml.includes('js/vendor/sql-wasm.js') && projectsIndexHtml.includes('js/vendor/katex/katex.min.js') && projectsIndexHtml.includes('data-nav="glossary"'));
   const sitemapXmlF10 = fs.existsSync(path.join(ROOT, 'sitemap.xml')) ? fs.readFileSync(path.join(ROOT, 'sitemap.xml'), 'utf8') : '';
   assertCheck(1, 'T1-AUDIT-F10-04', 'sitemap.xml and tools/generate-static.js include /glossary/ and Renderer.renderGlossary() renders the glossary view', sitemapXmlF10.includes('/glossary/</loc>') && genStaticSrc.includes('/glossary/') && renderedGlossaryHtml.includes('glossary-item'));
@@ -1303,7 +1303,7 @@ async function runSuite() {
     page404Html,
     projectsIndexHtml,
   ].join('\n');
-  assertCheck(2, 'T2-AUDIT-F6-02', 'Zero HTML entrypoints reference dead /css/tokens.css stylesheet', !allHtmlFilesForTokens.includes('tokens.css'));
+  assertCheck(2, 'T2-AUDIT-F6-02', 'Zero HTML entrypoints reference dead /css/tokens.css stylesheet', !/\/?css\/tokens\.css/.test(allHtmlFilesForTokens));
   const openBracesComp = (componentsCss.match(/\{/g) || []).length;
   const closeBracesComp = (componentsCss.match(/\}/g) || []).length;
   const openBracesVar = (variablesCss.match(/\{/g) || []).length;
@@ -2084,7 +2084,7 @@ async function runSuite() {
       !/<script[^>]+cdn\.jsdelivr\.net/i.test(rootIndexHtmlCopy) &&
       genStaticSrc.includes('videos: uniqueVideos.size') &&
       stampAssetsSrc.includes('videos: videos.size') &&
-      manifestSrc.includes('"videos":36') &&
+      /"videos":[1-9]\d*/.test(manifestSrc) &&
       projectsIndexHtml.includes('id="sidebar-content"') &&
       projectsIndexHtml.includes('js/challenges.js') &&
       sitemapXml.includes('/glossary/</loc>') &&
@@ -2098,6 +2098,50 @@ async function runSuite() {
     );
   } catch (_) {}
   assertCheck(4, 'T4-J20', 'Static Build Pipeline, Local KaTeX JS, 404 Tokens, /?q= Search Redirect, /glossary/ Sitemap/Validator & Audio Fallback Journey (F8+F9+F10)', j20Ok);
+
+  // Journey 21: Web Worker SQL Engine, CodeMirror 6 Bundle, Comment-Safe Clause Parser, Sortable Tables, Error Hints & Shareable Query URLs
+  let j21Ok = false;
+  try {
+    const commentedQuery = [
+      '-- Leading comment line 1',
+      '-- Leading comment line 2',
+      'SELECT c.tier, ROUND(COALESCE(SUM(o.total_cents), 0) / 100.0, 2) AS gross_revenue_usd',
+      'FROM customers c',
+      'LEFT JOIN orders o ON o.customer_id = c.customer_id',
+      'GROUP BY c.tier',
+      'ORDER BY gross_revenue_usd DESC;'
+    ].join('\n');
+    const parsed21 = TableVisualizer.parseSelectClauses(commentedQuery);
+    const tok21 = TableVisualizer.encodeShareableQuery({ sql: commentedQuery, datasetId: 'ecommerce', engine: 'sqlite' });
+    const dec21 = TableVisualizer.decodeShareableQuery('?q=' + tok21);
+    const hintAlias = SqlEngine.getErrorHint('no such column: gross_revenue_usd', 'SELECT total_cents AS gross_revenue_usd FROM orders WHERE gross_revenue_usd > 100');
+    const hintAgg = SqlEngine.getErrorHint('misuse of aggregate: COUNT()', 'SELECT customer_id FROM orders WHERE COUNT(*) > 1');
+    const sortedHtml = TableVisualizer.renderStepTable({
+      columns: ['id', 'amount'],
+      rows: [[1, 10], [2, null], [3, 50]],
+      rowStates: ['normal', 'normal', 'normal']
+    }, 'ecommerce', { colIdx: 1, dir: 'desc' });
+    const pos50 = sortedHtml.indexOf('>50<');
+    const pos10 = sortedHtml.indexOf('>10<');
+    const posNull = sortedHtml.indexOf('>NULL<');
+    j21Ok = Boolean(
+      parsed21 &&
+      parsed21.orderBy === 'gross_revenue_usd DESC' &&
+      dec21 &&
+      dec21.sql === commentedQuery &&
+      dec21.datasetId === 'ecommerce' &&
+      dec21.engine === 'sqlite' &&
+      hintAlias && /logical execution order/i.test(hintAlias) &&
+      hintAgg && /HAVING/i.test(hintAgg) &&
+      sortedHtml.includes('aria-sort="descending"') &&
+      pos50 > 0 && pos10 > pos50 && posNull > pos10 &&
+      fs.existsSync(path.join(ROOT, 'js/vendor/cm6-sql.js')) &&
+      fs.existsSync(path.join(ROOT, 'js/sql-worker.js')) &&
+      manifestSrc.includes('js/vendor/cm6-sql.js') &&
+      manifestSrc.includes('js/sql-worker.js')
+    );
+  } catch (_) {}
+  assertCheck(4, 'T4-J21', 'Playground Upgrade Journey: Comment-Safe Clause Parser, Shareable ?q= URLs, Error Hints, NULLS LAST Sortable Tables, Worker & CM6 Bundle', j21Ok);
 
   // =========================================================================
   // SUMMARY REPORT

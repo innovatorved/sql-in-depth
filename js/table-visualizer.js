@@ -314,17 +314,73 @@
             .trim();
     }
 
+    function buildSchemaTablesForEditor(datasetId) {
+        var datasets = getDatasets();
+        var keys = (datasetId && datasetId !== '__unified__' && datasets[datasetId])
+            ? [datasetId]
+            : Object.keys(datasets);
+        var seen = {};
+        var out = [];
+        keys.forEach(function (dsKey) {
+            var ds = datasets[dsKey];
+            if (!ds || !Array.isArray(ds.tables)) return;
+            ds.tables.forEach(function (t) {
+                if (!t || !t.name || seen[t.name]) return;
+                seen[t.name] = true;
+                var meta = SCHEMA_META[String(t.name).toLowerCase()] || { pk: [], fk: {} };
+                var cols = (t.columns || []).map(function (colItem) {
+                    if (typeof colItem === 'string') {
+                        var parts = colItem.trim().split(/\s+/);
+                        var cName = parts[0] || '';
+                        var cType = parts[1] || 'TEXT';
+                        var lc = cName.toLowerCase();
+                        return {
+                            name: cName,
+                            type: cType,
+                            pk: /PRIMARY\s+KEY/i.test(colItem) || (meta.pk || []).indexOf(lc) !== -1,
+                            fk: /REFERENCES/i.test(colItem) || Boolean(meta.fk && meta.fk[lc])
+                        };
+                    }
+                    var objName = (colItem && colItem.name) || '';
+                    var objLc = objName.toLowerCase();
+                    return {
+                        name: objName,
+                        type: (colItem && colItem.type) || 'TEXT',
+                        pk: Boolean((colItem && colItem.pk) || (meta.pk || []).indexOf(objLc) !== -1),
+                        fk: Boolean((colItem && colItem.fk) || (meta.fk && meta.fk[objLc]))
+                    };
+                });
+                out.push({ name: t.name, columns: cols });
+            });
+        });
+        return out;
+    }
+
     /**
-     * Enhances a <textarea> into a live syntax-highlighted SQL IDE with line numbers,
-     * scroll sync, Tab/Shift+Tab indentation, and Cmd/Ctrl+Enter execution.
+     * Enhances a <textarea> into a live syntax-highlighted SQL IDE (CodeMirror 6 when loaded in browser,
+     * with lightweight accessible DOM fallback for headless/Node validation).
      */
     function enhanceTextareaToIde(textarea, options) {
         if (!textarea || typeof document === 'undefined') return null;
         options = options || {};
         if (textarea._sqlIdeInstance) {
             if (options.onRun) textarea._sqlIdeInstance.onRun = options.onRun;
-            textarea._sqlIdeInstance.sync();
+            if (typeof textarea._sqlIdeInstance.sync === 'function') textarea._sqlIdeInstance.sync();
             return textarea._sqlIdeInstance;
+        }
+
+        if (root.SqlCodeMirror && typeof root.SqlCodeMirror.enhanceTextarea === 'function') {
+            var schemaTables = buildSchemaTablesForEditor(options.datasetId || '__unified__');
+            var dialect = (getEngine() && typeof getEngine().getEngineMode === 'function')
+                ? getEngine().getEngineMode()
+                : 'sqlite';
+            var cmCtrl = root.SqlCodeMirror.enhanceTextarea(textarea, {
+                dialect: dialect,
+                schema: schemaTables,
+                onRun: options.onRun || null,
+                ariaLabel: options.ariaLabel || textarea.getAttribute('aria-label') || 'SQL query editor'
+            });
+            if (cmCtrl) return cmCtrl;
         }
 
         var shell = document.createElement('div');
@@ -400,7 +456,11 @@
             highlightCode: highlightCode,
             textarea: textarea,
             onRun: options.onRun || null,
-            sync: sync
+            sync: sync,
+            setError: function () {},
+            clearError: function () {},
+            setSchema: function () {},
+            focus: function () { try { textarea.focus(); } catch (e) {} }
         };
 
         textarea.addEventListener('input', sync);
@@ -671,8 +731,138 @@
         '</div>';
     }
 
+    function toBase64UrlUtf8(str) {
+        var raw = String(str || '');
+        try {
+            if (typeof Buffer !== 'undefined' && typeof Buffer.from === 'function') {
+                return Buffer.from(raw, 'utf8').toString('base64')
+                    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+            }
+            if (typeof TextEncoder !== 'undefined' && typeof btoa === 'function') {
+                var bytes = new TextEncoder().encode(raw);
+                var bin = '';
+                for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+                return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+            }
+        } catch (e) {}
+        return encodeURIComponent(raw);
+    }
+
+    function fromBase64UrlUtf8(encoded) {
+        var norm = String(encoded || '').trim();
+        if (!norm) return '';
+        try {
+            var b64 = norm.replace(/-/g, '+').replace(/_/g, '/');
+            while (b64.length % 4 !== 0) b64 += '=';
+            if (typeof Buffer !== 'undefined' && typeof Buffer.from === 'function') {
+                return Buffer.from(b64, 'base64').toString('utf8');
+            }
+            if (typeof TextDecoder !== 'undefined' && typeof atob === 'function') {
+                var bin = atob(b64);
+                var bytes = new Uint8Array(bin.length);
+                for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+                return new TextDecoder().decode(bytes);
+            }
+        } catch (e) {}
+        try { return decodeURIComponent(norm); } catch (e2) { return ''; }
+    }
+
+    function encodeShareableQuery(payload) {
+        var obj = typeof payload === 'string'
+            ? { s: payload }
+            : {
+                s: String((payload && payload.sql) || ''),
+                d: (payload && payload.datasetId) || '',
+                e: (payload && payload.engine) || ''
+            };
+        return toBase64UrlUtf8(JSON.stringify(obj));
+    }
+
+    function decodeShareableQuery(searchOrToken) {
+        var raw = String(searchOrToken || '').trim();
+        if (!raw) return null;
+        if (raw.charAt(0) === '?' || raw.indexOf('=') !== -1) {
+            try {
+                var params = new URLSearchParams(raw.charAt(0) === '?' ? raw : ('?' + raw));
+                var qToken = params.get('q');
+                var rawSqlParam = params.get('sql');
+                var dsParam = params.get('ds') || params.get('dataset') || '';
+                var engParam = params.get('eng') || params.get('engine') || '';
+                if (qToken) {
+                    var decoded = fromBase64UrlUtf8(qToken);
+                    if (decoded) {
+                        try {
+                            var parsed = JSON.parse(decoded);
+                            if (parsed && typeof parsed.s === 'string') {
+                                return {
+                                    sql: parsed.s,
+                                    datasetId: parsed.d || dsParam || '__unified__',
+                                    engine: parsed.e || engParam || ''
+                                };
+                            }
+                        } catch (jsonErr) {
+                            return { sql: decoded, datasetId: dsParam || '__unified__', engine: engParam || '' };
+                        }
+                    }
+                }
+                if (rawSqlParam) {
+                    return { sql: rawSqlParam, datasetId: dsParam || '__unified__', engine: engParam || '' };
+                }
+            } catch (e) {}
+            return null;
+        }
+        var direct = fromBase64UrlUtf8(raw);
+        if (!direct) return null;
+        try {
+            var obj = JSON.parse(direct);
+            if (obj && typeof obj.s === 'string') {
+                return { sql: obj.s, datasetId: obj.d || '__unified__', engine: obj.e || '' };
+            }
+        } catch (e2) {}
+        return { sql: direct, datasetId: '__unified__', engine: '' };
+    }
+
+    function buildShareableQueryUrl(opts) {
+        opts = opts || {};
+        var token = encodeShareableQuery({
+            sql: opts.sql || '',
+            datasetId: opts.datasetId || '__unified__',
+            engine: opts.engine || ((getEngine() && getEngine().getEngineMode) ? getEngine().getEngineMode() : 'sqlite')
+        });
+        var origin = (root.location && root.location.origin && root.location.origin !== 'null')
+            ? root.location.origin
+            : 'https://sql-in-depth.vedgupta.in';
+        return origin + '/sandbox/?q=' + token;
+    }
+
+    function shareSqlQueryLink(opts, buttonEl) {
+        var shareUrl = buildShareableQueryUrl(opts);
+        if (root.App && typeof root.App.sharePageUrl === 'function') {
+            root.App.sharePageUrl({
+                title: (opts && opts.title) || 'Runnable SQL Query — SQL in Depth',
+                text: 'Run and step through this SQL query in your browser:',
+                url: shareUrl
+            });
+        } else {
+            copySqlToClipboard(shareUrl, null);
+        }
+        if (buttonEl) {
+            var orig = buttonEl.textContent;
+            buttonEl.textContent = '✓ Link Copied';
+            setTimeout(function () { buttonEl.textContent = orig; }, 1400);
+        }
+        return shareUrl;
+    }
+
     function insertSqlSnippet(textarea, snippet) {
         if (!textarea || snippet === null || snippet === undefined) return '';
+        if (textarea._sqlIdeInstance && typeof textarea._sqlIdeInstance.insertSnippet === 'function') {
+            textarea._sqlIdeInstance.insertSnippet(snippet);
+            try {
+                textarea.dispatchEvent(new Event('input', { bubbles: true }));
+            } catch (e) {}
+            return textarea.value || '';
+        }
         var text = String(snippet);
         var current = textarea.value || '';
         var start = typeof textarea.selectionStart === 'number' ? textarea.selectionStart : current.length;
@@ -1010,12 +1200,10 @@
      * Respects parentheses depth so subqueries and CTEs do not confuse top-level clause boundaries.
      */
     function parseSelectClauses(sql) {
-        var cleaned = String(sql || '')
+        var trimmed = String(sql || '').trim().replace(/;+\s*$/, '');
+        var cleanedTrim = trimmed
             .replace(/--[^\n]*/g, function (m) { return ' '.repeat(m.length); })
             .replace(/\/\*[\s\S]*?\*\//g, function (m) { return ' '.repeat(m.length); });
-
-        var trimmed = sql.trim().replace(/;+\s*$/, '');
-        var cleanedTrim = cleaned.trim().replace(/;+\s*$/, '');
 
         var depth = 0;
         var inSingle = false;
@@ -1706,7 +1894,7 @@
     /**
      * Render a rich HTML data table with PK/FK badges, row states, and DML cell diffs
      */
-    function renderStepTable(step, datasetId) {
+    function renderStepTable(step, datasetId, sortState) {
         // Step 0 multi-table view
         if (step.subTables && step.subTables.length > 0) {
             return '<div class="sql-subtables-grid">' +
@@ -1768,18 +1956,26 @@
                    s === 'inserted' || s === 'updated' || s === 'deleted';
         });
 
+        var activeSortCol = (sortState && typeof sortState.colIdx === 'number') ? sortState.colIdx : -1;
+        var activeSortDir = (sortState && sortState.dir) ? sortState.dir : 'none';
+
         var html = '<div class="sql-step-table-scroll"><table class="sql-step-table">';
         html += '<thead><tr>';
         if (hasRowStateBadges) {
-            html += '<th class="sql-row-state-th">Row State</th>';
+            html += '<th scope="col" class="sql-row-state-th">Row State</th>';
         }
-        step.columns.forEach(function (col) {
+        step.columns.forEach(function (col, colIdx) {
             var lowerCol = String(col).toLowerCase();
             var isPk = pkSet[lowerCol];
             var fkTarget = fkMap[lowerCol];
             var isHighlighted = highlightSet[lowerCol];
-            html += '<th class="' + (isHighlighted ? 'is-highlighted-col' : '') + '">';
-            html += '<div class="sql-th-inner">';
+            var ariaSort = (activeSortCol === colIdx && activeSortDir !== 'none')
+                ? (activeSortDir === 'asc' ? 'ascending' : 'descending')
+                : 'none';
+            var sortIndicator = ariaSort === 'ascending' ? '↑' : (ariaSort === 'descending' ? '↓' : '↕');
+            html += '<th scope="col" aria-sort="' + ariaSort + '" class="' + (isHighlighted ? 'is-highlighted-col' : '') + '">';
+            html += '<button type="button" class="sql-sort-btn" data-sort-col="' + colIdx + '" title="Sort by ' + escapeHtml(col) + '">';
+            html += '<span class="sql-th-inner">';
             html += '<span>' + escapeHtml(col) + '</span>';
             if (isPk) {
                 html += '<span class="sql-col-key-badge is-pk" title="Primary Key">PK</span>';
@@ -1787,14 +1983,38 @@
             if (fkTarget) {
                 html += '<span class="sql-col-key-badge is-fk" title="Foreign Key → ' + escapeHtml(fkTarget) + '">FK</span>';
             }
-            html += '</div></th>';
+            html += '<span class="sql-sort-glyph" aria-hidden="true">' + sortIndicator + '</span>';
+            html += '</span></button></th>';
         });
         html += '</tr></thead><tbody>';
 
         if (!step.rows || step.rows.length === 0) {
             html += '<tr><td colspan="' + (step.columns.length + (hasRowStateBadges ? 1 : 0)) + '" class="sql-empty-row-cell">0 rows matched this step</td></tr>';
         } else {
-            step.rows.forEach(function (row, rIdx) {
+            var indexedRows = step.rows.map(function (row, rIdx) {
+                return { row: row, origIdx: rIdx };
+            });
+            if (activeSortCol >= 0 && activeSortDir !== 'none') {
+                indexedRows.sort(function (a, b) {
+                    var va = a.row[activeSortCol];
+                    var vb = b.row[activeSortCol];
+                    var aNull = (va === null || va === undefined);
+                    var bNull = (vb === null || vb === undefined);
+                    if (aNull && bNull) return a.origIdx - b.origIdx;
+                    if (aNull) return 1; // NULLS LAST
+                    if (bNull) return -1;
+                    var na = typeof va === 'number' ? va : (typeof va === 'string' && va.trim() !== '' && !isNaN(Number(va)) ? Number(va) : NaN);
+                    var nb = typeof vb === 'number' ? vb : (typeof vb === 'string' && vb.trim() !== '' && !isNaN(Number(vb)) ? Number(vb) : NaN);
+                    var cmp = (!isNaN(na) && !isNaN(nb))
+                        ? (na - nb)
+                        : String(va).localeCompare(String(vb), undefined, { numeric: true, sensitivity: 'base' });
+                    if (cmp === 0) return a.origIdx - b.origIdx;
+                    return activeSortDir === 'desc' ? -cmp : cmp;
+                });
+            }
+            indexedRows.forEach(function (entry) {
+                var row = entry.row;
+                var rIdx = entry.origIdx;
                 var state = (step.rowStates && step.rowStates[rIdx]) || 'normal';
                 var rowDiffs = (step.cellDiffs && step.cellDiffs[rIdx]) || null;
                 html += '<tr class="sql-step-tr is-' + escapeHtml(state) + '">';
@@ -1848,26 +2068,68 @@
     }
 
     /**
-     * Render EXPLAIN QUERY PLAN tree nodes
+     * Render EXPLAIN QUERY PLAN hierarchical visual operator tree
      */
     function renderExplainPlan(plan) {
         if (!plan || plan.length === 0) return '';
         var engineLabel = (getEngine() && getEngine().getEngineLabel) ? getEngine().getEngineLabel() : 'SQL Engine';
+        var nodeById = {};
+        plan.forEach(function (n) { nodeById[String(n.id)] = n; });
+        function computeDepth(n) {
+            var d = 0;
+            var cur = n;
+            var guard = 0;
+            while (cur && cur.parent && nodeById[String(cur.parent)] && guard < 16) {
+                d++;
+                cur = nodeById[String(cur.parent)];
+                guard++;
+            }
+            return d;
+        }
+        var hasFullScan = false;
+        var fullScanTable = '';
         var html = '<div class="sql-explain-box">';
-        html += '<div class="sql-explain-title">Physical Execution Plan (' + escapeHtml(engineLabel) + ')</div>';
-        html += '<div class="sql-explain-tree">';
+        html += '<div class="sql-explain-header">' +
+            '<div class="sql-explain-title">Physical Execution Plan (' + escapeHtml(engineLabel) + ')</div>' +
+            '<div class="sql-explain-legend">' +
+                '<span class="sql-explain-pill is-index">B-Tree Index Seek</span>' +
+                '<span class="sql-explain-pill is-scan">Sequential / Full Scan</span>' +
+                '<span class="sql-explain-pill is-temp">Sort / Hash / Aggregate</span>' +
+            '</div>' +
+        '</div>';
+        html += '<div class="sql-explain-tree" role="list">';
         plan.forEach(function (node) {
             var detail = String(node.detail || '');
-            var isIndex = /USING.*INDEX|INDEX\s+SCAN|INDEX\s+ONLY\s+SCAN|BITMAP\s+INDEX/i.test(detail);
-            var isScan = /SCAN|SEQ\s+SCAN/i.test(detail) && !isIndex;
-            var isTemp = /TEMP\s+B-TREE|SORT|AGGREGATE|HASH/i.test(detail);
+            var isCovering = /COVERING\s+INDEX|INDEX\s+ONLY\s+SCAN/i.test(detail);
+            var isIndex = isCovering || /USING.*INDEX|INDEX\s+SCAN|BITMAP\s+INDEX|PRIMARY\s+KEY/i.test(detail);
+            var isScan = /\b(?:SCAN|SEQ\s+SCAN)\b/i.test(detail) && !isIndex && !/SUBQUERY|CONSTANT/i.test(detail);
+            var isTemp = /TEMP\s+B-TREE|SORT|AGGREGATE|HASH|GROUP/i.test(detail);
             var cls = isIndex ? 'is-index' : (isScan ? 'is-scan' : (isTemp ? 'is-temp' : ''));
-            html += '<div class="sql-explain-node ' + cls + '">' +
+            var badgeText = isCovering
+                ? 'COVERING INDEX'
+                : (isIndex ? 'INDEX SEEK' : (isScan ? 'FULL SCAN' : (isTemp ? 'MATERIALIZE / SORT' : 'OPERATOR')));
+            if (isScan && !hasFullScan) {
+                hasFullScan = true;
+                var tblM = detail.match(/\bSCAN\s+(?:TABLE\s+)?([a-zA-Z_][a-zA-Z0-9_]*)/i) || detail.match(/Seq\s+Scan\s+on\s+([a-zA-Z_][a-zA-Z0-9_]*)/i);
+                if (tblM && tblM[1]) fullScanTable = tblM[1];
+            }
+            var depth = computeDepth(node);
+            var indentPx = Math.min(depth * 18, 90);
+            html += '<div class="sql-explain-node ' + cls + '" role="listitem" style="margin-left:' + indentPx + 'px;">' +
+                (depth > 0 ? '<span class="sql-explain-branch" aria-hidden="true">↳</span>' : '') +
                 '<span class="sql-explain-node-id">#' + escapeHtml(node.id) + '</span>' +
+                '<span class="sql-explain-op-badge ' + cls + '">' + badgeText + '</span>' +
                 '<span class="sql-explain-node-detail">' + escapeHtml(detail) + '</span>' +
             '</div>';
         });
-        html += '</div></div>';
+        html += '</div>';
+        if (hasFullScan) {
+            html += '<div class="sql-explain-advisor">' +
+                '<strong>Optimizer Note:</strong> Full sequential scan detected' + (fullScanTable ? ' on <code>' + escapeHtml(fullScanTable) + '</code>' : '') + '. ' +
+                'On small tables this avoids random I/O, but at production scale ensure filter/join predicates match a SARGable B-Tree index prefix.' +
+            '</div>';
+        }
+        html += '</div>';
         return html;
     }
 
@@ -1933,7 +2195,7 @@
                             '</div>' +
                         '</div>' +
                         buildPracticeChipsHtml() +
-                        '<textarea class="sql-live-editor sql-inline-textarea" rows="7" spellcheck="false" style="width:100%;font-family:var(--font-mono,monospace);font-size:0.85rem;padding:10px 12px;border-radius:8px;background:var(--bg-surface);color:var(--fg);border:1px solid var(--border-subtle,rgba(148,163,184,0.28));">' + escapeHtml(sql) + '</textarea>' +
+                        '<textarea class="sql-live-editor sql-inline-textarea" aria-label="SQL query editor" rows="7" spellcheck="false" style="width:100%;font-family:var(--font-mono,monospace);font-size:0.85rem;padding:10px 12px;border-radius:8px;background:var(--bg-surface);color:var(--fg);border:1px solid var(--border-subtle,rgba(148,163,184,0.28));">' + escapeHtml(sql) + '</textarea>' +
                         '<div class="sql-lab-actions" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">' +
                             '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">' +
                                 '<button type="button" class="sql-exec-btn is-primary" data-inline-viz-action="run">Run Query</button>' +
@@ -1942,6 +2204,7 @@
                                 '<button type="button" class="sql-exec-btn is-secondary" data-inline-viz-action="explain">Explain Plan</button>' +
                                 '<button type="button" class="sql-exec-btn is-secondary" data-sql-ide-action="format" title="Format SQL &amp; Uppercase Keywords">Format</button>' +
                                 '<button type="button" class="sql-exec-btn is-secondary" data-sql-ide-action="copy" title="Copy SQL to Clipboard">Copy</button>' +
+                                '<button type="button" class="sql-exec-btn is-secondary" data-sql-ide-action="share-query" title="Copy shareable runnable query link">Share Link</button>' +
                             '</div>' +
                             '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">' +
                                 '<button type="button" class="sql-exec-btn is-secondary" data-sql-ide-action="export-sql" title="Download query as .sql file">.sql</button>' +
@@ -1966,6 +2229,7 @@
             var studioBtn = container.querySelector('[data-inline-viz-action="studio"]');
             var formatBtn = container.querySelector('[data-sql-ide-action="format"]');
             var copyBtn = container.querySelector('[data-sql-ide-action="copy"]');
+            var shareBtn = container.querySelector('[data-sql-ide-action="share-query"]');
             var saveBtn = container.querySelector('[data-sql-ide-action="save-query"]');
             var deleteSavedBtn = container.querySelector('[data-sql-ide-action="delete-saved"]');
             var saveTitleInput = container.querySelector('[data-sql-ide-role="save-title-input"]');
@@ -1973,6 +2237,7 @@
             var exportSqlBtn = container.querySelector('[data-sql-ide-action="export-sql"]');
             var exportCsvBtn = container.querySelector('[data-sql-ide-action="export-csv"]');
             var exportJsonBtn = container.querySelector('[data-sql-ide-action="export-json"]');
+            var editorIdeCtrl = null;
 
             function refreshSavedDropdown() {
                 if (savedHistorySelect) {
@@ -1983,14 +2248,20 @@
             function executeCurrentEditorSql(runOpts) {
                 if (verifyBanner) verifyBanner.style.display = 'none';
                 var currentSql = ed ? ed.value : sql;
-                return mountClauseVisualizer(stage, currentSql, datasetId, Object.assign({}, editorOpts, runOpts || { startAtFinal: true })).then(function (res) {
+                return mountClauseVisualizer(
+                    stage,
+                    currentSql,
+                    datasetId,
+                    Object.assign({}, editorOpts, { ideCtrl: editorIdeCtrl }, runOpts || { startAtFinal: true })
+                ).then(function (res) {
                     refreshSavedDropdown();
                     return res;
                 });
             }
 
             if (ed) {
-                enhanceTextareaToIde(ed, {
+                editorIdeCtrl = enhanceTextareaToIde(ed, {
+                    datasetId: datasetId,
                     onRun: function () {
                         executeCurrentEditorSql({ startAtFinal: true });
                     }
@@ -2022,6 +2293,15 @@
             if (copyBtn && ed) {
                 copyBtn.addEventListener('click', function () {
                     copySqlToClipboard(ed.value, copyBtn);
+                });
+            }
+            if (shareBtn && ed) {
+                shareBtn.addEventListener('click', function () {
+                    shareSqlQueryLink({
+                        sql: ed.value,
+                        datasetId: inferDatasetFromSql(ed.value) || datasetId || '__unified__',
+                        title: options.title || 'Runnable SQL Query'
+                    }, shareBtn);
                 });
             }
             if (saveBtn && ed) {
@@ -2178,6 +2458,10 @@
             var dsInfo = datasets[pipeline.datasetId] || { title: pipeline.datasetId };
 
             if (finalRes.error) {
+                if (options.ideCtrl && typeof options.ideCtrl.setError === 'function') {
+                    options.ideCtrl.setError(finalRes.error);
+                }
+                var pedHint = finalRes.errorHint || (engine && typeof engine.getErrorHint === 'function' ? engine.getErrorHint(finalRes.error, sql) : null);
                 container.innerHTML =
                     '<div class="sql-viz-panel sql-tviz is-error">' +
                         '<div class="sql-viz-header">' +
@@ -2188,14 +2472,20 @@
                             '</div>' +
                         '</div>' +
                         '<pre class="sql-viz-error-msg">' + escapeHtml(finalRes.error) + '</pre>' +
+                        (pedHint ? '<div class="sql-viz-hint-box"><strong>How to fix:</strong> ' + escapeHtml(pedHint) + '</div>' : '') +
                     '</div>';
                 bindEngineButtons(container, sql, pipeline.datasetId, options);
                 return;
             }
 
+            if (options.ideCtrl && typeof options.ideCtrl.clearError === 'function') {
+                options.ideCtrl.clearError();
+            }
+
             recordQueryHistory(sql, pipeline.datasetId);
 
             var activeIdx = steps.length > 0 ? steps.length - 1 : 0;
+            var sortByStep = {};
             // Default to final data step (before Step 8 Explain Plan) so the user immediately sees the output table
             if (steps.length > 1 && steps[activeIdx].isExplainStep && !options.focusExplain) {
                 activeIdx = steps.length - 2;
@@ -2278,7 +2568,8 @@
                 '</div>';
 
                 // Active Step Table Output
-                html += '<div class="sql-step-table-container">' + renderStepTable(currentStep, pipeline.datasetId) + '</div>';
+                var stepSortState = sortByStep[activeIdx] || { colIdx: -1, dir: 'none' };
+                html += '<div class="sql-step-table-container">' + renderStepTable(currentStep, pipeline.datasetId, stepSortState) + '</div>';
 
                 // Explain Query Plan Footer
                 if (finalRes.plan && finalRes.plan.length > 0) {
@@ -2287,6 +2578,19 @@
 
                 html += '</div>';
                 container.innerHTML = html;
+
+                container.querySelectorAll('.sql-sort-btn').forEach(function (sBtn) {
+                    sBtn.addEventListener('click', function () {
+                        var cIdx = Number(sBtn.getAttribute('data-sort-col'));
+                        if (isNaN(cIdx)) return;
+                        var cur = sortByStep[activeIdx] || { colIdx: -1, dir: 'none' };
+                        var nextDir = (cur.colIdx === cIdx)
+                            ? (cur.dir === 'asc' ? 'desc' : (cur.dir === 'desc' ? 'none' : 'asc'))
+                            : 'asc';
+                        sortByStep[activeIdx] = { colIdx: nextDir === 'none' ? -1 : cIdx, dir: nextDir };
+                        render();
+                    });
+                });
 
                 container.querySelectorAll('.sql-pipeline-step').forEach(function (btn) {
                     btn.addEventListener('click', function () {
@@ -2491,7 +2795,7 @@
                     '<span class="sql-inline-editor-title">SQL Sandbox (<code>query.sql</code> · Dataset: ' + escapeHtml(dsInfo.title) + ')</span>' +
                     '<span>Press <kbd>Cmd+Enter</kbd> / <kbd>Ctrl+Enter</kbd> to Execute</span>' +
                 '</div>' +
-                '<textarea class="sql-inline-textarea" rows="' + Math.min(14, Math.max(5, rawSql.split('\n').length + 1)) + '" spellcheck="false">' + escapeHtml(rawSql) + '</textarea>' +
+                '<textarea class="sql-inline-textarea" aria-label="SQL query editor" rows="' + Math.min(14, Math.max(5, rawSql.split('\n').length + 1)) + '" spellcheck="false">' + escapeHtml(rawSql) + '</textarea>' +
                 buildPracticeChipsHtml() +
                 '<div class="sql-inline-editor-actions">' +
                     '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
@@ -2499,6 +2803,7 @@
                         '<button type="button" class="sql-exec-btn is-secondary" data-action="step-edited-sql">Step Clauses</button>' +
                         '<button type="button" class="sql-exec-btn is-secondary" data-sql-ide-action="format">Format</button>' +
                         '<button type="button" class="sql-exec-btn is-secondary" data-sql-ide-action="copy">Copy</button>' +
+                        '<button type="button" class="sql-exec-btn is-secondary" data-sql-ide-action="share-query">Share Link</button>' +
                         '<button type="button" class="sql-exec-btn is-secondary" data-action="reset-edited-sql">Reset</button>' +
                     '</div>' +
                     '<button type="button" class="sql-exec-btn is-studio" data-action="open-sql-studio" data-lang="sql">Open in SQL Studio</button>' +
@@ -2526,9 +2831,11 @@
             var resetEditedBtn = editorWrap.querySelector('[data-action="reset-edited-sql"]');
             var formatInlineBtn = editorWrap.querySelector('[data-sql-ide-action="format"]');
             var copyInlineBtn = editorWrap.querySelector('[data-sql-ide-action="copy"]');
+            var shareInlineBtn = editorWrap.querySelector('[data-sql-ide-action="share-query"]');
             var outputStage = outputWrap.querySelector('.sql-inline-output-stage');
 
             var inlineIdeCtrl = textarea ? enhanceTextareaToIde(textarea, {
+                datasetId: dsId,
                 onRun: function () {
                     runCurrentBlock({ startAtFinal: true });
                 }
@@ -2551,7 +2858,7 @@
                 var currentSql = (textarea && textarea.value.trim()) ? textarea.value : rawSql;
                 var currentDs = inferDatasetFromSql(currentSql) || dsId;
                 outputWrap.hidden = false;
-                return mountClauseVisualizer(outputStage, currentSql, currentDs, opts);
+                return mountClauseVisualizer(outputStage, currentSql, currentDs, Object.assign({ ideCtrl: inlineIdeCtrl }, opts));
             }
 
             runBtn.addEventListener('click', function () {
@@ -2582,6 +2889,15 @@
             if (copyInlineBtn && textarea) {
                 copyInlineBtn.addEventListener('click', function () {
                     copySqlToClipboard(textarea.value, copyInlineBtn);
+                });
+            }
+
+            if (shareInlineBtn && textarea) {
+                shareInlineBtn.addEventListener('click', function () {
+                    shareSqlQueryLink({
+                        sql: textarea.value,
+                        datasetId: inferDatasetFromSql(textarea.value) || dsId
+                    }, shareInlineBtn);
                 });
             }
 
@@ -2790,7 +3106,7 @@
                             ) : '') +
                         '</div>' +
                         '<div class="sql-lab-editor-box">' +
-                            '<textarea class="sql-live-editor sql-inline-textarea" rows="6" spellcheck="false">' + escapeHtml(currentSql) + '</textarea>' +
+                            '<textarea class="sql-live-editor sql-inline-textarea" aria-label="Guided lab SQL editor" rows="6" spellcheck="false">' + escapeHtml(currentSql) + '</textarea>' +
                             buildPracticeChipsHtml() +
                             '<div class="sql-lab-actions">' +
                                 '<button type="button" class="sql-exec-btn is-primary" data-lab-action="run">Run Query</button>' +
@@ -2812,9 +3128,10 @@
             var vizMount = container.querySelector('.sql-lab-visualizer-mount');
 
             var labIdeCtrl = editor ? enhanceTextareaToIde(editor, {
+                datasetId: datasetId,
                 onRun: function () {
                     verifyBanner.hidden = true;
-                    mountClauseVisualizer(vizMount, editor.value, datasetId);
+                    mountClauseVisualizer(vizMount, editor.value, datasetId, { ideCtrl: labIdeCtrl });
                 }
             }) : null;
 
@@ -3076,6 +3393,11 @@
         exportJson: exportJson,
         SQL_PRACTICE_CHIPS: SQL_PRACTICE_CHIPS,
         insertSqlSnippet: insertSqlSnippet,
+        buildSchemaTablesForEditor: buildSchemaTablesForEditor,
+        encodeShareableQuery: encodeShareableQuery,
+        decodeShareableQuery: decodeShareableQuery,
+        buildShareableQueryUrl: buildShareableQueryUrl,
+        shareSqlQueryLink: shareSqlQueryLink,
         SCHEMA_META: SCHEMA_META
     };
 })(typeof globalThis !== 'undefined' ? globalThis : (typeof window !== 'undefined' ? window : this));

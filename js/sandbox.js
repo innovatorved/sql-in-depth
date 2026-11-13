@@ -79,10 +79,13 @@
     _lastQueryBlueprint: null,
     _simMetrics: null,
 
-    // Top-level SQL Workbench Mode ('sql-studio' default | 'architecture-canvas')
+    // Top-level SQL Workbench Mode ('sql-studio' default | 'sql-challenges' | 'architecture-canvas')
     _activeWorkbenchMode: 'sql-studio',
     _sqlStudioDatasetId: '__unified__',
-    _sqlStudioEngine: 'postgres',
+    _sqlStudioEngine: 'sqlite',
+    _activeChallengeId: 'chal-01-not-in-null-outage',
+    _challengeDrafts: {},
+    _solvedChallengesKey: 'sql_in_depth_solved_challenges_v1',
     _sqlStudioQuery: [
       '-- Interactive SQL & Table Studio (PostgreSQL 18 WASM & SQLite 3 WASM)',
       '-- Press Cmd/Ctrl+Enter or click "▶ Execute SQL" to run & visualize each relational clause',
@@ -156,6 +159,41 @@
       if (queryBp) {
         this._lastQueryBlueprint = queryBp;
       }
+
+      if (root.SQLEngine && typeof root.SQLEngine.getEngineMode === 'function') {
+        this._sqlStudioEngine = root.SQLEngine.getEngineMode() || 'sqlite';
+      }
+
+      try {
+        if (root.location && root.location.search) {
+          var urlParams = new URLSearchParams(root.location.search);
+          var modeParam = urlParams.get('mode') || urlParams.get('tab');
+          if (modeParam === 'challenges' || modeParam === 'sql-challenges') {
+            this._activeWorkbenchMode = 'sql-challenges';
+          } else if (modeParam === 'architecture' || modeParam === 'architecture-canvas' || queryBp) {
+            this._activeWorkbenchMode = 'architecture-canvas';
+          }
+          var chalParam = urlParams.get('challenge');
+          if (chalParam) {
+            this._activeChallengeId = chalParam;
+            this._activeWorkbenchMode = 'sql-challenges';
+          }
+          if (root.TableVisualizer && typeof root.TableVisualizer.decodeShareableQuery === 'function') {
+            var shared = root.TableVisualizer.decodeShareableQuery(root.location.search);
+            if (shared && shared.sql) {
+              this._activeWorkbenchMode = 'sql-studio';
+              this._sqlStudioQuery = shared.sql;
+              if (shared.datasetId) this._sqlStudioDatasetId = shared.datasetId;
+              if (shared.engine === 'postgres' || shared.engine === 'sqlite') {
+                this._sqlStudioEngine = shared.engine;
+                if (root.SQLEngine && typeof root.SQLEngine.setEngineMode === 'function') {
+                  root.SQLEngine.setEngineMode(shared.engine);
+                }
+              }
+            }
+          }
+        }
+      } catch (e) {}
 
       this._initBoards(requestedBp || 'sargable-composite-index-selector', Boolean(requestedBp));
       this.render();
@@ -922,10 +960,13 @@
 
           return (
             '<div class="sql-schema-table-item" style="margin-bottom:6px;border:1px solid var(--border);border-radius:6px;background:var(--bg);overflow:hidden;">' +
-              '<button type="button" data-sql-preview-table="' + escapeHtml(t.name) + '" data-sql-preview-ds="' + escapeHtml(dsKey) + '" style="width:100%;display:flex;justify-content:space-between;align-items:center;padding:6px 8px;background:var(--surface);border:none;color:var(--fg);font-family:var(--font-mono);font-size:0.78rem;font-weight:600;cursor:pointer;text-align:left;" title="Click to preview SELECT * FROM ' + escapeHtml(t.name) + ' LIMIT 15;">' +
-                '<span>' + escapeHtml(t.name) + '</span>' +
-                '<span style="font-size:0.68rem;color:var(--fg-muted);font-weight:400;">' + (t.rowCount || (Array.isArray(t.rows) ? t.rows.length : 0)) + ' rows</span>' +
-              '</button>' +
+              '<div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);padding:4px 8px;gap:6px;">' +
+                '<button type="button" data-sql-preview-table="' + escapeHtml(t.name) + '" data-sql-preview-ds="' + escapeHtml(dsKey) + '" style="flex:1;display:flex;justify-content:space-between;align-items:center;padding:2px 0;background:transparent;border:none;color:var(--fg);font-family:var(--font-mono);font-size:0.78rem;font-weight:600;cursor:pointer;text-align:left;" title="Click to preview SELECT * FROM ' + escapeHtml(t.name) + ' LIMIT 15;">' +
+                  '<span>' + escapeHtml(t.name) + '</span>' +
+                  '<span style="font-size:0.68rem;color:var(--fg-muted);font-weight:400;">' + (t.rowCount || (Array.isArray(t.rows) ? t.rows.length : 0)) + ' rows</span>' +
+                '</button>' +
+                '<button type="button" class="wb-insert-table-btn" data-insert-table="' + escapeHtml(t.name) + '" title="Insert table name ' + escapeHtml(t.name) + ' into SQL editor" aria-label="Insert table ' + escapeHtml(t.name) + '">+ Insert</button>' +
+              '</div>' +
               '<div style="padding:4px 4px 6px;border-top:1px solid var(--border);">' + colsHtml + '</div>' +
             '</div>'
           );
@@ -982,6 +1023,7 @@
       this._sqlStudioVizHandle = root.TableVisualizer.mountClauseVisualizer(slot, sql, {
         datasetId: this._sqlStudioDatasetId || '__unified__',
         referenceSql: sql,
+        ideCtrl: this._wbIdeCtrl || null,
         startAtFinal: opts.startAtFinal !== false,
         focusExplain: Boolean(opts.focusExplain),
         runTests: Boolean(opts.runTests),
@@ -997,6 +1039,33 @@
           }
         }
       }).catch(function() {});
+    },
+
+    _getChallengesList: function() {
+      var raw = (root && (root.CHALLENGES_DATA || root.ChallengesData)) || [];
+      var arr = Array.isArray(raw) ? raw : (raw.challenges || []);
+      return arr.filter(function(c) { return c && c.codeFix && c.codeFix.solutionCode; });
+    },
+
+    _getSolvedChallengesMap: function() {
+      try {
+        if (root.localStorage) {
+          var s = root.localStorage.getItem(this._solvedChallengesKey);
+          if (s) return JSON.parse(s) || {};
+        }
+      } catch (e) {}
+      return {};
+    },
+
+    _markChallengeSolved: function(chalId) {
+      if (!chalId) return;
+      var map = this._getSolvedChallengesMap();
+      map[chalId] = Date.now();
+      try {
+        if (root.localStorage) {
+          root.localStorage.setItem(this._solvedChallengesKey, JSON.stringify(map));
+        }
+      } catch (e) {}
     },
 
     _triggerDownload: function(content, filename, mime) {
@@ -1145,15 +1214,188 @@
       var inspectorHtml = this._renderInspectorPanel(blocks);
       var capacityPanelHtml = this._renderCapacityEstimator(cap);
 
+      var solvedMap = this._getSolvedChallengesMap();
+      var challengesList = this._getChallengesList();
+      var solvedCount = challengesList.filter(function(c) { return Boolean(solvedMap[c.id]); }).length;
+
       var modeSwitcherHtml =
-        '<div class="wb-mode-switcher" role="tablist" aria-label="SQL Workbench Mode Switcher" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">' +
+        '<div class="wb-mode-switcher" role="tablist" aria-label="SQL Workbench Mode Switcher">' +
           '<button type="button" role="tab" aria-selected="' + (this._activeWorkbenchMode === 'sql-studio') + '" class="eco-btn eco-btn--sm ' + (this._activeWorkbenchMode === 'sql-studio' ? 'eco-btn--primary' : '') + '" data-workbench-mode="sql-studio">' +
-            'SQL Sandbox' +
+            'SQL Playground' +
+          '</button>' +
+          '<button type="button" role="tab" aria-selected="' + (this._activeWorkbenchMode === 'sql-challenges') + '" class="eco-btn eco-btn--sm ' + (this._activeWorkbenchMode === 'sql-challenges' ? 'eco-btn--primary' : '') + '" data-workbench-mode="sql-challenges">' +
+            'SQL Challenges (' + solvedCount + '/' + (challengesList.length || 12) + ')' +
           '</button>' +
           '<button type="button" role="tab" aria-selected="' + (this._activeWorkbenchMode === 'architecture-canvas') + '" class="eco-btn eco-btn--sm ' + (this._activeWorkbenchMode === 'architecture-canvas' ? 'eco-btn--primary' : '') + '" data-workbench-mode="architecture-canvas">' +
             'Architecture Canvas' +
           '</button>' +
         '</div>';
+
+      if (this._activeWorkbenchMode === 'sql-challenges') {
+        if (challengesList.length === 0 && root.Lazy && typeof root.Lazy.load === 'function') {
+          this._container.innerHTML = '<div class="view-canvas sandbox-view"><p style="padding:2rem;color:var(--fg-muted);">Loading SQL Challenges…</p></div>';
+          root.Lazy.load('data/challenges.js').then(function() { self.render(); });
+          return;
+        }
+        var activeChal = challengesList.find(function(c) { return c.id === self._activeChallengeId; }) || challengesList[0] || {
+          id: 'fallback',
+          title: 'Filter Completed High-Value Orders',
+          subtitle: 'Return completed orders over $500 sorted by amount descending.',
+          difficulty: 'easy',
+          category: 'Filtering & Sorting',
+          invariants: ['Filter status = \'completed\' and total_cents >= 50000.'],
+          codeFix: {
+            datasetId: 'ecommerce',
+            buggyCode: 'SELECT order_id, customer_id, status, total_cents\nFROM orders;',
+            solutionCode: 'SELECT order_id, customer_id, status, total_cents\nFROM orders\nWHERE status = \'completed\' AND total_cents >= 50000\nORDER BY total_cents DESC;'
+          }
+        };
+        this._activeChallengeId = activeChal.id;
+        var cf = activeChal.codeFix || {};
+        var chalDs = cf.datasetId || 'ecommerce';
+        var draftSql = this._challengeDrafts[activeChal.id] !== undefined
+          ? this._challengeDrafts[activeChal.id]
+          : (cf.buggyCode || cf.solutionCode || '');
+        var isSolved = Boolean(solvedMap[activeChal.id]);
+        var hintsHtml = Array.isArray(activeChal.invariants) && activeChal.invariants.length > 0
+          ? '<ul style="margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:4px;">' +
+              activeChal.invariants.map(function(h) { return '<li>' + escapeHtml(h) + '</li>'; }).join('') +
+            '</ul>'
+          : '<p style="margin:6px 0 0;">' + escapeHtml(cf.summary || activeChal.summary || '') + '</p>';
+
+        var chalOptionsHtml = challengesList.map(function(ch, idx) {
+          var doneMark = solvedMap[ch.id] ? '✓ ' : '';
+          return '<option value="' + escapeHtml(ch.id) + '" ' + (ch.id === activeChal.id ? 'selected' : '') + '>' +
+            doneMark + (idx + 1) + '. ' + escapeHtml(ch.title) + ' [' + escapeHtml(String(ch.difficulty || 'medium').toUpperCase()) + ']' +
+          '</option>';
+        }).join('');
+
+        this._container.innerHTML =
+          '<div class="view-canvas sandbox-view sandbox-view--clean">' +
+            '<header class="wb-sandbox-topbar">' +
+              '<div class="wb-sandbox-brand">' +
+                '<h1 class="view-title wb-sandbox-title">SQL Challenges</h1>' +
+                '<span class="wb-sandbox-meta">' + solvedCount + ' / ' + challengesList.length + ' Solved · Auto-Checked</span>' +
+                modeSwitcherHtml +
+              '</div>' +
+              '<div class="wb-sandbox-controls">' +
+                '<label class="wb-ctrl-field">' +
+                  '<span>Challenge</span>' +
+                  '<select id="wb-challenge-select" aria-label="Select SQL challenge" class="eco-search-input wb-ctrl-select" style="max-width:340px;">' +
+                    chalOptionsHtml +
+                  '</select>' +
+                '</label>' +
+                '<label class="wb-ctrl-field">' +
+                  '<span>Engine</span>' +
+                  '<select id="wb-sql-engine-select" class="eco-search-input wb-ctrl-select">' +
+                    '<option value="postgres" ' + (this._sqlStudioEngine === 'postgres' ? 'selected' : '') + '>PostgreSQL 18 (WASM)</option>' +
+                    '<option value="sqlite" ' + (this._sqlStudioEngine === 'sqlite' ? 'selected' : '') + '>SQLite 3.46 (WASM)</option>' +
+                  '</select>' +
+                '</label>' +
+              '</div>' +
+            '</header>' +
+            '<main class="view-body" id="sandbox-mount-target">' +
+              '<div class="wb-challenge-shell" style="display:flex;flex-direction:column;gap:14px;max-width:1180px;margin:0 auto;padding:12px 0;">' +
+                '<section class="wb-editor-card" style="gap:10px;">' +
+                  '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">' +
+                    '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
+                      '<span class="eco-pill eco-pill--accent">' + escapeHtml(activeChal.category || 'SQL Challenge') + '</span>' +
+                      '<span class="eco-pill">Dataset: ' + escapeHtml(chalDs) + '</span>' +
+                      '<span class="eco-pill">' + escapeHtml(String(activeChal.difficulty || 'medium').toUpperCase()) + '</span>' +
+                      (isSolved ? '<span class="ds-badge ds-badge--success" id="wb-chal-solved-pill">✓ Solved</span>' : '<span class="ds-badge" id="wb-chal-solved-pill">Unsolved</span>') +
+                    '</div>' +
+                    '<button type="button" class="eco-btn eco-btn--sm" data-chal-action="share-challenge">Share Challenge</button>' +
+                  '</div>' +
+                  '<h2 style="margin:0;font-size:1.12rem;font-weight:650;color:var(--fg);">' + escapeHtml(cf.title || activeChal.title) + '</h2>' +
+                  '<p style="margin:0;font-size:0.9rem;color:var(--fg-muted);line-height:1.55;">' + escapeHtml(cf.summary || activeChal.subtitle || '') + '</p>' +
+                  '<details class="sql-lab-hint-details" style="margin-top:2px;">' +
+                    '<summary style="cursor:pointer;font-size:0.82rem;font-weight:600;color:var(--accent);">Show Relational Hints &amp; Invariants</summary>' +
+                    '<div style="font-size:0.83rem;color:var(--fg-muted);line-height:1.55;padding-top:4px;">' + hintsHtml + '</div>' +
+                  '</details>' +
+                '</section>' +
+                '<section class="wb-editor-card">' +
+                  '<div class="wb-editor-toolbar">' +
+                    '<div class="wb-editor-toolbar__left">' +
+                      '<button type="button" class="eco-btn eco-btn--sm eco-btn--primary" data-chal-action="check">Run &amp; Check Solution (Cmd+Enter)</button>' +
+                      '<button type="button" class="eco-btn eco-btn--sm" data-chal-action="run-only">Run Preview</button>' +
+                      '<button type="button" class="eco-btn eco-btn--sm" data-chal-action="explain">Explain Plan</button>' +
+                    '</div>' +
+                    '<div class="wb-editor-toolbar__right">' +
+                      '<button type="button" class="eco-btn eco-btn--sm" data-chal-action="format">Format</button>' +
+                      '<button type="button" class="eco-btn eco-btn--sm" data-chal-action="reset">Reset Buggy Starter</button>' +
+                      '<button type="button" class="eco-btn eco-btn--sm" data-chal-action="reveal">Reveal Solution</button>' +
+                    '</div>' +
+                  '</div>' +
+                  '<textarea class="sql-studio-editor sql-inline-workbench__editor" id="wb-challenge-editor" aria-label="SQL challenge editor" spellcheck="false" rows="9">' + escapeHtml(draftSql) + '</textarea>' +
+                  '<div id="wb-challenge-verdict" style="display:none;padding:10px 14px;border-radius:6px;font-size:0.84rem;"></div>' +
+                '</section>' +
+                '<div id="wb-challenge-visualizer-slot"></div>' +
+              '</div>' +
+            '</main>' +
+          '</div>';
+
+        var chalEditor = this._container.querySelector('#wb-challenge-editor');
+        var chalSlot = this._container.querySelector('#wb-challenge-visualizer-slot');
+        var chalVerdict = this._container.querySelector('#wb-challenge-verdict');
+
+        this._runChallengeCheck = function(onlyPreview, focusExplain) {
+          var curVal = chalEditor ? chalEditor.value : draftSql;
+          self._challengeDrafts[activeChal.id] = curVal;
+          if (!root.TableVisualizer) return;
+          root.TableVisualizer.mountClauseVisualizer(chalSlot, curVal, {
+            datasetId: chalDs,
+            ideCtrl: self._chalIdeCtrl || null,
+            startAtFinal: true,
+            focusExplain: Boolean(focusExplain),
+            compactHeader: false
+          });
+          if (onlyPreview) return;
+          if (chalVerdict) {
+            chalVerdict.style.display = 'block';
+            chalVerdict.style.border = '1px solid var(--border-strong)';
+            chalVerdict.style.background = 'var(--bg-alt)';
+            chalVerdict.textContent = 'Checking result set against expected relational output…';
+          }
+          root.TableVisualizer.verifyQueryAgainstReference(curVal, cf.solutionCode, {
+            datasetId: chalDs,
+            buggyCode: cf.buggyCode
+          }).then(function(vRes) {
+            if (!chalVerdict) return;
+            if (vRes && vRes.passed) {
+              self._markChallengeSolved(activeChal.id);
+              var pill = self._container ? self._container.querySelector('#wb-chal-solved-pill') : null;
+              if (pill) {
+                pill.className = 'ds-badge ds-badge--success';
+                pill.textContent = '✓ Solved';
+              }
+              chalVerdict.style.border = '1px solid var(--success)';
+              chalVerdict.style.background = 'var(--success-muted)';
+              chalVerdict.innerHTML =
+                '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">' +
+                  '<strong style="color:var(--success);">✓ Challenge Solved! (' + vRes.passedCount + '/' + vRes.totalCount + ' checks passed)</strong>' +
+                  '<button type="button" class="eco-btn eco-btn--sm" data-chal-action="share-solved">Share Solved Query</button>' +
+                '</div>';
+            } else {
+              var failed = (vRes && vRes.checks || []).find(function(c) { return !c.passed; });
+              chalVerdict.style.border = '1px solid var(--error)';
+              chalVerdict.style.background = 'var(--error-muted)';
+              chalVerdict.innerHTML =
+                '<strong style="color:var(--error);">✗ Not solved yet (' + ((vRes && vRes.passedCount) || 0) + '/' + ((vRes && vRes.totalCount) || 4) + ' checks):</strong> ' +
+                '<span style="color:var(--fg);">' + escapeHtml(failed ? (failed.name + ' — ' + failed.detail) : 'Output tuples differ from expected solution.') + '</span>';
+            }
+          });
+        };
+
+        if (chalEditor && root.TableVisualizer && typeof root.TableVisualizer.enhanceTextareaToIde === 'function') {
+          this._chalIdeCtrl = root.TableVisualizer.enhanceTextareaToIde(chalEditor, {
+            datasetId: chalDs,
+            ariaLabel: 'SQL challenge editor',
+            onRun: function() { self._runChallengeCheck(false, false); }
+          });
+        }
+        this._runChallengeCheck(true, false);
+        return;
+      }
 
       if (this._activeWorkbenchMode === 'sql-studio') {
         var templates = this._getSqlStudioTemplates();
@@ -1163,6 +1405,7 @@
           }).join('');
 
         var schemaExplorerHtml = this._renderSqlStudioSchemaExplorer();
+        var isDesktopViewport = !(root.innerWidth && root.innerWidth < 860);
         var practiceChipsHtml = (root.TableVisualizer && Array.isArray(root.TableVisualizer.SQL_PRACTICE_CHIPS))
           ? '<div class="sql-practice-bar" id="wb-sql-practice-bar">' +
               '<span class="sql-practice-bar__label" style="font-size:0.72rem;color:var(--fg-muted);font-family:var(--font-mono);margin-right:4px;">Insert clause:</span>' +
@@ -1178,6 +1421,7 @@
               '<div class="wb-sandbox-brand">' +
                 '<h1 class="view-title wb-sandbox-title">SQL Sandbox</h1>' +
                 '<span class="wb-sandbox-meta">5 Datasets · 26 Tables</span>' +
+                modeSwitcherHtml +
               '</div>' +
               '<div class="wb-sandbox-controls">' +
                 '<label class="wb-ctrl-field">' +
@@ -1215,11 +1459,16 @@
             '<main class="view-body" id="sandbox-mount-target">' +
               '<div class="sandbox-workspace wb-sql-workspace">' +
                 '<aside class="sandbox-palette wb-schema-sidebar">' +
-                  '<div class="sandbox-palette__header wb-schema-sidebar__header">' +
-                    '<h3 class="inspector-subtitle">Schema</h3>' +
-                    '<span class="sandbox-palette__hint">Click table to preview, column to insert</span>' +
-                  '</div>' +
-                  '<div id="wb-sql-schema-sidebar">' + schemaExplorerHtml + '</div>' +
+                  '<details class="wb-schema-drawer" ' + (isDesktopViewport ? 'open' : '') + '>' +
+                    '<summary class="sandbox-palette__header wb-schema-sidebar__header wb-schema-drawer__summary">' +
+                      '<div>' +
+                        '<h3 class="inspector-subtitle" style="display:inline;">Schema Browser</h3>' +
+                        '<span class="sandbox-palette__hint" style="display:block;">Click table to preview · + Insert or column to insert</span>' +
+                      '</div>' +
+                      '<span class="wb-schema-drawer__chevron" aria-hidden="true">▾</span>' +
+                    '</summary>' +
+                    '<div id="wb-sql-schema-sidebar">' + schemaExplorerHtml + '</div>' +
+                  '</details>' +
                 '</aside>' +
                 '<section class="sandbox-canvas-wrapper wb-sql-main">' +
                   '<div class="wb-editor-card">' +
@@ -1232,6 +1481,7 @@
                       '<div class="wb-editor-toolbar__right">' +
                         '<button type="button" class="eco-btn eco-btn--sm" data-wb-ide-action="format" data-sql-ide-action="format">Format</button>' +
                         '<button type="button" class="eco-btn eco-btn--sm" data-wb-ide-action="copy" data-sql-ide-action="copy">Copy</button>' +
+                        '<button type="button" class="eco-btn eco-btn--sm" data-wb-ide-action="share-query" data-sql-ide-action="share-query">Share Link</button>' +
                         '<button type="button" class="eco-btn eco-btn--sm" data-sql-studio-action="reset-db">Reset DB</button>' +
                         '<details class="wb-tools-menu">' +
                           '<summary class="eco-btn eco-btn--sm">Save / Export</summary>' +
@@ -1251,7 +1501,7 @@
                         '</details>' +
                       '</div>' +
                     '</div>' +
-                    '<textarea class="sql-studio-editor sql-inline-workbench__editor" id="wb-sql-studio-editor" spellcheck="false" rows="8">' + escapeHtml(this._sqlStudioQuery) + '</textarea>' +
+                    '<textarea class="sql-studio-editor sql-inline-workbench__editor" id="wb-sql-studio-editor" aria-label="SQL Playground query editor" spellcheck="false" rows="8">' + escapeHtml(this._sqlStudioQuery) + '</textarea>' +
                     practiceChipsHtml +
                   '</div>' +
                   '<div id="wb-sql-studio-visualizer-slot"></div>' +
@@ -1263,6 +1513,8 @@
         var topEditor = this._container.querySelector('#wb-sql-studio-editor');
         if (topEditor && root.TableVisualizer && typeof root.TableVisualizer.enhanceTextareaToIde === 'function') {
           this._wbIdeCtrl = root.TableVisualizer.enhanceTextareaToIde(topEditor, {
+            datasetId: this._sqlStudioDatasetId || '__unified__',
+            ariaLabel: 'SQL Playground query editor',
             onRun: function() {
               self._sqlStudioQuery = topEditor.value.trim();
               self._mountSqlStudioVisualizer({ startAtFinal: true });
@@ -1860,6 +2112,60 @@
           return;
         }
 
+        // Schema Explorer table insert button -> insert table name at cursor
+        var insertTblEl = e.target.closest('[data-insert-table]');
+        if (insertTblEl) {
+          e.stopPropagation();
+          var tNameInsert = insertTblEl.getAttribute('data-insert-table');
+          var edTblTa = container.querySelector('#wb-sql-studio-editor');
+          if (tNameInsert && edTblTa && root.TableVisualizer && typeof root.TableVisualizer.insertSqlSnippet === 'function') {
+            root.TableVisualizer.insertSqlSnippet(edTblTa, tNameInsert);
+            self._sqlStudioQuery = edTblTa.value;
+          }
+          return;
+        }
+
+        // SQL Challenges mode actions
+        var chalActBtn = e.target.closest('[data-chal-action]');
+        if (chalActBtn) {
+          var cAct = chalActBtn.getAttribute('data-chal-action');
+          var cEd = container.querySelector('#wb-challenge-editor');
+          var activeCh = self._getChallengesList().find(function(c) { return c.id === self._activeChallengeId; });
+          var cfObj = (activeCh && activeCh.codeFix) || {};
+          if (cAct === 'check' && typeof self._runChallengeCheck === 'function') {
+            self._runChallengeCheck(false, false);
+          } else if (cAct === 'run-only' && typeof self._runChallengeCheck === 'function') {
+            self._runChallengeCheck(true, false);
+          } else if (cAct === 'explain' && typeof self._runChallengeCheck === 'function') {
+            self._runChallengeCheck(true, true);
+          } else if (cAct === 'format' && cEd && root.TableVisualizer && typeof root.TableVisualizer.formatSql === 'function') {
+            cEd.value = root.TableVisualizer.formatSql(cEd.value);
+            self._challengeDrafts[self._activeChallengeId] = cEd.value;
+          } else if (cAct === 'reset' && cEd) {
+            cEd.value = cfObj.buggyCode || '';
+            self._challengeDrafts[self._activeChallengeId] = cEd.value;
+            if (typeof self._runChallengeCheck === 'function') self._runChallengeCheck(true, false);
+          } else if (cAct === 'reveal' && cEd) {
+            cEd.value = cfObj.solutionCode || '';
+            self._challengeDrafts[self._activeChallengeId] = cEd.value;
+            if (typeof self._runChallengeCheck === 'function') self._runChallengeCheck(true, false);
+          } else if (cAct === 'share-challenge') {
+            var chUrl = ((root.location && root.location.origin && root.location.origin !== 'null') ? root.location.origin : 'https://sql-in-depth.vedgupta.in') +
+              '/sandbox/?mode=challenges&challenge=' + encodeURIComponent(self._activeChallengeId);
+            if (root.App && typeof root.App.sharePageUrl === 'function') {
+              root.App.sharePageUrl({ title: (activeCh && activeCh.title) || 'SQL Challenge', url: chUrl });
+            }
+          } else if (cAct === 'share-solved' && cEd && root.TableVisualizer && typeof root.TableVisualizer.shareSqlQueryLink === 'function') {
+            root.TableVisualizer.shareSqlQueryLink({
+              sql: cEd.value,
+              datasetId: cfObj.datasetId || 'ecommerce',
+              engine: self._sqlStudioEngine,
+              title: 'Solved: ' + ((activeCh && activeCh.title) || 'SQL Challenge')
+            }, chalActBtn);
+          }
+          return;
+        }
+
         // Schema Explorer column click -> insert column name at cursor
         var insertColEl = e.target.closest('[data-insert-col]');
         if (insertColEl) {
@@ -1921,6 +2227,19 @@
             var origLabel = wbIdeBtn.textContent;
             wbIdeBtn.textContent = '✓ Copied';
             setTimeout(function() { wbIdeBtn.textContent = origLabel; }, 1200);
+          } else if (ideAct === 'share-query' && root.TableVisualizer && typeof root.TableVisualizer.shareSqlQueryLink === 'function') {
+            var sharedLink = root.TableVisualizer.shareSqlQueryLink({
+              sql: curSql,
+              datasetId: self._sqlStudioDatasetId || '__unified__',
+              engine: self._sqlStudioEngine,
+              title: 'Runnable SQL Query — SQL in Depth'
+            }, wbIdeBtn);
+            try {
+              if (root.history && typeof root.history.replaceState === 'function' && sharedLink) {
+                var parsedUrl = new URL(sharedLink);
+                root.history.replaceState(null, '', parsedUrl.pathname + parsedUrl.search);
+              }
+            } catch (e) {}
           } else if (ideAct === 'save-query' && root.TableVisualizer && typeof root.TableVisualizer.saveQuery === 'function') {
             var titleInput = container.querySelector('#wb-sql-save-title-input');
             var qTitle = (titleInput && titleInput.value && titleInput.value.trim())
@@ -2307,11 +2626,24 @@
 
       // 2b. Change & Keydown handlers for SQL Studio selects & editor
       container.addEventListener('change', function(e) {
+        if (e.target.id === 'wb-challenge-select') {
+          var prevEd = container.querySelector('#wb-challenge-editor');
+          if (prevEd && self._activeChallengeId) {
+            self._challengeDrafts[self._activeChallengeId] = prevEd.value;
+          }
+          self._activeChallengeId = e.target.value;
+          self.render();
+          return;
+        }
         if (e.target.id === 'wb-sql-engine-select') {
           self._sqlStudioEngine = e.target.value || 'postgres';
           if (root.SQLEngine && typeof root.SQLEngine.setEngineMode === 'function') {
             Promise.resolve(root.SQLEngine.setEngineMode(self._sqlStudioEngine)).then(function() {
-              self._mountSqlStudioVisualizer({ startAtFinal: true });
+              if (self._activeWorkbenchMode === 'sql-challenges' && typeof self._runChallengeCheck === 'function') {
+                self._runChallengeCheck(true, false);
+              } else {
+                self._mountSqlStudioVisualizer({ startAtFinal: true });
+              }
             });
           } else {
             self._mountSqlStudioVisualizer({ startAtFinal: true });

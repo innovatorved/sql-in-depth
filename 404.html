@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-product="sql" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <base href="/">
@@ -11,21 +11,23 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="robots" content="noindex, follow">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#ffffff">
+  <meta name="theme-color" content="#f7f8fa">
 
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preload" href="fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/variables.css?v=9c83c307bd">
-  <link rel="stylesheet" href="css/layout.css?v=a384f455dc">
-  <link rel="stylesheet" href="css/components.css?v=e10cd9c014">
-  <link rel="stylesheet" href="css/content.css?v=a8314bfb46">
-  <link rel="stylesheet" href="css/simulators.css?v=d890553508">
+  <link rel="stylesheet" href="design-system/tokens.css?v=51fcdc77d9">
+  <link rel="stylesheet" href="design-system/components.css?v=6c6589ed5c">
+  <link rel="stylesheet" href="css/variables.css?v=a80f2ff051">
+  <link rel="stylesheet" href="css/layout.css?v=cd1fac68d6">
+  <link rel="stylesheet" href="css/components.css?v=794db81dd6">
+  <link rel="stylesheet" href="css/content.css?v=9fbc099df8">
+  <link rel="stylesheet" href="css/simulators.css?v=12c0ddb1fa">
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=f6a6002f60"></script>
-  <script src="js/manifest.js?v=5685fdde9f"></script>
+  <script src="js/manifest.js?v=d32807ffd4"></script>
 
   <style>
     .not-found-wrapper {
@@ -214,7 +216,7 @@
 
         <!-- Quick Search Form -->
         <form class="not-found-search">
-          <input type="text" id="error-search-input" placeholder="Search 180 topics &amp; 18 builds (e.g. Window Functions, B+Tree, MVCC)…" autocomplete="off" spellcheck="false">
+          <input type="text" id="error-search-input" aria-label="Search 180 SQL topics and builds" placeholder="Search 180 topics &amp; 18 builds (e.g. Window Functions, B+Tree, MVCC)…" autocomplete="off" spellcheck="false">
           <button type="submit" class="btn btn--primary" style="padding:0 16px;">Search</button>
         </form>
 
