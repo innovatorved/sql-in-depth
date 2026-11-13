@@ -387,10 +387,12 @@ window.Search = (() => {
       handleKeyDown(e);
     });
 
-    // Auto-open search modal when navigated with ?q=<query> (e.g. from 404.html search box)
+    // Auto-open search modal when navigated with ?q=<query> (e.g. from 404.html search box),
+    // excluding /sandbox where ?q= encodes a shareable SQL query.
     try {
+      const pathName = (window.location && window.location.pathname) || '/';
       const qParam = new URLSearchParams(window.location.search).get('q');
-      if (qParam && qParam.trim()) {
+      if (qParam && qParam.trim() && !pathName.startsWith('/sandbox')) {
         open(qParam.trim());
       }
     } catch {}

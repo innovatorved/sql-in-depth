@@ -962,10 +962,12 @@ window.Renderer = (() => {
     articleCol += renderLessonNav(slug, mod, part);
 
     // Sticky Right-Rail TOC (visible on >= 1280px viewports)
-    const modProg = window.Progress?.getModuleProgress
+    const rawModProg = window.Progress?.getModuleProgress
       ? window.Progress.getModuleProgress(mod.id)
       : { completed: 0, total: mod.units.length };
-    const modPct = modProg.total > 0 ? Math.round((modProg.completed / modProg.total) * 100) : 0;
+    const modTotal = rawModProg.total || (mod.units ? mod.units.length : 10);
+    const modCompleted = rawModProg.completed || 0;
+    const modPct = modTotal > 0 ? Math.round((modCompleted / modTotal) * 100) : 0;
 
     const tocEntries = [];
     if (moduleContent?.intuition) tocEntries.push({ id: 'sec-why-it-matters', label: 'Why It Matters' });
@@ -990,7 +992,7 @@ window.Renderer = (() => {
         <div class="ds-toc__progress-card">
           <div class="ds-toc__progress-row">
             <span>Module ${escapeHtml(String(mod.number))}</span>
-            <span>${modProg.completed}/${modProg.total} done</span>
+            <span>${modCompleted}/${modTotal} done</span>
           </div>
           <div class="ds-toc__progress-bar" aria-hidden="true">
             <div class="ds-toc__progress-fill" style="width:${modPct}%"></div>

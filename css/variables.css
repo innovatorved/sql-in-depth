@@ -230,14 +230,14 @@
   --fg-faint: #526075;
   --fg-inv: #FFFFFF;
 
-  /* SQL In Depth Brand Accent — Precision Cobalt */
-  --accent: #0F62FE;
+  /* SQL In Depth Brand Accent — Precision Cobalt (WCAG AA >= 5.4:1 on #E9F1FF & #FFFFFF) */
+  --accent: #0B53D6;
   --accent-hover: #0043CE;
-  --accent-muted: rgba(15, 98, 254, 0.09);
-  --accent-border: rgba(15, 98, 254, 0.28);
+  --accent-muted: rgba(11, 83, 214, 0.09);
+  --accent-border: rgba(11, 83, 214, 0.28);
   --accent-fg: #FFFFFF;
-  --link: #0F62FE;
-  --selection: rgba(15, 98, 254, 0.18);
+  --link: #0B53D6;
+  --selection: rgba(11, 83, 214, 0.18);
 
   --success: #067647;
   --success-muted: rgba(6, 118, 71, 0.10);

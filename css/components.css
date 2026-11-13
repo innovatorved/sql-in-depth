@@ -537,11 +537,11 @@
   color: #f59e0b;
 }
 .tok-comment {
-  color: #64748b;
+  color: #8b9bb4;
   font-style: italic;
 }
 .tok-fn {
-  color: #818cf8;
+  color: #93c5fd;
 }
 .tok-preproc {
   color: #c084fc;
@@ -550,27 +550,27 @@
   color: #94a3b8;
 }
 
-/* Light mode token tweaks */
+/* Light mode token tweaks (WCAG AA >= 4.7:1 on #F4F6FA) */
 [data-theme="light"] .tok-kw {
-  color: #e11d48;
+  color: #be123c;
 }
 [data-theme="light"] .tok-type {
-  color: #0891b2;
+  color: #0e7490;
 }
 [data-theme="light"] .tok-str {
-  color: #059669;
+  color: #047857;
 }
 [data-theme="light"] .tok-num {
-  color: #d97706;
+  color: #b45309;
 }
 [data-theme="light"] .tok-comment {
-  color: #64748b;
+  color: #475569;
 }
 [data-theme="light"] .tok-fn {
-  color: #6366f1;
+  color: #4338ca;
 }
 [data-theme="light"] .tok-preproc {
-  color: #9333ea;
+  color: #7e22ce;
 }
 [data-theme="light"] .tok-op {
   color: #475569;
@@ -2062,41 +2062,50 @@
 .check-slider__dots {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 2px;
   margin-left: auto;
 }
 .check-slider__dot {
   appearance: none;
   padding: 0;
-  border: 1px solid transparent;
+  border: 0;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  display: inline-grid;
+  place-items: center;
+  cursor: pointer;
+}
+.check-slider__dot::before {
+  content: "";
   width: 9px;
   height: 9px;
   border-radius: 50%;
+  border: 1px solid transparent;
   background: var(--surface-active);
-  cursor: pointer;
   transition: background var(--dur-fast), transform var(--dur-fast), border-color var(--dur-fast);
 }
-.check-slider__dot.is-numeric {
+.check-slider__dot.is-numeric::before {
   border-radius: 2px;
 }
-.check-slider__dot.is-tradeoff {
+.check-slider__dot.is-tradeoff::before {
   border-radius: 2px;
   transform: rotate(45deg);
 }
-.check-slider__dot:hover {
+.check-slider__dot:hover::before {
   border-color: var(--fg-muted);
 }
-.check-slider__dot.is-current {
+.check-slider__dot.is-current::before {
   background: var(--fg);
   transform: scale(1.25);
 }
-.check-slider__dot.is-tradeoff.is-current {
+.check-slider__dot.is-tradeoff.is-current::before {
   transform: rotate(45deg) scale(1.25);
 }
-.check-slider__dot.is-right {
+.check-slider__dot.is-right::before {
   background: var(--success);
 }
-.check-slider__dot.is-wrong {
+.check-slider__dot.is-wrong::before {
   background: var(--error);
 }
 .check-slider__slide[hidden],

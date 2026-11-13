@@ -226,7 +226,7 @@ window.Landing = (() => {
             <div class="landing-hero__actions">
               <a class="btn btn--primary landing-btn" id="landing-primary-cta" href="/topic/${esc(first?.slug || 'why-databases-exist')}/">Start learning →</a>
               <a class="btn btn--outline landing-btn" href="/sandbox" data-nav="sandbox">Open SQL Studio</a>
-              <button class="landing-search" type="button" data-landing-search aria-label="Search ${c.topics} SQL topics">
+              <button class="landing-search" type="button" data-landing-search>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                 Search ${c.topics} topics <kbd>⌘K</kbd>
               </button>
