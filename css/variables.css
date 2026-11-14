@@ -1,6 +1,7 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   Design Tokens — SQL In Depth (powered by Shared Design System v1.0)
+   Design Tokens — In-Depth Engineering Series (Shared Design System v1.1)
    Self-hosted Geist + Geist Mono · Warm neutral light · Charcoal dark
+   Unified Brand Palette: VedGupta Dark Blue (#1E40AF light / #60A5FA dark)
    ═══════════════════════════════════════════════════════════════════════════ */
 
 @font-face {
@@ -107,7 +108,7 @@
   --z-toast: 60;
 }
 
-/* ── Dark Theme — Neutral Charcoal (Zero #000000 Glare, no blue cast) ──── */
+/* ── Dark Theme — Neutral Charcoal + Unified VedGupta Dark Blue ────────── */
 [data-theme="dark"], :root {
   --bg: #0F0F10;
   --bg-alt: #141415;
@@ -121,7 +122,7 @@
 
   --border: #27272A;
   --border-strong: #3A3A3E;
-  --border-focus: #A1A1AA;
+  --border-focus: #60A5FA;
   --divider: #202023;
   --border-subtle: #1D1D20;
 
@@ -132,17 +133,30 @@
   --fg-faint: #8E8E97;
   --fg-inv: #111113;
 
-  /* SQL In Depth Brand — Ink actions + Ember highlight */
-  --accent: #F4F4F5;
-  --accent-hover: #FFFFFF;
-  --accent-muted: rgba(244, 244, 245, 0.08);
-  --accent-border: rgba(244, 244, 245, 0.22);
-  --accent-fg: #111113;
-  --ember: #FB923C;
-  --ember-muted: rgba(251, 146, 60, 0.12);
-  --ember-border: rgba(251, 146, 60, 0.34);
-  --link: #FDBA74;
-  --selection: rgba(251, 146, 60, 0.26);
+  /* Unified VedGupta Dark Blue Brand */
+  --accent: #60A5FA;
+  --accent-hover: #93C5FD;
+  --accent-solid: #1E40AF;
+  --accent-solid-hover: #1D4ED8;
+  --accent-solid-fg: #FFFFFF;
+  --accent-text: #60A5FA;
+  --accent-muted: rgba(30, 64, 175, 0.24);
+  --accent-border: rgba(96, 165, 250, 0.36);
+  --accent-fg: #0B1528;
+
+  /* Legacy cross-repo aliases mapped to unified VedGupta Blue */
+  --ember: #60A5FA;
+  --ember-muted: rgba(30, 64, 175, 0.22);
+  --ember-border: rgba(96, 165, 250, 0.34);
+  --violet: #60A5FA;
+  --violet-muted: rgba(30, 64, 175, 0.22);
+  --violet-border: rgba(96, 165, 250, 0.34);
+  --teal: #60A5FA;
+  --teal-muted: rgba(30, 64, 175, 0.22);
+  --teal-border: rgba(96, 165, 250, 0.34);
+
+  --link: #60A5FA;
+  --selection: rgba(30, 64, 175, 0.36);
 
   /* Status Palette */
   --success: #34D399;
@@ -157,10 +171,10 @@
   --error-muted: rgba(239, 68, 68, 0.14);
   --error-bg: rgba(239, 68, 68, 0.10);
   --error-border: rgba(248, 113, 113, 0.34);
-  --info: #67D3E3;
-  --info-muted: rgba(103, 211, 227, 0.12);
-  --info-bg: rgba(103, 211, 227, 0.09);
-  --info-border: rgba(103, 211, 227, 0.32);
+  --info: #60A5FA;
+  --info-muted: rgba(30, 64, 175, 0.20);
+  --info-bg: rgba(30, 64, 175, 0.16);
+  --info-border: rgba(96, 165, 250, 0.34);
 
   /* Interactive & Legacy Compatibility Surfaces */
   --chip-bg: #1C1C1F;
@@ -168,7 +182,7 @@
   --chip-fg: #C4C4CA;
   --hover-bg: #1F1F22;
   --active-bg: #28282B;
-  --selected-bg: rgba(244, 244, 245, 0.06);
+  --selected-bg: rgba(30, 64, 175, 0.18);
   --bg-card: #18181A;
   --bg-hover: #1F1F22;
   --bg-secondary: #121213;
@@ -182,11 +196,11 @@
   --code-bg: #121213;
   --code-border: #27272A;
   --code-fg: #E4E4E7;
-  --code-inline-bg: rgba(161, 161, 170, 0.14);
-  --code-inline-fg: #FDBA74;
+  --code-inline-bg: rgba(30, 64, 175, 0.20);
+  --code-inline-fg: #93C5FD;
 
   /* Syntax tokens */
-  --syn-kw: #FDBA74;
+  --syn-kw: #93C5FD;
   --syn-fn: #7DD3E0;
   --syn-str: #86EFAC;
   --syn-num: #FDE68A;
@@ -196,14 +210,14 @@
   /* Callouts */
   --callout-bg: #18181A;
   --callout-border: #2E2E32;
-  --callout-note: #67D3E3;
+  --callout-note: #60A5FA;
   --callout-tip: #34D399;
   --callout-warn: #FBBF24;
   --callout-danger: #F87171;
 
   /* Progress */
   --progress-track: #27272A;
-  --progress-fill: #FB923C;
+  --progress-fill: #3B82F6;
 
   /* Clean Elevation (zero dual shadow+border ghosting on resting cards) */
   --shadow-sm: none;
@@ -216,7 +230,7 @@
   color-scheme: dark;
 }
 
-/* ── Light Theme — Warm Neutral Paper ──────────────────────────────────── */
+/* ── Light Theme — Warm Neutral Paper + Unified VedGupta Dark Blue ─────── */
 [data-theme="light"] {
   --bg: #F7F7F5;
   --bg-alt: #F1F1EE;
@@ -230,7 +244,7 @@
 
   --border: #E6E4DF;
   --border-strong: #D3D0C9;
-  --border-focus: #8A857D;
+  --border-focus: #1E40AF;
   --border-subtle: #EEEDE9;
   --divider: #EDECE8;
 
@@ -241,17 +255,30 @@
   --fg-faint: #6E6A64;
   --fg-inv: #FFFFFF;
 
-  /* SQL In Depth Brand — Ink actions + Ember highlight (WCAG AA >= 5.2:1 on #FFFFFF) */
-  --accent: #1A1917;
-  --accent-hover: #34312D;
-  --accent-muted: rgba(26, 25, 23, 0.06);
-  --accent-border: rgba(26, 25, 23, 0.20);
+  /* Unified VedGupta Dark Blue Brand (8.72:1 WCAG AAA on #FFFFFF) */
+  --accent: #1E40AF;
+  --accent-hover: #1E3A8A;
+  --accent-solid: #1E40AF;
+  --accent-solid-hover: #1E3A8A;
+  --accent-solid-fg: #FFFFFF;
+  --accent-text: #1E40AF;
+  --accent-muted: rgba(30, 64, 175, 0.08);
+  --accent-border: rgba(30, 64, 175, 0.26);
   --accent-fg: #FFFFFF;
-  --ember: #C2410C;
-  --ember-muted: rgba(194, 65, 12, 0.08);
-  --ember-border: rgba(194, 65, 12, 0.28);
-  --link: #B93D0B;
-  --selection: rgba(194, 65, 12, 0.16);
+
+  /* Legacy cross-repo aliases mapped to unified VedGupta Dark Blue */
+  --ember: #1E40AF;
+  --ember-muted: rgba(30, 64, 175, 0.08);
+  --ember-border: rgba(30, 64, 175, 0.26);
+  --violet: #1E40AF;
+  --violet-muted: rgba(30, 64, 175, 0.08);
+  --violet-border: rgba(30, 64, 175, 0.26);
+  --teal: #1E40AF;
+  --teal-muted: rgba(30, 64, 175, 0.08);
+  --teal-border: rgba(30, 64, 175, 0.26);
+
+  --link: #1E40AF;
+  --selection: rgba(30, 64, 175, 0.16);
 
   --success: #067647;
   --success-muted: rgba(6, 118, 71, 0.10);
@@ -265,17 +292,17 @@
   --error-muted: rgba(180, 35, 24, 0.10);
   --error-bg: #FEF3F2;
   --error-border: #FECDCA;
-  --info: #0E7490;
-  --info-muted: rgba(14, 116, 144, 0.09);
-  --info-bg: #ECFAFC;
-  --info-border: #A5E4EE;
+  --info: #1E40AF;
+  --info-muted: rgba(30, 64, 175, 0.09);
+  --info-bg: #EFF6FF;
+  --info-border: #BFDBFE;
 
   --chip-bg: #F1F1EE;
   --chip-border: #E1DFD9;
   --chip-fg: #3D3A36;
   --hover-bg: #F1F1EE;
   --active-bg: #E8E7E3;
-  --selected-bg: rgba(26, 25, 23, 0.05);
+  --selected-bg: rgba(30, 64, 175, 0.06);
   --bg-card: #FFFFFF;
   --bg-hover: #F5F5F2;
   --bg-secondary: #FAFAF8;
@@ -288,11 +315,11 @@
   --code-bg: #FAFAF8;
   --code-border: #E6E4DF;
   --code-fg: #1A1917;
-  --code-inline-bg: #F1F0EC;
-  --code-inline-fg: #9A3412;
+  --code-inline-bg: #EFF6FF;
+  --code-inline-fg: #1E40AF;
 
-  --syn-kw: #9A3412;
-  --syn-fn: #0E7490;
+  --syn-kw: #1E40AF;
+  --syn-fn: #0369A1;
   --syn-str: #15803D;
   --syn-num: #A16207;
   --syn-op: #6E6A64;
@@ -300,13 +327,13 @@
 
   --callout-bg: #FFFFFF;
   --callout-border: #E1DFD9;
-  --callout-note: #0E7490;
+  --callout-note: #1E40AF;
   --callout-tip: #067647;
   --callout-warn: #B54708;
   --callout-danger: #B42318;
 
   --progress-track: #E6E4DF;
-  --progress-fill: #C2410C;
+  --progress-fill: #1E40AF;
 
   --shadow-sm: none;
   --shadow-md: 0 4px 14px rgba(26, 25, 23, 0.06);

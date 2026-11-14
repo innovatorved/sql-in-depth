@@ -358,7 +358,7 @@
 .dsa-sim__scrubber {
   flex: 1;
   height: 28px;
-  accent-color: var(--accent, #C2410C);
+  accent-color: var(--accent, #1E40AF);
   cursor: pointer;
 }
 
@@ -1910,7 +1910,7 @@
 }
 
 [data-theme="light"] .dsa-sim__cell-tag {
-  color: var(--accent, #C2410C);
+  color: var(--accent, #1E40AF);
 }
 
 [data-theme="light"] .dsa-sim__cell.is-match,
