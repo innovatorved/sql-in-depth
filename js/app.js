@@ -39,31 +39,6 @@ window.App = (() => {
     collapsedModulesInitialized = true;
   }
 
-  function syncCollapseModulesBtn() {
-    const labelEl = document.getElementById('sidebar-collapse-modules-label');
-    const btnEl = document.getElementById('sidebar-collapse-modules-btn');
-    if (!labelEl || !btnEl) return;
-    const allIds = getAllModuleIds();
-    const allCollapsed = allIds.length > 0 && allIds.every(id => collapsedModules.has(id));
-    labelEl.textContent = allCollapsed ? 'Expand' : 'Collapse';
-    btnEl.title = allCollapsed ? 'Expand all modules' : 'Collapse all modules';
-    btnEl.setAttribute('aria-label', allCollapsed ? 'Expand all modules' : 'Collapse all modules');
-  }
-
-  function toggleAllModules() {
-    ensureDefaultCollapsedModules();
-    const allIds = getAllModuleIds();
-    const allCollapsed = allIds.length > 0 && allIds.every(id => collapsedModules.has(id));
-    if (allCollapsed) {
-      collapsedModules.clear();
-      document.querySelectorAll('.module-group').forEach(g => g.classList.remove('collapsed'));
-    } else {
-      allIds.forEach(id => collapsedModules.add(id));
-      document.querySelectorAll('.module-group').forEach(g => g.classList.add('collapsed'));
-    }
-    syncCollapseModulesBtn();
-  }
-
   function toggleDesktopSidebar(forceCollapsed) {
     const isOverlaySidebar = window.innerWidth <= 1024 ||
       document.body.classList.contains('view-landing') ||
@@ -77,9 +52,7 @@ window.App = (() => {
       : !document.body.classList.contains('sidebar-collapsed');
     document.body.classList.toggle('sidebar-collapsed', isCollapsed);
     const collapseBtn = document.getElementById('sidebar-collapse-btn');
-    const expandBtn = document.getElementById('sidebar-expand-btn');
     if (collapseBtn) collapseBtn.setAttribute('aria-expanded', String(!isCollapsed));
-    if (expandBtn) expandBtn.setAttribute('aria-expanded', String(!isCollapsed));
   }
 
   // Helper: find module ID for a given slug
@@ -1285,7 +1258,6 @@ window.App = (() => {
     }
 
     container.innerHTML = html;
-    syncCollapseModulesBtn();
   }
 
   function renderBuildsSidebar(container) {
@@ -1317,7 +1289,6 @@ window.App = (() => {
         el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
       }
     });
-    syncCollapseModulesBtn();
   }
 
   function toggleModule(moduleId) {
@@ -1328,7 +1299,6 @@ window.App = (() => {
     }
     const group = document.querySelector(`.module-group[data-module="${moduleId}"]`);
     if (group) group.classList.toggle('collapsed');
-    syncCollapseModulesBtn();
     if (window.Analytics) {
       window.Analytics.trackModuleToggle(moduleId, !collapsedModules.has(moduleId));
     }
@@ -1839,28 +1809,12 @@ window.App = (() => {
       });
     }
 
-    // Compact collapse/expand all modules button next to Curriculum tab
-    const collapseModulesBtn = document.getElementById('sidebar-collapse-modules-btn');
-    if (collapseModulesBtn) {
-      collapseModulesBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        toggleAllModules();
-      });
-    }
-
-    // Compact sidebar collapse & reopen buttons + '[' keyboard shortcut
+    // Minimal sidebar collapse button + '[' keyboard shortcut
     const sidebarCollapseBtn = document.getElementById('sidebar-collapse-btn');
     if (sidebarCollapseBtn) {
       sidebarCollapseBtn.addEventListener('click', (e) => {
         e.preventDefault();
         toggleDesktopSidebar(true);
-      });
-    }
-    const sidebarExpandBtn = document.getElementById('sidebar-expand-btn');
-    if (sidebarExpandBtn) {
-      sidebarExpandBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        toggleDesktopSidebar(false);
       });
     }
     document.addEventListener('keydown', (e) => {
