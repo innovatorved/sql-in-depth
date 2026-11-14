@@ -46,13 +46,23 @@
 
   var _activeDatasetId = 'ecommerce';
 
+  function getAssetHash(relPath) {
+    var clean = String(relPath || '').replace(/^\/+/, '');
+    if (typeof root !== 'undefined' && root) {
+      if (root.LAZY_MANIFEST && root.LAZY_MANIFEST[clean]) return root.LAZY_MANIFEST[clean];
+      if (root._LAZY_MANIFEST && root._LAZY_MANIFEST[clean]) return root._LAZY_MANIFEST[clean];
+      if (root.ASSET_VERSION) return root.ASSET_VERSION;
+      if (root._ASSET_VERSION) return root._ASSET_VERSION;
+    }
+    return 'pg186-v2';
+  }
+
   function getWorker() {
     if (!canUseWorker || _workerFailed) return null;
     if (_worker) return _worker;
     try {
-      var ver = (typeof window !== 'undefined' && window.ASSET_VERSION)
-        ? ('?v=' + encodeURIComponent(window.ASSET_VERSION))
-        : '';
+      var workerHash = getAssetHash('js/sql-worker.js');
+      var ver = workerHash ? ('?v=' + encodeURIComponent(workerHash)) : '';
       _worker = new Worker('/js/sql-worker.js' + ver);
       _worker.onmessage = function (ev) {
         var msg = ev && ev.data ? ev.data : {};
@@ -129,7 +139,8 @@
         id: id,
         action: action,
         payload: payload || {},
-        assetVersion: (typeof window !== 'undefined' && window.ASSET_VERSION) ? window.ASSET_VERSION : ''
+        assetVersion: (typeof window !== 'undefined' && window.ASSET_VERSION) ? window.ASSET_VERSION : getAssetHash('js/sql-engine.js'),
+        lazyManifest: (typeof window !== 'undefined' && window.LAZY_MANIFEST) ? window.LAZY_MANIFEST : null
       });
     });
   }
@@ -155,8 +166,9 @@
   };
 
   function resolveWasmUrl(file) {
-    if (typeof window !== 'undefined' && window.location) {
-      return '/js/vendor/' + file;
+    if ((typeof window !== 'undefined' && window.location) || isWorkerEnv) {
+      var wasmVer = getAssetHash('js/vendor/' + file);
+      return '/js/vendor/' + file + (wasmVer ? ('?v=' + encodeURIComponent(wasmVer)) : '');
     }
     return 'js/vendor/' + file;
   }
@@ -375,8 +387,9 @@
     if (_pglitePromise) return _pglitePromise;
 
     var loaderPromise;
+    var pgEntryHash = encodeURIComponent(getAssetHash('js/vendor/pglite/index.js'));
     if (isBrowserEnv || isWorkerEnv) {
-      loaderPromise = import('/js/vendor/pglite/index.js');
+      loaderPromise = import('/js/vendor/pglite/index.js?v=' + pgEntryHash);
     } else if (typeof require === 'function') {
       try {
         loaderPromise = Promise.resolve(require('@electric-sql/pglite'));
@@ -384,7 +397,7 @@
         loaderPromise = import('@electric-sql/pglite');
       }
     } else {
-      loaderPromise = import('/js/vendor/pglite/index.js');
+      loaderPromise = import('/js/vendor/pglite/index.js?v=' + pgEntryHash);
     }
 
     _pglitePromise = loaderPromise.then(function (mod) {

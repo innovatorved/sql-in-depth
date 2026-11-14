@@ -12,13 +12,19 @@ self.window = self;
 
 let _bootstrapped = false;
 
-function ensureWorkerLoaded(assetVersion) {
+function workerAssetUrl(cleanPath, assetVersion, lazyManifest) {
+  const hash = (lazyManifest && lazyManifest[cleanPath]) || assetVersion || 'pg186-v2';
+  return '/' + cleanPath + (hash ? ('?v=' + encodeURIComponent(hash)) : '');
+}
+
+function ensureWorkerLoaded(assetVersion, lazyManifest) {
+  if (assetVersion) self._ASSET_VERSION = assetVersion;
+  if (lazyManifest) self._LAZY_MANIFEST = lazyManifest;
   if (_bootstrapped && typeof self.SqlEngine !== 'undefined') return;
-  const qs = assetVersion ? ('?v=' + encodeURIComponent(assetVersion)) : '';
   importScripts(
-    '/data/datasets.js' + qs,
-    '/js/vendor/sql-wasm.js' + qs,
-    '/js/sql-engine.js' + qs
+    workerAssetUrl('data/datasets.js', assetVersion, lazyManifest),
+    workerAssetUrl('js/vendor/sql-wasm.js', assetVersion, lazyManifest),
+    workerAssetUrl('js/sql-engine.js', assetVersion, lazyManifest)
   );
   if (self.SqlEngine && typeof self.SqlEngine.onEngineChange === 'function') {
     self.SqlEngine.onEngineChange(function (mode, ready) {
@@ -34,8 +40,8 @@ function ensureWorkerLoaded(assetVersion) {
 
 let _taskQueue = Promise.resolve();
 
-async function handleWorkerAction(action, payload, assetVersion) {
-  ensureWorkerLoaded(assetVersion);
+async function handleWorkerAction(action, payload, assetVersion, lazyManifest) {
+  ensureWorkerLoaded(assetVersion, lazyManifest);
 
   switch (action) {
     case 'initSqlite':
@@ -69,12 +75,12 @@ async function handleWorkerAction(action, payload, assetVersion) {
 
 self.onmessage = function (event) {
   const msg = event && event.data ? event.data : {};
-  const { id, action, payload, assetVersion } = msg;
+  const { id, action, payload, assetVersion, lazyManifest } = msg;
   if (!id || !action) return;
 
   _taskQueue = _taskQueue.then(async function () {
     try {
-      const result = await handleWorkerAction(action, payload, assetVersion);
+      const result = await handleWorkerAction(action, payload, assetVersion, lazyManifest);
       self.postMessage({
         id,
         ok: true,

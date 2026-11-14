@@ -75,6 +75,9 @@ function generateManifest() {
     'data/glossary.js',
     'js/vendor/sql-wasm.js',
     'js/vendor/cm6-sql.js',
+    'js/vendor/pglite/index.js',
+    'js/vendor/pglite/chunk-NNS5RQRF.js',
+    'js/vendor/pglite/chunk-YWK3W5RG.js',
     'js/vendor/katex/katex.min.js',
     'js/vendor/katex/auto-render.min.js',
     'js/sql-engine.js',
@@ -118,7 +121,7 @@ function generateManifest() {
   }
   const topics = (site.CURRICULUM_DATA?.parts || []).reduce((n, p) => n + p.modules.reduce((k, m) => k + m.units.length, 0), 0);
   const counts = { topics, simulators: sims.size, builds: Object.keys(site.IMPLEMENTATIONS_DATA).length, videos: videos.size, questions };
-  const assetVer = hashDir('data/content');
+  const assetVer = hashOf(Buffer.from(hashDir('data/content') + ':' + JSON.stringify(manifest)));
 
   const manifestContent = `/**
  * SQL In Depth — Dynamic Asset & Content Manifest

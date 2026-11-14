@@ -2154,6 +2154,9 @@ async function runSuite() {
     const headersSrc = fs.readFileSync(path.join(ROOT, '_headers'), 'utf8');
     const wasmHeaderMatches = headersSrc.match(/Content-Type:\s*application\/wasm/gi) || [];
     const pgliteChunkSrc = fs.readFileSync(path.join(ROOT, 'js/vendor/pglite/chunk-NNS5RQRF.js'), 'utf8');
+    const pgliteIndexSrc = fs.readFileSync(path.join(ROOT, 'js/vendor/pglite/index.js'), 'utf8');
+    const stampSrc = fs.readFileSync(path.join(ROOT, 'tools/stamp-assets.js'), 'utf8');
+    const engineSrc = fs.readFileSync(path.join(ROOT, 'js/sql-engine.js'), 'utf8');
     const workerSrc = fs.readFileSync(path.join(ROOT, 'js/sql-worker.js'), 'utf8');
     const tvSrc = fs.readFileSync(path.join(ROOT, 'js/table-visualizer.js'), 'utf8');
     const sbSrc = fs.readFileSync(path.join(ROOT, 'js/sandbox.js'), 'utf8');
@@ -2169,7 +2172,13 @@ async function runSuite() {
       !headersSrc.includes('/js/vendor/pglite/*.wasm') &&
       pgliteChunkSrc.includes('instantiateStreaming') &&
       pgliteChunkSrc.includes('.arrayBuffer()') &&
+      pgliteChunkSrc.includes('pg186-v2') &&
+      pgliteIndexSrc.includes('chunk-NNS5RQRF.js?v=pg186-v2') &&
+      stampSrc.includes('JSON.stringify(manifest)') &&
+      engineSrc.includes('/js/vendor/pglite/index.js?v=') &&
+      engineSrc.includes('LAZY_MANIFEST') &&
       workerSrc.includes('_taskQueue') &&
+      workerSrc.includes('lazyManifest') &&
       !tvSrc.includes('Clause Snippets') &&
       !tvSrc.includes('Executing SQL query') &&
       !sbSrc.includes('Clause Snippets') &&

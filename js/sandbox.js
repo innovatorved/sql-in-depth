@@ -2792,6 +2792,12 @@
         }
         if (e.target.id === 'wb-sql-engine-select') {
           self._sqlStudioEngine = e.target.value || 'postgres';
+          if (self._sqlStudioEngine === 'postgres' && root.SQLEngine && typeof root.SQLEngine.isPgliteReady === 'function' && !root.SQLEngine.isPgliteReady()) {
+            var activeSlot = container.querySelector('#wb-sql-studio-visualizer-slot, #wb-challenge-visualizer-slot');
+            if (activeSlot) {
+              activeSlot.innerHTML = '<div class="sql-viz-loading">Initializing PostgreSQL 18.6 WASM…</div>';
+            }
+          }
           if (root.SQLEngine && typeof root.SQLEngine.setEngineMode === 'function') {
             Promise.resolve(root.SQLEngine.setEngineMode(self._sqlStudioEngine)).then(function() {
               if (self._activeWorkbenchMode === 'sql-challenges' && typeof self._runChallengeCheck === 'function') {

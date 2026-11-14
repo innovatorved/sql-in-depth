@@ -1332,6 +1332,7 @@
 
         // Run the full query first
         var finalRes = await getEngine().execute(cleanSql, dsId);
+        var stepExecOpts = { datasetId: dsId, explain: false, skipDmlDiff: true };
 
         // ─── DML PIPELINE (INSERT / UPDATE / DELETE / TRUNCATE) ───
         if (!finalRes.error && finalRes.dmlDiff) {
@@ -1446,7 +1447,7 @@
             var subTables = [];
             for (var stIdx = 0; stIdx < sourceTables.length; stIdx++) {
                 var tblName = sourceTables[stIdx];
-                var tblRes = await getEngine().execute('SELECT * FROM ' + tblName + ' LIMIT 6', dsId);
+                var tblRes = await getEngine().execute('SELECT * FROM ' + tblName + ' LIMIT 6', stepExecOpts);
                 if (!tblRes.error && tblRes.columns && tblRes.columns.length > 0) {
                     var tblMeta = SCHEMA_META[tblName] || { pk: [], fk: {} };
                     subTables.push({
@@ -1486,7 +1487,7 @@
                 if (cte.isRecursive && cte.anchorSql) {
                     // Step 1a: CTE Anchor Member
                     var anchorQuery = priorWithPrefix + cte.anchorSql + ' LIMIT 15';
-                    var anchorRes = await getEngine().execute(anchorQuery, dsId);
+                    var anchorRes = await getEngine().execute(anchorQuery, stepExecOpts);
                     var anchorCount = (!anchorRes.error && anchorRes.rows) ? anchorRes.rows.length : 0;
                     if (!anchorRes.error && anchorRes.columns && anchorRes.columns.length > 0) {
                         steps.push({
@@ -1504,7 +1505,7 @@
                     // Step 1b: CTE Fixpoint
                     var upToCtes = parsed.cteList.slice(0, cIdx + 1).map(function (p) { return p.rawDef; });
                     var fullRecWith = 'WITH RECURSIVE ' + upToCtes.join(',\n') + '\nSELECT * FROM ' + cte.name + ' LIMIT 25';
-                    var fixRes = await getEngine().execute(fullRecWith, dsId);
+                    var fixRes = await getEngine().execute(fullRecWith, stepExecOpts);
                     if (!fixRes.error && fixRes.columns && fixRes.columns.length > 0) {
                         steps.push({
                             clause: '1b. CTE FIXPOINT (' + cte.name + ')',
@@ -1523,7 +1524,7 @@
                     var upToDefs = parsed.cteList.slice(0, cIdx + 1).map(function (p) { return p.rawDef; });
                     var ctePrefix = 'WITH ' + (/^\s*WITH\s+RECURSIVE\b/i.test(parsed.withClause) ? 'RECURSIVE ' : '') + upToDefs.join(',\n');
                     var cteTestSql = ctePrefix + '\nSELECT * FROM ' + cte.name + ' LIMIT 20';
-                    var cteRes = await getEngine().execute(cteTestSql, dsId);
+                    var cteRes = await getEngine().execute(cteTestSql, stepExecOpts);
                     if (!cteRes.error && cteRes.columns && cteRes.columns.length > 0) {
                         var stepLabel = parsed.cteList.length > 1
                             ? ('1.' + (cIdx + 1) + ' WITH CTE (' + cte.name + ')')
@@ -1548,7 +1549,7 @@
             var hasJoin = /\bJOIN\b/i.test(parsed.from);
             var joinCols = extractJoinColumns(parsed.from);
             var fromSql = withPrefix + 'SELECT * FROM ' + parsed.from + ' LIMIT 20';
-            var fromRes = await getEngine().execute(fromSql, dsId);
+            var fromRes = await getEngine().execute(fromSql, stepExecOpts);
             if (!fromRes.error && fromRes.columns.length > 0) {
                 var fromRowStates = fromRes.rows.slice(0, 15).map(function (r) {
                     if (hasJoin && r.some(function (cell) { return cell === null; })) {
@@ -1575,11 +1576,11 @@
         if (parsed.from && parsed.where) {
             var whereMatchedSql = withPrefix + 'SELECT * FROM ' + parsed.from + ' WHERE ' + parsed.where + ' LIMIT 15';
             var whereRemovedSql = withPrefix + 'SELECT *, CASE WHEN NOT (' + parsed.where + ') THEN \'✗ FALSE (Pruned)\' ELSE \'∅ UNKNOWN / NULL (Pruned)\' END AS "__verdict__" FROM ' + parsed.from + ' WHERE NOT (' + parsed.where + ') OR (' + parsed.where + ') IS NULL LIMIT 6';
-            var matchedRes = await getEngine().execute(whereMatchedSql, dsId);
-            var removedRes = await getEngine().execute(whereRemovedSql, dsId);
+            var matchedRes = await getEngine().execute(whereMatchedSql, stepExecOpts);
+            var removedRes = await getEngine().execute(whereRemovedSql, stepExecOpts);
             if (removedRes.error) {
                 var fallbackRemovedSql = withPrefix + 'SELECT * FROM ' + parsed.from + ' WHERE NOT (' + parsed.where + ') OR (' + parsed.where + ') IS NULL LIMIT 6';
-                removedRes = await getEngine().execute(fallbackRemovedSql, dsId);
+                removedRes = await getEngine().execute(fallbackRemovedSql, stepExecOpts);
             }
 
             if (!matchedRes.error && matchedRes.columns.length > 0) {
@@ -1622,7 +1623,7 @@
             var safeProjectionCols = stripGroupingWrappers(parsed.groupBy, parsed.select);
             var selectColsForGroup = safeProjectionCols ? (safeProjectionCols + ', COUNT(*) AS _group_row_count') : 'COUNT(*) AS _group_row_count';
             var groupSql = withPrefix + 'SELECT ' + selectColsForGroup + ' FROM ' + parsed.from + wherePart + ' GROUP BY ' + parsed.groupBy + ' LIMIT 15';
-            var groupRes = await getEngine().execute(groupSql, dsId);
+            var groupRes = await getEngine().execute(groupSql, stepExecOpts);
             if (!groupRes.error && groupRes.columns.length > 0) {
                 var isRollupOrCube = /\b(?:ROLLUP|CUBE|GROUPING\s+SETS)\b/i.test(parsed.groupBy);
                 steps.push({
@@ -1642,8 +1643,8 @@
             if (parsed.having) {
                 var havingSql = withPrefix + 'SELECT ' + selectColsForGroup + ' FROM ' + parsed.from + wherePart + ' GROUP BY ' + parsed.groupBy + ' HAVING ' + parsed.having + ' LIMIT 15';
                 var havingRemovedSql = withPrefix + 'SELECT ' + selectColsForGroup + ' FROM ' + parsed.from + wherePart + ' GROUP BY ' + parsed.groupBy + ' HAVING NOT (' + parsed.having + ') OR (' + parsed.having + ') IS NULL LIMIT 5';
-                var havingRes = await getEngine().execute(havingSql, dsId);
-                var havingRemRes = await getEngine().execute(havingRemovedSql, dsId);
+                var havingRes = await getEngine().execute(havingSql, stepExecOpts);
+                var havingRemRes = await getEngine().execute(havingRemovedSql, stepExecOpts);
                 if (!havingRes.error && havingRes.columns.length > 0) {
                     var hRows = [];
                     var hStates = [];
@@ -1681,7 +1682,7 @@
                 (parsed.having ? ' HAVING ' + parsed.having : '') +
                 (parsed.window ? ' WINDOW ' + parsed.window : '') +
                 ' LIMIT 15';
-            var winRes = await getEngine().execute(winSql, dsId);
+            var winRes = await getEngine().execute(winSql, stepExecOpts);
             if (!winRes.error && winRes.columns.length > 0) {
                 // Identify window function output aliases to highlight
                 var winCols = [];
@@ -1714,7 +1715,7 @@
                 (parsed.having ? (' HAVING ' + parsed.having) : '') +
                 (parsed.window ? (' WINDOW ' + parsed.window) : '');
 
-            var selectRes = hasPostSelect ? await getEngine().execute(selectStepSql + ' LIMIT 20', dsId) : finalRes;
+            var selectRes = hasPostSelect ? await getEngine().execute(selectStepSql + ' LIMIT 20', stepExecOpts) : finalRes;
             if (!selectRes.error && selectRes.columns.length > 0) {
                 steps.push({
                     clause: parsed.selectDistinct ? '6. SELECT DISTINCT' : '6. SELECT',
@@ -1737,7 +1738,7 @@
                 (parsed.having ? (' HAVING ' + parsed.having) : '') +
                 (parsed.window ? (' WINDOW ' + parsed.window) : '') +
                 ' ' + parsed.setOp;
-            var setOpRes = (parsed.orderBy || parsed.limit) ? await getEngine().execute(setOpSql + ' LIMIT 20', dsId) : finalRes;
+            var setOpRes = (parsed.orderBy || parsed.limit) ? await getEngine().execute(setOpSql + ' LIMIT 20', stepExecOpts) : finalRes;
             if (!setOpRes.error && setOpRes.columns.length > 0) {
                 steps.push({
                     clause: '6b. ' + (parsed.setOpType || 'UNION'),
@@ -2448,7 +2449,8 @@
         }
 
         var promise = (async function () {
-            container.innerHTML = '<div class="sql-viz-loading">Running query…</div>';
+            var coldPgBoot = engine && typeof engine.getEngineMode === 'function' && engine.getEngineMode() === 'postgres' && typeof engine.isPgliteReady === 'function' && !engine.isPgliteReady();
+            container.innerHTML = '<div class="sql-viz-loading">' + (coldPgBoot ? 'Initializing PostgreSQL 18.6 WASM &amp; running query…' : 'Running query…') + '</div>';
 
             var pipeline;
             try {
