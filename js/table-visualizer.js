@@ -933,7 +933,7 @@
      */
     function inferDatasetFromSql(sql, explicitDataset) {
         var datasets = getDatasets();
-        if (explicitDataset && explicitDataset !== '__unified__' && datasets[explicitDataset]) {
+        if (explicitDataset && (explicitDataset === '__empty__' || String(explicitDataset).indexOf('custom:') === 0 || (explicitDataset !== '__unified__' && datasets[explicitDataset]))) {
             return explicitDataset;
         }
         var lower = String(sql || '').toLowerCase();
@@ -2449,6 +2449,14 @@
         }
 
         var promise = (async function () {
+            var trimmedInput = String(sql || '').trim();
+            if (!trimmedInput) {
+                container.innerHTML =
+                    '<div class="sql-viz-panel sql-tviz sql-viz-idle">' +
+                        '<div class="sql-viz-empty">Ready — write SQL, create tables, import a <code>.csv</code> / <code>.json</code> file, or load an example from the sidebar, then press <strong>Run</strong>.</div>' +
+                    '</div>';
+                return;
+            }
             var coldPgBoot = engine && typeof engine.getEngineMode === 'function' && engine.getEngineMode() === 'postgres' && typeof engine.isPgliteReady === 'function' && !engine.isPgliteReady();
             container.innerHTML = '<div class="sql-viz-loading">' + (coldPgBoot ? 'Initializing PostgreSQL 18.6 WASM &amp; running query…' : 'Running query…') + '</div>';
 

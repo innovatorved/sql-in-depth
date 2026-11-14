@@ -62,7 +62,7 @@ async function handleWorkerAction(action, payload, assetVersion, lazyManifest) {
       );
 
     case 'introspectSchema':
-      return await self.SqlEngine.introspectSchema(payload && payload.datasetId);
+      return await self.SqlEngine.introspectSchema(payload && payload.datasetId, payload && payload.options);
 
     case 'resetDataset':
       await self.SqlEngine.resetDataset(payload && payload.datasetId);

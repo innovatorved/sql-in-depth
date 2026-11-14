@@ -298,11 +298,35 @@
     return String(ddl).replace(/^\s*PRAGMA\b[^;]*;\s*/gim, '');
   }
 
+  function isCustomOrEmptyDataset(dsId) {
+    var s = String(dsId || '');
+    return s === '__empty__' || s.indexOf('custom:') === 0;
+  }
+
+  function pgSchemaForDataset(dsId) {
+    var s = String(dsId || '');
+    if (s === '__empty__') return 'ws_empty';
+    if (s.indexOf('custom:') === 0) {
+      var slug = s.slice(7).toLowerCase().replace(/[^a-z0-9_]/g, '_').replace(/^_+|_+$/g, '').slice(0, 48);
+      return 'ws_' + (slug || 'custom');
+    }
+    return 'public';
+  }
+
   /**
    * Seeds or resets a dataset inside the PGlite PostgreSQL 18 instance.
    */
   function seedPostgresDataset(pgDb, datasetId, forceReset) {
     var dsId = datasetId || _activeDatasetId || '__unified__';
+    if (isCustomOrEmptyDataset(dsId)) {
+      var customSchema = pgSchemaForDataset(dsId);
+      var schemaSql = forceReset
+        ? ('DROP SCHEMA IF EXISTS "' + customSchema + '" CASCADE; CREATE SCHEMA "' + customSchema + '"; SET search_path TO "' + customSchema + '";')
+        : ('CREATE SCHEMA IF NOT EXISTS "' + customSchema + '"; SET search_path TO "' + customSchema + '";');
+      return pgDb.exec(schemaSql).then(function () {
+        return pgDb;
+      });
+    }
     var datasets = root.SQL_DATASETS || {};
     var targetKeys = (dsId === '__unified__' || !datasets[dsId])
       ? Object.keys(datasets)
@@ -313,10 +337,12 @@
     });
 
     if (toSeed.length === 0) {
-      return Promise.resolve(pgDb);
+      return pgDb.exec('SET search_path TO public;').catch(function () {}).then(function () {
+        return pgDb;
+      });
     }
 
-    var sqlParts = [];
+    var sqlParts = ['SET search_path TO public;'];
     toSeed.forEach(function (k) {
       var ds = datasets[k];
       if (!ds) return;
@@ -529,6 +555,10 @@
         try { _databases[dsId].close(); } catch (e) {}
       }
       var db = new SQL.Database();
+      if (isCustomOrEmptyDataset(dsId)) {
+        _databases[dsId] = db;
+        return db;
+      }
       var datasets = root.SQL_DATASETS || {};
       var ds = datasets[dsId] || datasets.ecommerce;
       if (ds && ds.ddl) {
@@ -1218,22 +1248,97 @@
   /**
    * Introspects all tables, columns, primary keys, foreign keys, and indexes in a dataset.
    */
-  function introspectSchema(datasetId) {
+  function introspectSchema(datasetId, options) {
     var dsId = datasetId || _activeDatasetId || 'ecommerce';
+    var opts = options || {};
     if (canUseWorker && !_workerFailed) {
-      return workerCall('introspectSchema', { datasetId: dsId }).catch(function () {
-        return introspectSchemaLocal(dsId);
+      return workerCall('introspectSchema', { datasetId: dsId, options: opts }).catch(function () {
+        return introspectSchemaLocal(dsId, opts);
       });
     }
-    return introspectSchemaLocal(dsId);
+    return introspectSchemaLocal(dsId, opts);
   }
 
-  function introspectSchemaLocal(dsId) {
-    return createDatabaseForDataset(dsId, false).then(function (db) {
+  function introspectPostgresLocal(pgDb, dsId) {
+    var schemaName = pgSchemaForDataset(dsId);
+    var tablesSql = "SELECT table_name FROM information_schema.tables WHERE table_schema = '" + schemaName.replace(/'/g, "''") + "' AND table_type = 'BASE TABLE' ORDER BY table_name;";
+    return pgDb.exec(tablesSql, { rowMode: 'array' }).then(function (tRes) {
+      var tableNames = (tRes && tRes[0] && tRes[0].rows) ? tRes[0].rows.map(function (r) { return r[0]; }) : [];
+      if (!isCustomOrEmptyDataset(dsId) && dsId && dsId !== '__unified__' && root.SQL_DATASETS && root.SQL_DATASETS[dsId] && Array.isArray(root.SQL_DATASETS[dsId].tables)) {
+        var allowedSet = {};
+        root.SQL_DATASETS[dsId].tables.forEach(function (t) {
+          if (t && t.name) allowedSet[String(t.name).toLowerCase()] = true;
+        });
+        tableNames = tableNames.filter(function (name) {
+          return Boolean(allowedSet[String(name).toLowerCase()]);
+        });
+      }
+      var chain = Promise.resolve([]);
+      tableNames.forEach(function (tableName) {
+        chain = chain.then(function (acc) {
+          var safeTbl = String(tableName).replace(/'/g, "''");
+          var safeSch = schemaName.replace(/'/g, "''");
+          var colSql = "SELECT column_name, data_type, is_nullable, column_default FROM information_schema.columns WHERE table_schema = '" + safeSch + "' AND table_name = '" + safeTbl + "' ORDER BY ordinal_position;";
+          var pkSql = "SELECT kcu.column_name FROM information_schema.table_constraints tc JOIN information_schema.key_column_usage kcu ON tc.constraint_name = kcu.constraint_name AND tc.table_schema = kcu.table_schema WHERE tc.constraint_type = 'PRIMARY KEY' AND tc.table_schema = '" + safeSch + "' AND tc.table_name = '" + safeTbl + "';";
+          var countSql = 'SELECT COUNT(*)::int FROM "' + schemaName + '"."' + String(tableName).replace(/"/g, '""') + '";';
+          return pgDb.exec(colSql, { rowMode: 'array' }).then(function (cRes) {
+            return pgDb.exec(pkSql, { rowMode: 'array' }).catch(function () { return []; }).then(function (pRes) {
+              return pgDb.exec(countSql, { rowMode: 'array' }).catch(function () { return []; }).then(function (cntRes) {
+                var pkSet = {};
+                if (pRes && pRes[0] && pRes[0].rows) {
+                  pRes[0].rows.forEach(function (r) { pkSet[String(r[0]).toLowerCase()] = true; });
+                }
+                var cols = (cRes && cRes[0] && cRes[0].rows ? cRes[0].rows : []).map(function (c, idx) {
+                  return {
+                    cid: idx,
+                    name: c[0],
+                    type: String(c[1] || 'TEXT').toUpperCase(),
+                    notNull: c[2] === 'NO',
+                    defaultValue: c[3],
+                    isPk: Boolean(pkSet[String(c[0]).toLowerCase()]),
+                    fk: null
+                  };
+                });
+                var rowCount = (cntRes && cntRes[0] && cntRes[0].rows && cntRes[0].rows[0]) ? Number(cntRes[0].rows[0][0]) : 0;
+                acc.push({
+                  name: tableName,
+                  rowCount: rowCount,
+                  columns: cols,
+                  indexes: [],
+                  sampleColumns: [],
+                  sampleRows: []
+                });
+                return acc;
+              });
+            });
+          });
+        });
+      });
+      return chain;
+    });
+  }
+
+  function introspectSchemaLocal(dsId, options) {
+    var opts = options || {};
+    var requestedEngine = opts.engine || _engineMode;
+    if (requestedEngine === 'postgres') {
+      return initPglite().then(function (pgDb) {
+        if (!pgDb) return introspectSchemaLocal(dsId, { engine: 'sqlite' });
+        return seedPostgresDataset(pgDb, dsId, false).then(function () {
+          return introspectPostgresLocal(pgDb, dsId);
+        });
+      }).catch(function () {
+        return [];
+      });
+    }
+    var dbPromise = (!dsId || dsId === '__unified__')
+      ? getUnifiedDatabase(false)
+      : createDatabaseForDataset(dsId, false);
+    return dbPromise.then(function (db) {
       var tablesRes = db.exec("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name;");
       var tableNames = (tablesRes[0] && tablesRes[0].values) ? tablesRes[0].values.map(function (r) { return r[0]; }) : [];
 
-      if (dsId && dsId !== '__unified__' && root.SQL_DATASETS && root.SQL_DATASETS[dsId] && Array.isArray(root.SQL_DATASETS[dsId].tables)) {
+      if (!isCustomOrEmptyDataset(dsId) && dsId && dsId !== '__unified__' && root.SQL_DATASETS && root.SQL_DATASETS[dsId] && Array.isArray(root.SQL_DATASETS[dsId].tables)) {
         var allowedSet = {};
         root.SQL_DATASETS[dsId].tables.forEach(function (t) {
           if (t && t.name) allowedSet[String(t.name).toLowerCase()] = true;

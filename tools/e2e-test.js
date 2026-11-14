@@ -2187,6 +2187,59 @@ async function runSuite() {
   } catch (_) {}
   assertCheck(4, 'T4-J22', 'PostgreSQL 18 WASM Reliability & Clean Build Journey: Single WASM Content-Type, ArrayBuffer Fallback, Serialized Worker Queue & Zero Legacy Snippets', j22Ok);
 
+  // Journey 23: Multi-File SQL Studio Workspace, Isolated Custom/Empty Databases & Multi-Format Runner Journey
+  let j23Ok = false;
+  try {
+    await SqlEngine.resetDataset('__empty__');
+    await SqlEngine.resetDataset('custom:analytics_lab');
+
+    const emptyPgBefore = await SqlEngine.introspectSchema('__empty__', { engine: 'postgres' });
+    const emptySlBefore = await SqlEngine.introspectSchema('__empty__', { engine: 'sqlite' });
+
+    const ddlSql = `
+      CREATE TABLE metrics (id INTEGER PRIMARY KEY, label TEXT NOT NULL, score INTEGER NOT NULL);
+      INSERT INTO metrics (id, label, score) VALUES (1, 'alpha', 95), (2, 'beta', 88);
+    `;
+    const pgMut = await SqlEngine.execute(ddlSql, { datasetId: 'custom:analytics_lab', engine: 'postgres', explain: false });
+    const slMut = await SqlEngine.execute(ddlSql, { datasetId: 'custom:analytics_lab', engine: 'sqlite', explain: false });
+
+    const customPgSchema = await SqlEngine.introspectSchema('custom:analytics_lab', { engine: 'postgres' });
+    const customSlSchema = await SqlEngine.introspectSchema('custom:analytics_lab', { engine: 'sqlite' });
+    const emptyPgAfter = await SqlEngine.introspectSchema('__empty__', { engine: 'postgres' });
+    const emptySlAfter = await SqlEngine.introspectSchema('__empty__', { engine: 'sqlite' });
+
+    const pgQuery = await SqlEngine.execute('SELECT label, score FROM metrics ORDER BY id;', { datasetId: 'custom:analytics_lab', engine: 'postgres' });
+    const slQuery = await SqlEngine.execute('SELECT label, score FROM metrics ORDER BY id;', { datasetId: 'custom:analytics_lab', engine: 'sqlite' });
+
+    const sbWorkspaceSrc = fs.readFileSync(path.join(ROOT, 'js/sandbox.js'), 'utf8');
+    j23Ok = Boolean(
+      emptyPgBefore.length === 0 &&
+      emptySlBefore.length === 0 &&
+      !pgMut.error &&
+      !slMut.error &&
+      customPgSchema.length === 1 &&
+      customPgSchema[0].name === 'metrics' &&
+      customPgSchema[0].rowCount === 2 &&
+      customSlSchema.length === 1 &&
+      customSlSchema[0].name === 'metrics' &&
+      customSlSchema[0].rowCount === 2 &&
+      emptyPgAfter.length === 0 &&
+      emptySlAfter.length === 0 &&
+      pgQuery.rows.length === 2 &&
+      slQuery.rows.length === 2 &&
+      sbWorkspaceSrc.includes("_sqlStudioDatasetId: '__empty__'") &&
+      sbWorkspaceSrc.includes('studio-tablist') &&
+      sbWorkspaceSrc.includes('toggle-new-file') &&
+      sbWorkspaceSrc.includes('toggle-new-db') &&
+      sbWorkspaceSrc.includes('_parseDelimitedRecords') &&
+      sbWorkspaceSrc.includes('_parseJsonRecords') &&
+      sbWorkspaceSrc.includes('_extractRunnableSqlFromText') &&
+      sbWorkspaceSrc.includes('studio-examples') &&
+      sbWorkspaceSrc.includes('e.isComposing || e.keyCode === 229')
+    );
+  } catch (_) {}
+  assertCheck(4, 'T4-J23', 'Multi-File SQL Studio Workspace, Isolated Custom/Empty Databases (PG18 & SQLite3) & Multi-Format Runner Journey', j23Ok);
+
   // =========================================================================
   // SUMMARY REPORT
   // =========================================================================
