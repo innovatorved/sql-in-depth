@@ -2217,10 +2217,16 @@
       var isMacPlatform = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent || '');
       var runKbdHtml = '<kbd class="studio-kbd">' + (isMacPlatform ? '⌘' : 'Ctrl') + '↵</kbd>';
       var sidebarCollapsed = Boolean(this._sidebarCollapsed);
-      var sidebarToggleBtnHtml =
-        '<button type="button" class="studio-icon-btn studio-sidebar-toggle' + (sidebarCollapsed ? ' is-collapsed' : '') + '" data-sql-studio-action="toggle-sidebar" aria-expanded="' + (!sidebarCollapsed) + '" aria-label="Toggle side panel" title="Toggle Explorer (' + (isMacPlatform ? '⌘B' : 'Ctrl+B') + ')">' +
-          '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>' +
+      var sidebarCollapseBtnHtml =
+        '<button type="button" class="sidebar__collapse-panel-btn studio-sidebar-collapse-btn" data-sql-studio-action="toggle-sidebar" aria-expanded="' + (!sidebarCollapsed) + '" aria-label="Collapse sidebar" title="Collapse sidebar (' + (isMacPlatform ? '⌘B' : 'Ctrl+B') + ')">' +
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>' +
         '</button>';
+      var sidebarReopenRailHtml =
+        '<div class="studio-sidebar-rail">' +
+          '<button type="button" class="studio-sidebar-reopen-btn" data-sql-studio-action="toggle-sidebar" aria-expanded="' + (!sidebarCollapsed) + '" aria-label="Expand sidebar" title="Expand sidebar (' + (isMacPlatform ? '⌘B' : 'Ctrl+B') + ')">' +
+            '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>' +
+          '</button>' +
+        '</div>';
       var sqlFileIconSvg = '<svg class="studio-file-tab__icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3"/></svg>';
       var dotsIconSvg = '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.75"/><circle cx="12" cy="12" r="1.75"/><circle cx="19" cy="12" r="1.75"/></svg>';
       var engineSelectHtml =
@@ -2285,7 +2291,6 @@
           '<div class="view-canvas sql-studio studio-app studio-app--challenges">' +
             '<header class="studio-toolbar">' +
               '<div class="studio-toolbar__group">' +
-                sidebarToggleBtnHtml +
                 '<h1 class="studio-title">SQL Studio</h1>' +
                 modeSwitcherHtml +
               '</div>' +
@@ -2294,6 +2299,7 @@
               '</div>' +
             '</header>' +
             '<div class="studio-body studio-body--challenge' + (sidebarCollapsed ? ' is-sidebar-collapsed' : '') + '" id="sandbox-mount-target">' +
+              sidebarReopenRailHtml +
               '<aside class="studio-panel studio-brief" aria-label="Challenge brief">' +
                 '<div class="studio-panel__head studio-brief__nav">' +
                   '<button type="button" class="studio-icon-btn" data-chal-action="prev" aria-label="Previous challenge" title="Previous challenge"' + (chalIndex === 0 ? ' disabled' : '') + '>‹</button>' +
@@ -2301,6 +2307,7 @@
                     chalOptionsHtml +
                   '</select>' +
                   '<button type="button" class="studio-icon-btn" data-chal-action="next" aria-label="Next challenge" title="Next challenge"' + (chalIndex >= chalTotal - 1 ? ' disabled' : '') + '>›</button>' +
+                  sidebarCollapseBtnHtml +
                 '</div>' +
                 '<div class="studio-panel__scroll studio-brief__body">' +
                   '<div class="studio-progress" title="' + solvedCount + ' of ' + chalTotal + ' challenges solved">' +
@@ -2496,7 +2503,6 @@
           '<div class="view-canvas sql-studio studio-app studio-app--playground">' +
             '<header class="studio-toolbar">' +
               '<div class="studio-toolbar__group">' +
-                sidebarToggleBtnHtml +
                 '<h1 class="studio-title">SQL Studio</h1>' +
                 modeSwitcherHtml +
               '</div>' +
@@ -2506,6 +2512,7 @@
               '</div>' +
             '</header>' +
             '<div class="studio-body studio-body--playground' + (sidebarCollapsed ? ' is-sidebar-collapsed' : '') + '" id="sandbox-mount-target">' +
+              sidebarReopenRailHtml +
               '<aside class="studio-panel studio-explorer wb-schema-sidebar" aria-label="Workspace and database schema">' +
                 '<div class="studio-panel__head studio-explorer__head">' +
                   '<div class="studio-db-bar">' +
@@ -2527,6 +2534,7 @@
                     (isCustomDbSelected
                       ? '<button type="button" class="studio-icon-btn studio-db-del-btn" data-sql-studio-action="delete-custom-db" aria-label="Delete custom database" title="Delete custom database">' + trashIconSvg + '</button>'
                       : '') +
+                    sidebarCollapseBtnHtml +
                   '</div>' +
                   '<div id="wb-new-db-bar" class="studio-inline-bar"' + (this._newDbBarOpen ? '' : ' hidden') + '>' +
                     '<label for="wb-new-db-input" class="sr-only">New database name</label>' +
@@ -3559,8 +3567,9 @@
             self._sidebarCollapsed = !self._sidebarCollapsed;
             var bodyEl = container.querySelector('.studio-body');
             if (bodyEl) bodyEl.classList.toggle('is-sidebar-collapsed', self._sidebarCollapsed);
-            sqlActBtn.classList.toggle('is-collapsed', self._sidebarCollapsed);
-            sqlActBtn.setAttribute('aria-expanded', String(!self._sidebarCollapsed));
+            container.querySelectorAll('[data-sql-studio-action="toggle-sidebar"]').forEach(function(btn) {
+              btn.setAttribute('aria-expanded', String(!self._sidebarCollapsed));
+            });
             return;
           }
           if (sqlAct === 'toggle-new-file') {
@@ -4260,7 +4269,9 @@
           }
           return;
         }
-        if ((e.metaKey || e.ctrlKey) && (e.key === 'b' || e.key === 'B')) {
+        if (((e.metaKey || e.ctrlKey) && (e.key === 'b' || e.key === 'B')) ||
+            (e.key === '[' && !e.metaKey && !e.ctrlKey && !e.altKey &&
+             !(e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT' || e.target.isContentEditable || (e.target.closest && e.target.closest('.cm-editor')))))) {
           var sbBtn = container.querySelector('[data-sql-studio-action="toggle-sidebar"]');
           if (sbBtn) {
             e.preventDefault();

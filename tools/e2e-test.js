@@ -2235,6 +2235,9 @@ async function runSuite() {
       sbWorkspaceSrc.includes('_parseJsonRecords') &&
       sbWorkspaceSrc.includes('_extractRunnableSqlFromText') &&
       sbWorkspaceSrc.includes('studio-examples') &&
+      sbWorkspaceSrc.includes('studio-sidebar-collapse-btn') &&
+      sbWorkspaceSrc.includes('studio-sidebar-reopen-btn') &&
+      !sbWorkspaceSrc.includes('studio-sidebar-toggle') &&
       sbWorkspaceSrc.includes('e.isComposing || e.keyCode === 229')
     );
   } catch (_) {}

@@ -6550,23 +6550,45 @@ body.view-ecosystem .main__content:has(.studio-app) {
   grid-template-columns: minmax(300px, 356px) minmax(0, 1fr);
 }
 
+.studio-sidebar-rail {
+  display: none;
+}
+
 .studio-body.is-sidebar-collapsed {
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: 38px minmax(0, 1fr);
 }
 
 .studio-body.is-sidebar-collapsed > .studio-panel {
   display: none;
 }
 
-.studio-sidebar-toggle {
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  border-color: transparent;
+.studio-body.is-sidebar-collapsed > .studio-sidebar-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 6px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
 }
 
-.studio-sidebar-toggle.is-collapsed {
+.studio-sidebar-reopen-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
   color: var(--fg-faint);
+  cursor: pointer;
+  transition: color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
+}
+
+.studio-sidebar-reopen-btn:hover {
+  color: var(--fg);
+  background: var(--hover-bg);
 }
 
 .studio-btn--sm {
@@ -8947,14 +8969,21 @@ body.view-ecosystem .main__content:has(.dashboard-view) {
     flex-wrap: wrap;
   }
 
-  .studio-sidebar-toggle {
+  .studio-sidebar-collapse-btn,
+  .studio-sidebar-rail,
+  .studio-body.is-sidebar-collapsed > .studio-sidebar-rail {
     display: none;
   }
 
   .studio-body,
   .studio-body--challenge,
+  .studio-body.is-sidebar-collapsed,
   .sql-studio-modal-body {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .studio-body.is-sidebar-collapsed > .studio-panel {
+    display: flex;
   }
 
   .studio-panel,
