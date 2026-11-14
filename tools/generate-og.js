@@ -3,7 +3,7 @@
  * Per-Page Open Graph & Twitter Card Generator — SQL In Depth
  * Generates 1200×630 PNG social cards in assets/og/*.png (plus assets/og-image.png)
  * for the landing page, hubs, 404, 12 challenges, 180 topic lessons, and 18 build labs
- * using the Warm Charcoal (#0F0F10 / #18181A) + VedGupta Dark Blue (#1E40AF / #60A5FA) design palette.
+ * using the Neutral Charcoal (#0F0F10 / #18181A) + Monochrome Crisp Ink (#F4F4F5) design palette.
  *
  * Usage: node tools/generate-og.js
  */
@@ -79,19 +79,19 @@ function schematicSvg(variant) {
       <g transform="translate(855, 165)">
         <rect x="0" y="0" width="275" height="300" rx="12" fill="#18181A" stroke="#2D2D31" stroke-width="1.5"/>
         <text x="20" y="30" fill="#A1A1AA" font-family="Menlo, Monaco, monospace" font-size="12" font-weight="700">8KB B+TREE PAGE HIERARCHY</text>
-        <rect x="78" y="52" width="120" height="40" rx="6" fill="#1E40AF" fill-opacity="0.22" stroke="#60A5FA" stroke-width="1.5"/>
+        <rect x="78" y="52" width="120" height="40" rx="6" fill="#27272A" stroke="#E4E4E7" stroke-width="1.5"/>
         <text x="138" y="77" text-anchor="middle" fill="#FAFAFA" font-family="Menlo, Monaco, monospace" font-size="13" font-weight="700">[ 42 | 108 ]</text>
-        <line x1="105" y1="92" x2="55" y2="144" stroke="#60A5FA" stroke-width="1.5"/>
-        <line x1="138" y1="92" x2="138" y2="144" stroke="#60A5FA" stroke-width="1.5"/>
-        <line x1="172" y1="92" x2="220" y2="144" stroke="#60A5FA" stroke-width="1.5"/>
+        <line x1="105" y1="92" x2="55" y2="144" stroke="#71717A" stroke-width="1.5"/>
+        <line x1="138" y1="92" x2="138" y2="144" stroke="#E4E4E7" stroke-width="1.5"/>
+        <line x1="172" y1="92" x2="220" y2="144" stroke="#71717A" stroke-width="1.5"/>
         <rect x="18" y="144" width="74" height="36" rx="5" fill="#1F1F23" stroke="#3F3F46" stroke-width="1.5"/>
         <text x="55" y="166" text-anchor="middle" fill="#D4D4D8" font-family="Menlo, Monaco, monospace" font-size="11">10..41</text>
-        <rect x="101" y="144" width="74" height="36" rx="5" fill="#1E40AF" fill-opacity="0.26" stroke="#60A5FA" stroke-width="1.5"/>
+        <rect x="101" y="144" width="74" height="36" rx="5" fill="#27272A" stroke="#F4F4F5" stroke-width="1.5"/>
         <text x="138" y="166" text-anchor="middle" fill="#FFFFFF" font-family="Menlo, Monaco, monospace" font-size="11" font-weight="700">42..107</text>
         <rect x="184" y="144" width="74" height="36" rx="5" fill="#1F1F23" stroke="#3F3F46" stroke-width="1.5"/>
         <text x="221" y="166" text-anchor="middle" fill="#D4D4D8" font-family="Menlo, Monaco, monospace" font-size="11">108..250</text>
         <rect x="18" y="212" width="240" height="64" rx="6" fill="#121213" stroke="#27272A" stroke-width="1.5"/>
-        <text x="32" y="236" fill="#60A5FA" font-family="Menlo, Monaco, monospace" font-size="11" font-weight="700">EXPLAIN: INDEX SEEK</text>
+        <text x="32" y="236" fill="#F4F4F5" font-family="Menlo, Monaco, monospace" font-size="11" font-weight="700">EXPLAIN: INDEX SEEK</text>
         <text x="32" y="258" fill="#A1A1AA" font-family="Menlo, Monaco, monospace" font-size="11">3 page reads · O(log_B N)</text>
       </g>`;
   }
@@ -103,9 +103,9 @@ function schematicSvg(variant) {
         <rect x="20" y="52" width="235" height="54" rx="6" fill="#1F1F23" stroke="#3F3F46" stroke-width="1.5"/>
         <text x="34" y="74" fill="#A1A1AA" font-family="Menlo, Monaco, monospace" font-size="11">v1 · xmin=102  xmax=108</text>
         <text x="34" y="94" fill="#D4D4D8" font-family="Menlo, Monaco, monospace" font-size="12">bal = 1200  (reader snap)</text>
-        <line x1="138" y1="106" x2="138" y2="134" stroke="#60A5FA" stroke-width="1.5"/>
-        <rect x="20" y="134" width="235" height="54" rx="6" fill="#1E40AF" fill-opacity="0.24" stroke="#60A5FA" stroke-width="1.5"/>
-        <text x="34" y="156" fill="#60A5FA" font-family="Menlo, Monaco, monospace" font-size="11" font-weight="700">v2 · xmin=108  xmax=INF</text>
+        <line x1="138" y1="106" x2="138" y2="134" stroke="#E4E4E7" stroke-width="1.5"/>
+        <rect x="20" y="134" width="235" height="54" rx="6" fill="#27272A" stroke="#F4F4F5" stroke-width="1.5"/>
+        <text x="34" y="156" fill="#E4E4E7" font-family="Menlo, Monaco, monospace" font-size="11" font-weight="700">v2 · xmin=108  xmax=INF</text>
         <text x="34" y="176" fill="#FFFFFF" font-family="Menlo, Monaco, monospace" font-size="12" font-weight="700">bal = 950   (committed)</text>
         <rect x="20" y="214" width="235" height="62" rx="6" fill="#121213" stroke="#27272A" stroke-width="1.5"/>
         <text x="34" y="238" fill="#4ADE80" font-family="Menlo, Monaco, monospace" font-size="11" font-weight="700">WAL LSN 0/16B3748</text>
@@ -118,14 +118,14 @@ function schematicSvg(variant) {
       <text x="20" y="30" fill="#A1A1AA" font-family="Menlo, Monaco, monospace" font-size="12" font-weight="700">RELATIONAL QUERY PIPELINE</text>
       <rect x="20" y="50" width="235" height="44" rx="6" fill="#1F1F23" stroke="#3F3F46" stroke-width="1.5"/>
       <text x="34" y="77" fill="#D4D4D8" font-family="Menlo, Monaco, monospace" font-size="12">1.SCAN + SARGABLE FILTER</text>
-      <line x1="138" y1="94" x2="138" y2="116" stroke="#60A5FA" stroke-width="1.5"/>
-      <rect x="20" y="116" width="235" height="44" rx="6" fill="#1E40AF" fill-opacity="0.24" stroke="#60A5FA" stroke-width="1.5"/>
+      <line x1="138" y1="94" x2="138" y2="116" stroke="#A1A1AA" stroke-width="1.5"/>
+      <rect x="20" y="116" width="235" height="44" rx="6" fill="#27272A" stroke="#F4F4F5" stroke-width="1.5"/>
       <text x="34" y="143" fill="#FFFFFF" font-family="Menlo, Monaco, monospace" font-size="12" font-weight="700">2.HASH / INDEX JOIN  ⋈</text>
-      <line x1="138" y1="160" x2="138" y2="182" stroke="#60A5FA" stroke-width="1.5"/>
+      <line x1="138" y1="160" x2="138" y2="182" stroke="#A1A1AA" stroke-width="1.5"/>
       <rect x="20" y="182" width="235" height="44" rx="6" fill="#1F1F23" stroke="#3F3F46" stroke-width="1.5"/>
       <text x="34" y="209" fill="#D4D4D8" font-family="Menlo, Monaco, monospace" font-size="12">3.GROUP · WINDOW · SORT</text>
       <rect x="20" y="242" width="235" height="40" rx="6" fill="#121213" stroke="#27272A" stroke-width="1.5"/>
-      <text x="34" y="267" fill="#60A5FA" font-family="Menlo, Monaco, monospace" font-size="11" font-weight="700">SQLite + PostgreSQL 18 WASM</text>
+      <text x="34" y="267" fill="#E4E4E7" font-family="Menlo, Monaco, monospace" font-size="11" font-weight="700">SQLite + PostgreSQL 18 WASM</text>
     </g>`;
 }
 
@@ -149,15 +149,15 @@ function buildCardSvg({ badge, title, subtitle, variant }) {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
   <rect width="1200" height="630" fill="#0F0F10"/>
   <rect x="24" y="24" width="1152" height="582" rx="16" fill="#141416" stroke="#27272A" stroke-width="1.5"/>
-  <rect x="24" y="24" width="1152" height="6" fill="#1E40AF"/>
+  <rect x="24" y="24" width="1152" height="6" fill="#F4F4F5"/>
 
   <!-- Brand & Module Header -->
-  <rect x="68" y="72" width="54" height="34" rx="6" fill="#1E40AF"/>
-  <text x="95" y="95" text-anchor="middle" fill="#FFFFFF" font-family="Menlo, Monaco, monospace" font-size="16" font-weight="700">SQL</text>
+  <rect x="68" y="72" width="54" height="34" rx="6" fill="#F4F4F5"/>
+  <text x="95" y="95" text-anchor="middle" fill="#0F0F10" font-family="Menlo, Monaco, monospace" font-size="16" font-weight="700">SQL</text>
   <text x="136" y="95" fill="#F4F4F5" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="700">SQL IN DEPTH</text>
 
-  <rect x="68" y="128" width="${Math.min(720, Math.max(210, badge.length * 10 + 28))}" height="30" rx="6" fill="#111C33" stroke="#1E3A8A" stroke-width="1"/>
-  <text x="82" y="148" fill="#60A5FA" font-family="Menlo, Monaco, monospace" font-size="13" font-weight="700">${escXml(badge.toUpperCase())}</text>
+  <rect x="68" y="128" width="${Math.min(720, Math.max(210, badge.length * 10 + 28))}" height="30" rx="6" fill="#1C1C1F" stroke="#3F3F46" stroke-width="1"/>
+  <text x="82" y="148" fill="#E4E4E7" font-family="Menlo, Monaco, monospace" font-size="13" font-weight="700">${escXml(badge.toUpperCase())}</text>
 
   <!-- Title & Promise -->
   ${titleTspans}
@@ -168,7 +168,7 @@ function buildCardSvg({ badge, title, subtitle, variant }) {
 
   <!-- Footer -->
   <line x1="68" y1="530" x2="1132" y2="530" stroke="#27272A" stroke-width="1"/>
-  <text x="68" y="566" fill="#60A5FA" font-family="Menlo, Monaco, monospace" font-size="16" font-weight="700">sql-in-depth.vedgupta.in</text>
+  <text x="68" y="566" fill="#E4E4E7" font-family="Menlo, Monaco, monospace" font-size="16" font-weight="700">sql-in-depth.vedgupta.in</text>
   <text x="1132" y="566" text-anchor="end" fill="#A1A1AA" font-family="Menlo, Monaco, monospace" font-size="14">6 Tracks · 180 Topics · Browser WASM SQL Studio</text>
 </svg>`;
 }

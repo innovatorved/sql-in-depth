@@ -31,15 +31,15 @@
   <link rel="preload" href="fonts/geist-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
 
   <!-- Stylesheets: Shared Design System + Self-Hosted KaTeX + Product Styles -->
-  <link rel="stylesheet" href="design-system/tokens.css?v=7ae2cd325c">
+  <link rel="stylesheet" href="design-system/tokens.css?v=b774bbc99d">
   <link rel="stylesheet" href="design-system/components.css?v=606a179125">
   <link rel="stylesheet" href="css/vendor/katex/katex.min.css?v=83121916c0" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/variables.css?v=f58be3cd85">
-  <link rel="stylesheet" href="css/layout.css?v=42e02c972c">
-  <link rel="stylesheet" href="css/components.css?v=b52aff4b4a">
+  <link rel="stylesheet" href="css/variables.css?v=58074e99d7">
+  <link rel="stylesheet" href="css/layout.css?v=f9d0dca7b9">
+  <link rel="stylesheet" href="css/components.css?v=0d745c8674">
   <link rel="stylesheet" href="css/content.css?v=c40a7aea42">
   <link rel="stylesheet" href="css/landing.css?v=56010c078b" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/simulators.css?v=ea40774506" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/simulators.css?v=3707a18c53" media="print" onload="this.media='all'">
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=d98d79ab7a"></script>
@@ -123,8 +123,15 @@
       <div role="tablist" aria-label="Sidebar sections" style="display:flex;align-items:center;">
         <button class="sidebar__tab active" data-tab="curriculum" role="tab" aria-selected="true">Curriculum</button>
       </div>
-      <button type="button" id="sidebar-collapse-modules-btn" title="Collapse all modules" aria-label="Collapse all modules" style="margin-left:auto;min-height:32px;padding:6px 8px;font-size:11px;font-weight:500;color:var(--fg-muted);background:none;border:none;cursor:pointer;"><span id="sidebar-collapse-modules-label">Collapse</span></button>
-      <button type="button" id="sidebar-collapse-btn" title="Collapse sidebar" aria-label="Collapse sidebar" aria-expanded="true" style="min-width:32px;min-height:32px;padding:6px 8px;font-size:11px;color:var(--fg-muted);background:none;border:none;cursor:pointer;">⟨</button>
+      <div class="sidebar__header-actions">
+        <button type="button" class="sidebar__collapse-modules-btn" id="sidebar-collapse-modules-btn" title="Collapse all modules" aria-label="Collapse all modules">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="7 15 12 20 17 15"/><polyline points="7 9 12 4 17 9"/></svg>
+          <span id="sidebar-collapse-modules-label">Collapse</span>
+        </button>
+        <button type="button" class="sidebar__collapse-panel-btn" id="sidebar-collapse-btn" title="Collapse sidebar ( [ )" aria-label="Collapse curriculum sidebar" aria-expanded="true">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><polyline points="14 9 11 12 14 15"/></svg>
+        </button>
+      </div>
     </div>
     <div class="sidebar__content" id="sidebar-content">
 <div style="padding:4px 16px 4px;font-size:11px;font-weight:600;color:var(--fg-faint);text-transform:uppercase;letter-spacing:0.05em;">Relational Foundations &amp; Core Querying</div><div class="module-group" data-module="m01">
@@ -802,6 +809,10 @@
 
   <!-- Main Content -->
   <main class="main" id="main-content" tabindex="-1">
+    <button type="button" class="sidebar-reopen-btn" id="sidebar-expand-btn" title="Expand curriculum sidebar ( [ )" aria-label="Expand curriculum sidebar" aria-expanded="true">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><polyline points="12 9 15 12 12 15"/></svg>
+      <span>Curriculum</span>
+    </button>
     <div class="main__content" id="reader" data-prerendered="aries-crash-recovery-analysis-redo-undo">
 
       <div class="ds-lesson-shell ds-lesson-shell--with-toc">
@@ -1792,7 +1803,7 @@ sequenceDiagram
   <script type="text/plain" data-defer src="js/renderer.js?v=36f6f37691"></script>
   <script type="text/plain" data-defer src="js/landing.js?v=51833858e9"></script>
   <script type="text/plain" data-defer src="js/quiz.js?v=5b300d9b3d"></script>
-  <script type="text/plain" data-defer src="js/app.js?v=d7a48f58f9"></script>
+  <script type="text/plain" data-defer src="js/app.js?v=961acff952"></script>
 
   <!-- Route-Scoped Lazy Scripts (stamped & loaded on demand via window.Lazy) -->
   <script type="text/plain" data-lazy src="data/datasets.js?v=259e5934af"></script>

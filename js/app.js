@@ -65,7 +65,7 @@ window.App = (() => {
   }
 
   function toggleDesktopSidebar(forceCollapsed) {
-    const isOverlaySidebar = window.innerWidth <= 900 ||
+    const isOverlaySidebar = window.innerWidth <= 1024 ||
       document.body.classList.contains('view-landing') ||
       document.body.classList.contains('view-ecosystem');
     if (isOverlaySidebar && sidebarOpen) {
@@ -1828,7 +1828,7 @@ window.App = (() => {
     if (hamburger) {
       hamburger.addEventListener('click', () => {
         const body = document.body;
-        const hasDockedSidebar = window.innerWidth > 900 &&
+        const hasDockedSidebar = window.innerWidth > 1024 &&
           !body.classList.contains('view-landing') &&
           !body.classList.contains('view-ecosystem');
         if (hasDockedSidebar && body.classList.contains('sidebar-collapsed')) {
@@ -1848,7 +1848,7 @@ window.App = (() => {
       });
     }
 
-    // Compact sidebar collapse & reopen buttons
+    // Compact sidebar collapse & reopen buttons + '[' keyboard shortcut
     const sidebarCollapseBtn = document.getElementById('sidebar-collapse-btn');
     if (sidebarCollapseBtn) {
       sidebarCollapseBtn.addEventListener('click', (e) => {
@@ -1863,6 +1863,19 @@ window.App = (() => {
         toggleDesktopSidebar(false);
       });
     }
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== '[' || e.metaKey || e.ctrlKey || e.altKey) return;
+      const t = e.target;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable || t.closest?.('.cm-editor, code-lab'))) return;
+      const body = document.body;
+      const hasDockedSidebar = window.innerWidth > 1024 &&
+        !body.classList.contains('view-landing') &&
+        !body.classList.contains('view-ecosystem');
+      if (hasDockedSidebar) {
+        e.preventDefault();
+        toggleDesktopSidebar();
+      }
+    });
 
     // Sidebar overlay
     const overlay = document.getElementById('sidebar-overlay');
@@ -2391,11 +2404,6 @@ window.App = (() => {
       if (e.key === ' ' && currentView === 'topic' && !isInputFocused()) {
         e.preventDefault();
         if (currentSlug) toggleComplete(currentSlug);
-      }
-      // '[' to toggle desktop sidebar collapse
-      if (e.key === '[' && !e.metaKey && !e.ctrlKey && !e.altKey && !isInputFocused()) {
-        e.preventDefault();
-        toggleDesktopSidebar();
       }
     });
   }
