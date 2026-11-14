@@ -152,7 +152,6 @@ body.view-landing .main__content { max-width: var(--content-max, 1180px); paddin
   background: var(--surface);
   border: 1px solid var(--border-strong);
   border-radius: var(--r-lg, 12px);
-  box-shadow: var(--shadow-md, 0 8px 24px rgba(15, 23, 42, 0.06));
   overflow: hidden;
   min-width: 0;
 }
@@ -210,26 +209,21 @@ body.view-landing .main__content { max-width: var(--content-max, 1180px); paddin
 
 .landing-pg__editor-wrap {
   border-bottom: 1px solid var(--border);
-  background: var(--code-bg, var(--bg));
+  background: var(--code-bg, var(--surface));
 }
-.landing-pg__editor {
-  display: block;
-  width: 100%;
-  min-height: 158px;
-  padding: 12px 14px;
-  margin: 0;
+.landing-pg__ide.sql-ide-shell {
   border: 0;
-  resize: vertical;
-  background: transparent;
-  color: var(--fg);
-  font-family: var(--font-mono);
-  font-size: 13px;
-  line-height: 1.55;
-  tab-size: 2;
+  border-radius: 0;
+  box-shadow: none;
+  background: var(--code-bg, var(--surface));
+  min-height: 220px;
 }
-.landing-pg__editor:focus {
-  outline: 2px solid var(--accent);
-  outline-offset: -2px;
+.landing-pg__ide.sql-ide-shell:focus-within {
+  box-shadow: inset 0 0 0 1px var(--border-focus);
+}
+.landing-pg__ide .sql-ide-stage,
+.landing-pg__ide textarea.sql-ide-textarea {
+  min-height: 220px;
 }
 
 .landing-pg__toolbar {

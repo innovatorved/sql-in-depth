@@ -201,11 +201,12 @@
   --code-inline-bg: rgba(161, 161, 170, 0.16);
   --code-inline-fg: #F4F4F5;
 
-  /* Syntax tokens */
-  --syn-kw: #FAFAFA;
-  --syn-fn: #D4D4D8;
+  /* Syntax tokens (VS Code-grade WCAG AA+ contrast >= 5.5:1 on #121213 / #18181A) */
+  --syn-kw: #C084FC;
+  --syn-fn: #FCD34D;
+  --syn-type: #2DD4BF;
   --syn-str: #86EFAC;
-  --syn-num: #FDE68A;
+  --syn-num: #FB923C;
   --syn-op: #A1A1AA;
   --syn-cmt: #8E8E98;
 
@@ -322,12 +323,14 @@
   --code-inline-bg: #F1F0EC;
   --code-inline-fg: #18181B;
 
-  --syn-kw: #18181B;
-  --syn-fn: #3F3F46;
+  /* Syntax tokens (VS Code Light-grade WCAG AA+ contrast >= 5.0:1 on #FAFAF8 / #FFFFFF) */
+  --syn-kw: #7E22CE;
+  --syn-fn: #854D0E;
+  --syn-type: #0F766E;
   --syn-str: #15803D;
-  --syn-num: #A16207;
-  --syn-op: #6E6A64;
-  --syn-cmt: #68635C;
+  --syn-num: #C2410C;
+  --syn-op: #52525B;
+  --syn-cmt: #6E6A64;
 
   --callout-bg: #FFFFFF;
   --callout-border: #E1DFD9;

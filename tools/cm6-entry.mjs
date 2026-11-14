@@ -21,7 +21,7 @@ import {
   bracketMatching,
   indentOnInput,
 } from '@codemirror/language';
-import { tags } from '@lezer/highlight';
+import { tags, tagHighlighter } from '@lezer/highlight';
 import {
   autocompletion,
   completionKeymap,
@@ -29,75 +29,227 @@ import {
   closeBracketsKeymap,
   acceptCompletion,
 } from '@codemirror/autocomplete';
-import { sql, PostgreSQL, SQLite } from '@codemirror/lang-sql';
+import { sql, SQLDialect } from '@codemirror/lang-sql';
 import { setDiagnostics, lintGutter } from '@codemirror/lint';
 import { searchKeymap } from '@codemirror/search';
 
+const SQL_KEYWORDS_LIST = [
+  'abort', 'action', 'add', 'after', 'all', 'alter', 'always', 'analyse', 'analyze', 'and', 'any',
+  'as', 'asc', 'attach', 'autoincrement', 'before', 'begin', 'between', 'by', 'cascade', 'case',
+  'check', 'cluster', 'collate', 'column', 'comment', 'commit', 'committed', 'concurrently',
+  'conflict', 'constraint', 'copy', 'costs', 'create', 'cross', 'cube', 'current', 'current_row',
+  'cycle', 'database', 'deallocate', 'declare', 'default', 'deferrable', 'deferred', 'delete',
+  'desc', 'detach', 'distinct', 'do', 'drop', 'each', 'else', 'end', 'escape', 'except', 'exclude',
+  'excluding', 'exclusive', 'exists', 'explain', 'extension', 'fail', 'fetch', 'filter', 'first',
+  'following', 'for', 'foreign', 'from', 'full', 'function', 'generated', 'glob', 'grant', 'group',
+  'grouping', 'groups', 'having', 'identity', 'if', 'ignore', 'ilike', 'immediate', 'in', 'include',
+  'including', 'increment', 'index', 'indexed', 'inherits', 'initially', 'inner', 'inout',
+  'insensitive', 'insert', 'instead', 'intersect', 'into', 'is', 'isolation', 'join', 'key',
+  'language', 'last', 'lateral', 'leading', 'left', 'level', 'like', 'limit', 'listen', 'load',
+  'local', 'lock', 'locked', 'logged', ' matched', 'matched', 'materialized', 'merge', 'natural',
+  'next', 'no', 'not', 'nothing', 'notify', 'notnull', 'nowait', 'nulls', 'of', 'off', 'offset',
+  'on', 'only', 'open', 'operator', 'option', 'or', 'order', 'ordinality', 'others', 'out', 'outer',
+  'over', 'overlaps', 'overriding', 'owned', 'partition', 'passing', 'placing', 'plan', 'policy',
+  'pragma', 'preceding', 'prepare', 'prepared', 'primary', 'prior', 'privileges', 'procedure',
+  'publication', 'query', 'raise', 'range', 'read', ' recursive', 'recursive', 'ref', 'references',
+  'refresh', 'ava', 'regexp', 'reindex', 'release', 'rename', 'repeatable', 'replace', 'replica',
+  'reset', 'restart', 'restrict', 'return', 'returning', 'returns', 'revoke', 'right', 'role',
+  'rollback', 'rollup', 'routine', 'row', 'rows', 'rule', 'savepoint', 'schema', 'scroll', 'search',
+  'security', 'select', 'sequence', 'serializable', 'session', 'set', 'sets', 'share', 'show',
+  'similar', 'simple', 'skip', 'snapshot', 'some', 'sql', 'stable', 'standalone', 'start',
+  'statement', 'statistics', 'stdin', 'stdout', 'storage', 'stored', 'strict', 'subscription',
+  'symmetric', 'sysid', 'system', 'table', 'tables', 'tablesample', 'tablespace', 'temp',
+  'template', 'temporary', 'then', 'ties', 'to', 'trailing', 'transaction', 'trigger', 'truncate',
+  'trusted', 'type', 'types', 'unbounded', 'uncommitted', 'union', 'unique', 'unknown', 'unlisten',
+  'unlogged', 'until', 'update', 'upsert', 'using', 'vacuum', 'valid', 'validate', 'value',
+  'values', 'variadic', 'verbose', 'version', 'view', 'views', 'virtual', 'volatile', 'when',
+  'where', 'window', 'with', 'within', 'without', 'work', 'write', 'zone', 'buffers'
+].join(' ');
+
+const SQL_TYPES_LIST = [
+  'array', 'bigint', 'bigserial', 'bit', 'blob', 'bool', 'boolean', 'box', 'bytea', 'char',
+  'character', 'cidr', 'circle', 'clob', 'date', 'datetime', 'dec', 'decimal', 'double', 'enum',
+  'float', 'float4', 'float8', 'inet', 'int', 'int2', 'int4', 'int8', 'integer', 'interval',
+  'json', 'jsonb', 'line', 'lseg', 'macaddr', 'macaddr8', 'money', 'nchar', 'numeric', 'nvarchar',
+  'path', 'pg_lsn', 'point', 'polygon', 'precision', 'real', 'regclass', 'regtype', 'serial',
+  'serial2', 'serial4', 'serial8', 'smallint', 'smallserial', 'text', 'time', 'timestamp',
+  'timestamptz', 'timetz', 'tsquery', 'tsvector', 'txid_snapshot', 'uuid', 'varbinary', 'varbit',
+  'varchar', 'varying', 'xml'
+].join(' ');
+
+const SQL_BUILTIN_FUNCTIONS_LIST = [
+  'abs', 'acos', 'age', 'any_value', 'array_agg', 'array_append', 'array_length', 'array_position',
+  'array_remove', 'array_to_string', 'ascii', 'asin', 'atan', 'atan2', 'avg', 'bit_and', 'bit_length',
+  'bit_or', 'bool_and', 'bool_or', 'btrim', 'cardinality', 'cast', 'cbrt', 'ceil', 'ceiling',
+  'char_length', 'character_length', 'changes', 'chr', ' clock_timestamp', 'coalesce', 'concat',
+  'concat_ws', 'corr', 'cos', 'cot', 'count', 'covar_pop', 'covar_samp', 'cume_dist', 'current_date',
+  'current_database', 'current_schema', 'current_setting', 'current_time', 'current_timestamp',
+  'current_user', 'currval', 'date_add', 'date_bin', 'date_part', 'date_sub', 'date_trunc',
+  'datetime', 'dense_rank', 'div', 'encode', 'decode', 'every', 'exp', 'extract', 'first_value',
+  'floor', 'format', 'gen_random_uuid', 'generate_series', 'generate_subscripts', 'greatest',
+  'group_concat', 'hex', 'ifnull', 'iif', 'initcap', 'instr', 'isfinite', 'json_agg', 'json_array',
+  'json_array_elements', 'json_array_length', 'json_build_array', 'json_build_object', 'json_each',
+  'json_extract', 'json_group_array', 'json_group_object', 'json_object', 'json_object_agg',
+  'json_set', 'json_strip_nulls', 'json_type', 'json_valid', 'jsonb_agg', 'jsonb_array_elements',
+  'jsonb_array_length', 'jsonb_build_array', 'jsonb_build_object', 'jsonb_each', 'jsonb_extract_path',
+  'jsonb_extract_path_text', 'jsonb_object_agg', 'jsonb_pretty', 'jsonb_set', 'julianday', 'lag',
+  'last_insert_rowid', 'last_value', 'lead', 'least', 'left', 'length', 'ln', 'localtime',
+  'localtimestamp', 'log', 'log10', 'lower', 'lpad', 'ltrim', 'make_date', 'make_interval',
+  'make_timestamp', 'max', 'md5', 'min', 'mod', 'nextval', 'now', 'nth_value', 'ntile', 'nullif',
+  'octet_length', 'overlay', 'parse_ident', 'percent_rank', 'percentile_cont', 'percentile_disc',
+  'pg_backend_pid', 'pg_Blocking_pids', 'pg_column_size', 'pg_current_wal_lsn', 'pg_indexes_size',
+  'pg_relation_size', 'pg_size_pretty', 'pg_sleep', 'pg_table_size', 'pg_total_relation_size',
+  'pg_typeof', 'pi', 'position', 'pow', 'power', 'printf', 'quote_ident', 'quote_literal',
+  'quote_nullable', 'radians', 'random', 'rank', 'regexp_count', 'regexp_instr', 'regexp_like',
+  'regexp_match', 'regexp_matches', 'regexp_replace', 'regexp_split_to_array',
+  'regexp_split_to_table', 'regexp_substr', 'regr_avgx', 'regr_avgy', 'regr_count', 'regr_r2',
+  'regr_slope', 'repeat', 'replace', 'reverse', 'right', 'round', 'row_number', 'row_to_json',
+  'rpad', 'rtrim', 'setval', 'sha256', 'sign', 'sin', 'split_part', 'sqrt', ' statement_timestamp',
+  'stddev', 'stddev_pop', 'stddev_samp', 'strftime', 'string_agg', 'string_to_array', 'strpos',
+  'substr', 'substring', 'sum', 'tan', 'timeofday', 'to_char', 'to_date', 'to_hex', 'to_json',
+  'to_jsonb', 'to_number', 'to_timestamp', 'total', 'transaction_timestamp', 'translate', 'trim',
+  'trunc', 'typeof', 'unicode', 'unnest', 'upper', 'variance', 'var_pop', 'var_samp', 'width_bucket'
+].join(' ');
+
+const RichPostgreSQL = SQLDialect.define({
+  charSetCasts: true,
+  doubleDollarQuotedStrings: true,
+  operatorChars: '+-*/<>=~!@#%^&|`?',
+  specialVar: '$',
+  identifierQuotes: '"',
+  keywords: SQL_KEYWORDS_LIST,
+  types: SQL_TYPES_LIST,
+  builtin: SQL_BUILTIN_FUNCTIONS_LIST,
+});
+
+const RichSQLite = SQLDialect.define({
+  operatorChars: '*+-%<>!=&|/~',
+  identifierQuotes: '`"[]',
+  specialVar: '@:?$',
+  keywords: SQL_KEYWORDS_LIST,
+  types: SQL_TYPES_LIST,
+  builtin: SQL_BUILTIN_FUNCTIONS_LIST,
+});
+
 const sqlHighlightStyle = HighlightStyle.define([
-  { tag: tags.keyword, class: 'cm-sql-kw' },
-  { tag: [tags.operatorKeyword, tags.modifier, tags.controlKeyword], class: 'cm-sql-kw' },
-  { tag: [tags.typeName, tags.standard(tags.name)], class: 'cm-sql-type' },
-  { tag: [tags.function(tags.variableName), tags.function(tags.name)], class: 'cm-sql-fn' },
-  { tag: [tags.string, tags.special(tags.string)], class: 'cm-sql-str' },
-  { tag: [tags.number, tags.integer, tags.float, tags.bool], class: 'cm-sql-num' },
+  {
+    tag: [tags.keyword, tags.operatorKeyword, tags.modifier, tags.controlKeyword, tags.definitionKeyword],
+    color: 'var(--syn-kw)',
+    fontWeight: '600',
+  },
+  {
+    tag: [tags.standard(tags.name), tags.function(tags.variableName), tags.function(tags.name), tags.special(tags.name)],
+    color: 'var(--syn-fn)',
+    fontWeight: '500',
+  },
+  {
+    tag: [tags.typeName, tags.className, tags.namespace],
+    color: 'var(--syn-type)',
+    fontWeight: '500',
+  },
+  {
+    tag: [tags.string, tags.character],
+    color: 'var(--syn-str)',
+  },
+  {
+    tag: [tags.special(tags.string)],
+    color: 'var(--code-fg)',
+  },
+  {
+    tag: [tags.number, tags.integer, tags.float, tags.bool, tags.null, tags.atom],
+    color: 'var(--syn-num)',
+  },
+  {
+    tag: [tags.comment, tags.lineComment, tags.blockComment],
+    color: 'var(--syn-cmt)',
+    fontStyle: 'italic',
+  },
+  {
+    tag: [tags.operator, tags.compareOperator, tags.arithmeticOperator, tags.logicOperator, tags.punctuation],
+    color: 'var(--syn-op)',
+  },
+  {
+    tag: [tags.name, tags.propertyName, tags.variableName],
+    color: 'var(--code-fg)',
+  },
+]);
+
+const sqlClassHighlighter = tagHighlighter([
+  { tag: [tags.keyword, tags.operatorKeyword, tags.modifier, tags.controlKeyword], class: 'cm-sql-kw' },
+  { tag: [tags.standard(tags.name), tags.function(tags.variableName), tags.function(tags.name), tags.special(tags.name)], class: 'cm-sql-fn' },
+  { tag: [tags.typeName, tags.className], class: 'cm-sql-type' },
+  { tag: [tags.string, tags.character], class: 'cm-sql-str' },
+  { tag: [tags.number, tags.integer, tags.float, tags.bool, tags.null, tags.atom], class: 'cm-sql-num' },
   { tag: [tags.comment, tags.lineComment, tags.blockComment], class: 'cm-sql-cmt' },
-  { tag: [tags.operator, tags.compareOperator, tags.arithmeticOperator], class: 'cm-sql-op' },
-  { tag: [tags.propertyName, tags.variableName], class: 'cm-sql-ident' },
+  { tag: [tags.operator, tags.compareOperator, tags.arithmeticOperator, tags.punctuation], class: 'cm-sql-op' },
+  { tag: [tags.name, tags.propertyName, tags.variableName], class: 'cm-sql-ident' },
 ]);
 
 const baseTheme = EditorView.theme({
   '&': {
     fontSize: '13px',
     fontFamily: 'var(--font-mono, "Geist Mono", monospace)',
-    backgroundColor: 'var(--code-bg, #141416)',
-    color: 'var(--code-fg, #f4f4f5)',
+    backgroundColor: 'var(--code-bg, #FAFAF8)',
+    color: 'var(--code-fg, #18181B)',
     borderRadius: 'var(--r-md, 6px)',
-    border: '1px solid var(--border, #27272a)',
+    border: '1px solid var(--border, #E6E4DF)',
   },
   '&.cm-focused': {
-    outline: '2px solid var(--accent, #c2410c)',
-    outlineOffset: '-1px',
-    borderColor: 'var(--accent, #c2410c)',
+    outline: 'none',
+    borderColor: 'var(--border-focus, #3F3F46)',
   },
   '.cm-scroller': {
     fontFamily: 'inherit',
     lineHeight: '1.6',
-    minHeight: '116px',
+    minHeight: 'var(--cm-min-h, 112px)',
     maxHeight: '420px',
     overflow: 'auto',
   },
   '.cm-content': {
     padding: '10px 0',
-    caretColor: 'var(--fg, #1a1917)',
+    caretColor: 'var(--fg, #18181B)',
+  },
+  '.cm-cursor, .cm-dropCursor': {
+    borderLeftColor: 'var(--fg, #18181B)',
   },
   '.cm-line': {
     padding: '0 12px',
   },
   '.cm-gutters': {
-    backgroundColor: 'var(--bg-alt, #121213)',
-    color: 'var(--fg-faint, #71717a)',
-    borderRight: '1px solid var(--border, #27272a)',
+    backgroundColor: 'var(--bg-alt, #F1F1EE)',
+    color: 'var(--fg-faint, #6E6A64)',
+    borderRight: '1px solid var(--border, #E6E4DF)',
     fontFamily: 'var(--font-mono, monospace)',
     fontSize: '12px',
     fontVariantNumeric: 'tabular-nums',
     userSelect: 'none',
   },
+  '.cm-lineNumbers .cm-gutterElement': {
+    padding: '0 10px 0 12px',
+    minWidth: '36px',
+  },
   '.cm-activeLineGutter': {
-    backgroundColor: 'var(--surface-hover, rgba(194,65,12,0.08))',
-    color: 'var(--fg, #f4f4f5)',
+    backgroundColor: 'transparent',
+    color: 'var(--fg, #18181B)',
+    fontWeight: '500',
   },
   '.cm-activeLine': {
-    backgroundColor: 'rgba(128, 128, 128, 0.06)',
+    backgroundColor: 'rgba(128, 128, 128, 0.055)',
+  },
+  '.cm-matchingBracket': {
+    backgroundColor: 'var(--accent-muted, rgba(24, 24, 27, 0.1))',
+    outline: '1px solid var(--border-strong, #D3D0C9)',
+    borderRadius: '2px',
   },
   '.cm-selectionBackground, ::selection': {
-    backgroundColor: 'var(--selection, rgba(194, 65, 12, 0.18)) !important',
+    backgroundColor: 'var(--selection, rgba(24, 24, 27, 0.14)) !important',
   },
   '.cm-tooltip': {
     backgroundColor: 'var(--surface, #ffffff)',
-    color: 'var(--fg, #1a1917)',
-    border: '1px solid var(--border-strong, #d1d0cb)',
+    color: 'var(--fg, #18181B)',
+    border: '1px solid var(--border-strong, #D3D0C9)',
     borderRadius: '8px',
-    boxShadow: 'var(--shadow-lg, 0 12px 32px rgba(0,0,0,0.22))',
+    boxShadow: 'var(--shadow-lg)',
     fontFamily: 'var(--font-mono, monospace)',
     fontSize: '12px',
     overflow: 'hidden',
@@ -110,19 +262,19 @@ const baseTheme = EditorView.theme({
     gap: '12px',
   },
   '.cm-tooltip-autocomplete ul li[aria-selected]': {
-    backgroundColor: 'var(--accent-muted, rgba(194, 65, 12, 0.12))',
-    color: 'var(--fg, #1a1917)',
+    backgroundColor: 'var(--accent-muted, rgba(24, 24, 27, 0.08))',
+    color: 'var(--fg, #18181B)',
   },
   '.cm-completionLabel': {
     fontWeight: '500',
   },
   '.cm-completionDetail': {
     fontSize: '11px',
-    color: 'var(--fg-muted, #63625e)',
+    color: 'var(--fg-muted, #52525B)',
     fontStyle: 'normal',
   },
   '.cm-diagnostic-error': {
-    borderLeft: '2px solid var(--error, #ef4444)',
+    borderLeft: '1px solid var(--error, #B42318)',
     padding: '6px 10px',
     fontFamily: 'var(--font-sans, sans-serif)',
     fontSize: '12px',
@@ -161,7 +313,7 @@ function buildSqlExtension(schemaTables, dialectName) {
       }));
     }
   }
-  const dialect = dialectName === 'postgres' ? PostgreSQL : SQLite;
+  const dialect = dialectName === 'postgres' ? RichPostgreSQL : RichSQLite;
   return [
     sql({
       dialect,
@@ -280,6 +432,7 @@ function enhanceTextarea(textarea, opts = {}) {
       highlightActiveLine(),
       lintGutter(),
       syntaxHighlighting(sqlHighlightStyle),
+      syntaxHighlighting(sqlClassHighlighter),
       baseTheme,
       EditorView.contentAttributes.of({
         'aria-label': opts.ariaLabel || textarea.getAttribute('aria-label') || 'SQL query editor',

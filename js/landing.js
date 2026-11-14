@@ -133,6 +133,23 @@ window.Landing = (() => {
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[c]));
   const shortTitle = t => String(t || '').replace(/\s*\(.*\)\s*$/, '');
 
+  function highlightSqlHtml(sql) {
+    const raw = String(sql ?? '');
+    const html = typeof window.Renderer?.highlightSyntax === 'function'
+      ? window.Renderer.highlightSyntax(raw, 'sql')
+      : esc(raw);
+    return raw.endsWith('\n') ? html + '\n ' : html;
+  }
+
+  function buildLineGutterHtml(sql) {
+    const count = Math.max(1, String(sql ?? '').split('\n').length);
+    let out = '';
+    for (let i = 1; i <= count; i++) {
+      out += `<span class="sql-ide-line-num">${i}</span>`;
+    }
+    return out;
+  }
+
   function encodeQueryToken(sql) {
     try {
       const json = JSON.stringify({ s: String(sql || ''), d: 'ecommerce', e: 'sqlite' });
@@ -245,7 +262,13 @@ window.Landing = (() => {
 
             <div class="landing-pg__editor-wrap">
               <label class="sr-only" for="landing-sql-input">Editable SQL query</label>
-              <textarea id="landing-sql-input" class="landing-pg__editor" rows="8" spellcheck="false">${esc(preset0.sql)}</textarea>
+              <div class="sql-ide-shell landing-pg__ide">
+                <div class="sql-ide-gutter" id="landing-sql-gutter" aria-hidden="true">${buildLineGutterHtml(preset0.sql)}</div>
+                <div class="sql-ide-stage">
+                  <pre class="sql-ide-backdrop" id="landing-sql-backdrop" aria-hidden="true"><code class="sql-ide-highlight" id="landing-sql-highlight">${highlightSqlHtml(preset0.sql)}</code></pre>
+                  <textarea id="landing-sql-input" class="sql-ide-textarea landing-pg__editor" rows="10" spellcheck="false" autocomplete="off" autocapitalize="off">${esc(preset0.sql)}</textarea>
+                </div>
+              </div>
             </div>
 
             <div class="landing-pg__toolbar">
@@ -412,11 +435,28 @@ window.Landing = (() => {
 
     // 2. Wire Above-the-Fold Live SQL Playground
     const sqlInput = root.querySelector('#landing-sql-input');
+    const sqlGutter = root.querySelector('#landing-sql-gutter');
+    const sqlBackdrop = root.querySelector('#landing-sql-backdrop');
+    const sqlHighlight = root.querySelector('#landing-sql-highlight');
     const sqlRunBtn = root.querySelector('#landing-sql-run');
     const sqlMeta = root.querySelector('#landing-sql-meta');
     const sqlOutput = root.querySelector('#landing-sql-output');
     const sqlOpen = root.querySelector('#landing-sql-open');
     const sqlCopy = root.querySelector('#landing-sql-copy');
+
+    const syncEditorVisuals = () => {
+      if (!sqlInput) return;
+      const val = sqlInput.value;
+      if (sqlHighlight) sqlHighlight.innerHTML = highlightSqlHtml(val);
+      if (sqlGutter) sqlGutter.innerHTML = buildLineGutterHtml(val);
+      if (sqlBackdrop) {
+        sqlBackdrop.scrollTop = sqlInput.scrollTop;
+        sqlBackdrop.scrollLeft = sqlInput.scrollLeft;
+      }
+      if (sqlGutter) {
+        sqlGutter.scrollTop = sqlInput.scrollTop;
+      }
+    };
 
     const syncShareLinks = () => {
       if (!sqlInput || !sqlOpen) return;
@@ -463,13 +503,35 @@ window.Landing = (() => {
     };
 
     on(sqlRunBtn, 'click', runLiveSql);
-    on(sqlInput, 'input', syncShareLinks);
+    on(sqlInput, 'input', () => {
+      syncEditorVisuals();
+      syncShareLinks();
+    });
+    on(sqlInput, 'scroll', () => {
+      if (sqlBackdrop) {
+        sqlBackdrop.scrollTop = sqlInput.scrollTop;
+        sqlBackdrop.scrollLeft = sqlInput.scrollLeft;
+      }
+      if (sqlGutter) sqlGutter.scrollTop = sqlInput.scrollTop;
+    });
     on(sqlInput, 'keydown', e => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
         e.preventDefault();
         runLiveSql();
+        return;
+      }
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        const start = sqlInput.selectionStart || 0;
+        const end = sqlInput.selectionEnd || 0;
+        const val = sqlInput.value;
+        sqlInput.value = val.slice(0, start) + '  ' + val.slice(end);
+        sqlInput.selectionStart = sqlInput.selectionEnd = start + 2;
+        syncEditorVisuals();
+        syncShareLinks();
       }
     });
+    syncEditorVisuals();
 
     on(root.querySelector('.landing-pg__presets'), 'click', e => {
       const btn = e.target.closest('[data-sql-preset]');
@@ -482,6 +544,7 @@ window.Landing = (() => {
         b.setAttribute('aria-selected', String(j === idx));
       });
       sqlInput.value = preset.sql;
+      syncEditorVisuals();
       syncShareLinks();
       // Instant zero-latency preview, plus live Worker execution if already loaded
       sqlOutput.innerHTML = renderResultPreviewHtml(preset.columns, preset.rows, preset.plan, null);

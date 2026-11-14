@@ -1348,7 +1348,14 @@
           modeTab('architecture-canvas', 'Architecture') +
         '</div>';
       var isMacPlatform = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent || '');
-      var runKbdHtml = '<kbd class="studio-kbd">' + (isMacPlatform ? '⌘' : 'Ctrl') + ' ↵</kbd>';
+      var runKbdHtml = '<kbd class="studio-kbd">' + (isMacPlatform ? '⌘' : 'Ctrl') + '↵</kbd>';
+      var sidebarCollapsed = Boolean(this._sidebarCollapsed);
+      var sidebarToggleBtnHtml =
+        '<button type="button" class="studio-icon-btn studio-sidebar-toggle' + (sidebarCollapsed ? ' is-collapsed' : '') + '" data-sql-studio-action="toggle-sidebar" aria-expanded="' + (!sidebarCollapsed) + '" aria-label="Toggle side panel" title="Toggle Explorer (' + (isMacPlatform ? '⌘B' : 'Ctrl+B') + ')">' +
+          '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>' +
+        '</button>';
+      var sqlFileIconSvg = '<svg class="studio-file-tab__icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3"/></svg>';
+      var dotsIconSvg = '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.75"/><circle cx="12" cy="12" r="1.75"/><circle cx="19" cy="12" r="1.75"/></svg>';
       var engineSelectHtml =
         '<label class="studio-engine">' +
           '<span class="studio-engine__dot" aria-hidden="true"></span>' +
@@ -1411,6 +1418,7 @@
           '<div class="view-canvas sql-studio studio-app studio-app--challenges">' +
             '<header class="studio-toolbar">' +
               '<div class="studio-toolbar__group">' +
+                sidebarToggleBtnHtml +
                 '<h1 class="studio-title">SQL Studio</h1>' +
                 modeSwitcherHtml +
               '</div>' +
@@ -1418,7 +1426,7 @@
                 engineSelectHtml +
               '</div>' +
             '</header>' +
-            '<div class="studio-body studio-body--challenge" id="sandbox-mount-target">' +
+            '<div class="studio-body studio-body--challenge' + (sidebarCollapsed ? ' is-sidebar-collapsed' : '') + '" id="sandbox-mount-target">' +
               '<aside class="studio-panel studio-brief" aria-label="Challenge brief">' +
                 '<div class="studio-panel__head studio-brief__nav">' +
                   '<button type="button" class="studio-icon-btn" data-chal-action="prev" aria-label="Previous challenge" title="Previous challenge"' + (chalIndex === 0 ? ' disabled' : '') + '>‹</button>' +
@@ -1442,41 +1450,41 @@
                   '<p class="studio-brief__summary">' + escapeHtml(cf.summary || activeChal.subtitle || '') + '</p>' +
                   '<div class="studio-brief__task">' +
                     '<span class="studio-label">Your task</span>' +
-                    '<p>Fix the starter query in the editor so its output matches the expected result, then press <strong>Check answer</strong>.</p>' +
+                    '<p>Fix the starter query in the editor so its output matches the expected result, then press <strong>Check</strong>.</p>' +
                   '</div>' +
                   '<details class="studio-hints sql-lab-hint-details">' +
-                    '<summary class="studio-hints__summary">Stuck? Show hints</summary>' +
+                    '<summary class="studio-hints__summary">Hints</summary>' +
                     '<div class="studio-hints__body">' + hintsHtml + '</div>' +
                   '</details>' +
                   '<dl class="studio-brief__facts">' +
                     '<div><dt>Dataset</dt><dd><code>' + escapeHtml(chalDs) + '</code></dd></div>' +
                   '</dl>' +
                 '</div>' +
-                '<div class="studio-panel__foot">' +
-                  '<button type="button" class="studio-btn studio-btn--ghost" data-chal-action="share-challenge">Share challenge</button>' +
-                '</div>' +
               '</aside>' +
               '<section class="studio-work wb-sql-main">' +
                 '<div class="studio-pane studio-pane--editor studio-editor">' +
                   '<div class="studio-pane__bar">' +
-                    '<span class="studio-file-tab">solution.sql</span>' +
+                    '<span class="studio-file-tab">' + sqlFileIconSvg + 'solution.sql</span>' +
                     '<div class="studio-pane__actions">' +
-                      '<button type="button" class="studio-btn studio-btn--ghost" data-chal-action="explain" title="Show the query plan">Explain</button>' +
-                      '<button type="button" class="studio-btn" data-chal-action="run-only" title="Run without checking">Run</button>' +
-                      '<button type="button" class="studio-btn studio-btn--primary" data-chal-action="check">Check answer ' + runKbdHtml + '</button>' +
+                      '<button type="button" class="studio-btn studio-btn--sm" data-chal-action="run-only" title="Run without checking">Run</button>' +
+                      '<button type="button" class="studio-btn studio-btn--sm studio-btn--primary" data-chal-action="check">Check ' + runKbdHtml + '</button>' +
+                      '<details class="wb-tools-menu studio-menu">' +
+                        '<summary class="studio-icon-btn studio-menu__trigger" aria-label="Editor actions" title="More actions">' + dotsIconSvg + '</summary>' +
+                        '<div class="wb-tools-popover studio-menu__panel">' +
+                          '<button type="button" class="studio-menu__item" data-chal-action="format">Format SQL</button>' +
+                          '<button type="button" class="studio-menu__item" data-chal-action="explain">Explain query plan</button>' +
+                          '<button type="button" class="studio-menu__item" data-chal-action="share-challenge">Copy challenge link</button>' +
+                          '<div class="studio-menu__sep" role="separator"></div>' +
+                          '<button type="button" class="studio-menu__item" data-chal-action="reset">Reset starter query</button>' +
+                          '<button type="button" class="studio-menu__item" data-chal-action="reveal">Reveal reference solution</button>' +
+                        '</div>' +
+                      '</details>' +
                     '</div>' +
                   '</div>' +
                   '<div class="studio-pane__editor">' +
                     '<textarea class="sql-studio-editor sql-inline-workbench__editor" id="wb-challenge-editor" aria-label="SQL challenge editor" spellcheck="false" rows="9">' + escapeHtml(draftSql) + '</textarea>' +
                   '</div>' +
                   '<div id="wb-challenge-verdict" class="studio-verdict" hidden></div>' +
-                  '<div class="studio-pane__foot">' +
-                    '<div class="studio-pane__tools">' +
-                      '<button type="button" class="studio-btn studio-btn--ghost" data-chal-action="format">Format</button>' +
-                      '<button type="button" class="studio-btn studio-btn--ghost" data-chal-action="reset">Reset starter</button>' +
-                      '<button type="button" class="studio-btn studio-btn--ghost" data-chal-action="reveal">Reveal solution</button>' +
-                    '</div>' +
-                  '</div>' +
                 '</div>' +
                 splitterHtml +
                 '<div class="studio-pane studio-pane--results">' +
@@ -1523,7 +1531,7 @@
               chalVerdict.className = 'studio-verdict is-pass';
               chalVerdict.innerHTML =
                 '<strong>✓ Solved — ' + vRes.passedCount + ' of ' + vRes.totalCount + ' checks passed</strong>' +
-                '<button type="button" class="studio-btn studio-btn--ghost" data-chal-action="share-solved">Share solution</button>';
+                '<button type="button" class="studio-btn studio-btn--ghost studio-btn--sm" data-chal-action="share-solved">Share solution</button>';
             } else {
               var failed = (vRes && vRes.checks || []).find(function(c) { return !c.passed; });
               chalVerdict.className = 'studio-verdict is-fail';
@@ -1554,14 +1562,6 @@
 
         var schemaExplorerHtml = this._renderSqlStudioSchemaExplorer();
         var isDesktopViewport = !(root.innerWidth && root.innerWidth < 860);
-        var practiceChipsHtml = (root.TableVisualizer && Array.isArray(root.TableVisualizer.SQL_PRACTICE_CHIPS))
-          ? '<div class="sql-practice-bar studio-snippets" id="wb-sql-practice-bar" role="group" aria-label="Insert a clause">' +
-              '<span class="studio-label">Insert</span>' +
-              root.TableVisualizer.SQL_PRACTICE_CHIPS.map(function(c) {
-                return '<button type="button" class="sql-practice-chip" data-wb-sql-chip="' + escapeHtml(c.id) + '" data-sql-chip="' + escapeHtml(c.id) + '" title="Insert ' + escapeHtml(c.label) + ' clause">' + escapeHtml(c.label) + '</button>';
-              }).join('') +
-            '</div>'
-          : '';
 
         var dsOption = function(value, label) {
           return '<option value="' + value + '" ' + (self._sqlStudioDatasetId === value ? 'selected' : '') + '>' + label + '</option>';
@@ -1571,16 +1571,16 @@
           '<div class="view-canvas sql-studio studio-app studio-app--playground">' +
             '<header class="studio-toolbar">' +
               '<div class="studio-toolbar__group">' +
+                sidebarToggleBtnHtml +
                 '<h1 class="studio-title">SQL Studio</h1>' +
                 modeSwitcherHtml +
               '</div>' +
               '<div class="studio-toolbar__group studio-toolbar__group--end">' +
                 engineSelectHtml +
-                '<span class="studio-toolbar__sep" aria-hidden="true"></span>' +
-                '<button type="button" class="studio-btn studio-btn--ghost" data-sql-studio-action="reset-db" title="Restore every table to its original rows">Reset data</button>' +
+                '<button type="button" class="studio-btn studio-btn--ghost studio-btn--sm" data-sql-studio-action="reset-db" title="Restore every table to its original rows">Reset DB</button>' +
               '</div>' +
             '</header>' +
-            '<div class="studio-body studio-body--playground" id="sandbox-mount-target">' +
+            '<div class="studio-body studio-body--playground' + (sidebarCollapsed ? ' is-sidebar-collapsed' : '') + '" id="sandbox-mount-target">' +
               '<aside class="studio-panel studio-explorer wb-schema-sidebar" aria-label="Database schema">' +
                 '<div class="studio-panel__head studio-explorer__head">' +
                   '<select id="wb-sql-dataset-select" class="studio-select studio-select--flush" aria-label="Dataset">' +
@@ -1591,62 +1591,58 @@
                     dsOption('saas_telemetry', 'SaaS telemetry') +
                     dsOption('social_graph', 'Social graph') +
                   '</select>' +
-                  '<input type="search" id="wb-sql-schema-filter" class="studio-input studio-input--search" placeholder="Filter tables or columns" aria-label="Filter tables or columns" autocomplete="off" spellcheck="false" value="' + escapeHtml(this._schemaFilter || '') + '" />' +
+                  '<input type="search" id="wb-sql-schema-filter" class="studio-input studio-input--search" placeholder="Filter tables or columns…" aria-label="Filter tables or columns" autocomplete="off" spellcheck="false" value="' + escapeHtml(this._schemaFilter || '') + '" />' +
                 '</div>' +
                 '<details class="wb-schema-drawer studio-schema" ' + (isDesktopViewport ? 'open' : '') + '>' +
                   '<summary class="wb-schema-drawer__summary studio-schema__summary">' +
-                    '<span class="studio-label">Tables</span>' +
+                    '<span class="studio-label">Explorer</span>' +
                     '<span class="studio-schema__count">5 datasets · 26 Tables</span>' +
                     '<span class="wb-schema-drawer__chevron" aria-hidden="true"></span>' +
                   '</summary>' +
                   '<div id="wb-sql-schema-sidebar" class="studio-schema__list">' + schemaExplorerHtml + '</div>' +
                   '<p class="studio-schema__empty" hidden>No tables or columns match.</p>' +
                 '</details>' +
-                '<p class="studio-panel__foot studio-hint">Click a column to insert it. Hover a table to preview its rows.</p>' +
               '</aside>' +
               '<section class="studio-work wb-sql-main">' +
                 '<div class="studio-pane studio-pane--editor studio-editor">' +
                   '<div class="studio-pane__bar">' +
-                    '<span class="studio-file-tab">query.sql</span>' +
+                    '<span class="studio-file-tab">' + sqlFileIconSvg + 'query.sql</span>' +
                     '<select id="wb-sql-template-select" class="studio-select studio-select--compact" aria-label="Load an example query">' +
                       templateOptionsHtml +
                     '</select>' +
-                    '<select id="wb-sql-saved-history-select" data-sql-ide-role="saved-history-select" aria-label="Saved queries and history" class="studio-select studio-select--compact">' +
-                      this._buildSavedHistoryOptionsHtml() +
-                    '</select>' +
                     '<div class="studio-pane__actions">' +
-                      '<button type="button" class="studio-btn studio-btn--ghost" data-sql-studio-action="explain" title="Show the query plan">Explain</button>' +
-                      '<button type="button" class="studio-btn" data-sql-studio-action="step-clauses" title="Walk through the query one clause at a time">Step through</button>' +
-                      '<button type="button" class="studio-btn studio-btn--primary" data-sql-studio-action="execute" title="Run query">Run ' + runKbdHtml + '</button>' +
+                      '<button type="button" class="studio-btn studio-btn--sm" data-sql-studio-action="step-clauses" title="Walk through the query one clause at a time">Step</button>' +
+                      '<button type="button" class="studio-btn studio-btn--sm studio-btn--primary" data-sql-studio-action="execute" title="Run query">Run ' + runKbdHtml + '</button>' +
+                      '<details class="wb-tools-menu studio-menu">' +
+                        '<summary class="studio-icon-btn studio-menu__trigger" aria-label="More actions" title="Format, Save, History &amp; Export">' + dotsIconSvg + '</summary>' +
+                        '<div class="wb-tools-popover studio-menu__panel sql-studio-saved-panel">' +
+                          '<button type="button" class="studio-menu__item" data-wb-ide-action="format" data-sql-ide-action="format">Format SQL</button>' +
+                          '<button type="button" class="studio-menu__item" data-wb-ide-action="copy" data-sql-ide-action="copy">Copy SQL</button>' +
+                          '<button type="button" class="studio-menu__item" data-wb-ide-action="share-query" data-sql-ide-action="share-query">Copy shareable query link</button>' +
+                          '<button type="button" class="studio-menu__item" data-sql-studio-action="explain">Explain query plan</button>' +
+                          '<div class="studio-menu__sep" role="separator"></div>' +
+                          '<span class="studio-label">Saved &amp; History</span>' +
+                          '<select id="wb-sql-saved-history-select" data-sql-ide-role="saved-history-select" aria-label="Saved queries and history" class="studio-select">' +
+                            this._buildSavedHistoryOptionsHtml() +
+                          '</select>' +
+                          '<div class="studio-menu__row">' +
+                            '<input type="text" id="wb-sql-save-title-input" data-sql-ide-role="save-title-input" placeholder="Save query as…" aria-label="Query title" class="studio-input" />' +
+                            '<button type="button" class="studio-btn studio-btn--sm" data-wb-ide-action="save-query" data-sql-ide-action="save-query">Save</button>' +
+                          '</div>' +
+                          '<button type="button" class="studio-menu__item" data-wb-ide-action="delete-saved" data-sql-ide-action="delete-saved">Delete selected saved query</button>' +
+                          '<div class="studio-menu__sep" role="separator"></div>' +
+                          '<span class="studio-label">Export</span>' +
+                          '<div class="studio-menu__row">' +
+                            '<button type="button" class="studio-btn studio-btn--sm" data-wb-ide-action="export-sql" data-sql-ide-action="export-sql">.sql</button>' +
+                            '<button type="button" class="studio-btn studio-btn--sm" data-wb-ide-action="export-csv" data-sql-ide-action="export-csv">.csv</button>' +
+                            '<button type="button" class="studio-btn studio-btn--sm" data-wb-ide-action="export-json" data-sql-ide-action="export-json">.json</button>' +
+                          '</div>' +
+                        '</div>' +
+                      '</details>' +
                     '</div>' +
                   '</div>' +
                   '<div class="studio-pane__editor">' +
                     '<textarea class="sql-studio-editor sql-inline-workbench__editor" id="wb-sql-studio-editor" aria-label="SQL Playground query editor" spellcheck="false" rows="8">' + escapeHtml(this._sqlStudioQuery) + '</textarea>' +
-                  '</div>' +
-                  '<div class="studio-pane__foot">' +
-                    practiceChipsHtml +
-                    '<div class="studio-pane__tools">' +
-                        '<button type="button" class="studio-btn studio-btn--ghost" data-wb-ide-action="format" data-sql-ide-action="format">Format</button>' +
-                        '<button type="button" class="studio-btn studio-btn--ghost" data-wb-ide-action="copy" data-sql-ide-action="copy">Copy</button>' +
-                        '<button type="button" class="studio-btn studio-btn--ghost" data-wb-ide-action="share-query" data-sql-ide-action="share-query">Share</button>' +
-                        '<details class="wb-tools-menu studio-menu">' +
-                          '<summary class="studio-btn studio-btn--ghost" aria-label="More actions">More</summary>' +
-                          '<div class="wb-tools-popover studio-menu__panel sql-studio-saved-panel">' +
-                            '<span class="studio-label">Save query</span>' +
-                            '<div class="studio-menu__row">' +
-                              '<input type="text" id="wb-sql-save-title-input" data-sql-ide-role="save-title-input" placeholder="Name this query" aria-label="Query title" class="studio-input" />' +
-                              '<button type="button" class="studio-btn" data-wb-ide-action="save-query" data-sql-ide-action="save-query">Save</button>' +
-                            '</div>' +
-                            '<button type="button" class="studio-menu__item" data-wb-ide-action="delete-saved" data-sql-ide-action="delete-saved">Delete selected saved query</button>' +
-                            '<span class="studio-label">Export</span>' +
-                            '<div class="studio-menu__row">' +
-                              '<button type="button" class="studio-btn" data-wb-ide-action="export-sql" data-sql-ide-action="export-sql">.sql</button>' +
-                              '<button type="button" class="studio-btn" data-wb-ide-action="export-csv" data-sql-ide-action="export-csv">.csv</button>' +
-                              '<button type="button" class="studio-btn" data-wb-ide-action="export-json" data-sql-ide-action="export-json">.json</button>' +
-                            '</div>' +
-                          '</div>' +
-                        '</details>' +
-                    '</div>' +
                   '</div>' +
                 '</div>' +
                 splitterHtml +
@@ -1676,33 +1672,24 @@
       }
 
       this._container.innerHTML =
-        '<div class="view-canvas sandbox-view">' +
-          '<header class="view-header">' +
-            '<div class="view-header__top">' +
-              '<div class="view-header__content">' +
-                '<div class="view-badge-row">' +
-                  '<span class="eco-pill eco-pill--accent">Excalidraw Architecture Studio</span>' +
-                  '<span class="eco-pill">' + this._boards.length + (this._boards.length === 1 ? ' Open Board' : ' Open Boards') + '</span>' +
-                  '<span class="eco-pill">' + this._nodes.length + ' Nodes</span>' +
-                  '<span class="eco-pill">' + this._connections.length + ' Connections</span>' +
-                  '<span class="eco-pill">' + this._frames.length + ' Zone Frames</span>' +
-                '</div>' +
-                '<h1 class="view-title">Database Architecture &amp; Sharding Canvas</h1>' +
-                '<p class="view-subtitle">Create multi-tab database topologies, drag engine blocks onto the canvas, connect ports, draw VPC zone boundaries, and simulate live QPS bottlenecks.</p>' +
-                modeSwitcherHtml +
-              '</div>' +
+        '<div class="view-canvas sql-studio sandbox-view">' +
+          '<header class="studio-toolbar">' +
+            '<div class="studio-toolbar__group">' +
+              '<h1 class="studio-title">SQL Studio</h1>' +
+              modeSwitcherHtml +
             '</div>' +
-
+            '<div class="studio-toolbar__group studio-toolbar__group--end">' +
+              '<button type="button" class="studio-btn studio-btn--sm studio-btn--ghost" data-sandbox-action="export-svg" title="Download SVG diagram">Export SVG</button>' +
+              '<button type="button" class="studio-btn studio-btn--sm studio-btn--ghost" data-sandbox-action="export-json" title="Download board JSON">Export JSON</button>' +
+            '</div>' +
+          '</header>' +
+          '<header class="view-header view-header--compact">' +
             '<!-- Multi-Board Browser-Style Tab Bar -->' +
             '<div class="wb-tabs-bar" role="tablist" aria-label="Whiteboard Tabs">' +
               '<div class="wb-tabs-scroll">' +
                 tabsHtml +
                 '<button class="wb-tab-add" data-wb-tab-add="blank" title="Create a new whiteboard tab (+ New Board)">+ New Board</button>' +
                 '<button class="wb-tab-action" data-sandbox-action="duplicate-board" title="Duplicate active board into a new tab">Duplicate Tab</button>' +
-              '</div>' +
-              '<div class="wb-tabs-meta">' +
-                '<button class="eco-btn eco-btn--sm" data-sandbox-action="export-svg" title="Download SVG diagram">Export SVG</button>' +
-                '<button class="eco-btn eco-btn--sm" data-sandbox-action="export-json" title="Download board JSON">Export JSON</button>' +
               '</div>' +
             '</div>' +
 
@@ -2248,6 +2235,15 @@
           return;
         }
 
+        // Auto-close open overflow menus when clicking outside them
+        var openMenus = container.querySelectorAll('details.studio-menu[open]');
+        if (openMenus.length > 0) {
+          var insideMenu = e.target.closest('details.studio-menu');
+          openMenus.forEach(function(m) {
+            if (m !== insideMenu) m.removeAttribute('open');
+          });
+        }
+
         // Top-level Workbench Mode Switcher (SQL Studio vs Architecture Canvas)
         var modeBtn = e.target.closest('[data-workbench-mode]');
         if (modeBtn) {
@@ -2298,13 +2294,16 @@
             self._runChallengeCheck(true, true);
           } else if (cAct === 'format' && cEd && root.TableVisualizer && typeof root.TableVisualizer.formatSql === 'function') {
             cEd.value = root.TableVisualizer.formatSql(cEd.value);
+            cEd.dispatchEvent(new Event('input', { bubbles: true }));
             self._challengeDrafts[self._activeChallengeId] = cEd.value;
           } else if (cAct === 'reset' && cEd) {
             cEd.value = cfObj.buggyCode || '';
+            cEd.dispatchEvent(new Event('input', { bubbles: true }));
             self._challengeDrafts[self._activeChallengeId] = cEd.value;
             if (typeof self._runChallengeCheck === 'function') self._runChallengeCheck(true, false);
           } else if (cAct === 'reveal' && cEd) {
             cEd.value = cfObj.solutionCode || '';
+            cEd.dispatchEvent(new Event('input', { bubbles: true }));
             self._challengeDrafts[self._activeChallengeId] = cEd.value;
             if (typeof self._runChallengeCheck === 'function') self._runChallengeCheck(true, false);
           } else if (cAct === 'share-challenge') {
@@ -2321,6 +2320,8 @@
               title: 'Solved: ' + ((activeCh && activeCh.title) || 'SQL Challenge')
             }, chalActBtn);
           }
+          var parentChalMenu = chalActBtn.closest('details.studio-menu');
+          if (parentChalMenu) parentChalMenu.removeAttribute('open');
           return;
         }
 
@@ -2449,7 +2450,7 @@
           } else if (ideAct === 'export-sql' && root.TableVisualizer && typeof root.TableVisualizer.exportSql === 'function') {
             root.TableVisualizer.exportSql(curSql, 'studio-query.sql');
           } else if ((ideAct === 'export-csv' || ideAct === 'export-json') && root.SQLEngine && typeof root.SQLEngine.execute === 'function') {
-            Promise.resolve(root.SQLEngine.execute(curSql, self._sqlStudioDatasetId || '__unified__', { forceEngine: self._sqlStudioEngine })).then(function(res) {
+            Promise.resolve(root.SQLEngine.execute(curSql, self._sqlStudioDatasetId || '__unified__', { engine: self._sqlStudioEngine })).then(function(res) {
               if (res && !res.error && root.TableVisualizer) {
                 if (ideAct === 'export-csv' && typeof root.TableVisualizer.exportCsv === 'function') {
                   root.TableVisualizer.exportCsv(res.columns || [], res.rows || [], 'studio-results.csv');
@@ -2459,24 +2460,9 @@
               }
             });
           }
-          return;
-        }
-
-        // SQL Studio practice snippet chips
-        var wbChipBtn = e.target.closest('[data-wb-sql-chip]');
-        if (wbChipBtn) {
-          var chipAttr = wbChipBtn.getAttribute('data-wb-sql-chip');
-          var chips = (root.TableVisualizer && Array.isArray(root.TableVisualizer.SQL_PRACTICE_CHIPS)) ? root.TableVisualizer.SQL_PRACTICE_CHIPS : [];
-          var chip = chips.find(function(c) { return c.id === chipAttr || c.label === chipAttr; }) || chips[parseInt(chipAttr, 10)];
-          var chipTa = container.querySelector('#wb-sql-studio-editor');
-          if (chip && chipTa) {
-            if (root.TableVisualizer && typeof root.TableVisualizer.insertSqlSnippet === 'function') {
-              root.TableVisualizer.insertSqlSnippet(chipTa, chip.snippet);
-            } else {
-              chipTa.value = (chipTa.value ? chipTa.value + '\n' : '') + chip.snippet;
-              chipTa.dispatchEvent(new Event('input', { bubbles: true }));
-            }
-            self._sqlStudioQuery = chipTa.value;
+          if (ideAct !== 'save-query' && ideAct !== 'delete-saved' && ideAct !== 'copy' && ideAct !== 'copy-sql' && ideAct !== 'share-query') {
+            var parentIdeMenu = wbIdeBtn.closest('details.studio-menu');
+            if (parentIdeMenu) parentIdeMenu.removeAttribute('open');
           }
           return;
         }
@@ -2485,6 +2471,14 @@
         var sqlActBtn = e.target.closest('[data-sql-studio-action]');
         if (sqlActBtn) {
           var sqlAct = sqlActBtn.getAttribute('data-sql-studio-action');
+          if (sqlAct === 'toggle-sidebar') {
+            self._sidebarCollapsed = !self._sidebarCollapsed;
+            var bodyEl = container.querySelector('.studio-body');
+            if (bodyEl) bodyEl.classList.toggle('is-sidebar-collapsed', self._sidebarCollapsed);
+            sqlActBtn.classList.toggle('is-collapsed', self._sidebarCollapsed);
+            sqlActBtn.setAttribute('aria-expanded', String(!self._sidebarCollapsed));
+            return;
+          }
           var editorEl = container.querySelector('#wb-sql-studio-editor');
           if (editorEl && editorEl.value.trim()) {
             self._sqlStudioQuery = editorEl.value.trim();
@@ -2504,6 +2498,8 @@
               self._mountSqlStudioVisualizer({ startAtFinal: true });
             }
           }
+          var parentSqlMenu = sqlActBtn.closest('details.studio-menu');
+          if (parentSqlMenu) parentSqlMenu.removeAttribute('open');
           return;
         }
 
@@ -2872,6 +2868,21 @@
       }, sig);
 
       container.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          var openM = container.querySelectorAll('details.studio-menu[open]');
+          if (openM.length > 0) {
+            openM.forEach(function(m) { m.removeAttribute('open'); });
+            return;
+          }
+        }
+        if ((e.metaKey || e.ctrlKey) && (e.key === 'b' || e.key === 'B')) {
+          var sbBtn = container.querySelector('[data-sql-studio-action="toggle-sidebar"]');
+          if (sbBtn) {
+            e.preventDefault();
+            sbBtn.click();
+            return;
+          }
+        }
         if (e.target.id === 'wb-sql-studio-editor' && (e.metaKey || e.ctrlKey) && e.key === 'Enter') {
           e.preventDefault();
           self._sqlStudioQuery = e.target.value.trim();

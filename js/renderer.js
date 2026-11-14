@@ -399,8 +399,15 @@ window.Renderer = (() => {
     const isPy = ['py', 'python'].includes(cleanLang);
     const isSh = ['sh', 'bash', 'shell', 'zsh'].includes(cleanLang);
     const SQL_KEYWORDS = new Set([
-      "SELECT","FROM","WHERE","JOIN","INNER","LEFT","RIGHT","FULL","OUTER","CROSS","ON","USING","GROUP","BY","HAVING","ORDER","ASC","DESC","NULLS","FIRST","LAST","LIMIT","OFFSET","FETCH","NEXT","ROWS","ONLY","WITH","RECURSIVE","AS","UNION","ALL","INTERSECT","EXCEPT","DISTINCT","CASE","WHEN","THEN","ELSE","END","COALESCE","NULLIF","CAST","OVER","PARTITION","RANGE","GROUPS","UNBOUNDED","PRECEDING","FOLLOWING","CURRENT","ROW","FILTER","WITHIN","EXISTS","IN","NOT","AND","OR","IS","NULL","TRUE","FALSE","BETWEEN","LIKE","ILIKE","SIMILAR","TO","CREATE","TABLE","TEMP","TEMPORARY","VIEW","MATERIALIZED","INDEX","UNIQUE","CONCURRENTLY","DROP","ALTER","ADD","COLUMN","CONSTRAINT","PRIMARY","KEY","FOREIGN","REFERENCES","CHECK","DEFAULT","GENERATED","ALWAYS","IDENTITY","INSERT","INTO","VALUES","UPDATE","SET","DELETE","RETURNING","CONFLICT","DO","NOTHING","MERGE","MATCHED","BEGIN","COMMIT","ROLLBACK","SAVEPOINT","TRANSACTION","ISOLATION","LEVEL","READ","COMMITTED","REPEATABLE","SERIALIZABLE","FOR","SHARE","SKIP","LOCKED","NOWAIT","EXPLAIN","ANALYZE","VACUUM","CLUSTER","REINDEX","PRAGMA","LATERAL","JSONB","JSON","INT","INTEGER","BIGINT","NUMERIC","DECIMAL","TEXT","VARCHAR","BOOLEAN","TIMESTAMPTZ","TIMESTAMP","DATE","INTERVAL","UUID","COUNT","SUM","AVG","MIN","MAX","ROW_NUMBER","RANK","DENSE_RANK","NTILE","LAG","LEAD","FIRST_VALUE","LAST_VALUE","NTH_VALUE","WINDOW","ROUND","STRING_AGG","ARRAY_AGG","JSONB_BUILD_OBJECT","GENERATE_SERIES","BUFFERS","COSTS","ROLLUP","CUBE","GROUPING","SETS","PERCENT_RANK","CUME_DIST","GROUP_CONCAT","TOTAL","PRINTF","STRFTIME","DATETIME","JULIANDAY","SUBSTR","INSTR","LENGTH","LOWER","UPPER","REPLACE","TRIM","ABS","RANDOM"
+      "SELECT","FROM","WHERE","JOIN","INNER","LEFT","RIGHT","FULL","OUTER","CROSS","ON","USING","GROUP","BY","HAVING","ORDER","ASC","DESC","NULLS","FIRST","LAST","LIMIT","OFFSET","FETCH","NEXT","ROWS","ONLY","WITH","RECURSIVE","AS","UNION","ALL","INTERSECT","EXCEPT","DISTINCT","CASE","WHEN","THEN","ELSE","END","OVER","PARTITION","RANGE","GROUPS","UNBOUNDED","PRECEDING","FOLLOWING","CURRENT","ROW","FILTER","WITHIN","EXISTS","IN","NOT","AND","OR","IS","BETWEEN","LIKE","ILIKE","SIMILAR","TO","CREATE","TABLE","TEMP","TEMPORARY","VIEW","MATERIALIZED","INDEX","UNIQUE","CONCURRENTLY","DROP","ALTER","ADD","COLUMN","CONSTRAINT","PRIMARY","KEY","FOREIGN","REFERENCES","CHECK","DEFAULT","GENERATED","ALWAYS","IDENTITY","INSERT","INTO","VALUES","UPDATE","SET","DELETE","RETURNING","CONFLICT","DO","NOTHING","MERGE","MATCHED","BEGIN","COMMIT","ROLLBACK","SAVEPOINT","TRANSACTION","ISOLATION","LEVEL","READ","COMMITTED","REPEATABLE","SERIALIZABLE","FOR","SHARE","SKIP","LOCKED","NOWAIT","EXPLAIN","ANALYZE","VACUUM","CLUSTER","REINDEX","PRAGMA","LATERAL","WINDOW","BUFFERS","COSTS","ROLLUP","CUBE","GROUPING","SETS","IF","CASCADE","RESTRICT","TRUNCATE","UNLOGGED"
     ]);
+    const SQL_FUNCTIONS = new Set([
+      "COALESCE","NULLIF","CAST","COUNT","SUM","AVG","MIN","MAX","ROW_NUMBER","RANK","DENSE_RANK","NTILE","LAG","LEAD","FIRST_VALUE","LAST_VALUE","NTH_VALUE","ROUND","STRING_AGG","ARRAY_AGG","JSONB_BUILD_OBJECT","JSON_BUILD_OBJECT","JSON_EXTRACT","JSON_EACH","GENERATE_SERIES","PERCENT_RANK","CUME_DIST","PERCENTILE_CONT","PERCENTILE_DISC","GROUP_CONCAT","TOTAL","PRINTF","STRFTIME","DATETIME","DATE","JULIANDAY","SUBSTR","SUBSTRING","INSTR","POSITION","LENGTH","CHAR_LENGTH","LOWER","UPPER","REPLACE","TRIM","ABS","RANDOM","NOW","DATE_TRUNC","EXTRACT","GREATEST","LEAST","IFNULL","IIF"
+    ]);
+    const SQL_TYPES = new Set([
+      "JSONB","JSON","INT","INTEGER","SMALLINT","BIGINT","SERIAL","BIGSERIAL","NUMERIC","DECIMAL","REAL","FLOAT","DOUBLE","PRECISION","TEXT","CHAR","VARCHAR","BOOLEAN","BOOL","TIMESTAMPTZ","TIMESTAMP","TIME","INTERVAL","UUID","BYTEA","BLOB"
+    ]);
+    const SQL_ATOMS = new Set(["NULL", "TRUE", "FALSE"]);
     const isSql = ["sql", "postgres", "postgresql", "sqlite", "mysql", "duckdb"].includes(cleanLang);
     const isJs = ['js', 'javascript', 'ts', 'typescript', 'node'].includes(cleanLang);
 
@@ -430,7 +437,15 @@ window.Renderer = (() => {
       } else if (num) {
         result += '<span class="tok-num">' + escapeHtml(num) + '</span>';
       } else if (word) {
-        if (isSql && SQL_KEYWORDS.has(word.toUpperCase())) {
+        const upper = word.toUpperCase();
+        const isDotQualified = match.index > 0 && code[match.index - 1] === '.';
+        if (isSql && !isDotQualified && SQL_ATOMS.has(upper)) {
+          result += '<span class="tok-num">' + escapeHtml(word) + '</span>';
+        } else if (isSql && !isDotQualified && SQL_FUNCTIONS.has(upper)) {
+          result += '<span class="tok-fn">' + escapeHtml(word) + '</span>';
+        } else if (isSql && !isDotQualified && SQL_TYPES.has(upper)) {
+          result += '<span class="tok-type">' + escapeHtml(word) + '</span>';
+        } else if (isSql && !isDotQualified && SQL_KEYWORDS.has(upper)) {
           result += '<span class="tok-kw">' + escapeHtml(word) + '</span>';
         } else if (isCpp && CPP_KEYWORDS.has(word)) {
           result += '<span class="tok-kw">' + escapeHtml(word) + '</span>';
@@ -2290,6 +2305,7 @@ window.Renderer = (() => {
     convertMarkdownToHTML,
     renderTopicCodeBlock,
     renderTopicCodeLabCard,
+    highlightSyntax,
     escapeHtml,
     icons
   };

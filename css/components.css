@@ -521,59 +521,44 @@
   font-size: inherit;
 }
 
-/* ── Code Syntax Token Highlighting ────────────────────────── */
-.tok-kw {
-  color: #f43f5e;
+/* ── Code Syntax Token Highlighting (Unified via --syn-* tokens) ── */
+.tok-kw,
+.cm-sql-kw {
+  color: var(--syn-kw);
   font-weight: 600;
 }
-.tok-type {
-  color: #06b6d4;
+.tok-type,
+.cm-sql-type {
+  color: var(--syn-type);
   font-weight: 500;
 }
-.tok-str {
-  color: #10b981;
+.tok-str,
+.cm-sql-str {
+  color: var(--syn-str);
 }
-.tok-num {
-  color: #f59e0b;
+.tok-num,
+.cm-sql-num {
+  color: var(--syn-num);
 }
-.tok-comment {
-  color: #8b9bb4;
+.tok-comment,
+.cm-sql-cmt {
+  color: var(--syn-cmt);
   font-style: italic;
 }
-.tok-fn {
-  color: #e4e4e7;
+.tok-fn,
+.cm-sql-fn {
+  color: var(--syn-fn);
+  font-weight: 500;
 }
 .tok-preproc {
-  color: #c084fc;
+  color: var(--syn-kw);
 }
-.tok-op {
-  color: #94a3b8;
+.tok-op,
+.cm-sql-op {
+  color: var(--syn-op);
 }
-
-/* Light mode token tweaks (WCAG AA >= 4.7:1 on #F4F6FA) */
-[data-theme="light"] .tok-kw {
-  color: #be123c;
-}
-[data-theme="light"] .tok-type {
-  color: #0e7490;
-}
-[data-theme="light"] .tok-str {
-  color: #047857;
-}
-[data-theme="light"] .tok-num {
-  color: #b45309;
-}
-[data-theme="light"] .tok-comment {
-  color: #475569;
-}
-[data-theme="light"] .tok-fn {
-  color: #4338ca;
-}
-[data-theme="light"] .tok-preproc {
-  color: #7e22ce;
-}
-[data-theme="light"] .tok-op {
-  color: #475569;
+.cm-sql-ident {
+  color: var(--code-fg);
 }
 
 /* ── KaTeX Display Tweaks ─────────────────────────────────── */
@@ -5508,17 +5493,16 @@ body.view-ecosystem .main__content {
 /* Guided 3-Step SQL Lab Component */
 .sql-guided-lab {
   margin: 18px 0;
-  border: 1px solid rgba(99, 102, 241, 0.35);
+  border: 1px solid var(--border-strong);
   border-radius: 10px;
-  background: var(--bg-secondary);
+  background: var(--surface);
   overflow: hidden;
-  box-shadow: var(--shadow-md);
 }
 
 .sql-guided-lab-header {
   padding: 12px 16px 0;
-  background: rgba(99, 102, 241, 0.08);
-  border-bottom: 1px solid rgba(99, 102, 241, 0.22);
+  background: var(--bg-alt);
+  border-bottom: 1px solid var(--border);
 }
 
 .sql-guided-lab-title-row {
@@ -5535,10 +5519,10 @@ body.view-ecosystem .main__content {
   padding: 2px 8px;
   border-radius: 999px;
   font-size: 11px;
-  font-weight: 700;
-  background: rgba(99, 102, 241, 0.18);
-  color: var(--info);
-  border: 1px solid rgba(99, 102, 241, 0.4);
+  font-weight: 600;
+  background: var(--accent-muted);
+  color: var(--accent);
+  border: 1px solid var(--border);
 }
 
 .sql-guided-lab-title {
@@ -5922,35 +5906,35 @@ body.view-ecosystem .main__content {
   box-sizing: border-box;
   font-family: var(--font-mono, 'JetBrains Mono', monospace);
   font-size: 13px;
-  line-height: 1.55;
+  line-height: 20px;
 }
 
 .sql-ide-shell:focus-within {
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px var(--accent-muted);
+  box-shadow: 0 0 0 2px var(--accent-muted);
 }
 
 .sql-ide-gutter {
   flex-shrink: 0;
-  width: 36px;
-  padding: 10px 6px 10px 4px;
+  width: 38px;
+  padding: 10px 8px 10px 4px;
   background: var(--bg-alt, #1e293b);
   border-right: 1px solid var(--border, #334155);
-  color: var(--fg-muted, #94a3b8);
+  color: var(--fg-faint, #94a3b8);
   text-align: right;
   user-select: none;
   overflow: hidden;
   font-family: inherit;
   font-size: 12px;
-  line-height: 1.55;
+  line-height: 20px;
   box-sizing: border-box;
 }
 
 .sql-ide-line-num,
 .sql-ide-gutter > span {
   display: block;
-  height: 1.55em;
-  line-height: 1.55;
+  height: 20px;
+  line-height: 20px;
   padding-right: 2px;
   font-variant-numeric: tabular-nums;
 }
@@ -5974,7 +5958,7 @@ body.view-ecosystem .main__content {
   word-wrap: break-word;
   font-family: inherit;
   font-size: 13px;
-  line-height: 1.55;
+  line-height: 20px;
   color: var(--fg, #e2e8f0);
   background: transparent;
   border: none;
@@ -6012,7 +5996,7 @@ body.view-ecosystem .main__content {
   caret-color: var(--fg, #e2e8f0) !important;
   font-family: inherit !important;
   font-size: 13px !important;
-  line-height: 1.55 !important;
+  line-height: 20px !important;
   white-space: pre-wrap !important;
   word-wrap: break-word !important;
   resize: vertical;
@@ -6033,9 +6017,13 @@ body.view-ecosystem .main__content {
   font-weight: 600;
 }
 
-.sql-tok-fn,
-.sql-tok-type {
+.sql-tok-fn {
   color: var(--syn-fn);
+  font-weight: 500;
+}
+
+.sql-tok-type {
+  color: var(--syn-type);
   font-weight: 500;
 }
 
@@ -6265,17 +6253,17 @@ body.view-ecosystem .main__content:has(.studio-app) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px 16px;
-  min-height: 52px;
-  padding: 8px 16px;
-  background: var(--surface);
+  gap: 10px 14px;
+  min-height: 44px;
+  padding: 6px 12px;
+  background: var(--bg-alt);
   border-bottom: 1px solid var(--border);
 }
 
 .studio-toolbar__group {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 10px;
   min-width: 0;
 }
 
@@ -6554,12 +6542,39 @@ body.view-ecosystem .main__content:has(.studio-app) {
 /* Body: side panel + work area */
 .studio-body {
   display: grid;
-  grid-template-columns: 264px minmax(0, 1fr);
+  grid-template-columns: 256px minmax(0, 1fr);
   min-height: 0;
 }
 
 .studio-body--challenge {
-  grid-template-columns: minmax(320px, 380px) minmax(0, 1fr);
+  grid-template-columns: minmax(300px, 356px) minmax(0, 1fr);
+}
+
+.studio-body.is-sidebar-collapsed {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.studio-body.is-sidebar-collapsed > .studio-panel {
+  display: none;
+}
+
+.studio-sidebar-toggle {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border-color: transparent;
+}
+
+.studio-sidebar-toggle.is-collapsed {
+  color: var(--fg-faint);
+}
+
+.studio-btn--sm {
+  height: 26px;
+  padding: 0 10px;
+  gap: 5px;
+  font-size: 12px;
+  border-radius: 6px;
 }
 
 .studio-panel {
@@ -6675,17 +6690,17 @@ body.view-ecosystem .main__content:has(.studio-app) {
 .schema-table__chevron {
   content: "";
   flex-shrink: 0;
-  width: 0;
-  height: 0;
-  border-left: 4px solid var(--fg-faint);
-  border-top: 3.5px solid transparent;
-  border-bottom: 3.5px solid transparent;
+  width: 5px;
+  height: 5px;
+  border-right: 1.5px solid var(--fg-faint);
+  border-bottom: 1.5px solid var(--fg-faint);
+  transform: rotate(-45deg);
   transition: transform var(--dur-fast) var(--ease-out);
 }
 
 .schema-ds[open] > .schema-ds__summary::before,
 .schema-table__details[open] .schema-table__chevron {
-  transform: rotate(90deg);
+  transform: rotate(45deg);
 }
 
 .schema-ds__title {
@@ -6840,13 +6855,14 @@ body.view-ecosystem .main__content:has(.studio-app) {
   }
 }
 
-/* Work area: editor pane, splitter, results pane */
+/* Work area: VS Code flush split panes (editor, 1px sash, bottom output panel) */
 .studio-work {
   display: grid;
-  grid-template-rows: var(--studio-editor-h, minmax(240px, 44%)) 12px minmax(0, 1fr);
+  grid-template-rows: var(--studio-editor-h, minmax(220px, 46%)) 5px minmax(0, 1fr);
   min-width: 0;
   min-height: 0;
-  padding: 12px 12px 12px;
+  padding: 0;
+  background: var(--surface);
 }
 
 .studio-work.is-resizing {
@@ -6858,30 +6874,24 @@ body.view-ecosystem .main__content:has(.studio-app) {
   min-width: 0;
   min-height: 0;
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  border: 0;
+  border-radius: 0;
 }
 
 .studio-pane--editor {
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  grid-template-rows: auto minmax(0, 1fr) auto;
 }
 
-.studio-pane__bar,
-.studio-pane__foot {
+.studio-pane__bar {
   display: flex;
   align-items: center;
   gap: 4px 8px;
   min-width: 0;
-  padding: 6px 8px;
-}
-
-.studio-pane__bar {
-  border-bottom: 1px solid var(--divider);
-}
-
-.studio-pane__foot {
-  border-top: 1px solid var(--divider);
+  min-height: 36px;
+  padding: 0 10px 0 0;
+  background: var(--bg-alt);
+  border-bottom: 1px solid var(--border);
 }
 
 .studio-pane__actions,
@@ -6892,21 +6902,26 @@ body.view-ecosystem .main__content:has(.studio-app) {
   margin-left: auto;
 }
 
-.studio-pane__tools {
-  gap: 2px;
-}
-
 .studio-file-tab {
   display: inline-flex;
   align-items: center;
-  height: 28px;
-  padding: 0 10px;
-  margin-right: 4px;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
+  margin: 0 4px -1px 0;
   font-family: var(--font-mono);
   font-size: 12px;
+  font-weight: 500;
   color: var(--fg);
-  background: var(--bg-alt);
-  border-radius: 6px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  border-top: 2px solid var(--accent);
+  border-radius: 0;
+}
+
+.studio-file-tab__icon {
+  color: var(--syn-type, var(--fg-muted));
+  flex-shrink: 0;
 }
 
 .studio-pane__editor {
@@ -6914,6 +6929,7 @@ body.view-ecosystem .main__content:has(.studio-app) {
   flex-direction: column;
   min-height: 0;
   overflow: hidden;
+  background: var(--code-bg, var(--surface));
 }
 
 .studio-pane__editor > * {
@@ -6921,20 +6937,28 @@ body.view-ecosystem .main__content:has(.studio-app) {
   min-height: 0;
 }
 
+.studio-pane__editor .cm-sql-host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
 .sql-studio .studio-pane__editor .sql-ide-shell,
 .sql-studio .studio-pane__editor .cm-editor {
+  flex: 1 1 auto;
   height: 100%;
   margin: 0;
   border: 0;
   border-radius: 0;
   box-shadow: none;
   outline: none;
-  background: var(--surface);
+  background: var(--code-bg, var(--surface));
 }
 
 .sql-studio .studio-pane__editor .sql-ide-shell {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
 }
 
 .sql-studio .studio-pane__editor .sql-ide-shell > * {
@@ -6952,8 +6976,8 @@ body.view-ecosystem .main__content:has(.studio-app) {
 
 .sql-studio .studio-pane__editor .cm-gutters,
 .sql-studio .studio-pane__editor .sql-ide-gutter {
-  background: var(--surface);
-  border-right: 0;
+  background: var(--bg-alt);
+  border-right: 1px solid var(--border);
 }
 
 .sql-studio .studio-pane__editor > textarea {
@@ -6962,9 +6986,9 @@ body.view-ecosystem .main__content:has(.studio-app) {
   border: 0;
   font-family: var(--font-mono);
   font-size: 13px;
-  line-height: 1.6;
+  line-height: 20px;
   color: var(--fg);
-  background: var(--surface);
+  background: var(--code-bg, var(--surface));
   resize: none;
 }
 
@@ -6973,6 +6997,10 @@ body.view-ecosystem .main__content:has(.studio-app) {
   cursor: row-resize;
   touch-action: none;
   outline: none;
+  background: var(--bg-alt);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  transition: background var(--dur-fast) var(--ease-out);
 }
 
 .studio-splitter::before {
@@ -6980,19 +7008,25 @@ body.view-ecosystem .main__content:has(.studio-app) {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 40px;
-  height: 4px;
+  width: 32px;
+  height: 2px;
   border-radius: 2px;
   background: var(--border-strong);
   transform: translate(-50%, -50%);
   transition: background var(--dur-fast) var(--ease-out), width var(--dur-fast) var(--ease-out);
 }
 
+.studio-splitter:hover,
+.studio-splitter:focus-visible,
+.studio-work.is-resizing .studio-splitter {
+  background: var(--surface-hover);
+}
+
 .studio-splitter:hover::before,
 .studio-splitter:focus-visible::before,
 .studio-work.is-resizing .studio-splitter::before {
-  width: 64px;
-  background: var(--fg-faint);
+  width: 56px;
+  background: var(--fg-muted);
 }
 
 .studio-pane--results {
@@ -7001,56 +7035,24 @@ body.view-ecosystem .main__content:has(.studio-app) {
   overflow: hidden;
 }
 
-.sql-studio .studio-snippets {
-  display: flex;
-  flex: 1 1 auto;
-  flex-wrap: nowrap;
-  align-items: center;
-  gap: 4px;
-  min-width: 0;
-  margin: 0;
-  padding: 0 0 0 4px;
-  overflow-x: auto;
-  background: none;
-  border: 0;
-  scrollbar-width: none;
-}
-
-.sql-studio .studio-snippets::-webkit-scrollbar {
-  display: none;
-}
-
-.sql-studio .studio-snippets .sql-practice-chip {
-  flex-shrink: 0;
-}
-
-.studio-snippets .studio-label {
-  margin-right: 6px;
-}
-
-.sql-studio .sql-practice-chip {
-  min-height: 26px;
-  padding: 0 9px;
-  font-size: 12px;
-  color: var(--fg-muted);
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-}
-
-.sql-studio .sql-practice-chip:hover {
-  color: var(--fg);
-  background: var(--surface-hover);
-  border-color: var(--border-strong);
-}
-
-/* More menu */
+/* Overflow menu (opens downward from editor tab bar) */
 .studio-menu {
   position: relative;
 }
 
 .studio-menu > summary {
   list-style: none;
+}
+
+.studio-menu > summary::-webkit-details-marker {
+  display: none;
+}
+
+.studio-menu__trigger {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border-color: transparent;
 }
 
 .studio-menu[open] > summary {
@@ -7060,22 +7062,29 @@ body.view-ecosystem .main__content:has(.studio-app) {
 
 .studio-menu__panel {
   position: absolute;
-  bottom: calc(100% + 6px);
+  top: calc(100% + 6px);
+  bottom: auto;
   right: 0;
-  z-index: var(--z-dropdown);
+  z-index: var(--z-dropdown, 200);
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  width: 280px;
-  padding: 12px;
+  gap: 6px;
+  width: 272px;
+  padding: 8px;
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
   box-shadow: var(--shadow-lg);
 }
 
-.studio-menu__panel .studio-label:not(:first-child) {
-  margin-top: 4px;
+.studio-menu__sep {
+  height: 1px;
+  margin: 2px -8px;
+  background: var(--divider);
+}
+
+.studio-menu__panel .studio-label {
+  padding: 2px 4px 0;
 }
 
 .studio-menu__row {
@@ -7085,20 +7094,34 @@ body.view-ecosystem .main__content:has(.studio-app) {
 
 .studio-menu__row .studio-input {
   flex: 1;
+  height: 28px;
+  font-size: 12px;
 }
 
 .studio-menu__row .studio-btn {
-  height: 32px;
+  flex: 1;
+  height: 28px;
+}
+
+.studio-menu__row .studio-input + .studio-btn {
+  flex: 0 0 auto;
 }
 
 .studio-menu__item {
-  height: 32px;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 28px;
   padding: 0 8px;
-  margin: 0 -4px;
-  font-size: 13px;
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 500;
   text-align: left;
-  color: var(--fg-prose);
-  border-radius: 6px;
+  color: var(--fg);
+  background: transparent;
+  border: 0;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 .studio-menu__item:hover {
@@ -7709,8 +7732,7 @@ body.view-ecosystem .main__content:has(.dashboard-view) {
   gap: 6px;
   padding: 24px;
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--accent);
+  border: 1px solid var(--border-strong);
   border-radius: 12px;
 }
 
@@ -7951,27 +7973,536 @@ body.view-ecosystem .main__content:has(.dashboard-view) {
 
 /* CodeMirror SQL token colors */
 .cm-sql-kw { color: var(--syn-kw); font-weight: 600; }
-.cm-sql-type,
-.cm-sql-fn { color: var(--syn-fn); }
+.cm-sql-fn { color: var(--syn-fn); font-weight: 500; }
+.cm-sql-type { color: var(--syn-type); font-weight: 500; }
 .cm-sql-str { color: var(--syn-str); }
 .cm-sql-num { color: var(--syn-num); }
 .cm-sql-cmt { color: var(--syn-cmt); font-style: italic; }
 .cm-sql-op { color: var(--syn-op); }
 
+/* Architecture Canvas Compact Header */
+.view-header--compact {
+  margin: 0;
+  padding: 8px 16px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── VS Code-Inspired SQL Workbench, Panel Tabs & Modal Chrome ── */
+.sql-vscode-workbench {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: visible;
+}
+
+.sql-guided-visualizer-mount .sql-vscode-workbench,
+.sql-studio-modal-host .sql-vscode-workbench {
+  border: 0;
+  border-radius: 0;
+}
+
+.sql-vscode-editor-pane {
+  display: flex;
+  flex-direction: column;
+  background: var(--code-bg, var(--surface));
+  border-bottom: 1px solid var(--border);
+}
+
+.sql-vscode-editor-pane[hidden],
+.sql-inline-editor-wrap[hidden],
+.sql-executable-block > pre[hidden] {
+  display: none !important;
+}
+
+.sql-vscode-editor-pane .cm-sql-host {
+  display: block;
+  width: 100%;
+}
+
+.sql-vscode-editor-pane .cm-editor,
+.sql-vscode-editor-pane .sql-ide-shell {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: var(--code-bg, var(--surface));
+}
+
+.sql-vscode-editor-pane .cm-gutters,
+.sql-vscode-editor-pane .sql-ide-gutter {
+  background: var(--bg-alt);
+  border-right: 1px solid var(--border);
+}
+
+.sql-vscode-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  min-height: 34px;
+  padding: 0 8px 0 0;
+  background: var(--bg-alt);
+  border-bottom: 1px solid var(--border);
+}
+
+.sql-vscode-bar__left,
+.sql-vscode-bar__right {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.sql-vscode-bar__right {
+  margin-left: auto;
+}
+
+.sql-vscode-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 12px;
+  margin-bottom: -1px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--fg);
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  border-top: 2px solid var(--accent);
+}
+
+.sql-vscode-tab svg {
+  color: var(--syn-type, var(--fg-muted));
+  flex-shrink: 0;
+}
+
+.sql-vscode-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 25px;
+  padding: 0 9px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--fg);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 5px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+
+.sql-vscode-btn:hover:not(:disabled) {
+  background: var(--surface-hover);
+  border-color: var(--border-focus);
+}
+
+.sql-vscode-btn:disabled {
+  opacity: 0.42;
+  cursor: default;
+}
+
+.sql-vscode-btn kbd {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  opacity: 0.85;
+}
+
+.sql-vscode-btn--primary {
+  color: var(--accent-fg);
+  background: var(--accent);
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+.sql-vscode-btn--primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.sql-vscode-btn--verify {
+  color: var(--success);
+}
+
+.sql-vscode-icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 25px;
+  height: 25px;
+  padding: 0;
+  color: var(--fg-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.sql-vscode-icon-btn::-webkit-details-marker {
+  display: none;
+}
+
+.sql-vscode-icon-btn:hover {
+  color: var(--fg);
+  background: var(--surface-hover);
+  border-color: var(--border);
+}
+
+/* Verification Banner */
+.sql-inline-verify-banner {
+  padding: 10px 14px;
+  font-size: 12.5px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-alt);
+  color: var(--fg);
+}
+
+.sql-inline-verify-banner.is-pass {
+  background: var(--success-bg);
+  border-bottom-color: var(--success-border);
+}
+
+.sql-inline-verify-banner.is-fail {
+  background: var(--danger-bg, rgba(220, 38, 38, 0.08));
+  border-bottom-color: var(--danger-border, rgba(220, 38, 38, 0.3));
+}
+
+.sql-verify-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.sql-verify-head span {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--fg-muted);
+}
+
+.sql-verify-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 4px 14px;
+}
+
+.sql-verify-check {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--fg-muted);
+}
+
+.sql-verify-check strong {
+  color: var(--fg);
+}
+
+.sql-verify-check__mark.is-pass {
+  color: var(--success);
+  font-weight: 700;
+}
+
+.sql-verify-check__mark.is-fail {
+  color: var(--danger, #dc2626);
+  font-weight: 700;
+}
+
+/* VS Code Output Panel Tab Strip (Results | Clause Stepper | Execution Plan) */
+.sql-tviz .sql-viz-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  min-height: 35px;
+  padding: 0 12px;
+  background: var(--bg-alt);
+  border-bottom: 1px solid var(--border);
+}
+
+.sql-panel-tabs {
+  display: inline-flex;
+  align-items: stretch;
+  gap: 2px;
+  min-height: 35px;
+}
+
+.sql-panel-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  margin-bottom: -1px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--fg-muted);
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+}
+
+.sql-panel-tab:hover {
+  color: var(--fg);
+}
+
+.sql-panel-tab.is-active {
+  color: var(--fg);
+  font-weight: 600;
+  border-bottom-color: var(--fg);
+}
+
+.sql-panel-tab__count {
+  padding: 1px 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--fg-muted);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+
+.sql-viz-timing {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--fg-muted);
+  white-space: nowrap;
+}
+
+.sql-tviz .sql-explain-box {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+/* Lesson Inline SQL Executable Block (flush single-unit design) */
+.sql-executable-block {
+  margin: 16px 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: visible;
+}
+
+.code-block .sql-executable-block {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+.sql-executable-block > pre {
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+}
+
+.sql-exec-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--bg-alt);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.sql-exec-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.sql-inline-output-wrap .sql-tviz {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* Guided Topic SQL Lab Shell */
+.sql-guided-lab-shell {
+  margin-top: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  overflow: visible;
+}
+
+.sql-guided-step-bar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--bg-alt);
+  border-bottom: 1px solid var(--border);
+  border-radius: 10px 10px 0 0;
+}
+
+.sql-guided-step-bar__meta {
+  flex: 1;
+  min-width: 220px;
+}
+
+.sql-guided-step-bar__eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--fg-muted);
+  margin-bottom: 2px;
+}
+
+.sql-guided-step-bar__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.sql-guided-step-bar__desc {
+  font-size: 13px;
+  color: var(--fg-muted);
+  margin-top: 2px;
+}
+
+.sql-guided-step-bar__actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.sql-inline-schema-drawer__toggle {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--fg-muted);
+}
+
+.sql-guided-step-hint {
+  padding: 9px 16px;
+  font-size: 12.5px;
+  color: var(--fg);
+  background: var(--bg-alt);
+  border-bottom: 1px solid var(--border);
+}
+
+/* Full-Screen SQL Studio Modal */
+.sql-studio-modal-shell {
+  display: flex;
+  flex-direction: column;
+  width: 96vw;
+  max-width: 1520px;
+  height: 92vh;
+  margin: 4vh auto;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-xl);
+}
+
+.sql-studio-modal-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  min-height: 46px;
+  padding: 6px 14px;
+  background: var(--bg-alt);
+  border-bottom: 1px solid var(--border);
+}
+
+.sql-studio-modal-topbar .global-codelab-topbar-left,
+.sql-studio-modal-topbar .global-codelab-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sql-studio-modal-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--fg);
+  max-width: 440px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sql-studio-modal-body {
+  display: grid;
+  grid-template-columns: 248px minmax(0, 1fr);
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.sql-studio-modal-sidebar {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 10px 8px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.sql-studio-modal-sidebar__head {
+  padding: 2px 8px 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg-faint);
+}
+
+.sql-studio-modal-main {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  overflow-y: auto;
+  background: var(--surface);
+}
+
+.sql-studio-modal-host {
+  flex: 1;
+  min-height: 0;
+}
+
 /* Responsive */
 .studio-pane__bar .studio-select--compact {
-  flex: 0 1 150px;
-  min-width: 84px;
+  flex: 0 1 160px;
+  min-width: 88px;
 }
 
 .studio-pane__actions {
   flex-shrink: 0;
-}
-
-@media (max-width: 760px) {
-  .studio-pane__bar {
-    flex-wrap: wrap;
-  }
+  padding-left: 8px;
 }
 
 @media (max-width: 960px) {
@@ -7983,58 +8514,53 @@ body.view-ecosystem .main__content:has(.dashboard-view) {
     flex-wrap: wrap;
   }
 
+  .studio-sidebar-toggle {
+    display: none;
+  }
+
   .studio-body,
-  .studio-body--challenge {
+  .studio-body--challenge,
+  .sql-studio-modal-body {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .studio-panel {
+  .studio-panel,
+  .sql-studio-modal-sidebar {
     border-right: 0;
     border-bottom: 1px solid var(--border);
   }
 
-  .studio-schema {
-    max-height: 340px;
-  }
-
-  .studio-explorer .studio-panel__foot {
-    display: none;
+  .studio-schema,
+  .sql-studio-modal-sidebar {
+    max-height: 280px;
   }
 
   .studio-work {
     grid-template-rows: auto;
-    gap: 12px;
+    gap: 0;
   }
 
   .studio-splitter {
     display: none;
   }
 
+  .studio-pane--editor {
+    border-bottom: 1px solid var(--border);
+  }
+
   .sql-studio .studio-pane__editor .cm-editor,
   .sql-studio .studio-pane__editor .sql-ide-stage,
   .sql-studio .studio-pane__editor > textarea {
-    min-height: 220px;
+    min-height: 210px;
   }
 
-  .studio-pane--results {
-    overflow: visible;
-  }
-
+  .studio-pane--results,
   .sql-studio .studio-results {
     overflow: visible;
   }
 
   .sql-studio .studio-results .sql-step-table-scroll {
     max-height: 60vh;
-  }
-
-  .studio-pane__foot {
-    flex-wrap: wrap;
-  }
-
-  .sql-studio .studio-snippets {
-    flex-basis: 100%;
-    padding: 2px 0;
   }
 }
 
@@ -8054,18 +8580,20 @@ body.view-ecosystem .main__content:has(.dashboard-view) {
     padding: 0 8px;
   }
 
-  .studio-pane__actions {
-    width: 100%;
-    margin-left: 0;
+  .studio-pane__bar {
+    flex-wrap: wrap;
+    padding: 4px 8px;
   }
 
-  .studio-pane__actions .studio-btn {
-    flex: 1;
+  .studio-file-tab {
+    height: 28px;
+    padding: 0 8px;
+    border: 0;
+    background: transparent;
   }
 
-  .studio-select--compact {
-    max-width: none;
-    flex: 1 1 120px;
+  .sql-studio-modal-title {
+    max-width: 210px;
   }
 }
 
@@ -8079,6 +8607,7 @@ body.view-ecosystem .main__content:has(.dashboard-view) {
   max-height: none;
   height: 100%;
 }
+
 
 
 

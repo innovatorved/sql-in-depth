@@ -32,62 +32,64 @@ function ensureWorkerLoaded(assetVersion) {
   _bootstrapped = true;
 }
 
-self.onmessage = async function (event) {
+let _taskQueue = Promise.resolve();
+
+async function handleWorkerAction(action, payload, assetVersion) {
+  ensureWorkerLoaded(assetVersion);
+
+  switch (action) {
+    case 'initSqlite':
+      await self.SqlEngine.initSqlite();
+      return { ready: true, engine: 'sqlite' };
+
+    case 'initPglite':
+      await self.SqlEngine.initPglite();
+      return { ready: true, pgliteReady: self.SqlEngine.isPgliteReady(), engine: 'postgres' };
+
+    case 'setEngineMode':
+      return await self.SqlEngine.setEngineMode(payload && payload.mode);
+
+    case 'execute':
+      return await self.SqlEngine.execute(
+        payload && payload.sql,
+        (payload && payload.options) || {}
+      );
+
+    case 'introspectSchema':
+      return await self.SqlEngine.introspectSchema(payload && payload.datasetId);
+
+    case 'resetDataset':
+      await self.SqlEngine.resetDataset(payload && payload.datasetId);
+      return { reset: true };
+
+    default:
+      throw new Error('Unknown SQL Worker action: ' + action);
+  }
+}
+
+self.onmessage = function (event) {
   const msg = event && event.data ? event.data : {};
   const { id, action, payload, assetVersion } = msg;
   if (!id || !action) return;
 
-  try {
-    ensureWorkerLoaded(assetVersion);
-
-    let result = null;
-    switch (action) {
-      case 'initSqlite':
-        await self.SqlEngine.initSqlite();
-        result = { ready: true, engine: 'sqlite' };
-        break;
-
-      case 'initPglite':
-        await self.SqlEngine.initPglite();
-        result = { ready: true, pgliteReady: self.SqlEngine.isPgliteReady(), engine: 'postgres' };
-        break;
-
-      case 'setEngineMode':
-        result = await self.SqlEngine.setEngineMode(payload && payload.mode);
-        break;
-
-      case 'execute':
-        result = await self.SqlEngine.execute(
-          payload && payload.sql,
-          (payload && payload.options) || {}
-        );
-        break;
-
-      case 'introspectSchema':
-        result = await self.SqlEngine.introspectSchema(payload && payload.datasetId);
-        break;
-
-      case 'resetDataset':
-        await self.SqlEngine.resetDataset(payload && payload.datasetId);
-        result = { reset: true };
-        break;
-
-      default:
-        throw new Error('Unknown SQL Worker action: ' + action);
+  _taskQueue = _taskQueue.then(async function () {
+    try {
+      const result = await handleWorkerAction(action, payload, assetVersion);
+      self.postMessage({
+        id,
+        ok: true,
+        pgliteReady: self.SqlEngine.isPgliteReady(),
+        engineMode: self.SqlEngine.getEngineMode(),
+        result,
+      });
+    } catch (err) {
+      self.postMessage({
+        id,
+        ok: false,
+        pgliteReady: Boolean(self.SqlEngine && self.SqlEngine.isPgliteReady()),
+        engineMode: (self.SqlEngine && self.SqlEngine.getEngineMode()) || 'sqlite',
+        error: err && err.message ? err.message : String(err),
+      });
     }
-
-    self.postMessage({
-      id,
-      ok: true,
-      pgliteReady: self.SqlEngine.isPgliteReady(),
-      engineMode: self.SqlEngine.getEngineMode(),
-      result,
-    });
-  } catch (err) {
-    self.postMessage({
-      id,
-      ok: false,
-      error: err && err.message ? err.message : String(err),
-    });
-  }
+  });
 };

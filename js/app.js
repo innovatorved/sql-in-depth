@@ -2827,38 +2827,38 @@ window.App = (() => {
       }).join('');
 
       host.innerHTML = `
-        <div class="sql-guided-step-bar" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:12px 16px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:10px 10px 0 0;margin-top:8px;">
-          <div style="flex:1;min-width:240px;">
-            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--info);margin-bottom:2px;">
-              Active Step ${activeStepIdx + 1} of ${steps.length || 1} · Dataset: <code>${escapeHtml(dsObj ? (dsObj.title || datasetId) : datasetId)}</code>
+        <div class="sql-guided-lab-shell">
+          <div class="sql-guided-step-bar">
+            <div class="sql-guided-step-bar__meta">
+              <div class="sql-guided-step-bar__eyebrow">
+                Step ${activeStepIdx + 1} of ${steps.length || 1} · <code>${escapeHtml(dsObj ? (dsObj.title || datasetId) : datasetId)}</code>
+              </div>
+              <div class="sql-guided-step-bar__title">${escapeHtml(step.title || '')}</div>
+              <div class="sql-guided-step-bar__desc">${formatInlineBackticks(step.instructions || step.concept || '')}</div>
             </div>
-            <div style="font-size:0.95rem;font-weight:600;color:var(--fg);">${escapeHtml(step.title || '')}</div>
-            <div style="font-size:13px;color:var(--fg-muted);margin-top:2px;">${formatInlineBackticks(step.instructions || step.concept || '')}</div>
+            <div class="sql-guided-step-bar__actions">
+              ${steps.length > 1 ? `
+                <button type="button" class="sql-vscode-btn" data-sql-lab-nav="prev" ${activeStepIdx === 0 ? 'disabled' : ''}>‹ Prev</button>
+                <button type="button" class="sql-vscode-btn" data-sql-lab-nav="next" ${activeStepIdx >= steps.length - 1 ? 'disabled' : ''}>Next ›</button>
+              ` : ''}
+              <button type="button" class="sql-vscode-btn" data-sql-lab-action="hint">Hint</button>
+              <button type="button" class="sql-vscode-btn" data-sql-lab-action="solution">Solution</button>
+            </div>
           </div>
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-            ${steps.length > 1 ? `
-              <button type="button" class="btn btn--secondary btn--sm" data-sql-lab-nav="prev" ${activeStepIdx === 0 ? 'disabled' : ''}>← Prev Step</button>
-              <button type="button" class="btn btn--secondary btn--sm" data-sql-lab-nav="next" ${activeStepIdx >= steps.length - 1 ? 'disabled' : ''}>Next Step →</button>
-            ` : ''}
-            <button type="button" class="btn btn--secondary btn--sm" data-sql-lab-action="verify" style="border-color:var(--success-border);color:var(--success);">✓ Check SQL Assertions</button>
-            <button type="button" class="btn btn--secondary btn--sm" data-sql-lab-action="hint">Hint</button>
-            <button type="button" class="btn btn--secondary btn--sm" data-sql-lab-action="solution">Load Solution SQL</button>
-            <button type="button" class="btn btn--primary btn--sm" data-sql-lab-action="fullscreen">⤢ Full-Screen Studio</button>
+          ${dsTables.length > 0 ? `
+            <details class="sql-inline-schema-drawer">
+              <summary>
+                <span>Schema Explorer · ${escapeHtml(dsObj ? dsObj.title : datasetId)} (${dsTables.length} tables)</span>
+                <span class="sql-inline-schema-drawer__toggle">Show tables ▾</span>
+              </summary>
+              <div class="sql-inline-schema-grid">${schemaCardsHtml}</div>
+            </details>
+          ` : ''}
+          <div class="sql-guided-step-hint" style="display:none;">
+            <strong>Hint:</strong> ${formatInlineBackticks(step.hint || 'Inspect the intermediate tables produced by each SQL clause.')}
           </div>
+          <div class="sql-guided-visualizer-mount"></div>
         </div>
-        ${dsTables.length > 0 ? `
-          <details class="sql-inline-schema-drawer" style="border-left:1px solid var(--border);border-right:1px solid var(--border);">
-            <summary>
-              <span><strong>Dataset Schema &amp; PK/FK Relationship Explorer</strong> (${escapeHtml(dsObj ? dsObj.title : datasetId)} · ${dsTables.length} tables — click any table to preview rows)</span>
-              <span class="badge badge--secondary">Expand Schema ▾</span>
-            </summary>
-            <div class="sql-inline-schema-grid">${schemaCardsHtml}</div>
-          </details>
-        ` : ''}
-        <div class="sql-guided-step-hint" style="display:none;padding:10px 16px;background:var(--info-bg);border-left:3px solid var(--info);border-right:1px solid var(--border);font-size:13px;color:var(--fg);">
-          <strong>Hint:</strong> ${formatInlineBackticks(step.hint || 'Inspect the intermediate tables produced by each SQL clause.')}
-        </div>
-        <div class="sql-guided-visualizer-mount" style="border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;overflow:hidden;"></div>
       `;
 
       const mountSlot = host.querySelector('.sql-guided-visualizer-mount');
@@ -3170,58 +3170,46 @@ window.App = (() => {
     }
 
     overlay.innerHTML = `
-      <div class="global-codelab-shell sql-studio-modal-shell" style="display:flex;flex-direction:column;width:96vw;max-width:1560px;height:92vh;margin:4vh auto;background:var(--bg);border:1px solid var(--border-strong);border-radius:14px;overflow:hidden;box-shadow:var(--shadow-xl);">
-        <div class="global-codelab-topbar" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;background:var(--surface);border-bottom:1px solid var(--border);">
-          <div class="global-codelab-topbar-left" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-            <button class="btn btn--secondary btn--sm global-codelab-back-btn" id="global-codelab-close-btn">
-              ← ${escapeHtml(opts.backLabel || 'Back to Lesson')}
+      <div class="global-codelab-shell sql-studio-modal-shell">
+        <div class="global-codelab-topbar sql-studio-modal-topbar">
+          <div class="global-codelab-topbar-left">
+            <button type="button" class="studio-btn studio-btn--sm" id="global-codelab-close-btn">
+              ← ${escapeHtml(opts.backLabel || 'Back')}
             </button>
-              <div>
-                <div style="display:flex;align-items:center;gap:8px;">
-                  <span class="global-codelab-badge" style="background:var(--accent-muted);color:var(--accent);padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;">SQL STUDIO</span>
-                  <strong style="font-size:15px;color:var(--fg);">${escapeHtml(title)}</strong>
-                </div>
-                <div style="font-size:12px;color:var(--fg-muted);margin-top:2px;">${escapeHtml(summary)}</div>
-              </div>
-            </div>
-            <div class="global-codelab-topbar-right" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-              <label style="font-size:12px;color:var(--fg-muted);display:flex;align-items:center;gap:6px;">
-                Preset:
-                <select id="sql-studio-modal-query-select" data-role="modal-query-select" aria-label="Load Topic Query / Solution" style="background:var(--bg);color:var(--fg);border:1px solid var(--border-strong);border-radius:6px;padding:4px 8px;font-size:12px;max-width:240px;">
-                  ${buildQueryPresetOptionsHtml()}
-                </select>
-              </label>
-              <label style="font-size:12px;color:var(--fg-muted);display:flex;align-items:center;gap:6px;">
-                Dataset:
-                <select id="sql-studio-modal-dataset" data-role="modal-dataset" style="background:var(--bg);color:var(--fg);border:1px solid var(--border-strong);border-radius:6px;padding:4px 8px;font-size:12px;">
-                  <option value="__unified__" ${activeDatasetId === '__unified__' ? 'selected' : ''}>All 5 Datasets</option>
-                  ${datasetKeys.map(k => {
-                    const ds = datasets[k] || { title: k };
-                    return `<option value="${escapeHtml(k)}" ${k === activeDatasetId ? 'selected' : ''}>${escapeHtml(ds.title || ds.label || k)}</option>`;
-                  }).join('')}
-                </select>
-              </label>
-              <label style="font-size:12px;color:var(--fg-muted);display:flex;align-items:center;gap:6px;">
-                Engine:
-                <select id="sql-studio-modal-engine" data-role="modal-engine" style="background:var(--bg);color:var(--fg);border:1px solid var(--border-strong);border-radius:6px;padding:4px 8px;font-size:12px;">
-                  <option value="sqlite" ${activeEngine === 'sqlite' ? 'selected' : ''}>SQLite 3 (WASM)</option>
-                  <option value="postgres" ${activeEngine === 'postgres' ? 'selected' : ''}>PostgreSQL 18 (PGlite)</option>
-                </select>
-              </label>
-              <button class="btn btn--secondary btn--sm" id="sql-studio-modal-reset-btn">Reset Dataset</button>
-            </div>
+            <span class="sql-studio-modal-title">${escapeHtml(title)}</span>
           </div>
-
-          <div style="display:grid;grid-template-columns:280px 1fr;flex:1;min-height:0;overflow:hidden;">
-            <aside id="sql-studio-modal-schema" style="border-right:1px solid var(--border);background:var(--bg-alt);padding:14px;overflow-y:auto;">
-              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--fg-muted);margin-bottom:10px;">Schema &amp; PK/FK Explorer</div>
-              <div id="sql-studio-modal-schema-list" style="font-size:13px;color:var(--fg);"></div>
-            </aside>
-
-            <div style="display:flex;flex-direction:column;min-height:0;overflow-y:auto;padding:16px;gap:14px;">
-              <div id="sql-studio-modal-visualizer-host" style="flex:1;min-height:420px;"></div>
-            </div>
+          <div class="global-codelab-topbar-right">
+            <select id="sql-studio-modal-query-select" class="studio-select studio-select--compact" data-role="modal-query-select" aria-label="Load Topic Query / Solution">
+              ${buildQueryPresetOptionsHtml()}
+            </select>
+            <select id="sql-studio-modal-dataset" class="studio-select studio-select--compact" data-role="modal-dataset" aria-label="Dataset">
+              <option value="__unified__" ${activeDatasetId === '__unified__' ? 'selected' : ''}>All datasets</option>
+              ${datasetKeys.map(k => {
+                const ds = datasets[k] || { title: k };
+                return `<option value="${escapeHtml(k)}" ${k === activeDatasetId ? 'selected' : ''}>${escapeHtml(ds.title || ds.label || k)}</option>`;
+              }).join('')}
+            </select>
+            <label class="studio-engine">
+              <span class="studio-engine__dot" aria-hidden="true"></span>
+              <select id="sql-studio-modal-engine" class="studio-select studio-select--bare" data-role="modal-engine" aria-label="SQL engine">
+                <option value="sqlite" ${activeEngine === 'sqlite' ? 'selected' : ''}>SQLite 3.46</option>
+                <option value="postgres" ${activeEngine === 'postgres' ? 'selected' : ''}>PostgreSQL 18</option>
+              </select>
+            </label>
+            <button type="button" class="studio-btn studio-btn--ghost studio-btn--sm" id="sql-studio-modal-reset-btn">Reset DB</button>
           </div>
+        </div>
+
+        <div class="sql-studio-modal-body">
+          <aside id="sql-studio-modal-schema" class="sql-studio-modal-sidebar" aria-label="Schema Explorer">
+            <div class="sql-studio-modal-sidebar__head">Explorer</div>
+            <div id="sql-studio-modal-schema-list" class="sql-studio-modal-schema-list"></div>
+          </aside>
+
+          <div class="sql-studio-modal-main">
+            <div id="sql-studio-modal-visualizer-host" class="sql-studio-modal-host"></div>
+          </div>
+        </div>
       </div>
     `;
 
@@ -3269,36 +3257,40 @@ window.App = (() => {
         }
       });
       if (tables.length > 0) {
-        schemaListEl.innerHTML = tables.map(t => {
+        schemaListEl.innerHTML = tables.map((t, idx) => {
           const rowCnt = t.rowCount || (Array.isArray(t.rows) ? t.rows.length : 0);
           return `
-            <div style="margin-bottom:10px;padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;">
-              <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;" data-preview-table="${escapeHtml(t.name)}" title="Click to preview SELECT * FROM ${escapeHtml(t.name)} LIMIT 15;">
-                <strong style="color:var(--info);font-family:var(--font-mono,monospace);">▤ ${escapeHtml(t.name)}</strong>
-                <span style="font-size:12px;color:var(--fg-muted);">${rowCnt ? `${rowCnt} rows` : 'SELECT *'}</span>
+            <div class="schema-table">
+              <details class="schema-table__details" ${idx < 3 ? 'open' : ''}>
+                <summary class="schema-table__summary">
+                  <span class="schema-table__chevron" aria-hidden="true"></span>
+                  <span class="schema-table__name">${escapeHtml(t.name)}</span>
+                  <span class="schema-table__rows">${rowCnt || ''}</span>
+                </summary>
+                ${Array.isArray(t.columns) ? `
+                  <div class="schema-table__cols">
+                    ${t.columns.map(c => {
+                      if (typeof c === 'string') {
+                        const colToken = c.split(/\s+/)[0] || c;
+                        return `<button type="button" class="schema-col sql-studio-col-item sql-studio-col-item--clickable" data-insert-col="${escapeHtml(colToken)}"><span class="schema-col__name">${escapeHtml(c)}</span></button>`;
+                      }
+                      const isPk = Boolean(c.pk);
+                      const fkRef = c.fk ? String(c.fk) : '';
+                      return `
+                        <button type="button" class="schema-col sql-studio-col-item sql-studio-col-item--clickable" data-insert-col="${escapeHtml(c.name || '')}" title="Click to insert ${escapeHtml(c.name || '')}">
+                          <span class="schema-col__name">${escapeHtml(c.name || '')}</span>
+                          ${isPk ? '<span class="col-badge col-badge--pk sql-studio-col-badge sql-studio-col-badge--pk">PK</span>' : ''}
+                          ${fkRef ? `<span class="col-badge col-badge--fk sql-studio-col-badge sql-studio-col-badge--fk" title="Foreign Key → ${escapeHtml(fkRef)}">FK</span>` : ''}
+                          <span class="schema-col__type">${escapeHtml(c.type || '')}</span>
+                        </button>
+                      `;
+                    }).join('')}
+                  </div>
+                ` : ''}
+              </details>
+              <div class="schema-table__actions">
+                <button type="button" class="schema-action" data-preview-table="${escapeHtml(t.name)}" title="Preview rows from ${escapeHtml(t.name)}">Preview</button>
               </div>
-              ${Array.isArray(t.columns) ? `
-                <div style="margin-top:6px;display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--fg-muted);font-family:var(--font-mono,monospace);">
-                  ${t.columns.map(c => {
-                    if (typeof c === 'string') {
-                      const colToken = c.split(/\s+/)[0] || c;
-                      return `<div class="sql-studio-col-item sql-studio-col-item--clickable" data-insert-col="${escapeHtml(colToken)}" style="cursor:pointer;">• ${escapeHtml(c)}</div>`;
-                    }
-                    const isPk = Boolean(c.pk);
-                    const fkRef = c.fk ? String(c.fk) : '';
-                    return `
-                      <div class="sql-studio-col-item sql-studio-col-item--clickable" data-insert-col="${escapeHtml(c.name || '')}" title="Click to insert ${escapeHtml(c.name || '')}" style="display:flex;align-items:center;justify-content:space-between;gap:4px;cursor:pointer;">
-                        <span>
-                          <strong style="color:var(--fg);">${escapeHtml(c.name || '')}</strong>
-                          ${isPk ? ' <span class="col-badge col-badge--pk sql-studio-col-badge sql-studio-col-badge--pk">PK</span>' : ''}
-                          ${fkRef ? ` <span class="col-badge col-badge--fk sql-studio-col-badge sql-studio-col-badge--fk" title="Foreign Key → ${escapeHtml(fkRef)}">FK→${escapeHtml(fkRef)}</span>` : ''}
-                        </span>
-                        <span style="color:var(--fg-faint);font-size:0.68rem;">${escapeHtml(c.type || '')}</span>
-                      </div>
-                    `;
-                  }).join('')}
-                </div>
-              ` : ''}
             </div>
           `;
         }).join('');

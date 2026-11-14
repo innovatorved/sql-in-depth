@@ -34,16 +34,16 @@
   <link rel="stylesheet" href="design-system/tokens.css?v=b774bbc99d">
   <link rel="stylesheet" href="design-system/components.css?v=606a179125">
   <link rel="stylesheet" href="css/vendor/katex/katex.min.css?v=83121916c0" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/variables.css?v=58074e99d7">
+  <link rel="stylesheet" href="css/variables.css?v=24e2a6fbbe">
   <link rel="stylesheet" href="css/layout.css?v=e6d15bce05">
-  <link rel="stylesheet" href="css/components.css?v=0d745c8674">
+  <link rel="stylesheet" href="css/components.css?v=b9b22c7348">
   <link rel="stylesheet" href="css/content.css?v=c40a7aea42">
-  <link rel="stylesheet" href="css/landing.css?v=56010c078b" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="css/simulators.css?v=3707a18c53" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/landing.css?v=b406800926" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/simulators.css?v=986609ebe3" media="print" onload="this.media='all'">
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=d98d79ab7a"></script>
-  <script src="js/manifest.js?v=839298cb0a"></script>
+  <script src="js/manifest.js?v=47a0ec2e5f"></script>
 
   <script type="application/ld+json">
 {
@@ -1228,7 +1228,7 @@ erDiagram
   sh<span class="tok-op">.</span>old_salary_usd<span class="tok-op">,</span>
   sh<span class="tok-op">.</span>new_salary_usd<span class="tok-op">,</span>
   (sh<span class="tok-op">.</span>new_salary_usd <span class="tok-op">-</span> sh<span class="tok-op">.</span>old_salary_usd) <span class="tok-kw">AS</span> raise_delta_usd<span class="tok-op">,</span>
-  <span class="tok-kw">ROUND</span>(((sh<span class="tok-op">.</span>new_salary_usd <span class="tok-op">-</span> sh<span class="tok-op">.</span>old_salary_usd) <span class="tok-op">*</span> <span class="tok-num">100.0</span>) <span class="tok-op">/</span> sh<span class="tok-op">.</span>old_salary_usd<span class="tok-op">,</span> <span class="tok-num">1</span>) <span class="tok-kw">AS</span> raise_pct<span class="tok-op">,</span>
+  <span class="tok-fn">ROUND</span>(((sh<span class="tok-op">.</span>new_salary_usd <span class="tok-op">-</span> sh<span class="tok-op">.</span>old_salary_usd) <span class="tok-op">*</span> <span class="tok-num">100.0</span>) <span class="tok-op">/</span> sh<span class="tok-op">.</span>old_salary_usd<span class="tok-op">,</span> <span class="tok-num">1</span>) <span class="tok-kw">AS</span> raise_pct<span class="tok-op">,</span>
   sh<span class="tok-op">.</span>effective_date
 <span class="tok-kw">FROM</span> salary_history <span class="tok-kw">AS</span> sh
 <span class="tok-kw">INNER</span> <span class="tok-kw">JOIN</span> employees <span class="tok-kw">AS</span> e
@@ -1284,10 +1284,10 @@ erDiagram
   <span class="tok-kw">SELECT</span>
     d<span class="tok-op">.</span>dept_id<span class="tok-op">,</span>
     d<span class="tok-op">.</span>name <span class="tok-kw">AS</span> dept_name<span class="tok-op">,</span>
-    <span class="tok-kw">COUNT</span>(e<span class="tok-op">.</span>emp_id) <span class="tok-kw">AS</span> staff_count<span class="tok-op">,</span>
-    <span class="tok-kw">ROUND</span>(<span class="tok-kw">AVG</span>(e<span class="tok-op">.</span>salary_usd)<span class="tok-op">,</span> <span class="tok-num">0</span>) <span class="tok-kw">AS</span> avg_salary_usd<span class="tok-op">,</span>
-    <span class="tok-kw">MAX</span>(e<span class="tok-op">.</span>salary_usd) <span class="tok-kw">AS</span> top_salary_usd<span class="tok-op">,</span>
-    <span class="tok-kw">SUM</span>(e<span class="tok-op">.</span>salary_usd) <span class="tok-kw">AS</span> total_payroll_usd<span class="tok-op">,</span>
+    <span class="tok-fn">COUNT</span>(e<span class="tok-op">.</span>emp_id) <span class="tok-kw">AS</span> staff_count<span class="tok-op">,</span>
+    <span class="tok-fn">ROUND</span>(<span class="tok-fn">AVG</span>(e<span class="tok-op">.</span>salary_usd)<span class="tok-op">,</span> <span class="tok-num">0</span>) <span class="tok-kw">AS</span> avg_salary_usd<span class="tok-op">,</span>
+    <span class="tok-fn">MAX</span>(e<span class="tok-op">.</span>salary_usd) <span class="tok-kw">AS</span> top_salary_usd<span class="tok-op">,</span>
+    <span class="tok-fn">SUM</span>(e<span class="tok-op">.</span>salary_usd) <span class="tok-kw">AS</span> total_payroll_usd<span class="tok-op">,</span>
     d<span class="tok-op">.</span>annual_budget_usd
   <span class="tok-kw">FROM</span> departments <span class="tok-kw">AS</span> d
   <span class="tok-kw">LEFT</span> <span class="tok-kw">JOIN</span> employees <span class="tok-kw">AS</span> e
@@ -1301,7 +1301,7 @@ erDiagram
   avg_salary_usd<span class="tok-op">,</span>
   top_salary_usd<span class="tok-op">,</span>
   total_payroll_usd<span class="tok-op">,</span>
-  <span class="tok-kw">ROUND</span>((total_payroll_usd <span class="tok-op">*</span> <span class="tok-num">100.0</span>) <span class="tok-op">/</span> annual_budget_usd<span class="tok-op">,</span> <span class="tok-num">1</span>) <span class="tok-kw">AS</span> budget_utilization_pct
+  <span class="tok-fn">ROUND</span>((total_payroll_usd <span class="tok-op">*</span> <span class="tok-num">100.0</span>) <span class="tok-op">/</span> annual_budget_usd<span class="tok-op">,</span> <span class="tok-num">1</span>) <span class="tok-kw">AS</span> budget_utilization_pct
 <span class="tok-kw">FROM</span> dept_rollup
 <span class="tok-kw">WHERE</span> staff_count <span class="tok-op">&gt;=</span> <span class="tok-num">1</span>
 <span class="tok-kw">ORDER</span> <span class="tok-kw">BY</span> total_payroll_usd <span class="tok-kw">DESC</span><span class="tok-op">;</span></code></pre></div>
@@ -1821,15 +1821,15 @@ erDiagram
 
   <!-- Core Shell Scripts (deferred to idle after first paint) -->
   <script type="text/plain" data-defer src="data/curriculum.js?v=4f53b5646e"></script>
-  <script type="text/plain" data-defer src="js/lazy.js?v=683e461abe"></script>
+  <script type="text/plain" data-defer src="js/lazy.js?v=1d9b2638c9"></script>
   <script type="text/plain" data-defer src="js/analytics.js?v=a1ffee77a9"></script>
   <script type="text/plain" data-defer src="js/progress.js?v=20e4822556"></script>
   <script type="text/plain" data-defer src="js/search.js?v=cfb7464ca7"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
-  <script type="text/plain" data-defer src="js/renderer.js?v=36f6f37691"></script>
-  <script type="text/plain" data-defer src="js/landing.js?v=51833858e9"></script>
+  <script type="text/plain" data-defer src="js/renderer.js?v=dde19fa7e5"></script>
+  <script type="text/plain" data-defer src="js/landing.js?v=9286e224a4"></script>
   <script type="text/plain" data-defer src="js/quiz.js?v=5b300d9b3d"></script>
-  <script type="text/plain" data-defer src="js/app.js?v=34b2b26177"></script>
+  <script type="text/plain" data-defer src="js/app.js?v=984d65b432"></script>
 
   <!-- Route-Scoped Lazy Scripts (stamped & loaded on demand via window.Lazy) -->
   <script type="text/plain" data-lazy src="data/datasets.js?v=259e5934af"></script>
@@ -1842,9 +1842,9 @@ erDiagram
   <script type="text/plain" data-lazy src="data/projects.js?v=2280ac085f"></script>
   <script type="text/plain" data-lazy src="data/glossary.js?v=cbce13b203"></script>
   <script type="text/plain" data-lazy src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>
-  <script type="text/plain" data-lazy src="js/sql-engine.js?v=ef30cfbffa"></script>
-  <script type="text/plain" data-lazy src="js/vendor/cm6-sql.js?v=acc5cb4445"></script>
-  <script type="text/plain" data-lazy src="js/table-visualizer.js?v=abf76f2092"></script>
+  <script type="text/plain" data-lazy src="js/sql-engine.js?v=6cab14fc82"></script>
+  <script type="text/plain" data-lazy src="js/vendor/cm6-sql.js?v=c9474beb2c"></script>
+  <script type="text/plain" data-lazy src="js/table-visualizer.js?v=f5918b8887"></script>
   <script type="text/plain" data-lazy src="js/simulators.js?v=4cf0ceeb96"></script>
   <script type="text/plain" data-lazy src="js/simulators-relational.js?v=32c1358d02"></script>
   <script type="text/plain" data-lazy src="js/simulators-analytical.js?v=50d950f3b6"></script>
@@ -1857,7 +1857,7 @@ erDiagram
   <script type="text/plain" data-lazy src="js/roadmap.js?v=687d490300"></script>
   <script type="text/plain" data-lazy src="js/challenges.js?v=438d35cd1b"></script>
   <script type="text/plain" data-lazy src="js/dashboard.js?v=3fd8d6f60d"></script>
-  <script type="text/plain" data-lazy src="js/sandbox.js?v=775e2f00c1"></script>
+  <script type="text/plain" data-lazy src="js/sandbox.js?v=371393a6c5"></script>
   <script type="text/plain" data-lazy src="js/topic-codelab.js?v=49fccccd99"></script>
 
   <!-- App bootstrap & deferred script loader -->

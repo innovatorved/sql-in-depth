@@ -74,15 +74,13 @@ window.Lazy = (() => {
       return Promise.resolve();
     }
     if (_sqlStackPromise) return _sqlStackPromise;
-    const files = ['data/datasets.js'];
-    if (typeof Worker !== 'function') {
-      files.push('js/vendor/sql-wasm.js');
-    }
-    files.push(
+    const files = [
+      'data/datasets.js',
+      'js/vendor/sql-wasm.js',
       'js/sql-engine.js',
       'js/vendor/cm6-sql.js',
       'js/table-visualizer.js'
-    );
+    ];
     _sqlStackPromise = loadAll(files).catch(err => {
       _sqlStackPromise = null;
       throw err;

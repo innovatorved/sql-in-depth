@@ -598,7 +598,7 @@ async function runSuite() {
   assertCheck(1, 'T1-R3-07', 'insertSqlSnippet inserts SQL snippet at cursor position and advances selection', chipTa.value.includes('SELECT * FROM customers') && chipTa.value.includes("WHERE tier = 'enterprise'"));
   assertCheck(1, 'T1-R3-08', 'Schema Explorer in Modal, Inline Lab, and Sandbox renders clickable columns with [data-insert-col] and table preview buttons', appSrc.includes('data-insert-col="') && appSrc.includes('data-preview-table="') && sandboxSrc.includes('data-insert-col="') && sandboxSrc.includes('data-sql-preview-table="'));
   assertCheck(1, 'T1-R3-09', 'Clause Visualizer and Sandbox render Saved/History selector and Save/Export (.sql, .csv, .json) action buttons', syncMountHost.innerHTML.includes('data-sql-ide-role="saved-history-select"') && syncMountHost.innerHTML.includes('data-sql-ide-action="save-query"') && syncMountHost.innerHTML.includes('data-sql-ide-action="export-sql"') && syncMountHost.innerHTML.includes('data-sql-ide-action="export-csv"') && syncMountHost.innerHTML.includes('data-sql-ide-action="export-json"'));
-  assertCheck(1, 'T1-R3-10', 'Clause Visualizer and Sandbox render interactive [data-sql-chip] / [data-wb-sql-chip] practice bars', (syncMountHost.innerHTML.includes('data-sql-chip="select"') || syncMountHost.innerHTML.includes('data-sql-chip="SELECT"')) && (syncMountHost.innerHTML.includes('data-sql-chip="window_over"') || syncMountHost.innerHTML.includes('data-sql-chip="WINDOW OVER"')) && sandboxSrc.includes('data-wb-sql-chip="'));
+  assertCheck(1, 'T1-R3-10', 'Clause Visualizer and Sandbox omit clause-injection chip clutter from rendered UI while exposing compact VS Code overflow menus', !syncMountHost.innerHTML.includes('data-sql-chip=') && !sandboxSrc.includes('wb-sql-practice-bar') && syncMountHost.innerHTML.includes('sql-vscode-bar') && sandboxSrc.includes('studio-menu'));
 
   // --- R4: 180 Topic-Specific Progressive Guided SQL Labs (6 Checks) ---
   const topicGuidedLabsSrc = fs.readFileSync(path.join(ROOT, 'data/topic_guided_labs.js'), 'utf8');
@@ -717,11 +717,9 @@ async function runSuite() {
   assertCheck(1, 'T1-AUDIT-F2-04', 'Switching [data-role="preset"] between preset 0 and preset 1 produces distinct frame output across all 36 primary domain simulators', distinctPresetSims === primarySimKeys.length, identicalPresetSims.slice(0, 5).join(', '));
   assertCheck(1, 'T1-AUDIT-F2-05', 'All 6 domain simulator files transform preset params dynamically in buildFrames(preset)', [simRelationalSrc, simAnalyticalSrc, simModelingSrc, simIndexingSrc, simTransactionsSrc, simOlapOpsSrc].every(src => /buildFrames\s*\(\s*preset\s*\)/.test(src) && src.includes('buildInteractiveFrames(spec, preset')));
 
-  // --- Audit F3: SQL Practice Clause Chips Wiring & Valid Schema Columns (R2 Bug 3) (5 Checks) ---
-  const renderedChipsBarHtml = typeof TableVisualizer.buildPracticeChipsHtml === 'function' ? TableVisualizer.buildPracticeChipsHtml() : syncMountHost.innerHTML;
-  const all12ChipIdsPresent = (TableVisualizer.SQL_PRACTICE_CHIPS || []).every(chip => renderedChipsBarHtml.includes(`data-sql-chip="${chip.id}"`));
-  assertCheck(1, 'T1-AUDIT-F3-01', 'TableVisualizer.buildPracticeChipsHtml() emits data-sql-chip="<chip.id>" (e.g. select, window_over) for all 12 SQL_PRACTICE_CHIPS', all12ChipIdsPresent && renderedChipsBarHtml.includes('data-sql-chip="select"') && renderedChipsBarHtml.includes('data-sql-chip="window_over"'));
-  assertCheck(1, 'T1-AUDIT-F3-02', 'js/table-visualizer.js and js/sandbox.js match practice chips by c.id === chipId / c.id === chipAttr', tableVisSrc.includes('c.id === chipId') && sandboxSrc.includes('c.id === chipAttr'));
+  // --- Audit F3: Clause-Chip Removal & SQL_PRACTICE_CHIPS Canonical Schema Integrity (5 Checks) ---
+  assertCheck(1, 'T1-AUDIT-F3-01', 'Minimal VS Code UI removes cluttering clause-injection chip bars (.sql-practice-bar / #wb-sql-practice-bar) from mounted editors while retaining 12 canonical SQL_PRACTICE_CHIPS specs', !syncMountHost.innerHTML.includes('sql-practice-bar') && !syncMountHost.innerHTML.includes('data-sql-chip') && Array.isArray(TableVisualizer.SQL_PRACTICE_CHIPS) && TableVisualizer.SQL_PRACTICE_CHIPS.length === 12);
+  assertCheck(1, 'T1-AUDIT-F3-02', 'js/table-visualizer.js and js/sandbox.js contain zero rendered data-sql-chip or data-wb-sql-chip injection bars and expose VS Code tab strip (.sql-vscode-bar / .studio-pane__bar)', !tableVisSrc.includes('data-sql-chip=') && !sandboxSrc.includes('data-wb-sql-chip') && tableVisSrc.includes('sql-vscode-bar') && sandboxSrc.includes('studio-pane__bar'));
   const allChipsSnippetsJoined = (TableVisualizer.SQL_PRACTICE_CHIPS || []).map(c => c.snippet).join('\n');
   assertCheck(1, 'T1-AUDIT-F3-03', 'SQL_PRACTICE_CHIPS snippets use valid schema columns (name, total_cents, salary_usd) and zero non-existent full_name, total_amount, or salary columns', !/\bfull_name\b|\btotal_amount\b|\bsalary\b/.test(allChipsSnippetsJoined) && allChipsSnippetsJoined.includes('total_cents') && allChipsSnippetsJoined.includes('salary_usd'));
   let chipsSqlitePassed = 0;
@@ -962,8 +960,8 @@ async function runSuite() {
 
   // --- F6 Boundaries ---
   assertCheck(2, 'T2-F6-01', 'css/variables.css defines --bg-elevated, --bg-surface, --fg, and --fg-muted in both :root and [data-theme="light"]', variablesCss.includes('--bg-elevated:') && variablesCss.includes('--bg-surface:') && variablesCss.includes('[data-theme="light"]'));
-  assertCheck(2, 'T2-F6-02', 'table-visualizer.js uses var(--bg-elevated) for badge and card backgrounds', tableVisSrc.includes('var(--bg-elevated)'));
-  assertCheck(2, 'T2-F6-03', 'table-visualizer.js uses var(--bg-surface) for table/cell surfaces', tableVisSrc.includes('var(--bg-surface)'));
+  assertCheck(2, 'T2-F6-02', 'SQL workbench styling uses theme tokens (--bg-elevated / --bg-alt) for bar and badge backgrounds across components.css and table-visualizer.js', componentsCss.includes('var(--bg-elevated') && componentsCss.includes('var(--bg-alt)') && tableVisSrc.includes('sql-vscode-workbench'));
+  assertCheck(2, 'T2-F6-03', 'SQL workbench styling uses theme surface tokens (--surface) for table/cell surfaces across components.css', componentsCss.includes('var(--surface)') && componentsCss.includes('.sql-vscode-workbench'));
   assertCheck(2, 'T2-F6-04', 'table-visualizer.js uses var(--fg) for primary text in inline styles', tableVisSrc.includes('var(--fg)'));
   assertCheck(2, 'T2-F6-05', 'table-visualizer.js uses var(--fg-muted) for secondary text in inline styles', tableVisSrc.includes('var(--fg-muted)'));
 
@@ -1213,12 +1211,11 @@ async function runSuite() {
   assertCheck(2, 'T2-AUDIT-F2-04', 'Advancing to Step 2 and then changing [data-role="preset"] resets simulator back to Step 1 of the new preset', afterNextText.startsWith('Step 2 /') && afterPresetSwitchText.startsWith('Step 1 /'));
   assertCheck(2, 'T2-AUDIT-F2-05', 'All 6 domain simulator modules contain zero rigid grid-template-columns:1fr 1fr inline styles and zero hardcoded #090d16 canvas fills', !/grid-template-columns\s*:\s*1fr\s+1fr\b/.test(domainSimSources) && !domainSimSources.includes('#090d16'));
 
-  // --- Audit F3 Boundaries: Practice Chip IDs, Escaping & Insertion Edge Cases (5 Checks) ---
+  // --- Audit F3 Boundaries: Canonical SQL Snippet Specs & Insertion Edge Cases (5 Checks) ---
   const allChipIdsSnakeCase = (TableVisualizer.SQL_PRACTICE_CHIPS || []).every(c => /^[a-z0-9_]+$/.test(c.id));
   assertCheck(2, 'T2-AUDIT-F3-01', 'All 12 SQL_PRACTICE_CHIPS ids are lowercase snake_case identifiers with zero whitespace', allChipIdsSnakeCase && TableVisualizer.SQL_PRACTICE_CHIPS.length === 12);
-  const extractedChipIds = [...renderedChipsBarHtml.matchAll(/data-sql-chip="([^"]+)"/g)].map(m => m[1]);
-  const matchedChipObjects = extractedChipIds.map(cid => (TableVisualizer.SQL_PRACTICE_CHIPS || []).find(c => c.id === cid)).filter(Boolean);
-  assertCheck(2, 'T2-AUDIT-F3-02', 'Every rendered data-sql-chip attribute in buildPracticeChipsHtml resolves to a valid chip object via c.id === chipId (12/12)', extractedChipIds.length === 12 && matchedChipObjects.length === 12);
+  const validSpecFieldsCount = (TableVisualizer.SQL_PRACTICE_CHIPS || []).filter(c => c.id && c.label && c.clause && c.snippet && c.snippet.trim().length > 10).length;
+  assertCheck(2, 'T2-AUDIT-F3-02', 'Every canonical SQL_PRACTICE_CHIPS entry (12/12) defines non-empty id, label, clause, and executable snippet fields while visualizer renders VS Code panel tabs', validSpecFieldsCount === 12 && tableVisSrc.includes('sql-panel-tabs') && tableVisSrc.includes('data-viz-panel-tab="results"') && tableVisSrc.includes('data-viz-panel-tab="clauses"') && tableVisSrc.includes('data-viz-panel-tab="explain"'));
   let nullSnippetSafe = true;
   try {
     TableVisualizer.insertSqlSnippet(null, 'SELECT 1;');
@@ -1240,7 +1237,7 @@ async function runSuite() {
     }
   }
   assertCheck(2, 'T2-AUDIT-F3-04', 'All 12 SQL_PRACTICE_CHIPS snippets return matching row and column counts across SQLite 3 and PostgreSQL 18 (with non-empty query plans on EXPLAIN)', all12ChipsParity === 12, `matched ${all12ChipsParity}/12`);
-  assertCheck(2, 'T2-AUDIT-F3-05', 'Sandbox practice chip click handler in js/sandbox.js looks up chip by c.id === chipAttr or data-wb-sql-snippet cleanly', sandboxSrc.includes('data-wb-sql-chip') && sandboxSrc.includes('c.id === chipAttr') && sandboxSrc.includes('insertSqlSnippet'));
+  assertCheck(2, 'T2-AUDIT-F3-05', 'Sandbox Schema Explorer supports clean column/table insertion via insertSqlSnippet without clause-injection chip bars', !sandboxSrc.includes('data-wb-sql-chip') && sandboxSrc.includes('data-insert-col') && sandboxSrc.includes('insertSqlSnippet'));
 
   // --- Audit F4 Boundaries: /sandbox SQL Studio Toolbar & Saved/History Dropdown Corner Cases (5 Checks) ---
   global.localStorage.removeItem('sql_in_depth_saved_queries_v1');
@@ -1594,7 +1591,7 @@ async function runSuite() {
   const comboHtml = comboHost.innerHTML;
   const comboEd = comboHost.querySelector('.sql-live-editor');
   const comboIde = comboEd && comboEd._sqlIdeInstance;
-  assertCheck(3, 'T3-19', 'R1+R2+R3: mountClauseVisualizer synchronously mounts IDE shell, line gutter, highlight layer, format/save/export toolbar, and practice chips', Boolean(comboIde && comboIde.shell.className === 'sql-ide-shell' && comboIde.gutter.className === 'sql-ide-gutter' && comboIde.highlightCode.className === 'sql-ide-highlight' && comboHtml.includes('data-sql-ide-action="format"') && comboHtml.includes('data-sql-ide-action="export-csv"') && (comboHtml.includes('data-sql-chip="select"') || comboHtml.includes('data-sql-chip="SELECT"'))));
+  assertCheck(3, 'T3-19', 'R1+R2+R3: mountClauseVisualizer synchronously mounts IDE shell, line gutter, highlight layer, and compact VS Code action menu without clause chip clutter', Boolean(comboIde && comboIde.shell.className === 'sql-ide-shell' && comboIde.gutter.className === 'sql-ide-gutter' && comboIde.highlightCode.className === 'sql-ide-highlight' && comboHtml.includes('data-sql-ide-action="format"') && comboHtml.includes('data-sql-ide-action="export-csv"') && !comboHtml.includes('data-sql-chip=')));
 
   // T3-20: R2 + R4 + Visualizer (formatSql on all 18 module representative solutionCode queries preserves execution and step pipeline decomposition)
   let formattedLabsOk = 0;
@@ -1630,19 +1627,17 @@ async function runSuite() {
   } catch (_) {}
   assertCheck(3, 'T3-21', 'Audit F1+F2: Domain simulator mounts with customInput:false, preset switch updates stage, and auto-play advances step via lifecycle().after', t3F1F2Ok);
 
-  // T3-22: Audit F3 + F4 (Practice chip data-sql-chip="<id>" lookup -> insertSqlSnippet -> format-sql -> save-query with title input -> history:<id> recall)
+  // T3-22: Audit F3 + F4 (Snippet insertion -> format-sql -> save-query with title input -> history:<id> recall)
   global.localStorage.removeItem('sql_in_depth_saved_queries_v1');
   global.localStorage.removeItem('sql_in_depth_query_history_v1');
-  const winChipMatch = renderedChipsBarHtml.match(/data-sql-chip="(window_over)"/);
-  const winChipId = winChipMatch ? winChipMatch[1] : null;
-  const winChipObj = (TableVisualizer.SQL_PRACTICE_CHIPS || []).find(c => c.id === winChipId);
+  const winChipObj = (TableVisualizer.SQL_PRACTICE_CHIPS || []).find(c => c.id === 'window_over');
   const t3ChipTa = createMockDomNode('textarea');
   t3ChipTa.value = '';
   if (winChipObj) TableVisualizer.insertSqlSnippet(t3ChipTa, winChipObj.snippet);
   const t3FmtChipSql = TableVisualizer.formatSql(t3ChipTa.value);
   const t3SavedQ = TableVisualizer.saveQuery('Window Over Title', t3FmtChipSql, 'ecommerce');
   const t3HistQ = TableVisualizer.recordQueryHistory(t3FmtChipSql, 'ecommerce');
-  assertCheck(3, 'T3-22', 'Audit F3+F4: Practice chip lookup via c.id === chipId ("window_over") + insertSqlSnippet + formatSql + saveQuery + recordQueryHistory pipeline succeeds', Boolean(winChipObj && t3FmtChipSql.includes('OVER') && t3SavedQ && t3SavedQ.title === 'Window Over Title' && t3HistQ && t3HistQ.id));
+  assertCheck(3, 'T3-22', 'Audit F3+F4: Snippet insertion via insertSqlSnippet ("window_over") + formatSql + saveQuery + recordQueryHistory pipeline succeeds', Boolean(winChipObj && t3FmtChipSql.includes('OVER') && t3SavedQ && t3SavedQ.title === 'Window Over Title' && t3HistQ && t3HistQ.id));
 
   // T3-23: Audit F3 + DualEngine (All 12 SQL_PRACTICE_CHIPS snippets execute cleanly after formatSql in both PostgreSQL 18 and SQLite 3)
   let t3FormattedChipsOk = 0;
@@ -2011,15 +2006,12 @@ async function runSuite() {
   } catch (_) {}
   assertCheck(4, 'T4-J16', 'Interactive Simulator Auto-Play Lifecycle & Preset Transformation Journey (F1+F2+F6: mount -> switch preset 0->1 -> auto-play step advance -> pause)', j16Ok);
 
-  // Journey 17: SQL Studio Clause Chips + Toolbar Actions (format-sql, copy-sql, save-query with title input, delete-saved, history:<id> recall) + Dual-Engine Execution Journey (F3 + F4)
+  // Journey 17: SQL Studio Snippet Insertion + Toolbar Actions (format-sql, copy-sql, save-query with title input, delete-saved, history:<id> recall) + Dual-Engine Execution Journey (F3 + F4)
   let j17Ok = false;
   try {
     global.localStorage.setItem('sql_in_depth_saved_queries_v1', '[]');
     TableVisualizer.clearQueryHistory();
-    const chipsHtml17 = renderedChipsBarHtml;
-    const chipIdMatch17 = chipsHtml17.match(/data-sql-chip="(group_by)"/);
-    const chipId17 = chipIdMatch17 ? chipIdMatch17[1] : null;
-    const chipObj17 = (TableVisualizer.SQL_PRACTICE_CHIPS || []).find(c => c.id === chipId17);
+    const chipObj17 = (TableVisualizer.SQL_PRACTICE_CHIPS || []).find(c => c.id === 'group_by');
     const ta17 = createMockDomNode('textarea');
     ta17.value = '';
     if (chipObj17) TableVisualizer.insertSqlSnippet(ta17, chipObj17.snippet);
@@ -2042,7 +2034,7 @@ async function runSuite() {
       sandboxSrc.includes("selVal.indexOf('history:') === 0")
     );
   } catch (_) {}
-  assertCheck(4, 'T4-J17', 'SQL Studio Clause Chip Insertion -> Format -> Save Title -> History Recall -> Delete Saved -> Dual-Engine Execution Journey (F3+F4)', j17Ok);
+  assertCheck(4, 'T4-J17', 'SQL Studio Snippet Insertion -> Format -> Save Title -> History Recall -> Delete Saved -> Dual-Engine Execution Journey (F3+F4)', j17Ok);
 
   // Journey 18: Production Incident War-Room Challenges End-to-End Verification & Hotfix Callback Journey across all 12 Challenges (F5)
   let j18Passed = 0;
@@ -2155,6 +2147,36 @@ async function runSuite() {
     );
   } catch (_) {}
   assertCheck(4, 'T4-J21', 'Playground Upgrade Journey: Comment-Safe Clause Parser, Shareable ?q= URLs, Error Hints, NULLS LAST Sortable Tables, Worker & CM6 Bundle', j21Ok);
+
+  // Journey 22: PostgreSQL 18 WASM Streaming Fallback, Single WASM Header, Serialized Worker Queue & Zero Legacy Clause Snippets in Root + dist/
+  let j22Ok = false;
+  try {
+    const headersSrc = fs.readFileSync(path.join(ROOT, '_headers'), 'utf8');
+    const wasmHeaderMatches = headersSrc.match(/Content-Type:\s*application\/wasm/gi) || [];
+    const pgliteChunkSrc = fs.readFileSync(path.join(ROOT, 'js/vendor/pglite/chunk-NNS5RQRF.js'), 'utf8');
+    const workerSrc = fs.readFileSync(path.join(ROOT, 'js/sql-worker.js'), 'utf8');
+    const tvSrc = fs.readFileSync(path.join(ROOT, 'js/table-visualizer.js'), 'utf8');
+    const sbSrc = fs.readFileSync(path.join(ROOT, 'js/sandbox.js'), 'utf8');
+    const distTvPath = path.join(ROOT, 'dist/js/table-visualizer.js');
+    const distSbPath = path.join(ROOT, 'dist/js/sandbox.js');
+    const distClean = !fs.existsSync(distTvPath) || (
+      !fs.readFileSync(distTvPath, 'utf8').includes('Clause Snippets') &&
+      !fs.readFileSync(distTvPath, 'utf8').includes('Executing SQL query') &&
+      (!fs.existsSync(distSbPath) || !fs.readFileSync(distSbPath, 'utf8').includes('Clause Snippets'))
+    );
+    j22Ok = Boolean(
+      wasmHeaderMatches.length === 1 &&
+      !headersSrc.includes('/js/vendor/pglite/*.wasm') &&
+      pgliteChunkSrc.includes('instantiateStreaming') &&
+      pgliteChunkSrc.includes('.arrayBuffer()') &&
+      workerSrc.includes('_taskQueue') &&
+      !tvSrc.includes('Clause Snippets') &&
+      !tvSrc.includes('Executing SQL query') &&
+      !sbSrc.includes('Clause Snippets') &&
+      distClean
+    );
+  } catch (_) {}
+  assertCheck(4, 'T4-J22', 'PostgreSQL 18 WASM Reliability & Clean Build Journey: Single WASM Content-Type, ArrayBuffer Fallback, Serialized Worker Queue & Zero Legacy Snippets', j22Ok);
 
   // =========================================================================
   // SUMMARY REPORT

@@ -70,6 +70,7 @@
         var entry = msg.id ? _workerPending[msg.id] : null;
         if (!entry) return;
         delete _workerPending[msg.id];
+        if (entry.timer) clearTimeout(entry.timer);
         if (msg.ok) {
           entry.resolve(msg.result);
         } else {
@@ -82,6 +83,7 @@
         keys.forEach(function (k) {
           var pending = _workerPending[k];
           delete _workerPending[k];
+          if (pending && pending.timer) clearTimeout(pending.timer);
           if (pending) pending.reject(err || new Error('SQL Worker crashed'));
         });
         try { _worker.terminate(); } catch (e) {}
@@ -95,12 +97,34 @@
     }
   }
 
+  function withTimeout(promise, ms, label) {
+    return new Promise(function (resolve, reject) {
+      var timer = setTimeout(function () {
+        reject(new Error(label || ('Operation timed out after ' + ms + 'ms')));
+      }, ms);
+      Promise.resolve(promise).then(function (val) {
+        clearTimeout(timer);
+        resolve(val);
+      }, function (err) {
+        clearTimeout(timer);
+        reject(err);
+      });
+    });
+  }
+
   function workerCall(action, payload) {
     var w = getWorker();
     if (!w) return Promise.reject(new Error('SQL Worker unavailable'));
+    var timeoutMs = (action === 'initPglite' || action === 'setEngineMode' || action === 'execute') ? 30000 : 15000;
     return new Promise(function (resolve, reject) {
       var id = 'sqlw_' + (++_workerSeq);
-      _workerPending[id] = { resolve: resolve, reject: reject };
+      var timer = setTimeout(function () {
+        if (_workerPending[id]) {
+          delete _workerPending[id];
+          reject(new Error('SQL Worker ' + action + ' timed out'));
+        }
+      }, timeoutMs);
+      _workerPending[id] = { resolve: resolve, reject: reject, timer: timer };
       w.postMessage({
         id: id,
         action: action,
@@ -369,7 +393,7 @@
         throw new Error('PGlite constructor not found in module exports.');
       }
       var instance = new _PGliteClass();
-      return (instance.waitReady || Promise.resolve()).then(function () {
+      return withTimeout(instance.waitReady || Promise.resolve(), 25000, 'PostgreSQL WASM initialization timed out').then(function () {
         // Install compatibility helper overloads so both PostgreSQL and SQLite idioms work seamlessly
         var compatSql = [
           'CREATE OR REPLACE FUNCTION pg_catalog.round(double precision, integer) RETURNS numeric AS $$ SELECT pg_catalog.round($1::numeric, $2); $$ LANGUAGE SQL IMMUTABLE;',
@@ -863,9 +887,12 @@
             ? pgDb.exec('SELECT * FROM "' + dmlInfo.tableName + '" LIMIT 50;', { rowMode: 'array' }).catch(function () { return []; })
             : Promise.resolve(null);
 
-          var explainPromise = includeExplain ? explainQueryPlanPg(pgDb, norm.sql) : Promise.resolve([]);
-
-          return Promise.all([afterPromise, explainPromise]).then(function (postPair) {
+          return afterPromise.then(function (afterRaw) {
+            var explainPromise = includeExplain ? explainQueryPlanPg(pgDb, norm.sql) : Promise.resolve([]);
+            return explainPromise.then(function (explainRes) {
+              return [afterRaw, explainRes];
+            });
+          }).then(function (postPair) {
             var afterRaw = postPair[0];
             var explainNodes = postPair[1] || [];
             var dmlDiff = null;

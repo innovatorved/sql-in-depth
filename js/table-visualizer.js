@@ -722,15 +722,6 @@
         { id: 'explain', label: 'EXPLAIN', clause: 'EXPLAIN', snippet: 'EXPLAIN SELECT * FROM orders WHERE customer_id = 1;' }
     ];
 
-    function buildPracticeChipsHtml() {
-        return '<div class="sql-practice-bar" role="toolbar" aria-label="SQL Clause Practice Chips">' +
-            '<span class="sql-practice-label">Clause Snippets:</span>' +
-            SQL_PRACTICE_CHIPS.map(function (chip) {
-                return `<button type="button" class="sql-practice-chip" data-sql-chip="${escapeHtml(chip.id)}" data-sql-snippet="${escapeHtml(chip.snippet)}" title="Insert ${escapeHtml(chip.label)} clause snippet">+ ${escapeHtml(chip.label)}</button>`;
-            }).join('') +
-        '</div>';
-    }
-
     function toBase64UrlUtf8(str) {
         var raw = String(str || '');
         try {
@@ -2145,10 +2136,10 @@
         var pgReady = (getEngine() && getEngine().isPgliteReady) ? getEngine().isPgliteReady() : false;
         return '<div class="sql-engine-switch" role="group" aria-label="SQL Engine Selector">' +
             '<button type="button" class="sql-engine-btn ' + (mode === 'postgres' ? 'is-active' : '') + '" data-engine-mode="postgres" title="PostgreSQL 18.6 (PGlite WASM)">' +
-                '<span class="sql-engine-dot ' + (pgReady ? 'is-ready' : 'is-loading') + '"></span>PostgreSQL 18 WASM' +
+                '<span class="sql-engine-dot ' + (pgReady ? 'is-ready' : 'is-loading') + '"></span>PG 18' +
             '</button>' +
-            '<button type="button" class="sql-engine-btn ' + (mode === 'sqlite' ? 'is-active' : '') + '" data-engine-mode="sqlite" title="SQLite 3 (sql.js WASM)">' +
-                'SQLite 3 WASM' +
+            '<button type="button" class="sql-engine-btn ' + (mode === 'sqlite' ? 'is-active' : '') + '" data-engine-mode="sqlite" title="SQLite 3.46 (sql.js WASM)">' +
+                'SQLite' +
             '</button>' +
         '</div>';
     }
@@ -2184,51 +2175,61 @@
             var isInsideModal = Boolean(container && typeof container.closest === 'function' && container.closest('#global-codelab-overlay'));
             var editorOpts = Object.assign({}, options, { showEditor: false, compactHeader: isInsideModal ? true : Boolean(options.compactHeader) });
             var refSql = options.referenceSql || options.solutionSql || sql;
+            var dotsSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>';
+            var dbIconSvg = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3"/></svg>';
             container.innerHTML =
-                '<div class="sql-studio-inline-workbench" style="display:flex;flex-direction:column;gap:10px;padding:12px;background:var(--bg-elevated);">' +
-                    '<div class="sql-lab-editor-box" style="display:flex;flex-direction:column;gap:8px;">' +
-                        '<div class="sql-ide-header-bar" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--fg-muted);padding:0 2px;">' +
-                            '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
-                                '<span style="font-family:var(--font-mono,monospace);color:var(--accent);font-weight:700;">query.sql · Live SQL IDE</span>' +
-                                '<span>Shortcut: Cmd/Ctrl + Enter to Run · Tab to Indent</span>' +
+                '<div class="sql-studio-inline-workbench sql-vscode-workbench">' +
+                    '<div class="sql-lab-editor-box sql-vscode-editor-pane">' +
+                        '<div class="sql-vscode-bar">' +
+                            '<div class="sql-vscode-bar__left">' +
+                                '<span class="sql-vscode-tab">' + dbIconSvg + 'query.sql</span>' +
                             '</div>' +
-                            '<div class="sql-studio-saved-panel" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">' +
-                                '<select class="sql-studio-saved-select" data-sql-ide-role="saved-history-select" aria-label="Saved Queries and History" style="background:var(--bg-surface);color:var(--fg);border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:12px;max-width:260px;">' +
-                                    buildSavedAndHistorySelectOptionsHtml() +
-                                '</select>' +
-                                '<input type="text" data-sql-ide-role="save-title-input" placeholder="Query name..." aria-label="Saved query title" style="background:var(--bg-surface);color:var(--fg);border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:12px;width:125px;" />' +
-                                '<button type="button" class="sql-exec-btn is-secondary" data-sql-ide-action="save-query" title="Save current SQL query to browser storage">Save Query</button>' +
-                                '<button type="button" class="sql-exec-btn is-secondary" data-sql-ide-action="delete-saved" title="Delete selected saved query">Delete</button>' +
-                            '</div>' +
-                        '</div>' +
-                        buildPracticeChipsHtml() +
-                        '<textarea class="sql-live-editor sql-inline-textarea" aria-label="SQL query editor" rows="7" spellcheck="false" style="width:100%;font-family:var(--font-mono,monospace);font-size:13px;padding:10px 12px;border-radius:8px;background:var(--bg-surface);color:var(--fg);border:1px solid var(--border-subtle,rgba(148,163,184,0.28));">' + escapeHtml(sql) + '</textarea>' +
-                        '<div class="sql-lab-actions" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">' +
-                            '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">' +
-                                '<button type="button" class="sql-exec-btn is-primary" data-inline-viz-action="run">Run Query</button>' +
-                                '<button type="button" class="sql-exec-btn is-secondary" data-inline-viz-action="step">Step Clauses</button>' +
-                                '<button type="button" class="sql-exec-btn is-verify" data-inline-viz-action="verify" style="background:rgba(16,185,129,0.16);color:#10b981;border:1px solid rgba(16,185,129,0.4);">Check Assertions</button>' +
-                                '<button type="button" class="sql-exec-btn is-secondary" data-inline-viz-action="explain">Explain Plan</button>' +
-                                '<button type="button" class="sql-exec-btn is-secondary" data-sql-ide-action="format" title="Format SQL &amp; Uppercase Keywords">Format</button>' +
-                                '<button type="button" class="sql-exec-btn is-secondary" data-sql-ide-action="copy" title="Copy SQL to Clipboard">Copy</button>' +
-                                '<button type="button" class="sql-exec-btn is-secondary" data-sql-ide-action="share-query" title="Copy shareable runnable query link">Share Link</button>' +
-                            '</div>' +
-                            '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">' +
-                                '<button type="button" class="sql-exec-btn is-secondary" data-sql-ide-action="export-sql" title="Download query as .sql file">.sql</button>' +
-                                '<button type="button" class="sql-exec-btn is-secondary" data-sql-ide-action="export-csv" title="Download result table as .csv file">.csv</button>' +
-                                '<button type="button" class="sql-exec-btn is-secondary" data-sql-ide-action="export-json" title="Download result table as .json file">.json</button>' +
-                                (!isInsideModal
-                                    ? '<button type="button" class="sql-exec-btn is-studio" data-inline-viz-action="studio" data-action="open-sql-studio" data-lang="sql">Open in SQL Studio</button>'
+                            '<div class="sql-vscode-bar__right">' +
+                                (!options.hideVerify
+                                    ? '<button type="button" class="sql-vscode-btn sql-vscode-btn--verify" data-inline-viz-action="verify" title="Verify output against reference SQL">Verify</button>'
                                     : '') +
+                                '<button type="button" class="sql-vscode-btn" data-inline-viz-action="step" title="Step through query clauses">Step</button>' +
+                                '<button type="button" class="sql-vscode-btn sql-vscode-btn--primary" data-inline-viz-action="run" title="Execute SQL query (⌘↵)">Run <kbd>⌘↵</kbd></button>' +
+                                (!isInsideModal && !options.hideStudioBtn
+                                    ? '<button type="button" class="sql-vscode-btn" data-inline-viz-action="studio" data-action="open-sql-studio" data-lang="sql" title="Open in full-screen SQL Studio">Studio ↗</button>'
+                                    : '') +
+                                '<details class="sql-ide-menu studio-menu">' +
+                                    '<summary class="sql-vscode-icon-btn" aria-label="Editor actions" title="Format, Copy, Save &amp; Export">' + dotsSvg + '</summary>' +
+                                    '<div class="studio-menu__panel sql-studio-saved-panel">' +
+                                        '<button type="button" class="studio-menu__item" data-sql-ide-action="format">Format SQL</button>' +
+                                        '<button type="button" class="studio-menu__item" data-sql-ide-action="copy">Copy SQL</button>' +
+                                        '<button type="button" class="studio-menu__item" data-sql-ide-action="share-query">Copy shareable link</button>' +
+                                        '<button type="button" class="studio-menu__item" data-inline-viz-action="explain">Explain query plan</button>' +
+                                        '<div class="studio-menu__sep" role="separator"></div>' +
+                                        '<span class="studio-label">Saved &amp; History</span>' +
+                                        '<select class="studio-select sql-studio-saved-select" data-sql-ide-role="saved-history-select" aria-label="Saved Queries and History">' +
+                                            buildSavedAndHistorySelectOptionsHtml() +
+                                        '</select>' +
+                                        '<div class="studio-menu__row">' +
+                                            '<input type="text" class="studio-input" data-sql-ide-role="save-title-input" placeholder="Save query as…" aria-label="Saved query title" />' +
+                                            '<button type="button" class="studio-btn studio-btn--sm" data-sql-ide-action="save-query">Save</button>' +
+                                        '</div>' +
+                                        '<button type="button" class="studio-menu__item" data-sql-ide-action="delete-saved">Delete selected saved query</button>' +
+                                        '<div class="studio-menu__sep" role="separator"></div>' +
+                                        '<span class="studio-label">Export</span>' +
+                                        '<div class="studio-menu__row">' +
+                                            '<button type="button" class="studio-btn studio-btn--sm" data-sql-ide-action="export-sql">.sql</button>' +
+                                            '<button type="button" class="studio-btn studio-btn--sm" data-sql-ide-action="export-csv">.csv</button>' +
+                                            '<button type="button" class="studio-btn studio-btn--sm" data-sql-ide-action="export-json">.json</button>' +
+                                        '</div>' +
+                                    '</div>' +
+                                '</details>' +
                             '</div>' +
                         '</div>' +
+                        '<textarea class="sql-live-editor sql-inline-textarea" aria-label="SQL query editor" rows="7" spellcheck="false">' + escapeHtml(sql) + '</textarea>' +
                     '</div>' +
-                    '<div class="sql-inline-verify-banner" style="display:none;padding:12px 14px;border-radius:8px;font-size:13px;"></div>' +
+                    '<div class="sql-inline-verify-banner" style="display:none;"></div>' +
                     '<div class="sql-inline-viz-stage"></div>' +
                 '</div>';
             var ed = container.querySelector('.sql-live-editor');
             var stage = container.querySelector('.sql-inline-viz-stage');
             var verifyBanner = container.querySelector('.sql-inline-verify-banner');
+            var ideMenu = container.querySelector('details.sql-ide-menu');
             var runBtn = container.querySelector('[data-inline-viz-action="run"]');
             var stepBtn = container.querySelector('[data-inline-viz-action="step"]');
             var verifyBtn = container.querySelector('[data-inline-viz-action="verify"]');
@@ -2245,6 +2246,16 @@
             var exportCsvBtn = container.querySelector('[data-sql-ide-action="export-csv"]');
             var exportJsonBtn = container.querySelector('[data-sql-ide-action="export-json"]');
             var editorIdeCtrl = null;
+
+            function closeIdeMenu() {
+                if (ideMenu) ideMenu.removeAttribute('open');
+            }
+
+            container.addEventListener('click', function (ev) {
+                if (ideMenu && ideMenu.hasAttribute('open') && !ideMenu.contains(ev.target)) {
+                    ideMenu.removeAttribute('open');
+                }
+            });
 
             function refreshSavedDropdown() {
                 if (savedHistorySelect) {
@@ -2275,26 +2286,12 @@
                 });
             }
 
-            container.querySelectorAll('[data-sql-chip]').forEach(function (chipBtn) {
-                chipBtn.addEventListener('click', function () {
-                    var label = chipBtn.getAttribute('data-sql-chip');
-                    var found = null;
-                    for (var i = 0; i < SQL_PRACTICE_CHIPS.length; i++) {
-                        if (SQL_PRACTICE_CHIPS[i].label === label || SQL_PRACTICE_CHIPS[i].id === label) {
-                            found = SQL_PRACTICE_CHIPS[i];
-                            break;
-                        }
-                    }
-                    if (found && ed) {
-                        insertSqlSnippet(ed, found.snippet);
-                    }
-                });
-            });
-
             if (formatBtn && ed) {
                 formatBtn.addEventListener('click', function () {
                     ed.value = formatSql(ed.value);
+                    ed.dispatchEvent(new Event('input', { bubbles: true }));
                     if (typeof ed._syncSqlIde === 'function') ed._syncSqlIde();
+                    closeIdeMenu();
                 });
             }
             if (copyBtn && ed) {
@@ -2345,26 +2342,31 @@
                     }
                     if (targetItem && targetItem.sql) {
                         ed.value = targetItem.sql;
+                        ed.dispatchEvent(new Event('input', { bubbles: true }));
                         if (typeof ed._syncSqlIde === 'function') ed._syncSqlIde();
                         executeCurrentEditorSql({ startAtFinal: true });
+                        closeIdeMenu();
                     }
                 });
             }
             if (exportSqlBtn) {
                 exportSqlBtn.addEventListener('click', function () {
                     exportSql(ed ? ed.value : sql, (datasetId || 'query') + '.sql');
+                    closeIdeMenu();
                 });
             }
             if (exportCsvBtn) {
                 exportCsvBtn.addEventListener('click', function () {
                     var last = (stage && stage._lastExecutionResult) || { columns: [], rows: [] };
                     exportCsv(last.columns, last.rows, (datasetId || 'results') + '.csv');
+                    closeIdeMenu();
                 });
             }
             if (exportJsonBtn) {
                 exportJsonBtn.addEventListener('click', function () {
                     var last = (stage && stage._lastExecutionResult) || { columns: [], rows: [] };
                     exportJson(last.columns, last.rows, (datasetId || 'results') + '.json');
+                    closeIdeMenu();
                 });
             }
 
@@ -2372,32 +2374,29 @@
                 if (!verifyBanner) return;
                 var currentSql = ed ? ed.value : sql;
                 verifyBanner.style.display = 'block';
-                verifyBanner.style.background = 'rgba(56,189,248,0.1)';
-                verifyBanner.style.border = '1px solid rgba(56,189,248,0.35)';
-                verifyBanner.style.color = 'var(--fg)';
-                verifyBanner.innerHTML = 'Running relational assertions against reference schema...';
+                verifyBanner.className = 'sql-inline-verify-banner is-checking';
+                verifyBanner.textContent = 'Checking relational assertions against reference result…';
                 await mountClauseVisualizer(stage, currentSql, datasetId, Object.assign({}, editorOpts, { startAtFinal: true }));
                 var vRes = await verifyQueryAgainstReference(currentSql, refSql, {
                     datasetId: datasetId,
                     buggyCode: options.buggyCode
                 });
                 var checksHtml = (vRes.checks || []).map(function (c) {
-                    return '<div style="display:flex;align-items:center;gap:8px;padding:3px 0;">' +
-                        '<span style="font-weight:700;color:' + (c.passed ? '#10b981' : '#ef4444') + ';">' + (c.passed ? '✓' : '✗') + '</span>' +
-                        '<strong style="color:var(--fg);">' + escapeHtml(c.name) + ':</strong>' +
-                        '<span style="color:var(--fg-muted);">' + escapeHtml(c.detail || '') + '</span>' +
+                    return '<div class="sql-verify-check">' +
+                        '<span class="sql-verify-check__mark ' + (c.passed ? 'is-pass' : 'is-fail') + '">' + (c.passed ? '✓' : '✗') + '</span>' +
+                        '<strong>' + escapeHtml(c.name) + '</strong>' +
+                        '<span>' + escapeHtml(c.detail || '') + '</span>' +
                     '</div>';
                 }).join('');
-                verifyBanner.style.background = vRes.passed ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.12)';
-                verifyBanner.style.border = vRes.passed ? '1px solid rgba(16,185,129,0.45)' : '1px solid rgba(239,68,68,0.45)';
+                verifyBanner.className = 'sql-inline-verify-banner ' + (vRes.passed ? 'is-pass' : 'is-fail');
                 verifyBanner.innerHTML =
-                    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">' +
-                        '<strong style="font-size:14px;color:' + (vRes.passed ? '#10b981' : '#ef4444') + ';">' +
-                            (vRes.passed ? '✓ All Relational SQL Assertions Passed (' + vRes.passedCount + '/' + vRes.totalCount + ')' : '✗ SQL Verification Checks (' + (vRes.passedCount || 0) + '/' + (vRes.totalCount || 4) + ' Passed)') +
+                    '<div class="sql-verify-head">' +
+                        '<strong>' +
+                            (vRes.passed ? '✓ All checks passed (' + vRes.passedCount + '/' + vRes.totalCount + ')' : '✗ Verification (' + (vRes.passedCount || 0) + '/' + (vRes.totalCount || 4) + ' passed)') +
                         '</strong>' +
-                        '<span style="font-size:0.75rem;color:var(--fg-muted);">Dataset: ' + escapeHtml(datasetId || 'ecommerce') + '</span>' +
+                        '<span>' + escapeHtml(datasetId || 'ecommerce') + '</span>' +
                     '</div>' +
-                    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:4px 14px;">' + checksHtml + '</div>';
+                    '<div class="sql-verify-grid">' + checksHtml + '</div>';
                 if (typeof options.onVerify === 'function') {
                     options.onVerify(vRes);
                 }
@@ -2422,16 +2421,9 @@
                 });
             }
             if (explainBtn) {
-                explainBtn.addEventListener('click', async function () {
-                    await executeCurrentEditorSql({ startAtFinal: true });
-                    var stepBtns = stage.querySelectorAll('.sql-pipeline-step');
-                    if (stepBtns.length > 0) {
-                        stepBtns[stepBtns.length - 1].click();
-                    }
-                    var expBox = stage.querySelector('.sql-explain-box');
-                    if (expBox) {
-                        expBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                    }
+                explainBtn.addEventListener('click', function () {
+                    closeIdeMenu();
+                    executeCurrentEditorSql({ startAtFinal: true, focusExplain: true });
                 });
             }
             if (studioBtn) {
@@ -2444,7 +2436,7 @@
                         sql: currentSql,
                         referenceSql: refSql || currentSql,
                         datasetId: currentDs,
-                        title: options.title || 'Interactive SQL & Table Studio'
+                        title: options.title || 'SQL Studio'
                     });
                 });
             }
@@ -2456,9 +2448,26 @@
         }
 
         var promise = (async function () {
-            container.innerHTML = '<div class="sql-viz-loading">Executing SQL query...</div>';
+            container.innerHTML = '<div class="sql-viz-loading">Running query…</div>';
 
-            var pipeline = await buildStepPipeline(sql, datasetId);
+            var pipeline;
+            try {
+                pipeline = await buildStepPipeline(sql, datasetId);
+            } catch (err) {
+                var errText = err && err.message ? err.message : String(err);
+                container.innerHTML =
+                    '<div class="sql-viz-panel sql-tviz is-error">' +
+                        '<div class="sql-viz-header">' +
+                            '<span class="sql-viz-badge is-error">SQL Error</span>' +
+                            '<div class="sql-viz-meta-right">' +
+                                (options.compactHeader ? '' : buildEngineSwitchHtml()) +
+                            '</div>' +
+                        '</div>' +
+                        '<pre class="sql-viz-error-msg">' + escapeHtml(errText) + '</pre>' +
+                    '</div>';
+                bindEngineButtons(container, sql, datasetId, options);
+                return;
+            }
             var finalRes = pipeline.finalRes;
             var steps = pipeline.steps;
             var datasets = getDatasets();
@@ -2472,14 +2481,14 @@
                 container.innerHTML =
                     '<div class="sql-viz-panel sql-tviz is-error">' +
                         '<div class="sql-viz-header">' +
-                            '<span class="sql-viz-badge is-error">✗ SQL Execution Error</span>' +
+                            '<span class="sql-viz-badge is-error">SQL Error</span>' +
                             '<div class="sql-viz-meta-right">' +
                                 (options.compactHeader ? '' : buildEngineSwitchHtml()) +
-                                '<span class="sql-viz-dataset">Dataset: ' + escapeHtml(dsInfo.title) + '</span>' +
+                                '<span class="sql-viz-dataset">' + escapeHtml(dsInfo.title) + '</span>' +
                             '</div>' +
                         '</div>' +
                         '<pre class="sql-viz-error-msg">' + escapeHtml(finalRes.error) + '</pre>' +
-                        (pedHint ? '<div class="sql-viz-hint-box"><strong>How to fix:</strong> ' + escapeHtml(pedHint) + '</div>' : '') +
+                        (pedHint ? '<div class="sql-viz-hint-box"><strong>Hint:</strong> ' + escapeHtml(pedHint) + '</div>' : '') +
                     '</div>';
                 bindEngineButtons(container, sql, pipeline.datasetId, options);
                 return;
@@ -2491,24 +2500,31 @@
 
             recordQueryHistory(sql, pipeline.datasetId);
 
-            var activeIdx = steps.length > 0 ? steps.length - 1 : 0;
-            var sortByStep = {};
-            // Default to final data step (before Step 8 Explain Plan) so the user immediately sees the output table
-            if (steps.length > 1 && steps[activeIdx].isExplainStep && !options.focusExplain) {
-                activeIdx = steps.length - 2;
+            var clauseSteps = steps.filter(function (st) { return !st.isExplainStep; });
+            if (clauseSteps.length === 0 && steps.length > 0) {
+                clauseSteps = steps.slice();
             }
+            var finalDataStepIdx = Math.max(0, clauseSteps.length - 1);
+            var hasExplainPlan = Boolean(finalRes.plan && finalRes.plan.length > 0);
+
+            var activePanelTab = 'results';
+            if (options.focusExplain && hasExplainPlan) {
+                activePanelTab = 'explain';
+            } else if (options.startAtFinal === false || typeof options.initialStepIndex === 'number') {
+                activePanelTab = clauseSteps.length > 1 ? 'clauses' : 'results';
+            }
+
+            var activeIdx = finalDataStepIdx;
             if (options.startAtFinal === false) {
                 activeIdx = 0;
             }
-            if (options.focusExplain && steps.length > 0) {
-                activeIdx = steps.length - 1;
-            }
-            if (typeof options.initialStepIndex === 'number' && options.initialStepIndex >= 0 && options.initialStepIndex < steps.length) {
+            if (typeof options.initialStepIndex === 'number' && options.initialStepIndex >= 0 && options.initialStepIndex < clauseSteps.length) {
                 activeIdx = options.initialStepIndex;
             }
+            var sortByStep = {};
 
             function render() {
-                var currentStep = steps[activeIdx] || {
+                var finalStepObj = clauseSteps[finalDataStepIdx] || {
                     clause: 'RESULT',
                     badge: (finalRes.rows ? finalRes.rows.length : 0) + ' rows',
                     description: 'Query output',
@@ -2517,9 +2533,12 @@
                     rows: finalRes.rows || [],
                     rowStates: []
                 };
+                var currentStep = (activePanelTab === 'clauses' ? clauseSteps[activeIdx] : finalStepObj) || finalStepObj;
+                var tableStepIdx = activePanelTab === 'clauses' ? activeIdx : finalDataStepIdx;
 
                 var exportCols = (currentStep.columns && currentStep.columns.length > 0) ? currentStep.columns : (finalRes.columns || []);
                 var exportRows = (currentStep.rows && currentStep.rows.length > 0) ? currentStep.rows : (finalRes.rows || []);
+                var finalRowCount = (finalRes.rows && Array.isArray(finalRes.rows)) ? finalRes.rows.length : exportRows.length;
                 container._lastExecutionResult = {
                     sql: sql,
                     datasetId: pipeline.datasetId,
@@ -2528,77 +2547,94 @@
                 };
 
                 var html = '<div class="sql-viz-panel sql-tviz">';
-                // Header bar
+                // Single VS Code Bottom Panel Tab Bar
                 html += '<div class="sql-viz-header">' +
-                    '<div class="sql-viz-title-wrap">' +
-                        '<span class="sql-viz-badge is-ok">Executed (' + escapeHtml(finalRes.durationMs) + ' ms)</span>' +
-                        '<span class="sql-viz-dataset">Dataset: ' + escapeHtml(dsInfo.title) + '</span>' +
+                    '<div class="sql-panel-tabs" role="tablist" aria-label="Query output">' +
+                        '<button type="button" role="tab" aria-selected="' + (activePanelTab === 'results') + '" class="sql-panel-tab ' + (activePanelTab === 'results' ? 'is-active' : '') + '" data-viz-panel-tab="results">' +
+                            'Results <span class="sql-panel-tab__count">' + finalRowCount + '</span>' +
+                        '</button>' +
+                        (clauseSteps.length > 1
+                            ? '<button type="button" role="tab" aria-selected="' + (activePanelTab === 'clauses') + '" class="sql-panel-tab ' + (activePanelTab === 'clauses' ? 'is-active' : '') + '" data-viz-panel-tab="clauses">' +
+                                'Clause Stepper <span class="sql-panel-tab__count">' + clauseSteps.length + '</span>' +
+                              '</button>'
+                            : '') +
+                        (hasExplainPlan
+                            ? '<button type="button" role="tab" aria-selected="' + (activePanelTab === 'explain') + '" class="sql-panel-tab ' + (activePanelTab === 'explain' ? 'is-active' : '') + '" data-viz-panel-tab="explain">' +
+                                'Execution Plan' +
+                              '</button>'
+                            : '') +
                     '</div>' +
                     '<div class="sql-viz-meta-right">' +
+                        '<span class="sql-viz-timing">' + finalRowCount + (finalRowCount === 1 ? ' row' : ' rows') + ' · ' + escapeHtml(finalRes.durationMs) + ' ms</span>' +
                         (options.compactHeader
-                            ? '<span class="sql-viz-dataset">' + exportRows.length + ' rows · ' + exportCols.length + ' columns</span>'
+                            ? ''
                             : (
                                 buildEngineSwitchHtml() +
-                                '<button type="button" class="sql-viz-reset-btn" data-sql-ide-action="export-sql" title="Download SQL (.sql)">.sql</button>' +
                                 '<button type="button" class="sql-viz-reset-btn" data-sql-ide-action="export-csv" title="Download CSV (.csv)">.csv</button>' +
-                                '<button type="button" class="sql-viz-reset-btn" data-sql-ide-action="export-json" title="Download JSON (.json)">.json</button>' +
-                                '<button type="button" class="sql-viz-reset-btn" data-action="reset-dataset" title="Reset dataset tables to initial seed state">Reset DB</button>'
+                                '<button type="button" class="sql-viz-reset-btn" data-action="reset-dataset" title="Reset dataset tables">Reset</button>'
                             )
                         ) +
                     '</div>' +
                 '</div>';
 
-                // Clause Pipeline Stepper Bar
-                if (steps.length > 1) {
-                    html += '<div class="sql-pipeline-bar" role="tablist" aria-label="SQL Clause Execution Pipeline">';
-                    html += '<span class="sql-pipeline-label">Execution Order:</span>';
-                    steps.forEach(function (st, idx) {
-                        var isActive = idx === activeIdx;
-                        html += '<button type="button" role="tab" aria-selected="' + isActive + '" class="sql-pipeline-step ' + (isActive ? 'is-active' : '') + '" data-step-idx="' + idx + '">' +
-                            '<span class="sql-pipeline-clause">' + escapeHtml(st.clause) + '</span>' +
-                            '<span class="sql-pipeline-count">' + escapeHtml(st.badge) + '</span>' +
-                        '</button>';
-                        if (idx < steps.length - 1) {
-                            html += '<span class="sql-pipeline-arrow" aria-hidden="true">→</span>';
-                        }
-                    });
-                    html += '</div>';
-                }
-
-                // Active Step Explanation Banner
-                html += '<div class="sql-step-explainer">' +
-                    '<div class="sql-step-explainer-text">' +
-                        '<strong>' + escapeHtml(currentStep.clause) + ':</strong> ' +
-                        '<span>' + escapeHtml(currentStep.description) + '</span>' +
-                    '</div>' +
-                    '<code class="sql-step-code-pill">' + highlightSql(currentStep.code) + '</code>' +
-                '</div>';
-
-                // Active Step Table Output
-                var stepSortState = sortByStep[activeIdx] || { colIdx: -1, dir: 'none' };
-                html += '<div class="sql-step-table-container">' + renderStepTable(currentStep, pipeline.datasetId, stepSortState) + '</div>';
-
-                // Explain Query Plan Footer
-                if (finalRes.plan && finalRes.plan.length > 0) {
+                if (activePanelTab === 'explain' && hasExplainPlan) {
                     html += renderExplainPlan(finalRes.plan);
+                } else {
+                    if (activePanelTab === 'clauses' && clauseSteps.length > 1) {
+                        html += '<div class="sql-pipeline-bar" role="tablist" aria-label="SQL Clause Execution Pipeline">';
+                        clauseSteps.forEach(function (st, idx) {
+                            var isActive = idx === activeIdx;
+                            html += '<button type="button" role="tab" aria-selected="' + isActive + '" class="sql-pipeline-step ' + (isActive ? 'is-active' : '') + '" data-step-idx="' + idx + '">' +
+                                '<span class="sql-pipeline-clause">' + escapeHtml(st.clause) + '</span>' +
+                                '<span class="sql-pipeline-count">' + escapeHtml(st.badge) + '</span>' +
+                            '</button>';
+                            if (idx < clauseSteps.length - 1) {
+                                html += '<span class="sql-pipeline-arrow" aria-hidden="true">→</span>';
+                            }
+                        });
+                        html += '</div>';
+
+                        html += '<div class="sql-step-explainer">' +
+                            '<div class="sql-step-explainer-text">' +
+                                '<strong>' + escapeHtml(currentStep.clause) + ':</strong> ' +
+                                '<span>' + escapeHtml(currentStep.description) + '</span>' +
+                            '</div>' +
+                            '<code class="sql-step-code-pill">' + highlightSql(currentStep.code) + '</code>' +
+                        '</div>';
+                    }
+
+                    var stepSortState = sortByStep[tableStepIdx] || { colIdx: -1, dir: 'none' };
+                    html += '<div class="sql-step-table-container">' + renderStepTable(currentStep, pipeline.datasetId, stepSortState) + '</div>';
                 }
 
                 html += '</div>';
                 container.innerHTML = html;
 
+                container.querySelectorAll('[data-viz-panel-tab]').forEach(function (tabBtn) {
+                    tabBtn.addEventListener('click', function () {
+                        var nextTab = tabBtn.getAttribute('data-viz-panel-tab') || 'results';
+                        if (nextTab === activePanelTab) return;
+                        activePanelTab = nextTab;
+                        if (activePanelTab === 'clauses' && activeIdx === finalDataStepIdx && clauseSteps.length > 1) {
+                            activeIdx = 0;
+                        }
+                        render();
+                    });
+                });
+
                 container.querySelectorAll('.sql-sort-btn').forEach(function (sBtn) {
                     sBtn.addEventListener('click', function () {
                         var cIdx = Number(sBtn.getAttribute('data-sort-col'));
                         if (isNaN(cIdx)) return;
-                        var cur = sortByStep[activeIdx] || { colIdx: -1, dir: 'none' };
+                        var cur = sortByStep[tableStepIdx] || { colIdx: -1, dir: 'none' };
                         var nextDir = (cur.colIdx === cIdx)
                             ? (cur.dir === 'asc' ? 'desc' : 'asc')
                             : 'asc';
-                        sortByStep[activeIdx] = { colIdx: cIdx, dir: nextDir };
+                        sortByStep[tableStepIdx] = { colIdx: cIdx, dir: nextDir };
 
                         var table = sBtn.closest('table');
                         var tbody = table && table.tBodies && table.tBodies[0];
-                        var stepData = steps[activeIdx];
+                        var stepData = clauseSteps[tableStepIdx];
                         if (!table || !tbody || !stepData || !Array.isArray(stepData.rows) || !stepData.rows.length) return;
 
                         var ariaDir = nextDir === 'asc' ? 'ascending' : 'descending';
@@ -2651,10 +2687,6 @@
                     btn.addEventListener('click', function () {
                         activeIdx = Number(btn.getAttribute('data-step-idx')) || 0;
                         render();
-                        if (steps[activeIdx] && steps[activeIdx].isExplainStep) {
-                            var expBox = container.querySelector('.sql-explain-box');
-                            if (expBox) expBox.classList.add('is-focused');
-                        }
                     });
                 });
 
@@ -2681,7 +2713,7 @@
                 if (resetBtn) {
                     resetBtn.addEventListener('click', async function () {
                         resetBtn.disabled = true;
-                        resetBtn.textContent = 'Resetting...';
+                        resetBtn.textContent = 'Resetting…';
                         await engine.resetDataset(pipeline.datasetId);
                         await mountClauseVisualizer(container, sql, pipeline.datasetId, options);
                     });
@@ -2691,13 +2723,6 @@
             }
 
             render();
-            if (options.focusExplain) {
-                var expBox = container.querySelector('.sql-explain-box');
-                if (expBox) {
-                    expBox.classList.add('is-focused');
-                    expBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                }
-            }
         })();
 
         promise.stop = function () {};
@@ -2834,51 +2859,44 @@
             toolbar.innerHTML =
                 '<div class="sql-exec-toolbar-left">' +
                     '<span class="sql-exec-ds-tag" title="Target dataset">' + escapeHtml(dsInfo.title) + '</span>' +
-                    '<span class="sql-exec-status-hint">Live WASM SQL · Edit query or step through clauses below</span>' +
                 '</div>' +
                 '<div class="sql-exec-toolbar-actions">' +
-                    '<button type="button" class="sql-exec-btn is-primary" data-action="run-visualize">Run Query</button>' +
-                    '<button type="button" class="sql-exec-btn is-secondary" data-action="toggle-edit">Edit SQL</button>' +
-                    '<button type="button" class="sql-exec-btn is-studio" data-action="open-sql-studio" data-lang="sql">SQL Studio</button>' +
+                    '<button type="button" class="sql-vscode-btn" data-action="toggle-edit">Edit SQL</button>' +
+                    '<button type="button" class="sql-vscode-btn" data-action="step-inline-sql">Step</button>' +
+                    '<button type="button" class="sql-vscode-btn sql-vscode-btn--primary" data-action="run-visualize">Run</button>' +
+                    '<button type="button" class="sql-vscode-btn" data-action="open-sql-studio" data-lang="sql">Studio ↗</button>' +
                 '</div>';
 
             var editorWrap = document.createElement('div');
-            editorWrap.className = 'sql-inline-editor-wrap';
+            editorWrap.className = 'sql-inline-editor-wrap sql-vscode-editor-pane';
             editorWrap.hidden = true;
             editorWrap.innerHTML =
-                '<div class="sql-inline-editor-header">' +
-                    '<span class="sql-inline-editor-title">SQL Sandbox (<code>query.sql</code> · Dataset: ' + escapeHtml(dsInfo.title) + ')</span>' +
-                    '<span>Press <kbd>Cmd+Enter</kbd> / <kbd>Ctrl+Enter</kbd> to Execute</span>' +
-                '</div>' +
-                '<textarea class="sql-inline-textarea" aria-label="SQL query editor" rows="' + Math.min(14, Math.max(5, rawSql.split('\n').length + 1)) + '" spellcheck="false">' + escapeHtml(rawSql) + '</textarea>' +
-                buildPracticeChipsHtml() +
-                '<div class="sql-inline-editor-actions">' +
-                    '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
-                        '<button type="button" class="sql-exec-btn is-primary" data-action="exec-edited-sql">Run Query (Cmd+Enter)</button>' +
-                        '<button type="button" class="sql-exec-btn is-secondary" data-action="step-edited-sql">Step Clauses</button>' +
-                        '<button type="button" class="sql-exec-btn is-secondary" data-sql-ide-action="format">Format</button>' +
-                        '<button type="button" class="sql-exec-btn is-secondary" data-sql-ide-action="copy">Copy</button>' +
-                        '<button type="button" class="sql-exec-btn is-secondary" data-sql-ide-action="share-query">Share Link</button>' +
-                        '<button type="button" class="sql-exec-btn is-secondary" data-action="reset-edited-sql">Reset</button>' +
+                '<div class="sql-vscode-bar">' +
+                    '<div class="sql-vscode-bar__left">' +
+                        '<span class="sql-vscode-tab">query.sql</span>' +
                     '</div>' +
-                    '<button type="button" class="sql-exec-btn is-studio" data-action="open-sql-studio" data-lang="sql">Open in SQL Studio</button>' +
-                '</div>';
+                    '<div class="sql-vscode-bar__right">' +
+                        '<button type="button" class="sql-vscode-btn" data-sql-ide-action="format">Format</button>' +
+                        '<button type="button" class="sql-vscode-btn" data-sql-ide-action="copy">Copy</button>' +
+                        '<button type="button" class="sql-vscode-btn" data-sql-ide-action="share-query">Share</button>' +
+                        '<button type="button" class="sql-vscode-btn" data-action="reset-edited-sql">Reset</button>' +
+                        '<button type="button" class="sql-vscode-btn" data-action="step-edited-sql">Step</button>' +
+                        '<button type="button" class="sql-vscode-btn sql-vscode-btn--primary" data-action="exec-edited-sql">Run <kbd>⌘↵</kbd></button>' +
+                    '</div>' +
+                '</div>' +
+                '<textarea class="sql-inline-textarea" aria-label="SQL query editor" rows="' + Math.min(14, Math.max(5, rawSql.split('\n').length + 1)) + '" spellcheck="false">' + escapeHtml(rawSql) + '</textarea>';
 
             var outputWrap = document.createElement('div');
             outputWrap.className = 'sql-inline-output-wrap';
             outputWrap.hidden = false;
-            outputWrap.innerHTML =
-                '<div class="sql-output-section-banner">' +
-                    '<span>Query Output &amp; Step-by-Step Table Visualizer</span>' +
-                    '<span class="sql-output-mode-label">Live Result Set</span>' +
-                '</div>' +
-                '<div class="sql-inline-output-stage"></div>';
+            outputWrap.innerHTML = '<div class="sql-inline-output-stage"></div>';
 
             wrapper.appendChild(toolbar);
             wrapper.appendChild(editorWrap);
             wrapper.appendChild(outputWrap);
 
             var editBtn = toolbar.querySelector('[data-action="toggle-edit"]');
+            var stepToolbarBtn = toolbar.querySelector('[data-action="step-inline-sql"]');
             var runBtn = toolbar.querySelector('[data-action="run-visualize"]');
             var textarea = editorWrap.querySelector('.sql-inline-textarea');
             var execEditedBtn = editorWrap.querySelector('[data-action="exec-edited-sql"]');
@@ -2898,7 +2916,8 @@
 
             function setEditorVisible(visible, focusEditor) {
                 editorWrap.hidden = !visible;
-                editBtn.textContent = visible ? 'Hide Editor' : 'Edit SQL';
+                pre.hidden = Boolean(visible);
+                editBtn.textContent = visible ? 'Done Editing' : 'Edit SQL';
                 if (visible && inlineIdeCtrl) inlineIdeCtrl.sync();
                 if (visible && focusEditor && textarea) {
                     textarea.focus();
@@ -2916,8 +2935,13 @@
                 return mountClauseVisualizer(outputStage, currentSql, currentDs, Object.assign({ ideCtrl: inlineIdeCtrl }, opts));
             }
 
+            if (stepToolbarBtn) {
+                stepToolbarBtn.addEventListener('click', function () {
+                    runCurrentBlock({ startAtFinal: false, initialStepIndex: 0 });
+                });
+            }
+
             runBtn.addEventListener('click', function () {
-                setEditorVisible(true, false);
                 runCurrentBlock({ startAtFinal: true });
                 outputWrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             });
@@ -2937,6 +2961,7 @@
             if (formatInlineBtn && textarea) {
                 formatInlineBtn.addEventListener('click', function () {
                     textarea.value = formatSql(textarea.value);
+                    textarea.dispatchEvent(new Event('input', { bubbles: true }));
                     if (inlineIdeCtrl) inlineIdeCtrl.sync();
                 });
             }
@@ -2956,20 +2981,12 @@
                 });
             }
 
-            editorWrap.querySelectorAll('.sql-practice-chip[data-sql-chip]').forEach(function (chipBtn) {
-                chipBtn.addEventListener('click', function () {
-                    var chipId = chipBtn.getAttribute('data-sql-chip-id') || chipBtn.getAttribute('data-sql-chip');
-                    var chipObj = SQL_PRACTICE_CHIPS.find(function (c) { return c.id === chipId || c.label === chipId; });
-                    if (chipObj && textarea) {
-                        insertSqlSnippet(textarea, chipObj.snippet);
-                        if (inlineIdeCtrl) inlineIdeCtrl.sync();
-                    }
-                });
-            });
-
             if (resetEditedBtn) {
                 resetEditedBtn.addEventListener('click', function () {
-                    if (textarea) textarea.value = rawSql;
+                    if (textarea) {
+                        textarea.value = rawSql;
+                        textarea.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
                     if (inlineIdeCtrl) inlineIdeCtrl.sync();
                     runCurrentBlock({ startAtFinal: true });
                 });
@@ -3160,18 +3177,22 @@
                                 '</details>'
                             ) : '') +
                         '</div>' +
-                        '<div class="sql-lab-editor-box">' +
-                            '<textarea class="sql-live-editor sql-inline-textarea" aria-label="Guided lab SQL editor" rows="6" spellcheck="false">' + escapeHtml(currentSql) + '</textarea>' +
-                            buildPracticeChipsHtml() +
-                            '<div class="sql-lab-actions">' +
-                                '<button type="button" class="sql-exec-btn is-primary" data-lab-action="run">Run Query</button>' +
-                                '<button type="button" class="sql-exec-btn is-secondary" data-lab-action="step">Step Clauses</button>' +
-                                '<button type="button" class="sql-exec-btn is-verify" data-lab-action="verify">Verify SQL Output</button>' +
-                                '<button type="button" class="sql-exec-btn is-secondary" data-lab-action="solution">Load Step Solution</button>' +
-                                '<button type="button" class="sql-exec-btn is-secondary" data-sql-ide-action="format">Format</button>' +
-                                '<button type="button" class="sql-exec-btn is-secondary" data-sql-ide-action="copy">Copy</button>' +
-                                '<button type="button" class="sql-exec-btn is-studio" data-lab-action="studio" data-action="open-sql-studio" data-lang="sql">Open in SQL Studio</button>' +
+                        '<div class="sql-lab-editor-box sql-vscode-editor-pane">' +
+                            '<div class="sql-vscode-bar">' +
+                                '<div class="sql-vscode-bar__left">' +
+                                    '<span class="sql-vscode-tab">solution.sql</span>' +
+                                '</div>' +
+                                '<div class="sql-vscode-bar__right">' +
+                                    '<button type="button" class="sql-vscode-btn" data-sql-ide-action="format">Format</button>' +
+                                    '<button type="button" class="sql-vscode-btn" data-sql-ide-action="copy">Copy</button>' +
+                                    '<button type="button" class="sql-vscode-btn" data-lab-action="solution">Solution</button>' +
+                                    '<button type="button" class="sql-vscode-btn sql-vscode-btn--verify" data-lab-action="verify">Verify</button>' +
+                                    '<button type="button" class="sql-vscode-btn" data-lab-action="step">Step</button>' +
+                                    '<button type="button" class="sql-vscode-btn sql-vscode-btn--primary" data-lab-action="run">Run <kbd>⌘↵</kbd></button>' +
+                                    '<button type="button" class="sql-vscode-btn" data-lab-action="studio" data-action="open-sql-studio" data-lang="sql">Studio ↗</button>' +
+                                '</div>' +
                             '</div>' +
+                            '<textarea class="sql-live-editor sql-inline-textarea" aria-label="Guided lab SQL editor" rows="6" spellcheck="false">' + escapeHtml(currentSql) + '</textarea>' +
                         '</div>' +
                         '<div class="sql-lab-verify-banner" hidden></div>' +
                         '<div class="sql-lab-visualizer-mount"></div>' +
@@ -3200,6 +3221,7 @@
             if (labFormatBtn && editor) {
                 labFormatBtn.addEventListener('click', function () {
                     editor.value = formatSql(editor.value);
+                    editor.dispatchEvent(new Event('input', { bubbles: true }));
                     if (!isRefTab) draftSqlByStep[activeStepIdx] = editor.value;
                     if (labIdeCtrl) labIdeCtrl.sync();
                 });
@@ -3211,18 +3233,6 @@
                     copySqlToClipboard(editor.value, labCopyBtn);
                 });
             }
-
-            container.querySelectorAll('.sql-lab-editor-box .sql-practice-chip[data-sql-chip]').forEach(function (chipBtn) {
-                chipBtn.addEventListener('click', function () {
-                    var chipId = chipBtn.getAttribute('data-sql-chip-id') || chipBtn.getAttribute('data-sql-chip');
-                    var chipObj = SQL_PRACTICE_CHIPS.find(function (c) { return c.id === chipId || c.label === chipId; });
-                    if (chipObj && editor) {
-                        insertSqlSnippet(editor, chipObj.snippet);
-                        if (!isRefTab) draftSqlByStep[activeStepIdx] = editor.value;
-                        if (labIdeCtrl) labIdeCtrl.sync();
-                    }
-                });
-            });
 
             container.querySelectorAll('.sql-lab-step-tab').forEach(function (tabBtn) {
                 tabBtn.addEventListener('click', function () {

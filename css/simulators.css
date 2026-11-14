@@ -436,12 +436,13 @@
    ═══════════════════════════════════════════════════════════════ */
 
 .sql-tviz {
-  margin: 1.5rem 0;
-  border: 1px solid var(--border-subtle, #27272a);
-  border-radius: 12px;
-  background: var(--bg-secondary, #111114);
-  padding: 1.15rem;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  margin: 0.75rem 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  padding: 0;
+  box-shadow: none;
+  overflow: hidden;
 }
 
 .sql-tviz__header {
@@ -768,11 +769,23 @@
 }
 
 .sql-tviz {
-  border: 1px solid var(--border-subtle, #27272a);
-  border-radius: 10px;
-  background: var(--bg-secondary, #111114);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
   overflow: hidden;
   margin-top: 8px;
+}
+
+.studio-results .sql-tviz,
+.sql-vscode-workbench .sql-tviz,
+.sql-inline-output-wrap .sql-tviz,
+.sql-guided-visualizer-mount .sql-tviz,
+.sql-studio-modal-host .sql-tviz {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .sql-tviz__header {
@@ -990,9 +1003,9 @@
 }
 
 .sql-subtable-card {
-  border: 1px solid rgba(99, 102, 241, 0.25);
-  border-radius: 8px;
-  background: rgba(9, 9, 11, 0.65);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
   overflow: hidden;
 }
 
@@ -1001,15 +1014,15 @@
   justify-content: space-between;
   align-items: center;
   padding: 6px 10px;
-  background: rgba(99, 102, 241, 0.12);
-  border-bottom: 1px solid rgba(99, 102, 241, 0.22);
+  background: var(--bg-alt);
+  border-bottom: 1px solid var(--border);
   font-family: var(--font-mono, monospace);
   font-size: 12px;
 }
 
 .sql-subtable-name {
-  font-weight: 700;
-  color: #c7d2fe;
+  font-weight: 600;
+  color: var(--fg);
 }
 
 .sql-subtable-meta {
@@ -1092,12 +1105,12 @@
    ═══════════════════════════════════════════════════════════════════ */
 
 .sql-executable-block {
-  margin: 14px 0 22px;
-  border-radius: 12px;
-  border: 1px solid rgba(99, 102, 241, 0.28);
-  background: var(--bg-secondary, #0d111a);
+  margin: 12px 0 20px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
   overflow: hidden;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+  box-shadow: none;
 }
 
 .code-block .sql-executable-block {
@@ -1112,7 +1125,7 @@
   margin: 0 !important;
   border-radius: 0 !important;
   border: none !important;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.14) !important;
+  border-bottom: 1px solid var(--border) !important;
 }
 
 /* Action Toolbar below every SQL snippet */
@@ -1121,16 +1134,21 @@
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 10px;
-  padding: 9px 14px;
-  background: linear-gradient(90deg, rgba(15, 23, 42, 0.92), rgba(30, 27, 75, 0.55));
-  border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--bg-alt);
+  border-bottom: 1px solid var(--border);
+}
+
+.sql-executable-block > .sql-exec-toolbar:last-child,
+.sql-exec-toolbar:has(+ .sql-inline-editor-wrap[hidden] + .sql-inline-output-wrap:empty) {
+  border-bottom: 0;
 }
 
 .sql-exec-toolbar-left {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
@@ -1138,14 +1156,14 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 3px 10px;
-  border-radius: 999px;
+  padding: 2px 6px;
+  border-radius: 4px;
   font-family: var(--font-mono, monospace);
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--fg, #f4f4f5);
-  background: var(--accent-muted, rgba(244, 244, 245, 0.10));
-  border: 1px solid var(--accent-border, rgba(244, 244, 245, 0.24));
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--fg-muted);
+  background: transparent;
+  border: 0;
 }
 
 .sql-exec-status-hint {
