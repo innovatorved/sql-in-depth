@@ -1,8 +1,8 @@
 {
   "name": "sql-in-depth",
   "version": "1.0.0",
-  "description": "SQL In Depth — An interactive, first-principles relational database & SQL mastery platform with browser-native WASM SQLite execution, clause-by-clause table visualizers, storage engine simulators, and guided SQL labs.",
-  "private": true,
+  "description": "Open-source interactive curriculum for relational databases, SQL query execution, B+Tree storage engines, and MVCC concurrency with browser-native SQLite 3 and PostgreSQL 18 WebAssembly labs.",
+  "homepage": "https://sql-in-depth.vedgupta.in",
   "scripts": {
     "build": "node tools/build.js",
     "lint": "node tools/validate.js && node tools/stamp-assets.js --check",
@@ -35,10 +35,10 @@
     "code-lab"
   ],
   "author": "Ved Gupta",
-  "license": "MIT",
+  "license": "MIT AND CC-BY-4.0",
   "dependencies": {
     "@electric-sql/pglite": "^0.5.12",
-    "@innovatorved/code-lab": "^0.3.1",
+    "@innovatorved/code-lab": "^0.4.0",
     "katex": "^0.16.11",
     "sql.js": "^1.15.2"
   },

@@ -31,7 +31,7 @@
   <link rel="preload" href="fonts/geist-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
 
   <!-- Stylesheets: Shared Design System + Self-Hosted KaTeX + Product Styles -->
-  <link rel="stylesheet" href="design-system/tokens.css?v=3bc26075fb">
+  <link rel="stylesheet" href="design-system/tokens.css?v=dee287f0ce">
   <link rel="stylesheet" href="design-system/components.css?v=606a179125">
   <link rel="stylesheet" href="css/vendor/katex/katex.min.css?v=83121916c0" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="css/variables.css?v=98985bd48f">
@@ -43,7 +43,7 @@
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=d98d79ab7a"></script>
-  <script src="js/manifest.js?v=cd330e015c"></script>
+  <script src="js/manifest.js?v=839298cb0a"></script>
 
   <script type="application/ld+json">
 {
@@ -91,7 +91,7 @@
     </div>
 
     <div class="topbar__actions">
-      <nav class="topbar__nav" aria-label="Primary navigation">
+      <nav class="topbar__nav" aria-label="Primary">
         <a href="/roadmap/" class="topbar__nav-link" data-nav="roadmap">Roadmap</a>
         <a href="/challenges/" class="topbar__nav-link" data-nav="challenges">Challenges</a>
         <a href="/sandbox/" class="topbar__nav-link" data-nav="sandbox">SQL Studio</a>
@@ -118,7 +118,7 @@
   </header>
 
   <!-- Sidebar -->
-  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+  <aside class="sidebar" id="sidebar" aria-label="Curriculum">
     <div class="sidebar__tabs">
       <div role="tablist" aria-label="Sidebar sections" style="display:flex;align-items:center;">
         <button class="sidebar__tab active" data-tab="curriculum" role="tab" aria-selected="true">Curriculum</button>
@@ -801,7 +801,7 @@
   <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
   <!-- Main Content -->
-  <main class="main" id="main-content">
+  <main class="main" id="main-content" tabindex="-1">
     <div class="main__content" id="reader" data-prerendered-build="build-sessionization-retention-engine">
 
       <nav class="breadcrumbs" aria-label="Breadcrumb">
@@ -817,8 +817,8 @@
         <h1 class="lesson-header__title">Clickstream Sessionizer, Streak Tracker &amp; Rolling Window Analyzer</h1>
         <p class="build-summary">An analytical window function engine implementing LAG()-based clickstream sessionization, ROW_NUMBER() date-difference islands for consecutive activity streaks, and ROWS vs RANGE sliding window frames.</p>
         <div class="lesson-header__meta">
-          <span class="lesson-header__meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ~40 min</span>
-          <span class="lesson-header__meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Advanced</span>
+          <span class="lesson-header__meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ~25 min</span>
+          <span class="lesson-header__meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Intermediate</span>
           <span class="lesson-header__meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Lessons: <a href="#" data-nav="topic" data-slug="build-sessionization-retention-engine">Hands-On Build: Clickstream Sessionizer, Streak Tracker &amp; Rolling Window Analyzer</a>, <a href="#" data-nav="topic" data-slug="window-functions-mental-model">The Window Function Mental Model: Preserving Row Identity + Context</a>, <a href="#" data-nav="topic" data-slug="partition-by-order-by-mechanics">PARTITION BY, ORDER BY &amp; The Default RANGE Frame Trap</a>, <a href="#" data-nav="topic" data-slug="ranking-functions-row-number-rank">Ranking Functions: ROW_NUMBER, RANK, DENSE_RANK, NTILE &amp; CUME_DIST</a>, <a href="#" data-nav="topic" data-slug="top-n-per-group-deduplication">Canonical Top-N-Per-Group, Stream Deduplication &amp; QUALIFY</a>, <a href="#" data-nav="topic" data-slug="offset-functions-lag-lead-first-last">Navigational Offset Functions: LAG, LEAD, FIRST_VALUE &amp; The LAST_VALUE Trap</a></span>
         </div>
       </div>
@@ -828,11 +828,11 @@
           <div class="build-lab-card__intro">
             <div class="build-lab-card__eyebrow">
               <span>Guided SQL &amp; Storage Engine Lab</span>
-              <span class="build-lab-card__progress" id="build-lab-progress-badge">0/4 Steps Completed</span>
+              <span class="build-lab-card__progress" id="build-lab-progress-badge">0/3 Steps Completed</span>
             </div>
             <h2 class="build-lab-card__title">Execute &amp; Verify SQL &amp; Storage Engine Invariants in the Browser SQL Studio</h2>
             <p class="build-lab-card__desc">
-              Complete 4 progressive relational steps with guided hints in <strong>PostgreSQL 18 WASM, SQLite 3 &amp; Step-by-Step Relational Table Visualizer</strong> against automated result-set and query-plan assertions — zero local setup required.
+              Complete 3 progressive relational steps with guided hints in <strong>PostgreSQL 18 WASM, SQLite 3 &amp; Step-by-Step Relational Table Visualizer</strong> against automated result-set and query-plan assertions — zero local setup required.
             </p>
             <div class="build-lab-progress-track" aria-hidden="true">
               <div class="build-lab-progress-track__fill" style="width:0%"></div>
@@ -849,7 +849,7 @@
             </button>
             <button type="button" class="btn btn--outline build-lab-card__launch-btn" data-action="open-code-lab" data-build="build-sessionization-retention-engine" data-lab-mode="guided">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-              <span>Open Engine Code Lab</span>
+              <span>Inspect Engine Code (JS)</span>
             </button>
           </div>
         </div>
@@ -857,55 +857,42 @@
         
           <div class="build-lab-steps-grid" id="build-lab-steps-grid">
             
-                <div class="build-lab-step-card " data-action="open-code-lab" data-build="build-sessionization-retention-engine" data-lab-mode="guided" data-step="0" data-step-index="0">
+                <div class="build-lab-step-card " data-action="open-topic-codelab" data-slug="build-sessionization-retention-engine" data-mode="modal" data-step="0" data-step-index="0">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">01</span>
-                    <span class="build-lab-step-card__target">index.js · WindowAnalyticsEngine.sessionizeEvents</span>
+                    <span class="build-lab-step-card__target">Phase 1 · Navigational LAG() Over User Event Stream</span>
                   </div>
-                  <div class="build-lab-step-card__title">Clickstream Sessionization via LAG() &amp; Cumulative Sum</div>
-                  <div class="build-lab-step-card__concept">Two-Stage Window Pipeline: Inactivity Flagging + Running Session Counter</div>
+                  <div class="build-lab-step-card__title">Attach Previous Event Type &amp; Timestamp via LAG</div>
+                  <div class="build-lab-step-card__concept">Use <code>LAG(event_ts) OVER (PARTITION BY user_id ORDER BY event_ts ASC, event_id ASC)</code> to inspect adjacent events per user without a self-join.</div>
                   <div class="build-lab-step-card__footer">
-                    <span>1 SQL assertion</span>
+                    <span>4 SQL assertions</span>
                     <button type="button" class="btn btn--xs btn--ghost build-lab-step-card__open" data-action="open-topic-codelab" data-slug="build-sessionization-retention-engine" data-mode="modal" data-step="0" data-step-index="0">Step 1 →</button>
                   </div>
                 </div>
               
-                <div class="build-lab-step-card " data-action="open-code-lab" data-build="build-sessionization-retention-engine" data-lab-mode="guided" data-step="1" data-step-index="1">
+                <div class="build-lab-step-card " data-action="open-topic-codelab" data-slug="build-sessionization-retention-engine" data-mode="modal" data-step="1" data-step-index="1">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">02</span>
-                    <span class="build-lab-step-card__target">index.js · WindowAnalyticsEngine.computeStreaks</span>
+                    <span class="build-lab-step-card__target">Phase 2 · Session Boundary Island Flagging</span>
                   </div>
-                  <div class="build-lab-step-card__title">Gaps-and-Islands Consecutive Day Streak Finder</div>
-                  <div class="build-lab-step-card__concept">Constant Difference Invariant: dayIndex - ROW_NUMBER() OVER (PARTITION BY user ORDER BY dayIndex)</div>
+                  <div class="build-lab-step-card__title">Flag Session Starts &amp; Cumulative Step Numbers</div>
+                  <div class="build-lab-step-card__concept">Mark session boundaries (<code>1</code> when <code>prev_ts IS NULL</code> or <code>event_type = &#039;signup&#039;</code>, else <code>0</code>) and number events within each user stream via <code>ROW_NUMBER()</code>.</div>
                   <div class="build-lab-step-card__footer">
-                    <span>1 SQL assertion</span>
+                    <span>4 SQL assertions</span>
                     <button type="button" class="btn btn--xs btn--ghost build-lab-step-card__open" data-action="open-topic-codelab" data-slug="build-sessionization-retention-engine" data-mode="modal" data-step="1" data-step-index="1">Step 2 →</button>
                   </div>
                 </div>
               
-                <div class="build-lab-step-card " data-action="open-code-lab" data-build="build-sessionization-retention-engine" data-lab-mode="guided" data-step="2" data-step-index="2">
+                <div class="build-lab-step-card " data-action="open-topic-codelab" data-slug="build-sessionization-retention-engine" data-mode="modal" data-step="2" data-step-index="2">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">03</span>
-                    <span class="build-lab-step-card__target">index.js · WindowAnalyticsEngine.movingAvgRows</span>
+                    <span class="build-lab-step-card__target">Phase 3 · Rolling Latency Window &amp; Cumulative Session Telemetry</span>
                   </div>
-                  <div class="build-lab-step-card__title">Physical ROWS Window Frame Moving Average</div>
-                  <div class="build-lab-step-card__concept">Evaluating ROWS BETWEEN k PRECEDING AND CURRENT ROW</div>
+                  <div class="build-lab-step-card__title">Compute Running Latency &amp; Tenant Journey Depth</div>
+                  <div class="build-lab-step-card__concept">Combine <code>ROW_NUMBER()</code> and explicit <code>SUM(latency_ms) OVER (... ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)</code> to track cumulative session cost per user.</div>
                   <div class="build-lab-step-card__footer">
-                    <span>1 SQL assertion</span>
+                    <span>4 SQL assertions</span>
                     <button type="button" class="btn btn--xs btn--ghost build-lab-step-card__open" data-action="open-topic-codelab" data-slug="build-sessionization-retention-engine" data-mode="modal" data-step="2" data-step-index="2">Step 3 →</button>
-                  </div>
-                </div>
-              
-                <div class="build-lab-step-card " data-action="open-code-lab" data-build="build-sessionization-retention-engine" data-lab-mode="guided" data-step="3" data-step-index="3">
-                  <div class="build-lab-step-card__header">
-                    <span class="build-lab-step-card__num">04</span>
-                    <span class="build-lab-step-card__target">index.js · WindowAnalyticsEngine.movingSumRange</span>
-                  </div>
-                  <div class="build-lab-step-card__title">Logical RANGE Window Frame Sum with Peer Ties</div>
-                  <div class="build-lab-step-card__concept">Evaluating RANGE BETWEEN delta PRECEDING AND CURRENT ROW Including All Peer Ties</div>
-                  <div class="build-lab-step-card__footer">
-                    <span>1 SQL assertion</span>
-                    <button type="button" class="btn btn--xs btn--ghost build-lab-step-card__open" data-action="open-topic-codelab" data-slug="build-sessionization-retention-engine" data-mode="modal" data-step="3" data-step-index="3">Step 4 →</button>
                   </div>
                 </div>
               
@@ -917,8 +904,8 @@
 
       <div id="build-walkthrough-pane"><article class="prose" id="build-file-build-sessionization-retention-engine-README_md"><h2>Architectural Overview</h2>
 <p>An analytical window function engine implementing LAG()-based clickstream sessionization, ROW_NUMBER() date-difference islands for consecutive activity streaks, and ROWS vs RANGE sliding window frames.</p>
-<p>In production relational and analytical database systems—spanning PostgreSQL, SQLite, MySQL/InnoDB, and DuckDB—understanding how query clauses, schema constraints, index structures, and storage engines execute under the hood separates surface-level query authors from staff-level database engineers. This capstone build lab guides you through implementing <strong>Clickstream Sessionizer, Streak Tracker & Rolling Window Analyzer</strong> from first principles with deterministic self-test invariants.</p>
-<h2>Guided Implementation Walkthrough (4 Progressive Steps)</h2>
+<p>Use the <strong>Browser SQL Studio</strong> above to write, step through, and verify real SQL queries for <strong>Clickstream Sessionizer, Streak Tracker & Rolling Window Analyzer</strong> against PostgreSQL 18 and SQLite 3 WebAssembly with clause-by-clause tuple visualization. Once you have verified the SQL queries, you can also explore how a database engine enforces these same invariants internally via the optional reference storage-engine implementation documented below.</p>
+<h2>Reference Storage Engine Internals (Optional JS Deep Dive)</h2>
 <h3>Step 1: Clickstream Sessionization via LAG() & Cumulative Sum</h3>
 <ul>
 <li><strong>Core Database Concept</strong>: Two-Stage Window Pipeline: Inactivity Flagging + Running Session Counter</li>
@@ -966,15 +953,15 @@
 <li><a href="/topic/top-n-per-group-deduplication/" target="_blank" rel="noopener">top n per group deduplication</a></li>
 <li><a href="/topic/offset-functions-lag-lead-first-last/" target="_blank" rel="noopener">offset functions lag lead first last</a></li>
 </ul>
-<h2>Production Database Context & Verification</h2>
-<p>This from-scratch relational engine component is engineered with zero external dependencies and deterministic verification harnesses. Every internal database invariant—from three-valued logic (<code>TRUE</code> / <code>FALSE</code> / <code>UNKNOWN</code>), referential integrity, and fan-out-free join pre-aggregation to B+Tree page splits, MVCC snapshot visibility (<code>xmin</code> / <code>xmax</code>), slotted-page compaction, and ARIES write-ahead log crash recovery—is asserted directly in <code>test.js</code>. Use the interactive browser workbench above to complete the 4 guided steps in <strong>Guided Lab</strong> mode or inspect and benchmark the complete reference architecture in <strong>Full Solution</strong> mode.</p></article>
+<h2>Verification Notes</h2>
+<p>Every relational invariant in this build—from three-valued NULL handling, referential integrity, and fan-out-free join pre-aggregation to B+Tree page splits, MVCC snapshot visibility (<code>xmin</code> / <code>xmax</code>), slotted-page compaction, and ARIES write-ahead log recovery—can be practiced first in SQL via <strong>Launch SQL Studio Lab</strong> and optionally inspected in code via <strong>Inspect Engine Code (JS)</strong> (<code>index.js</code> and <code>test.js</code>).</p></article>
       </div>
 
       <div class="build-lab-overlay" id="build-lab-overlay" aria-hidden="true">
         <div id="codelab-mount" class="build-lab-overlay__mount codelab-container" data-build-id="build-sessionization-retention-engine"></div>
       </div>
     </div>
-    <footer class="ds-footer" aria-label="Site footer">
+    <footer class="ds-footer" aria-label="Site">
       <div class="ds-footer__inner">
         <div class="ds-footer__family">
           <span class="ds-footer__label">In Depth Learning Family</span>
@@ -1060,8 +1047,8 @@
   <script type="text/plain" data-defer src="js/progress.js?v=20e4822556"></script>
   <script type="text/plain" data-defer src="js/search.js?v=cfb7464ca7"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
-  <script type="text/plain" data-defer src="js/renderer.js?v=fd623be208"></script>
-  <script type="text/plain" data-defer src="js/landing.js?v=ab352e39f9"></script>
+  <script type="text/plain" data-defer src="js/renderer.js?v=36f6f37691"></script>
+  <script type="text/plain" data-defer src="js/landing.js?v=51833858e9"></script>
   <script type="text/plain" data-defer src="js/quiz.js?v=5b300d9b3d"></script>
   <script type="text/plain" data-defer src="js/app.js?v=d7a48f58f9"></script>
 
@@ -1071,9 +1058,9 @@
   <script type="text/plain" data-lazy src="data/challenges.js?v=784587e93a"></script>
   <script type="text/plain" data-lazy src="data/srs-cards.js?v=fabc47dd9c"></script>
   <script type="text/plain" data-lazy src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
-  <script type="text/plain" data-lazy src="data/implementations_code.js?v=fce884f8a8"></script>
+  <script type="text/plain" data-lazy src="data/implementations_code.js?v=1211e1feca"></script>
   <script type="text/plain" data-lazy src="data/guided_labs.js?v=3bd996e9dc"></script>
-  <script type="text/plain" data-lazy src="data/topic_guided_labs.js?v=5b7d013daa"></script>
+  <script type="text/plain" data-lazy src="data/topic_guided_labs.js?v=f0e6a07f8d"></script>
   <script type="text/plain" data-lazy src="data/projects.js?v=2280ac085f"></script>
   <script type="text/plain" data-lazy src="data/glossary.js?v=cbce13b203"></script>
   <script type="text/plain" data-lazy src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>

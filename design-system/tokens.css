@@ -221,6 +221,7 @@
 }
 
 html {
+  scrollbar-width: thin;
   scrollbar-color: var(--ds-border-strong) transparent;
 }
 

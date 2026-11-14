@@ -31,7 +31,7 @@
   <link rel="preload" href="fonts/geist-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
 
   <!-- Stylesheets: Shared Design System + Self-Hosted KaTeX + Product Styles -->
-  <link rel="stylesheet" href="design-system/tokens.css?v=3bc26075fb">
+  <link rel="stylesheet" href="design-system/tokens.css?v=dee287f0ce">
   <link rel="stylesheet" href="design-system/components.css?v=606a179125">
   <link rel="stylesheet" href="css/vendor/katex/katex.min.css?v=83121916c0" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="css/variables.css?v=98985bd48f">
@@ -43,7 +43,7 @@
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=d98d79ab7a"></script>
-  <script src="js/manifest.js?v=cd330e015c"></script>
+  <script src="js/manifest.js?v=839298cb0a"></script>
 
   <script type="application/ld+json">
 {
@@ -91,7 +91,7 @@
     </div>
 
     <div class="topbar__actions">
-      <nav class="topbar__nav" aria-label="Primary navigation">
+      <nav class="topbar__nav" aria-label="Primary">
         <a href="/roadmap/" class="topbar__nav-link" data-nav="roadmap">Roadmap</a>
         <a href="/challenges/" class="topbar__nav-link" data-nav="challenges">Challenges</a>
         <a href="/sandbox/" class="topbar__nav-link" data-nav="sandbox">SQL Studio</a>
@@ -118,7 +118,7 @@
   </header>
 
   <!-- Sidebar -->
-  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+  <aside class="sidebar" id="sidebar" aria-label="Curriculum">
     <div class="sidebar__tabs">
       <div role="tablist" aria-label="Sidebar sections" style="display:flex;align-items:center;">
         <button class="sidebar__tab active" data-tab="curriculum" role="tab" aria-selected="true">Curriculum</button>
@@ -801,7 +801,7 @@
   <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
   <!-- Main Content -->
-  <main class="main" id="main-content">
+  <main class="main" id="main-content" tabindex="-1">
     <div class="main__content" id="reader" data-prerendered="build-sessionization-retention-engine">
 
       <div class="ds-lesson-shell ds-lesson-shell--with-toc">
@@ -1289,10 +1289,10 @@ flowchart LR
             <h2 class="build-lab-card__title">Hands-On Build: Clickstream Sessionizer, Streak Tracker &amp; Rolling Window Analyzer — Interactive Guided SQL Lab</h2>
             <p class="build-lab-card__desc">Implement a complete analytical SQL pipeline that sessionizes raw user events, computes consecutive active streaks, and flags anomalous velocity spikes.</p>
             <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;">
-              <span class="badge">Target time: <code>O(V + E) recursive BFS + window sort</code></span>
-              <span class="badge">Extra space: <code>O(V) hierarchy working table</code></span>
-              <span class="badge">Pattern: Window Functions &amp; Analytical SQL Mastery · build</span>
-              <span class="badge">Dataset: <code>org_hr</code></span>
+              <span class="badge">Target time: <code>O(E log E) partitioned window sort</code></span>
+              <span class="badge">Extra space: <code>O(E) stream buffer</code></span>
+              <span class="badge">Pattern: LAG() Boundary Flag -&gt; Cumulative SUM() Island ID</span>
+              <span class="badge">Dataset: <code>saas_telemetry</code></span>
             </div>
           </div>
           <div class="build-lab-card__cta-col">
@@ -1317,26 +1317,15 @@ flowchart LR
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">01</span>
-                    <span class="build-lab-step-card__target">Phase 1 · Hands-On Build: Clickstream Sessionizer, Streak Tracker &amp; Rolling Window Analyzer: Project Portfolio &amp; Lead Assignment Scan</span>
+                    <span class="build-lab-step-card__target">Phase 1 · Navigational LAG() Over User Event Stream</span>
                   </div>
-                  <div class="build-lab-step-card__title">Inspect Engineering Projects &amp; Allocation Matrix</div>
-                  <div class="build-lab-step-card__invariant">Inspect <code>projects</code> and <code>employee_projects</code> to understand capital budgets and percentage allocations across staff.</div>
-                  <div class="build-lab-step-card__concept">Extend the starter <code>projects</code> query in <code>query.sql</code> to join the project lead&#039;s name from <code>employees</code>.</div>
+                  <div class="build-lab-step-card__title">Attach Previous Event Type &amp; Timestamp via LAG (build-sessionization-retention-engine)</div>
+                  <div class="build-lab-step-card__invariant">Use <code>LAG(event_ts) OVER (PARTITION BY user_id ORDER BY event_ts ASC, event_id ASC)</code> to inspect adjacent events per user without a self-join.</div>
+                  <div class="build-lab-step-card__concept">Project <code>event_id</code>, <code>user_id</code>, <code>event_type</code>, <code>event_ts</code>, and <code>COALESCE(LAG(event_type) OVER (PARTITION BY user_id ORDER BY event_ts ASC, event_id ASC), &#039;SESSION_START&#039;) AS prev_event</code> from <code>user_events</code> ordered by <code>user_id ASC, event_ts ASC</code>.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>Show hint for step 1</summary>
-                      <pre><code>-- Step 1 Solution (build-sessionization-retention-engine): Projects enriched with lead engineer identity
-SELECT
-  p.project_id,
-  p.code AS project_code,
-  p.title AS project_title,
-  e.name AS lead_engineer,
-  e.title AS lead_role,
-  p.budget_usd
-FROM projects AS p
-INNER JOIN employees AS e
-  ON e.emp_id = p.lead_emp_id
-ORDER BY p.budget_usd DESC, p.project_id ASC;</code></pre>
+                      <pre><code>Wrap `LAG(event_type) OVER (PARTITION BY user_id ORDER BY event_ts ASC, event_id ASC)` in `COALESCE(..., &#039;SESSION_START&#039;) AS prev_event`.</code></pre>
                     </details>
                   
                 </div>
@@ -1352,51 +1341,15 @@ ORDER BY p.budget_usd DESC, p.project_id ASC;</code></pre>
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">02</span>
-                    <span class="build-lab-step-card__target">Phase 2 · Hands-On Build: Clickstream Sessionizer, Streak Tracker &amp; Rolling Window Analyzer: Recursive Org Hierarchy CTE</span>
+                    <span class="build-lab-step-card__target">Phase 2 · Session Boundary Island Flagging</span>
                   </div>
-                  <div class="build-lab-step-card__title">Traverse Reporting Chain with WITH RECURSIVE (Hands-On Build: Clickstream Sessionizer, Streak Tracker &amp; Rolling Window Analyzer)</div>
-                  <div class="build-lab-step-card__invariant">Build a recursive CTE anchored at <code>manager_id IS NULL</code> and iteratively join direct reports up to depth 5.</div>
-                  <div class="build-lab-step-card__concept">Complete the <code>WITH RECURSIVE org_tree</code> query in <code>query.sql</code> to compute <code>hierarchy_level</code> and <code>reporting_chain</code>.</div>
+                  <div class="build-lab-step-card__title">Flag Session Starts &amp; Cumulative Step Numbers (build-sessionization-retention-engine)</div>
+                  <div class="build-lab-step-card__invariant">Mark session boundaries (<code>1</code> when <code>prev_ts IS NULL</code> or <code>event_type = &#039;signup&#039;</code>, else <code>0</code>) and number events within each user stream via <code>ROW_NUMBER()</code>.</div>
+                  <div class="build-lab-step-card__concept">In <code>query.sql</code>, project <code>event_id</code>, <code>user_id</code>, <code>event_type</code>, <code>ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY event_ts ASC, event_id ASC) AS user_step_no</code>, and <code>latency_ms</code> ordered by <code>user_id ASC, user_step_no ASC</code>.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>Show hint for step 2</summary>
-                      <pre><code>-- Step 2 Solution (build-sessionization-retention-engine): Full WITH RECURSIVE chain-of-command traversal
-WITH RECURSIVE org_tree AS (
-  SELECT
-    emp_id,
-    name,
-    title,
-    manager_id,
-    dept_id,
-    salary_usd,
-    0 AS hierarchy_level,
-    name AS reporting_chain
-  FROM employees
-  WHERE manager_id IS NULL
-  UNION ALL
-  SELECT
-    e.emp_id,
-    e.name,
-    e.title,
-    e.manager_id,
-    e.dept_id,
-    e.salary_usd,
-    t.hierarchy_level + 1 AS hierarchy_level,
-    t.reporting_chain || &#039; -&gt; &#039; || e.name AS reporting_chain
-  FROM employees AS e
-  INNER JOIN org_tree AS t
-    ON e.manager_id = t.emp_id
-  WHERE t.hierarchy_level &lt; 5
-)
-SELECT
-  emp_id,
-  name,
-  title,
-  hierarchy_level,
-  salary_usd,
-  reporting_chain
-FROM org_tree
-ORDER BY hierarchy_level ASC, salary_usd DESC;</code></pre>
+                      <pre><code>Add `ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY event_ts ASC, event_id ASC) AS user_step_no` and include `latency_ms` after it.</code></pre>
                     </details>
                   
                 </div>
@@ -1412,37 +1365,15 @@ ORDER BY hierarchy_level ASC, salary_usd DESC;</code></pre>
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">03</span>
-                    <span class="build-lab-step-card__target">Phase 3 · Hands-On Build: Clickstream Sessionizer, Streak Tracker &amp; Rolling Window Analyzer: Departmental Window Ranking &amp; Running Payroll</span>
+                    <span class="build-lab-step-card__target">Phase 3 · Rolling Latency Window &amp; Cumulative Session Telemetry</span>
                   </div>
-                  <div class="build-lab-step-card__title">Production Window Rank, Peer Gap &amp; Cumulative Payroll (Hands-On Build: Clickstream Sessionizer, Streak Tracker &amp; Rolling Window Analyzer)</div>
-                  <div class="build-lab-step-card__invariant">Evaluate <code>DENSE_RANK()</code>, <code>LAG()</code>, and <code>SUM() OVER (PARTITION BY e.dept_id ... ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)</code> without collapsing employee rows.</div>
-                  <div class="build-lab-step-card__concept">Complete the production window query in <code>query.sql</code> and step through the Window clause in the Table Visualizer.</div>
+                  <div class="build-lab-step-card__title">Compute Running Latency &amp; Tenant Journey Depth (build-sessionization-retention-engine)</div>
+                  <div class="build-lab-step-card__invariant">Combine <code>ROW_NUMBER()</code> and explicit <code>SUM(latency_ms) OVER (... ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)</code> to track cumulative session cost per user.</div>
+                  <div class="build-lab-step-card__concept">Join <code>user_events AS e</code> with <code>saas_users AS u</code>, projecting <code>u.org_name</code>, <code>e.event_type</code>, <code>step_seq</code>, <code>e.latency_ms</code>, and <code>cumulative_latency_ms</code> ordered by <code>u.user_id ASC, step_seq ASC</code>.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>Show hint for step 3</summary>
-                      <pre><code>-- Dataset: org_hr | Hands-On Build: Clickstream Sessionizer, Streak Tracker &amp; Rolling Window Analyzer (build-sessionization-retention-engine) — Partitioned Window Ranking &amp; Running Payroll
-SELECT
-  d.name AS dept_name,
-  e.name AS employee_name,
-  e.title,
-  e.salary_usd,
-  DENSE_RANK() OVER (
-    PARTITION BY e.dept_id
-    ORDER BY e.salary_usd DESC
-  ) AS dept_salary_rank,
-  LAG(e.salary_usd, 1, e.salary_usd) OVER (
-    PARTITION BY e.dept_id
-    ORDER BY e.salary_usd DESC
-  ) - e.salary_usd AS gap_to_higher_peer_usd,
-  SUM(e.salary_usd) OVER (
-    PARTITION BY e.dept_id
-    ORDER BY e.hired_at ASC, e.emp_id ASC
-    ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
-  ) AS cumulative_dept_payroll_usd
-FROM employees AS e
-INNER JOIN departments AS d
-  ON d.dept_id = e.dept_id
-ORDER BY d.name ASC, dept_salary_rank ASC, e.emp_id ASC;</code></pre>
+                      <pre><code>Use `ROW_NUMBER() OVER (PARTITION BY e.user_id ORDER BY e.event_ts ASC, e.event_id ASC) AS step_seq` and `SUM(e.latency_ms) OVER (PARTITION BY e.user_id ORDER BY e.event_ts ASC, e.event_id ASC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS cumulative_latency_ms`.</code></pre>
                     </details>
                   
                 </div>
@@ -1752,7 +1683,7 @@ ORDER BY d.name ASC, dept_salary_rank ASC, e.emp_id ASC;</code></pre>
       </aside>
       </div>
     </div>
-    <footer class="ds-footer" aria-label="Site footer">
+    <footer class="ds-footer" aria-label="Site">
       <div class="ds-footer__inner">
         <div class="ds-footer__family">
           <span class="ds-footer__label">In Depth Learning Family</span>
@@ -1838,8 +1769,8 @@ ORDER BY d.name ASC, dept_salary_rank ASC, e.emp_id ASC;</code></pre>
   <script type="text/plain" data-defer src="js/progress.js?v=20e4822556"></script>
   <script type="text/plain" data-defer src="js/search.js?v=cfb7464ca7"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
-  <script type="text/plain" data-defer src="js/renderer.js?v=fd623be208"></script>
-  <script type="text/plain" data-defer src="js/landing.js?v=ab352e39f9"></script>
+  <script type="text/plain" data-defer src="js/renderer.js?v=36f6f37691"></script>
+  <script type="text/plain" data-defer src="js/landing.js?v=51833858e9"></script>
   <script type="text/plain" data-defer src="js/quiz.js?v=5b300d9b3d"></script>
   <script type="text/plain" data-defer src="js/app.js?v=d7a48f58f9"></script>
 
@@ -1849,8 +1780,8 @@ ORDER BY d.name ASC, dept_salary_rank ASC, e.emp_id ASC;</code></pre>
   <script type="text/plain" data-lazy src="data/challenges.js?v=784587e93a"></script>
   <script type="text/plain" data-lazy src="data/srs-cards.js?v=fabc47dd9c"></script>
   <script type="text/plain" data-lazy src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
-  <script type="text/plain" data-lazy src="data/implementations_code.js?v=fce884f8a8"></script>
-  <script type="text/plain" data-lazy src="data/topic_guided_labs.js?v=5b7d013daa"></script>
+  <script type="text/plain" data-lazy src="data/implementations_code.js?v=1211e1feca"></script>
+  <script type="text/plain" data-lazy src="data/topic_guided_labs.js?v=f0e6a07f8d"></script>
   <script type="text/plain" data-lazy src="data/projects.js?v=2280ac085f"></script>
   <script type="text/plain" data-lazy src="data/glossary.js?v=cbce13b203"></script>
   <script type="text/plain" data-lazy src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>

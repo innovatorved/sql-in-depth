@@ -115,9 +115,9 @@ ${spec.testHarness}`;
 
 ${spec.summary}
 
-In production relational and analytical database systems—spanning PostgreSQL, SQLite, MySQL/InnoDB, and DuckDB—understanding how query clauses, schema constraints, index structures, and storage engines execute under the hood separates surface-level query authors from staff-level database engineers. This capstone build lab guides you through implementing **${spec.title}** from first principles with deterministic self-test invariants.
+Use the **Browser SQL Studio** above to write, step through, and verify real SQL queries for **${spec.title}** against PostgreSQL 18 and SQLite 3 WebAssembly with clause-by-clause tuple visualization. Once you have verified the SQL queries, you can also explore how a database engine enforces these same invariants internally via the optional reference storage-engine implementation documented below.
 
-## Guided Implementation Walkthrough (4 Progressive Steps)
+## Reference Storage Engine Internals (Optional JS Deep Dive)
 
 ${readmeStepsMd}
 
@@ -135,9 +135,9 @@ ${readmeStepsMd}
 
 ${relatedLinksMd}
 
-## Production Database Context & Verification
+## Verification Notes
 
-This from-scratch relational engine component is engineered with zero external dependencies and deterministic verification harnesses. Every internal database invariant—from three-valued logic (\`TRUE\` / \`FALSE\` / \`UNKNOWN\`), referential integrity, and fan-out-free join pre-aggregation to B+Tree page splits, MVCC snapshot visibility (\`xmin\` / \`xmax\`), slotted-page compaction, and ARIES write-ahead log crash recovery—is asserted directly in \`test.js\`. Use the interactive browser workbench above to complete the 4 guided steps in **Guided Lab** mode or inspect and benchmark the complete reference architecture in **Full Solution** mode.
+Every relational invariant in this build—from three-valued NULL handling, referential integrity, and fan-out-free join pre-aggregation to B+Tree page splits, MVCC snapshot visibility (\`xmin\` / \`xmax\`), slotted-page compaction, and ARIES write-ahead log recovery—can be practiced first in SQL via **Launch SQL Studio Lab** and optionally inspected in code via **Inspect Engine Code (JS)** (\`index.js\` and \`test.js\`).
 `;
 
   implementationsData[spec.id] = {

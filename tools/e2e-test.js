@@ -632,6 +632,13 @@ async function runSuite() {
   assertCheck(1, 'T1-R4-05', 'Step 1 and Step 2 titles across 180 topics reflect topic-specific domain concepts (>= 150 unique titles)', uniqueStep1Titles.size >= 150 && uniqueStep2Titles.size >= 150, `step1=${uniqueStep1Titles.size}, step2=${uniqueStep2Titles.size}`);
   const sampleLabGet = global.window.TopicGuidedLabs.getLab(firstSlug);
   assertCheck(1, 'T1-R4-06', 'TopicGuidedLabs.getLab(slug) returns matching 3-step lab object with runnable referenceSql', Boolean(sampleLabGet && sampleLabGet.steps.length === 3 && sampleLabGet.referenceSql === sampleLabGet.steps[2].solutionCode));
+  let coachingHintCount = 0;
+  for (const slug of allCurriculumSlugs) {
+    for (const step of TOPIC_GUIDED_LABS[slug].steps) {
+      if (step.hint && step.solutionCode && step.hint.trim() !== step.solutionCode.trim()) coachingHintCount++;
+    }
+  }
+  assertCheck(1, 'T1-R4-07', 'All 540 steps across 180 topics provide genuine coaching hints (0 steps with hint === solutionCode)', coachingHintCount === 540, `got ${coachingHintCount}/540`);
 
   // --- Audit F1: Step Simulator Auto-Play Timer Lifecycle (R2 Bug 1) (5 Checks) ---
   const lcInstance = Simulators && typeof Simulators.lifecycle === 'function' ? Simulators.lifecycle() : null;
@@ -1695,6 +1702,12 @@ async function runSuite() {
     }
   }
   assertCheck(3, 'T3-27', 'Audit F7+F8: All 18 Renderer.renderBuild(buildId) views combine SQL Studio, 4-step Engine Code Lab mode, and backtick-to-<code> formatting', t3BuildRenderClean === 18 && (appSrc.match(/formatInlineBackticks\(/g) || []).length >= 3);
+  const t3SqlFirstBuilds = all18BuildIds.filter(buildId => {
+    const html = Renderer.renderBuild(buildId);
+    const topicTriggers = (html.match(/data-action="open-topic-codelab"/g) || []).length;
+    return html.includes('0/3 Steps Completed') && topicTriggers >= 4 && html.includes('Inspect Engine Code (JS)');
+  }).length;
+  assertCheck(3, 'T3-27B', 'SQL-First Builds: All 18 /build/<id> pages prioritize 3-step Browser SQL Studio cards (0/3 Steps Completed) with optional JS Engine inspection secondary', t3SqlFirstBuilds === 18, `passed ${t3SqlFirstBuilds}/18`);
 
   // T3-28: Audit F8 + F9 (Glossary view renders zero raw backticks in .glossary-item__def and 404/Landing/Sidebar links point cleanly to /glossary/)
   const t3GlossaryHtml = Renderer.renderGlossary();

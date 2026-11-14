@@ -31,7 +31,7 @@
   <link rel="preload" href="fonts/geist-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
 
   <!-- Stylesheets: Shared Design System + Self-Hosted KaTeX + Product Styles -->
-  <link rel="stylesheet" href="design-system/tokens.css?v=3bc26075fb">
+  <link rel="stylesheet" href="design-system/tokens.css?v=dee287f0ce">
   <link rel="stylesheet" href="design-system/components.css?v=606a179125">
   <link rel="stylesheet" href="css/vendor/katex/katex.min.css?v=83121916c0" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="css/variables.css?v=98985bd48f">
@@ -43,7 +43,7 @@
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=d98d79ab7a"></script>
-  <script src="js/manifest.js?v=cd330e015c"></script>
+  <script src="js/manifest.js?v=839298cb0a"></script>
 
   <script type="application/ld+json">
 {
@@ -91,7 +91,7 @@
     </div>
 
     <div class="topbar__actions">
-      <nav class="topbar__nav" aria-label="Primary navigation">
+      <nav class="topbar__nav" aria-label="Primary">
         <a href="/roadmap/" class="topbar__nav-link" data-nav="roadmap">Roadmap</a>
         <a href="/challenges/" class="topbar__nav-link" data-nav="challenges">Challenges</a>
         <a href="/sandbox/" class="topbar__nav-link" data-nav="sandbox">SQL Studio</a>
@@ -118,7 +118,7 @@
   </header>
 
   <!-- Sidebar -->
-  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+  <aside class="sidebar" id="sidebar" aria-label="Curriculum">
     <div class="sidebar__tabs">
       <div role="tablist" aria-label="Sidebar sections" style="display:flex;align-items:center;">
         <button class="sidebar__tab active" data-tab="curriculum" role="tab" aria-selected="true">Curriculum</button>
@@ -801,7 +801,7 @@
   <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
   <!-- Main Content -->
-  <main class="main" id="main-content">
+  <main class="main" id="main-content" tabindex="-1">
     <div class="main__content" id="reader" data-prerendered="gap-locks-next-key-locks-innodb">
 
       <div class="ds-lesson-shell ds-lesson-shell--with-toc">
@@ -1313,22 +1313,13 @@ sequenceDiagram
                     <span class="build-lab-step-card__num">01</span>
                     <span class="build-lab-step-card__target">Phase 1 · Preventing Phantoms with Locks: Record Locks, Gap Locks &amp; Next-Key Locks: Telemetry Event Stream &amp; Null Latency Guard</span>
                   </div>
-                  <div class="build-lab-step-card__title">Filter Non-Null Telemetry Latency Events</div>
+                  <div class="build-lab-step-card__title">Filter Non-Null Telemetry Latency Events (gap-locks-next-key-locks-innodb)</div>
                   <div class="build-lab-step-card__invariant">Inspect <code>user_events</code> in <code>saas_telemetry</code> and apply an explicit <code>latency_ms IS NOT NULL</code> guard before computing latency statistics.</div>
                   <div class="build-lab-step-card__concept">Update the starter query in <code>query.sql</code> to filter out <code>NULL</code> latency rows and order by <code>latency_ms DESC</code>.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>Show hint for step 1</summary>
-                      <pre><code>-- Step 1 Solution (gap-locks-next-key-locks-innodb): NULL-safe telemetry event latency filter
-SELECT
-  event_id,
-  user_id,
-  event_type,
-  latency_ms,
-  event_ts
-FROM user_events
-WHERE latency_ms IS NOT NULL
-ORDER BY latency_ms DESC, event_id ASC;</code></pre>
+                      <pre><code>Add `WHERE latency_ms IS NOT NULL` and sort with `ORDER BY latency_ms DESC, event_id ASC`.</code></pre>
                     </details>
                   
                 </div>
@@ -1352,22 +1343,7 @@ ORDER BY latency_ms DESC, event_id ASC;</code></pre>
                   
                     <details class="quiz-hint-details">
                       <summary>Show hint for step 2</summary>
-                      <pre><code>-- Step 2 Solution (gap-locks-next-key-locks-innodb): Tenant MRR and invoice collection reconciliation
-SELECT
-  u.user_id,
-  u.org_name,
-  u.plan_tier,
-  s.mrr_usd,
-  COUNT(i.invoice_id) AS invoice_count,
-  COALESCE(SUM(CASE WHEN i.paid = 1 THEN i.amount_usd ELSE 0 END), 0) AS collected_usd,
-  COALESCE(SUM(CASE WHEN i.paid = 0 THEN i.amount_usd ELSE 0 END), 0) AS overdue_usd
-FROM saas_users AS u
-INNER JOIN subscriptions AS s
-  ON s.user_id = u.user_id
-LEFT JOIN invoices AS i
-  ON i.sub_id = s.sub_id
-GROUP BY u.user_id, u.org_name, u.plan_tier, s.mrr_usd
-ORDER BY s.mrr_usd DESC, u.user_id ASC;</code></pre>
+                      <pre><code>Left join `invoices AS i ON i.sub_id = s.sub_id`, group by `u.user_id, u.org_name, u.plan_tier, s.mrr_usd`, and compute conditional sums for `i.paid = 1` (`collected_usd`) and `i.paid = 0` (`overdue_usd`).</code></pre>
                     </details>
                   
                 </div>
@@ -1391,19 +1367,7 @@ ORDER BY s.mrr_usd DESC, u.user_id ASC;</code></pre>
                   
                     <details class="quiz-hint-details">
                       <summary>Show hint for step 3</summary>
-                      <pre><code>-- Dataset: saas_telemetry | Preventing Phantoms with Locks: Record Locks, Gap Locks &amp; Next-Key Locks (gap-locks-next-key-locks-innodb) — Telemetry Latency Profile by Tier
-SELECT
-  u.plan_tier,
-  e.event_type,
-  COUNT(*) AS event_count,
-  ROUND(AVG(e.latency_ms), 2) AS avg_latency_ms,
-  MAX(e.latency_ms) AS max_latency_ms,
-  MIN(e.latency_ms) AS min_latency_ms
-FROM user_events AS e
-INNER JOIN saas_users AS u
-  ON u.user_id = e.user_id
-GROUP BY u.plan_tier, e.event_type
-ORDER BY event_count DESC, avg_latency_ms DESC;</code></pre>
+                      <pre><code>Remove the single-row projection, group `user_events INNER JOIN saas_users` by `u.plan_tier, e.event_type`, and compute `COUNT(*)`, `ROUND(AVG(e.latency_ms), 2)`, `MAX(e.latency_ms)`, and `MIN(e.latency_ms)`.</code></pre>
                     </details>
                   
                 </div>
@@ -1701,7 +1665,7 @@ ORDER BY event_count DESC, avg_latency_ms DESC;</code></pre>
       </aside>
       </div>
     </div>
-    <footer class="ds-footer" aria-label="Site footer">
+    <footer class="ds-footer" aria-label="Site">
       <div class="ds-footer__inner">
         <div class="ds-footer__family">
           <span class="ds-footer__label">In Depth Learning Family</span>
@@ -1787,8 +1751,8 @@ ORDER BY event_count DESC, avg_latency_ms DESC;</code></pre>
   <script type="text/plain" data-defer src="js/progress.js?v=20e4822556"></script>
   <script type="text/plain" data-defer src="js/search.js?v=cfb7464ca7"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
-  <script type="text/plain" data-defer src="js/renderer.js?v=fd623be208"></script>
-  <script type="text/plain" data-defer src="js/landing.js?v=ab352e39f9"></script>
+  <script type="text/plain" data-defer src="js/renderer.js?v=36f6f37691"></script>
+  <script type="text/plain" data-defer src="js/landing.js?v=51833858e9"></script>
   <script type="text/plain" data-defer src="js/quiz.js?v=5b300d9b3d"></script>
   <script type="text/plain" data-defer src="js/app.js?v=d7a48f58f9"></script>
 
@@ -1798,8 +1762,8 @@ ORDER BY event_count DESC, avg_latency_ms DESC;</code></pre>
   <script type="text/plain" data-lazy src="data/challenges.js?v=784587e93a"></script>
   <script type="text/plain" data-lazy src="data/srs-cards.js?v=fabc47dd9c"></script>
   <script type="text/plain" data-lazy src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
-  <script type="text/plain" data-lazy src="data/implementations_code.js?v=fce884f8a8"></script>
-  <script type="text/plain" data-lazy src="data/topic_guided_labs.js?v=5b7d013daa"></script>
+  <script type="text/plain" data-lazy src="data/implementations_code.js?v=1211e1feca"></script>
+  <script type="text/plain" data-lazy src="data/topic_guided_labs.js?v=f0e6a07f8d"></script>
   <script type="text/plain" data-lazy src="data/projects.js?v=2280ac085f"></script>
   <script type="text/plain" data-lazy src="data/glossary.js?v=cbce13b203"></script>
   <script type="text/plain" data-lazy src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>

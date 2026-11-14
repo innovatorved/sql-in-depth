@@ -1116,9 +1116,9 @@ window.Renderer = (() => {
 
     const build = impls[buildId];
     const primarySlug = build.primarySlug || (Array.isArray(build.relatedSlugs) && build.relatedSlugs[0]) || buildId;
-    const guided = (window.GUIDED_LABS_DATA && window.GUIDED_LABS_DATA[buildId])
-      || (window.TOPIC_GUIDED_LABS && (window.TOPIC_GUIDED_LABS[buildId] || window.TOPIC_GUIDED_LABS[primarySlug]))
-      || (window.TopicGuidedLabs && typeof window.TopicGuidedLabs.getLab === 'function' ? window.TopicGuidedLabs.getLab(primarySlug, build.title, '') : null)
+    const guided = (window.TOPIC_GUIDED_LABS && (window.TOPIC_GUIDED_LABS[buildId] || window.TOPIC_GUIDED_LABS[primarySlug]))
+      || (window.TopicGuidedLabs && typeof window.TopicGuidedLabs.getLab === 'function' ? window.TopicGuidedLabs.getLab(buildId, build.title, '') : null)
+      || (window.GUIDED_LABS_DATA && window.GUIDED_LABS_DATA[buildId])
       || null;
     const steps = Array.isArray(guided?.steps) ? guided.steps : [];
     const files = orderedBuildFiles(build.files);
@@ -1189,7 +1189,7 @@ window.Renderer = (() => {
             </button>
             <button type="button" class="btn btn--outline build-lab-card__launch-btn" data-action="open-code-lab" data-build="${escapeHtml(buildId)}" data-lab-mode="guided">
               ${icons.code}
-              <span>Open Engine Code Lab</span>
+              <span>Inspect Engine Code (JS)</span>
             </button>
           </div>
         </div>
@@ -1202,7 +1202,7 @@ window.Renderer = (() => {
               const targetLabel = s.phase || (s.targetFile ? `${s.targetFile}${s.targetSymbol ? ' · ' + s.targetSymbol.split('/')[0].trim() : ''}` : 'query.sql');
               const assertionCount = Array.isArray(s.testNames) && s.testNames.length ? s.testNames.length : 4;
               return `
-                <div class="build-lab-step-card ${isDone ? 'is-done' : ''}" data-action="open-code-lab" data-build="${escapeHtml(buildId)}" data-lab-mode="guided" data-step="${idx}" data-step-index="${idx}">
+                <div class="build-lab-step-card ${isDone ? 'is-done' : ''}" data-action="open-topic-codelab" data-slug="${escapeHtml(buildId)}" data-mode="modal" data-step="${idx}" data-step-index="${idx}">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">${isDone ? icons.check : `0${idx + 1}`}</span>
                     <span class="build-lab-step-card__target">${escapeHtml(targetLabel)}</span>

@@ -31,7 +31,7 @@
   <link rel="preload" href="fonts/geist-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
 
   <!-- Stylesheets: Shared Design System + Self-Hosted KaTeX + Product Styles -->
-  <link rel="stylesheet" href="design-system/tokens.css?v=3bc26075fb">
+  <link rel="stylesheet" href="design-system/tokens.css?v=dee287f0ce">
   <link rel="stylesheet" href="design-system/components.css?v=606a179125">
   <link rel="stylesheet" href="css/vendor/katex/katex.min.css?v=83121916c0" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="css/variables.css?v=98985bd48f">
@@ -43,7 +43,7 @@
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=d98d79ab7a"></script>
-  <script src="js/manifest.js?v=cd330e015c"></script>
+  <script src="js/manifest.js?v=839298cb0a"></script>
 
   <script type="application/ld+json">
 {
@@ -91,7 +91,7 @@
     </div>
 
     <div class="topbar__actions">
-      <nav class="topbar__nav" aria-label="Primary navigation">
+      <nav class="topbar__nav" aria-label="Primary">
         <a href="/roadmap/" class="topbar__nav-link" data-nav="roadmap">Roadmap</a>
         <a href="/challenges/" class="topbar__nav-link" data-nav="challenges">Challenges</a>
         <a href="/sandbox/" class="topbar__nav-link" data-nav="sandbox">SQL Studio</a>
@@ -118,7 +118,7 @@
   </header>
 
   <!-- Sidebar -->
-  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+  <aside class="sidebar" id="sidebar" aria-label="Curriculum">
     <div class="sidebar__tabs">
       <div role="tablist" aria-label="Sidebar sections" style="display:flex;align-items:center;">
         <button class="sidebar__tab active" data-tab="curriculum" role="tab" aria-selected="true">Curriculum</button>
@@ -801,7 +801,7 @@
   <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
   <!-- Main Content -->
-  <main class="main" id="main-content">
+  <main class="main" id="main-content" tabindex="-1">
     <div class="main__content" id="reader" data-prerendered="idempotency-audit-logs-event-tables">
 
       <div class="ds-lesson-shell ds-lesson-shell--with-toc">
@@ -1321,25 +1321,13 @@ erDiagram
                     <span class="build-lab-step-card__num">01</span>
                     <span class="build-lab-step-card__target">Phase 1 · Immutable Ledger Tables, Append-Only Audit Logs &amp; Transactional Outbox: Exact-Cents Catalog Arithmetic</span>
                   </div>
-                  <div class="build-lab-step-card__title">Inspect Active Catalog SKUs &amp; Cents Domain</div>
+                  <div class="build-lab-step-card__title">Inspect Active Catalog SKUs &amp; Cents Domain (idempotency-audit-logs-event-tables)</div>
                   <div class="build-lab-step-card__invariant">Verify integer-cents pricing (<code>price_cents</code>) and active inventory flags (<code>is_active = 1</code>) in <code>products</code> without IEEE-754 float drift.</div>
                   <div class="build-lab-step-card__concept">Refine the starter <code>products</code> query in <code>query.sql</code> to filter <code>is_active = 1</code> and compute <code>price_usd</code> plus <code>stock_value_usd</code>.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>Show hint for step 1</summary>
-                      <pre><code>-- Step 1 Solution (idempotency-audit-logs-event-tables): Active SKUs with exact decimal USD valuation
-SELECT
-  product_id,
-  sku,
-  name AS product_title,
-  category_id,
-  price_cents,
-  ROUND(price_cents / 100.0, 2) AS price_usd,
-  stock_qty,
-  ROUND((price_cents * stock_qty) / 100.0, 2) AS stock_value_usd
-FROM products
-WHERE is_active = 1
-ORDER BY stock_value_usd DESC;</code></pre>
+                      <pre><code>Filter `WHERE is_active = 1`, include `category_id`, and compute `ROUND(price_cents / 100.0, 2) AS price_usd` and `ROUND((price_cents * stock_qty) / 100.0, 2) AS stock_value_usd` ordered by `stock_value_usd DESC`.</code></pre>
                     </details>
                   
                 </div>
@@ -1363,22 +1351,7 @@ ORDER BY stock_value_usd DESC;</code></pre>
                   
                     <details class="quiz-hint-details">
                       <summary>Show hint for step 2</summary>
-                      <pre><code>-- Step 2 Solution (idempotency-audit-logs-event-tables): Category-enriched product demand aggregation
-SELECT
-  p.product_id,
-  p.sku,
-  p.name AS product_title,
-  cat.name AS category_name,
-  ROUND(p.price_cents / 100.0, 2) AS price_usd,
-  COALESCE(SUM(oi.quantity), 0) AS units_sold
-FROM products AS p
-INNER JOIN categories AS cat
-  ON cat.category_id = p.category_id
-LEFT JOIN order_items AS oi
-  ON oi.product_id = p.product_id
-WHERE p.is_active = 1
-GROUP BY p.product_id, p.sku, p.name, cat.name, p.price_cents
-ORDER BY units_sold DESC, price_usd DESC;</code></pre>
+                      <pre><code>Add `LEFT JOIN order_items AS oi ON oi.product_id = p.product_id`, group by product and category columns, and project `COALESCE(SUM(oi.quantity), 0) AS units_sold` ordered by `units_sold DESC, price_usd DESC`.</code></pre>
                     </details>
                   
                 </div>
@@ -1402,25 +1375,7 @@ ORDER BY units_sold DESC, price_usd DESC;</code></pre>
                   
                     <details class="quiz-hint-details">
                       <summary>Show hint for step 3</summary>
-                      <pre><code>-- Dataset: ecommerce | Immutable Ledger Tables, Append-Only Audit Logs &amp; Transactional Outbox (idempotency-audit-logs-event-tables) — Catalog Valuation &amp; Demand Audit
-SELECT
-  p.product_id,
-  p.sku,
-  p.name AS product_title,
-  cat.name AS category_name,
-  ROUND(p.price_cents / 100.0, 2) AS price_usd,
-  p.stock_qty,
-  ROUND((p.price_cents * p.stock_qty) / 100.0, 2) AS inventory_valuation_usd,
-  COALESCE(SUM(oi.quantity), 0) AS total_units_sold,
-  ROUND(COALESCE(SUM(oi.quantity * oi.unit_price_cents), 0) / 100.0, 2) AS realized_revenue_usd
-FROM products AS p
-INNER JOIN categories AS cat
-  ON cat.category_id = p.category_id
-LEFT JOIN order_items AS oi
-  ON oi.product_id = p.product_id
-WHERE p.is_active = 1
-GROUP BY p.product_id, p.sku, p.name, cat.name, p.price_cents, p.stock_qty
-ORDER BY inventory_valuation_usd DESC, p.product_id ASC;</code></pre>
+                      <pre><code>Join `categories` and `LEFT JOIN order_items`, group by product/category attributes, and project `inventory_valuation_usd`, `total_units_sold`, and `realized_revenue_usd` ordered by `inventory_valuation_usd DESC, p.product_id ASC`.</code></pre>
                     </details>
                   
                 </div>
@@ -1718,7 +1673,7 @@ ORDER BY inventory_valuation_usd DESC, p.product_id ASC;</code></pre>
       </aside>
       </div>
     </div>
-    <footer class="ds-footer" aria-label="Site footer">
+    <footer class="ds-footer" aria-label="Site">
       <div class="ds-footer__inner">
         <div class="ds-footer__family">
           <span class="ds-footer__label">In Depth Learning Family</span>
@@ -1804,8 +1759,8 @@ ORDER BY inventory_valuation_usd DESC, p.product_id ASC;</code></pre>
   <script type="text/plain" data-defer src="js/progress.js?v=20e4822556"></script>
   <script type="text/plain" data-defer src="js/search.js?v=cfb7464ca7"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
-  <script type="text/plain" data-defer src="js/renderer.js?v=fd623be208"></script>
-  <script type="text/plain" data-defer src="js/landing.js?v=ab352e39f9"></script>
+  <script type="text/plain" data-defer src="js/renderer.js?v=36f6f37691"></script>
+  <script type="text/plain" data-defer src="js/landing.js?v=51833858e9"></script>
   <script type="text/plain" data-defer src="js/quiz.js?v=5b300d9b3d"></script>
   <script type="text/plain" data-defer src="js/app.js?v=d7a48f58f9"></script>
 
@@ -1815,8 +1770,8 @@ ORDER BY inventory_valuation_usd DESC, p.product_id ASC;</code></pre>
   <script type="text/plain" data-lazy src="data/challenges.js?v=784587e93a"></script>
   <script type="text/plain" data-lazy src="data/srs-cards.js?v=fabc47dd9c"></script>
   <script type="text/plain" data-lazy src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
-  <script type="text/plain" data-lazy src="data/implementations_code.js?v=fce884f8a8"></script>
-  <script type="text/plain" data-lazy src="data/topic_guided_labs.js?v=5b7d013daa"></script>
+  <script type="text/plain" data-lazy src="data/implementations_code.js?v=1211e1feca"></script>
+  <script type="text/plain" data-lazy src="data/topic_guided_labs.js?v=f0e6a07f8d"></script>
   <script type="text/plain" data-lazy src="data/projects.js?v=2280ac085f"></script>
   <script type="text/plain" data-lazy src="data/glossary.js?v=cbce13b203"></script>
   <script type="text/plain" data-lazy src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>

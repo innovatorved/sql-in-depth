@@ -1,0 +1,26 @@
+# SQL In Depth
+
+> Open-source interactive curriculum for relational databases, SQL query execution, B+Tree storage engines, and MVCC concurrency, running in the browser via SQLite 3 and PostgreSQL 18 WebAssembly.
+
+- Canonical Site: https://sql-in-depth.vedgupta.in/
+- Repository: https://github.com/innovatorved/sql-in-depth
+- License: Code MIT, Written Content CC BY 4.0
+
+## Primary Entry Points
+
+- [Home & Interactive Clause Stepper](https://sql-in-depth.vedgupta.in/): Overview, live clause-by-clause SQL evaluator, simulator previews, and full 6-track curriculum index.
+- [Learning Roadmap](https://sql-in-depth.vedgupta.in/roadmap/): Dependency DAG across all 6 tracks and 18 modules (180 units).
+- [Browser SQL Studio](https://sql-in-depth.vedgupta.in/sandbox/): Dual-engine SQLite 3 and PostgreSQL 18 WASM playground with 5 pre-seeded relational schemas (26 tables) and visual EXPLAIN plans.
+- [Production Incident Challenges](https://sql-in-depth.vedgupta.in/challenges/): 12 interactive SQL debugging scenarios covering NULL anti-joins, fan-out traps, recursive CTE cycles, SARGability, and deadlocks.
+- [Capstone Builds](https://sql-in-depth.vedgupta.in/projects/): 18 guided SQL and storage-engine build labs.
+- [Database Glossary](https://sql-in-depth.vedgupta.in/glossary/): Concise definitions of relational algebra, optimizer, indexing, MVCC, and WAL terminology.
+- [Sitemap](https://sql-in-depth.vedgupta.in/sitemap.xml): Complete list of all 218 pre-rendered URLs.
+
+## Curriculum Tracks (18 Modules · 180 Units)
+
+1. Relational Foundations & Core Querying (Modules 1.1–1.3): Relational model, three-valued logic, NULL semantics, DDL constraints, upserts, and joins.
+2. Aggregations, Subqueries, CTEs & Window Functions (Modules 2.1–2.3): GROUP BY internals, fan-out prevention, LATERAL joins, recursive CTEs, and window frames.
+3. Data Modeling, Normalization & Schema Architecture (Modules 3.1–3.3): 1NF–BCNF/5NF, Kimball star schemas, SCD Type 2, cohort retention, and JSONB.
+4. Indexing, Query Planning & Execution Internals (Modules 4.1–4.3): B+Tree anatomy, GIN/BRIN/covering indexes, cost-based optimizer histograms, EXPLAIN plans, and physical join algorithms.
+5. Transactions, Concurrency Control, MVCC & Storage (Modules 5.1–5.3): ACID anomalies, snapshot isolation, SSI, vacuuming, slotted pages, buffer pools, and ARIES WAL recovery.
+6. Columnar OLAP, Sharding & Production SQL Tuning (Modules 6.1–6.3): Vectorized columnar engines, LSM-trees, table partitioning, sharding, connection pooling, and query optimization.

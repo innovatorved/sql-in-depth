@@ -31,7 +31,7 @@
   <link rel="preload" href="fonts/geist-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
 
   <!-- Stylesheets: Shared Design System + Self-Hosted KaTeX + Product Styles -->
-  <link rel="stylesheet" href="design-system/tokens.css?v=3bc26075fb">
+  <link rel="stylesheet" href="design-system/tokens.css?v=dee287f0ce">
   <link rel="stylesheet" href="design-system/components.css?v=606a179125">
   <link rel="stylesheet" href="css/vendor/katex/katex.min.css?v=83121916c0" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="css/variables.css?v=98985bd48f">
@@ -43,7 +43,7 @@
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=d98d79ab7a"></script>
-  <script src="js/manifest.js?v=cd330e015c"></script>
+  <script src="js/manifest.js?v=839298cb0a"></script>
 
   <script type="application/ld+json">
 {
@@ -91,7 +91,7 @@
     </div>
 
     <div class="topbar__actions">
-      <nav class="topbar__nav" aria-label="Primary navigation">
+      <nav class="topbar__nav" aria-label="Primary">
         <a href="/roadmap/" class="topbar__nav-link" data-nav="roadmap">Roadmap</a>
         <a href="/challenges/" class="topbar__nav-link" data-nav="challenges">Challenges</a>
         <a href="/sandbox/" class="topbar__nav-link" data-nav="sandbox">SQL Studio</a>
@@ -118,7 +118,7 @@
   </header>
 
   <!-- Sidebar -->
-  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+  <aside class="sidebar" id="sidebar" aria-label="Curriculum">
     <div class="sidebar__tabs">
       <div role="tablist" aria-label="Sidebar sections" style="display:flex;align-items:center;">
         <button class="sidebar__tab active" data-tab="curriculum" role="tab" aria-selected="true">Curriculum</button>
@@ -801,7 +801,7 @@
   <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
   <!-- Main Content -->
-  <main class="main" id="main-content">
+  <main class="main" id="main-content" tabindex="-1">
     <div class="main__content" id="reader" data-prerendered="build-executive-kpi-aggregation-suite">
 
       <div class="ds-lesson-shell ds-lesson-shell--with-toc">
@@ -1297,9 +1297,9 @@ flowchart LR
             <h2 class="build-lab-card__title">Hands-On Build: Multi-Dimensional Revenue, Cohort &amp; Funnel Aggregation Suite — Interactive Guided SQL Lab</h2>
             <p class="build-lab-card__desc">Construct a fanout-safe executive KPI query suite combining conditional aggregation, pre-aggregated CTEs, and multi-dimensional rollups.</p>
             <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;">
-              <span class="badge">Target time: <code>O(N) index scan + hash join</code></span>
-              <span class="badge">Extra space: <code>O(C) category lookup state</code></span>
-              <span class="badge">Pattern: Grouping, Aggregations &amp; Multi-Dimensional Rollups · build</span>
+              <span class="badge">Target time: <code>O(O + I) pre-aggregated hash joins</code></span>
+              <span class="badge">Extra space: <code>O(C + O) CTE aggregate tables</code></span>
+              <span class="badge">Pattern: Fanout-Free Pre-Aggregation &amp; Conditional KPI Rollup</span>
               <span class="badge">Dataset: <code>ecommerce</code></span>
             </div>
           </div>
@@ -1325,27 +1325,15 @@ flowchart LR
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">01</span>
-                    <span class="build-lab-step-card__target">Phase 1 · Hands-On Build: Multi-Dimensional Revenue, Cohort &amp; Funnel Aggregation Suite: Exact-Cents Catalog Arithmetic</span>
+                    <span class="build-lab-step-card__target">Phase 1 · Conditional Order Status Pivoting</span>
                   </div>
-                  <div class="build-lab-step-card__title">Inspect Active Catalog SKUs &amp; Cents Domain</div>
-                  <div class="build-lab-step-card__invariant">Verify integer-cents pricing (<code>price_cents</code>) and active inventory flags (<code>is_active = 1</code>) in <code>products</code> without IEEE-754 float drift.</div>
-                  <div class="build-lab-step-card__concept">Refine the starter <code>products</code> query in <code>query.sql</code> to filter <code>is_active = 1</code> and compute <code>price_usd</code> plus <code>stock_value_usd</code>.</div>
+                  <div class="build-lab-step-card__title">Pivot Order Counts &amp; GMV by Tier (build-executive-kpi-aggregation-suite)</div>
+                  <div class="build-lab-step-card__invariant">Use <code>SUM(CASE WHEN ...)</code> conditional aggregation to compute completed vs non-completed metrics in a single scan.</div>
+                  <div class="build-lab-step-card__concept">Group <code>customers LEFT JOIN orders</code> by <code>c.tier</code> to compute <code>customer_count</code> (<code>COUNT(DISTINCT c.customer_id)</code>), <code>completed_orders</code>, and <code>completed_gmv_usd</code> ordered by <code>completed_gmv_usd DESC</code>.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>Show hint for step 1</summary>
-                      <pre><code>-- Step 1 Solution (build-executive-kpi-aggregation-suite): Active SKUs with exact decimal USD valuation
-SELECT
-  product_id,
-  sku,
-  name AS product_title,
-  category_id,
-  price_cents,
-  ROUND(price_cents / 100.0, 2) AS price_usd,
-  stock_qty,
-  ROUND((price_cents * stock_qty) / 100.0, 2) AS stock_value_usd
-FROM products
-WHERE is_active = 1
-ORDER BY stock_value_usd DESC;</code></pre>
+                      <pre><code>Use `COUNT(DISTINCT c.customer_id)`, `SUM(CASE WHEN o.status = &#039;completed&#039; THEN 1 ELSE 0 END)`, and `ROUND(SUM(CASE WHEN o.status = &#039;completed&#039; THEN o.total_cents ELSE 0 END) / 100.0, 2)`.</code></pre>
                     </details>
                   
                 </div>
@@ -1361,30 +1349,15 @@ ORDER BY stock_value_usd DESC;</code></pre>
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">02</span>
-                    <span class="build-lab-step-card__target">Phase 2 · Hands-On Build: Multi-Dimensional Revenue, Cohort &amp; Funnel Aggregation Suite: Category Hierarchy &amp; Line-Item Join</span>
+                    <span class="build-lab-step-card__target">Phase 2 · Pre-Aggregating Line Items to Prevent Fanout</span>
                   </div>
-                  <div class="build-lab-step-card__title">Join Categories &amp; Order Items for Hands-On Build: Multi-Dimensional Revenue, Cohort &amp; Funnel Aggregation Suite</div>
-                  <div class="build-lab-step-card__invariant">Enrich active products with <code>categories</code> metadata and aggregate ordered quantities from <code>order_items</code>.</div>
-                  <div class="build-lab-step-card__concept">Expand the category join in <code>query.sql</code> to include a <code>LEFT JOIN</code> on <code>order_items</code> and compute <code>units_sold</code>.</div>
+                  <div class="build-lab-step-card__title">Pre-Aggregate Order Units Without Header Fanout (build-executive-kpi-aggregation-suite)</div>
+                  <div class="build-lab-step-card__invariant">Joining <code>orders</code> directly to <code>order_items</code> multiplies <code>orders.total_cents</code> by line count; pre-aggregating <code>order_items</code> by <code>order_id</code> eliminates the fanout trap.</div>
+                  <div class="build-lab-step-card__concept">Aggregate <code>order_items</code> per <code>order_id</code> in a <code>WITH item_totals AS (...)</code> CTE (<code>SUM(quantity) AS total_units</code>), then join to completed <code>orders</code> ordered by <code>o.order_id ASC</code>.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>Show hint for step 2</summary>
-                      <pre><code>-- Step 2 Solution (build-executive-kpi-aggregation-suite): Category-enriched product demand aggregation
-SELECT
-  p.product_id,
-  p.sku,
-  p.name AS product_title,
-  cat.name AS category_name,
-  ROUND(p.price_cents / 100.0, 2) AS price_usd,
-  COALESCE(SUM(oi.quantity), 0) AS units_sold
-FROM products AS p
-INNER JOIN categories AS cat
-  ON cat.category_id = p.category_id
-LEFT JOIN order_items AS oi
-  ON oi.product_id = p.product_id
-WHERE p.is_active = 1
-GROUP BY p.product_id, p.sku, p.name, cat.name, p.price_cents
-ORDER BY units_sold DESC, price_usd DESC;</code></pre>
+                      <pre><code>Create `WITH item_totals AS (SELECT order_id, SUM(quantity) AS total_units, COUNT(*) AS sku_lines FROM order_items GROUP BY order_id)` and join to `orders` where `o.status = &#039;completed&#039;`.</code></pre>
                     </details>
                   
                 </div>
@@ -1400,33 +1373,15 @@ ORDER BY units_sold DESC, price_usd DESC;</code></pre>
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">03</span>
-                    <span class="build-lab-step-card__target">Phase 3 · Hands-On Build: Multi-Dimensional Revenue, Cohort &amp; Funnel Aggregation Suite: Inventory Valuation &amp; Sell-Through Audit</span>
+                    <span class="build-lab-step-card__target">Phase 3 · Chasm-Trap-Free Executive Customer KPI Suite</span>
                   </div>
-                  <div class="build-lab-step-card__title">Production Catalog Valuation &amp; Revenue Query (Hands-On Build: Multi-Dimensional Revenue, Cohort &amp; Funnel Aggregation Suite)</div>
-                  <div class="build-lab-step-card__invariant">Combine on-hand inventory valuation with realized line-item revenue to audit catalog performance for Hands-On Build: Multi-Dimensional Revenue, Cohort &amp; Funnel Aggregation Suite.</div>
-                  <div class="build-lab-step-card__concept">Complete the production query in <code>query.sql</code> by projecting <code>inventory_valuation_usd</code>, <code>realized_revenue_usd</code>, and ordering by total valuation.</div>
+                  <div class="build-lab-step-card__title">Executive Customer Revenue &amp; Unit KPI Suite (build-executive-kpi-aggregation-suite)</div>
+                  <div class="build-lab-step-card__invariant">Combine pre-aggregated order units with <code>orders</code> and <code>customers</code> so neither multi-item orders nor zero-order customers distort executive KPIs.</div>
+                  <div class="build-lab-step-card__concept">Using <code>WITH item_totals</code>, aggregate per customer: <code>completed_orders</code>, <code>units_purchased</code>, and <code>net_revenue_usd</code> across all <code>customers</code>, ordered by <code>net_revenue_usd DESC, c.customer_id ASC</code>.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>Show hint for step 3</summary>
-                      <pre><code>-- Dataset: ecommerce | Hands-On Build: Multi-Dimensional Revenue, Cohort &amp; Funnel Aggregation Suite (build-executive-kpi-aggregation-suite) — Catalog Valuation &amp; Demand Audit
-SELECT
-  p.product_id,
-  p.sku,
-  p.name AS product_title,
-  cat.name AS category_name,
-  ROUND(p.price_cents / 100.0, 2) AS price_usd,
-  p.stock_qty,
-  ROUND((p.price_cents * p.stock_qty) / 100.0, 2) AS inventory_valuation_usd,
-  COALESCE(SUM(oi.quantity), 0) AS total_units_sold,
-  ROUND(COALESCE(SUM(oi.quantity * oi.unit_price_cents), 0) / 100.0, 2) AS realized_revenue_usd
-FROM products AS p
-INNER JOIN categories AS cat
-  ON cat.category_id = p.category_id
-LEFT JOIN order_items AS oi
-  ON oi.product_id = p.product_id
-WHERE p.is_active = 1
-GROUP BY p.product_id, p.sku, p.name, cat.name, p.price_cents, p.stock_qty
-ORDER BY inventory_valuation_usd DESC, p.product_id ASC;</code></pre>
+                      <pre><code>Left join `orders AS o` (`AND o.status = &#039;completed&#039;`) and `LEFT JOIN item_totals AS it ON it.order_id = o.order_id`, then group by `c.customer_id, c.name, c.tier`.</code></pre>
                     </details>
                   
                 </div>
@@ -1736,7 +1691,7 @@ ORDER BY inventory_valuation_usd DESC, p.product_id ASC;</code></pre>
       </aside>
       </div>
     </div>
-    <footer class="ds-footer" aria-label="Site footer">
+    <footer class="ds-footer" aria-label="Site">
       <div class="ds-footer__inner">
         <div class="ds-footer__family">
           <span class="ds-footer__label">In Depth Learning Family</span>
@@ -1822,8 +1777,8 @@ ORDER BY inventory_valuation_usd DESC, p.product_id ASC;</code></pre>
   <script type="text/plain" data-defer src="js/progress.js?v=20e4822556"></script>
   <script type="text/plain" data-defer src="js/search.js?v=cfb7464ca7"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
-  <script type="text/plain" data-defer src="js/renderer.js?v=fd623be208"></script>
-  <script type="text/plain" data-defer src="js/landing.js?v=ab352e39f9"></script>
+  <script type="text/plain" data-defer src="js/renderer.js?v=36f6f37691"></script>
+  <script type="text/plain" data-defer src="js/landing.js?v=51833858e9"></script>
   <script type="text/plain" data-defer src="js/quiz.js?v=5b300d9b3d"></script>
   <script type="text/plain" data-defer src="js/app.js?v=d7a48f58f9"></script>
 
@@ -1833,8 +1788,8 @@ ORDER BY inventory_valuation_usd DESC, p.product_id ASC;</code></pre>
   <script type="text/plain" data-lazy src="data/challenges.js?v=784587e93a"></script>
   <script type="text/plain" data-lazy src="data/srs-cards.js?v=fabc47dd9c"></script>
   <script type="text/plain" data-lazy src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
-  <script type="text/plain" data-lazy src="data/implementations_code.js?v=fce884f8a8"></script>
-  <script type="text/plain" data-lazy src="data/topic_guided_labs.js?v=5b7d013daa"></script>
+  <script type="text/plain" data-lazy src="data/implementations_code.js?v=1211e1feca"></script>
+  <script type="text/plain" data-lazy src="data/topic_guided_labs.js?v=f0e6a07f8d"></script>
   <script type="text/plain" data-lazy src="data/projects.js?v=2280ac085f"></script>
   <script type="text/plain" data-lazy src="data/glossary.js?v=cbce13b203"></script>
   <script type="text/plain" data-lazy src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>

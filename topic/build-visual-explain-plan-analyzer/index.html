@@ -31,7 +31,7 @@
   <link rel="preload" href="fonts/geist-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
 
   <!-- Stylesheets: Shared Design System + Self-Hosted KaTeX + Product Styles -->
-  <link rel="stylesheet" href="design-system/tokens.css?v=3bc26075fb">
+  <link rel="stylesheet" href="design-system/tokens.css?v=dee287f0ce">
   <link rel="stylesheet" href="design-system/components.css?v=606a179125">
   <link rel="stylesheet" href="css/vendor/katex/katex.min.css?v=83121916c0" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="css/variables.css?v=98985bd48f">
@@ -43,7 +43,7 @@
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=d98d79ab7a"></script>
-  <script src="js/manifest.js?v=cd330e015c"></script>
+  <script src="js/manifest.js?v=839298cb0a"></script>
 
   <script type="application/ld+json">
 {
@@ -91,7 +91,7 @@
     </div>
 
     <div class="topbar__actions">
-      <nav class="topbar__nav" aria-label="Primary navigation">
+      <nav class="topbar__nav" aria-label="Primary">
         <a href="/roadmap/" class="topbar__nav-link" data-nav="roadmap">Roadmap</a>
         <a href="/challenges/" class="topbar__nav-link" data-nav="challenges">Challenges</a>
         <a href="/sandbox/" class="topbar__nav-link" data-nav="sandbox">SQL Studio</a>
@@ -118,7 +118,7 @@
   </header>
 
   <!-- Sidebar -->
-  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+  <aside class="sidebar" id="sidebar" aria-label="Curriculum">
     <div class="sidebar__tabs">
       <div role="tablist" aria-label="Sidebar sections" style="display:flex;align-items:center;">
         <button class="sidebar__tab active" data-tab="curriculum" role="tab" aria-selected="true">Curriculum</button>
@@ -801,7 +801,7 @@
   <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
   <!-- Main Content -->
-  <main class="main" id="main-content">
+  <main class="main" id="main-content" tabindex="-1">
     <div class="main__content" id="reader" data-prerendered="build-visual-explain-plan-analyzer">
 
       <div class="ds-lesson-shell ds-lesson-shell--with-toc">
@@ -1266,9 +1266,9 @@ flowchart LR
             <h2 class="build-lab-card__title">Hands-On Build: Interactive EXPLAIN Plan Bottleneck Detector &amp; Query Rewriter — Interactive Guided SQL Lab</h2>
             <p class="build-lab-card__desc">Build a diagnostic engine that parses EXPLAIN QUERY PLAN outputs, detects full table scans and temp B-Tree sorts, and verifies SARGable query rewrites.</p>
             <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;">
-              <span class="badge">Target time: <code>O(N) sequential/index scan</code></span>
-              <span class="badge">Extra space: <code>O(1) tuple projection state</code></span>
-              <span class="badge">Pattern: The Query Planner, Cost-Based Optimizer &amp; EXPLAIN · explain-plan</span>
+              <span class="badge">Target time: <code>O(log_B N + M) SARGable range + pre-aggregated hash join</code></span>
+              <span class="badge">Extra space: <code>O(C) grouped customer hash</code></span>
+              <span class="badge">Pattern: SARGability Rewrite &amp; Subquery Unnesting</span>
               <span class="badge">Dataset: <code>ecommerce</code></span>
             </div>
           </div>
@@ -1294,27 +1294,15 @@ flowchart LR
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">01</span>
-                    <span class="build-lab-step-card__target">Phase 1 · Hands-On Build: Interactive EXPLAIN Plan Bottleneck Detector &amp; Query Rewriter: Three-Valued Logic &amp; NULL Inspection</span>
+                    <span class="build-lab-step-card__target">Phase 1 · Rewriting Non-SARGable Function Wrappers</span>
                   </div>
-                  <div class="build-lab-step-card__title">Inspect Nullable Promo Codes in Orders</div>
-                  <div class="build-lab-step-card__invariant">Observe how <code>discount_code</code> contains <code>NULL</code> markers where direct equality (<code>=</code> or <code>&lt;&gt;</code>) evaluates to <code>UNKNOWN</code> under SQL Three-Valued Logic.</div>
-                  <div class="build-lab-step-card__concept">Enhance the starter query in <code>query.sql</code> with <code>COALESCE(discount_code, &#039;NO_PROMO&#039;)</code> and an explicit <code>IS NULL</code> / <code>IS NOT NULL</code> classification.</div>
+                  <div class="build-lab-step-card__title">Rewrite SUBSTR(created_at) into Index Range Seek (build-visual-explain-plan-analyzer)</div>
+                  <div class="build-lab-step-card__invariant">Wrapping <code>created_at</code> in <code>SUBSTR(created_at, 1, 7)</code> forces a full table scan; rewriting to half-open bounds <code>created_at &gt;= ... AND created_at &lt; ...</code> unlocks <code>idx_orders_created_at</code>.</div>
+                  <div class="build-lab-step-card__concept">Replace <code>SUBSTR(created_at, 1, 7) = &#039;2025-03&#039;</code> in <code>query.sql</code> with SARGable range bounds <code>created_at &gt;= &#039;2025-03-01&#039; AND created_at &lt; &#039;2025-04-01&#039;</code> ordered by <code>created_at ASC, order_id ASC</code>.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>Show hint for step 1</summary>
-                      <pre><code>-- Step 1 Solution (build-visual-explain-plan-analyzer): Explicit 3VL NULL guard and promo normalization
-SELECT
-  order_id,
-  customer_id,
-  status,
-  COALESCE(discount_code, &#039;NO_PROMO&#039;) AS promo_code,
-  CASE
-    WHEN discount_code IS NULL THEN &#039;ORGANIC_CHECKOUT&#039;
-    ELSE &#039;PROMO_APPLIED&#039;
-  END AS promo_state,
-  ROUND(total_cents / 100.0, 2) AS order_usd
-FROM orders
-ORDER BY total_cents DESC, order_id ASC;</code></pre>
+                      <pre><code>Remove `SUBSTR(created_at, 1, 7)` and write `WHERE created_at &gt;= &#039;2025-03-01&#039; AND created_at &lt; &#039;2025-04-01&#039;`.</code></pre>
                     </details>
                   
                 </div>
@@ -1330,28 +1318,15 @@ ORDER BY total_cents DESC, order_id ASC;</code></pre>
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">02</span>
-                    <span class="build-lab-step-card__target">Phase 2 · Hands-On Build: Interactive EXPLAIN Plan Bottleneck Detector &amp; Query Rewriter: Payment &amp; Shipment Fulfillment Join</span>
+                    <span class="build-lab-step-card__target">Phase 2 · Unnesting Correlated Subqueries into HashAggregate Join</span>
                   </div>
-                  <div class="build-lab-step-card__title">Reconcile Orders with Payments &amp; Shipments (Hands-On Build: Interactive EXPLAIN Plan Bottleneck Detector &amp; Query Rewriter)</div>
-                  <div class="build-lab-step-card__invariant">Correlate <code>orders</code> against <code>payments</code> and <code>shipments</code> using <code>LEFT JOIN</code> so unpaid or unshipped orders remain visible.</div>
-                  <div class="build-lab-step-card__concept">Add the <code>LEFT JOIN shipments</code> clause and normalize missing payment/carrier attributes with <code>COALESCE</code>.</div>
+                  <div class="build-lab-step-card__title">Replace Per-Row Subquery with Grouped Join (build-visual-explain-plan-analyzer)</div>
+                  <div class="build-lab-step-card__invariant">Replacing repeated correlated subqueries in <code>SELECT</code> with a single <code>GROUP BY customer_id</code> derived table turns <code>O(C * O)</code> loops into one hash pass.</div>
+                  <div class="build-lab-step-card__concept">Rewrite the correlated subquery into a <code>LEFT JOIN</code> against <code>(SELECT customer_id, COUNT(*) AS completed_cnt, SUM(total_cents) AS spend_cents FROM orders WHERE status = &#039;completed&#039; GROUP BY customer_id) AS agg</code> ordered by <code>spend_cents DESC, c.customer_id ASC</code>.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>Show hint for step 2</summary>
-                      <pre><code>-- Step 2 Solution (build-visual-explain-plan-analyzer): Full order-to-payment-to-shipment reconciliation
-SELECT
-  o.order_id,
-  o.status AS order_status,
-  ROUND(o.total_cents / 100.0, 2) AS billed_usd,
-  COALESCE(pay.method, &#039;UNPAID&#039;) AS payment_method,
-  COALESCE(pay.status, &#039;PENDING&#039;) AS payment_status,
-  COALESCE(s.carrier, &#039;NOT_SHIPPED&#039;) AS carrier_status
-FROM orders AS o
-LEFT JOIN payments AS pay
-  ON pay.order_id = o.order_id
-LEFT JOIN shipments AS s
-  ON s.order_id = o.order_id
-ORDER BY o.order_id ASC;</code></pre>
+                      <pre><code>Pre-aggregate completed orders with `GROUP BY customer_id` in a derived table or CTE, left join to `customers`, and use `COALESCE` for zero-order customers.</code></pre>
                     </details>
                   
                 </div>
@@ -1367,33 +1342,15 @@ ORDER BY o.order_id ASC;</code></pre>
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">03</span>
-                    <span class="build-lab-step-card__target">Phase 3 · Hands-On Build: Interactive EXPLAIN Plan Bottleneck Detector &amp; Query Rewriter: End-to-End Order Settlement Audit</span>
+                    <span class="build-lab-step-card__target">Phase 3 · Bounded Top-N Heap Sort &amp; Projection Pruning</span>
                   </div>
-                  <div class="build-lab-step-card__title">Production Settlement &amp; Promo Attribution Query (Hands-On Build: Interactive EXPLAIN Plan Bottleneck Detector &amp; Query Rewriter)</div>
-                  <div class="build-lab-step-card__invariant">Produce the complete customer, promo, payment, and fulfillment audit relation with strict 3VL NULL guards.</div>
-                  <div class="build-lab-step-card__concept">Run the complete multi-table settlement audit in <code>query.sql</code> and verify each clause in the Table Visualizer.</div>
+                  <div class="build-lab-step-card__title">Prune Columns &amp; Bound Sort with Top-N LIMIT (build-visual-explain-plan-analyzer)</div>
+                  <div class="build-lab-step-card__invariant">Adding <code>LIMIT 5</code> converts an <code>O(N log N)</code> full quicksort/spill into an <code>O(N log K)</code> bounded in-memory top-N heap.</div>
+                  <div class="build-lab-step-card__concept">Project <code>o.order_id</code>, <code>c.name AS customer_name</code>, <code>c.tier</code>, and <code>ROUND(o.total_cents / 100.0, 2) AS order_usd</code> for completed orders ordered by <code>o.total_cents DESC, o.order_id ASC LIMIT 5</code>.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>Show hint for step 3</summary>
-                      <pre><code>-- Dataset: ecommerce | Hands-On Build: Interactive EXPLAIN Plan Bottleneck Detector &amp; Query Rewriter (build-visual-explain-plan-analyzer) — End-to-End Settlement &amp; 3VL Audit
-SELECT
-  o.order_id,
-  c.name AS customer_name,
-  c.tier,
-  o.status AS order_status,
-  COALESCE(o.discount_code, &#039;NO_PROMO&#039;) AS promo_code,
-  ROUND(o.total_cents / 100.0, 2) AS billed_usd,
-  COALESCE(pay.method, &#039;UNPAID&#039;) AS payment_method,
-  COALESCE(pay.status, &#039;AWAITING_SETTLEMENT&#039;) AS payment_status,
-  COALESCE(s.carrier, &#039;UNFULFILLED&#039;) AS shipping_carrier
-FROM orders AS o
-INNER JOIN customers AS c
-  ON c.customer_id = o.customer_id
-LEFT JOIN payments AS pay
-  ON pay.order_id = o.order_id
-LEFT JOIN shipments AS s
-  ON s.order_id = o.order_id
-ORDER BY o.total_cents DESC, o.order_id ASC;</code></pre>
+                      <pre><code>Filter `WHERE o.status = &#039;completed&#039;`, project the 4 narrow columns, and add `ORDER BY o.total_cents DESC, o.order_id ASC LIMIT 5`.</code></pre>
                     </details>
                   
                 </div>
@@ -1703,7 +1660,7 @@ ORDER BY o.total_cents DESC, o.order_id ASC;</code></pre>
       </aside>
       </div>
     </div>
-    <footer class="ds-footer" aria-label="Site footer">
+    <footer class="ds-footer" aria-label="Site">
       <div class="ds-footer__inner">
         <div class="ds-footer__family">
           <span class="ds-footer__label">In Depth Learning Family</span>
@@ -1789,8 +1746,8 @@ ORDER BY o.total_cents DESC, o.order_id ASC;</code></pre>
   <script type="text/plain" data-defer src="js/progress.js?v=20e4822556"></script>
   <script type="text/plain" data-defer src="js/search.js?v=cfb7464ca7"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
-  <script type="text/plain" data-defer src="js/renderer.js?v=fd623be208"></script>
-  <script type="text/plain" data-defer src="js/landing.js?v=ab352e39f9"></script>
+  <script type="text/plain" data-defer src="js/renderer.js?v=36f6f37691"></script>
+  <script type="text/plain" data-defer src="js/landing.js?v=51833858e9"></script>
   <script type="text/plain" data-defer src="js/quiz.js?v=5b300d9b3d"></script>
   <script type="text/plain" data-defer src="js/app.js?v=d7a48f58f9"></script>
 
@@ -1800,8 +1757,8 @@ ORDER BY o.total_cents DESC, o.order_id ASC;</code></pre>
   <script type="text/plain" data-lazy src="data/challenges.js?v=784587e93a"></script>
   <script type="text/plain" data-lazy src="data/srs-cards.js?v=fabc47dd9c"></script>
   <script type="text/plain" data-lazy src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
-  <script type="text/plain" data-lazy src="data/implementations_code.js?v=fce884f8a8"></script>
-  <script type="text/plain" data-lazy src="data/topic_guided_labs.js?v=5b7d013daa"></script>
+  <script type="text/plain" data-lazy src="data/implementations_code.js?v=1211e1feca"></script>
+  <script type="text/plain" data-lazy src="data/topic_guided_labs.js?v=f0e6a07f8d"></script>
   <script type="text/plain" data-lazy src="data/projects.js?v=2280ac085f"></script>
   <script type="text/plain" data-lazy src="data/glossary.js?v=cbce13b203"></script>
   <script type="text/plain" data-lazy src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>

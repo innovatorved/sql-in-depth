@@ -6,6 +6,8 @@
  */
 const fs = require('fs');
 const path = require('path');
+const { buildCapstoneBlueprints } = require('./sql-capstone-and-module-labs');
+const { buildCapstoneBlueprintsPart2, buildModule01Blueprint, BLUEPRINT_HINTS } = require('./sql-capstone-part2');
 
 global.window = {};
 require('../data/curriculum.js');
@@ -1509,6 +1511,9 @@ function generateUnitQuestions(mod, unit, globalIdx, uIdx) {
 
 function buildProgressiveLabSteps(mod, unit, uIdx) {
   const modNum = parseInt(mod.id.replace('m', ''), 10);
+  const customCapstone = buildCapstoneBlueprints(mod, unit) || buildCapstoneBlueprintsPart2(mod, unit);
+  if (customCapstone) return customCapstone;
+  if (modNum === 1) return buildModule01Blueprint(mod, unit, uIdx);
   const slug = unit.slug;
   const title = unit.title;
   const tags = unit.archive?.tags || ['sql', 'relational', 'execution'];
@@ -2643,7 +2648,14 @@ ORDER BY like_count DESC, pr.reputation DESC, po.post_id ASC;`
     bpIndex = [2, 7, 9, 8, 5, 1, 4, 10, 3, 0][uIdx % 10];
   }
 
-  return blueprints[bpIndex];
+  const chosen = blueprints[bpIndex];
+  const hints = BLUEPRINT_HINTS[bpIndex] || [];
+  return {
+    ...chosen,
+    step1: { ...chosen.step1, hint: chosen.step1.hint || hints[0] },
+    step2: { ...chosen.step2, hint: chosen.step2.hint || hints[1] },
+    step3: { ...chosen.step3, hint: chosen.step3.hint || hints[2] }
+  };
 }
 
 function generateGuidedLabEntry(mod, unit, uIdx) {
@@ -2669,7 +2681,7 @@ function generateGuidedLabEntry(mod, unit, uIdx) {
         title: bp.step1.title,
         concept: bp.step1.concept,
         instructions: bp.step1.instructions,
-        hint: bp.step1.solution,
+        hint: bp.step1.hint,
         file: 'query.sql',
         targetFile: 'query.sql',
         starterCode: bp.step1.starter,
@@ -2681,7 +2693,7 @@ function generateGuidedLabEntry(mod, unit, uIdx) {
         title: bp.step2.title,
         concept: bp.step2.concept,
         instructions: bp.step2.instructions,
-        hint: bp.step2.solution,
+        hint: bp.step2.hint,
         file: 'query.sql',
         targetFile: 'query.sql',
         starterCode: bp.step2.starter,
@@ -2693,7 +2705,7 @@ function generateGuidedLabEntry(mod, unit, uIdx) {
         title: bp.step3.title,
         concept: bp.step3.concept,
         instructions: bp.step3.instructions,
-        hint: bp.step3.solution,
+        hint: bp.step3.hint,
         file: 'query.sql',
         targetFile: 'query.sql',
         starterCode: bp.step3.starter,
@@ -2786,7 +2798,7 @@ const guidedLabsJs = `// Interactive Guided SQL & Engine Topic Labs — SQL In D
           title: 'Step 1: Inspect Customer Cohort Attributes (' + safeTitle + ')',
           concept: 'Project core domain columns and apply NULL-safe attribute defaults.',
           instructions: 'Run or edit query.sql to filter the customer cohort and step through the live Table Visualizer.',
-          hint: step1Solution,
+          hint: "Filter WHERE country IN ('US', 'IN', 'GB', 'DE') and project COALESCE(referred_by, 0) AS referrer_id.",
           file: 'query.sql',
           targetFile: 'query.sql',
           starterCode: step1Starter,
@@ -2798,7 +2810,7 @@ const guidedLabsJs = `// Interactive Guided SQL & Engine Topic Labs — SQL In D
           title: 'Step 2: Left Join Completed Orders (' + safeTitle + ')',
           concept: 'Combine customer and order relations without dropping zero-order accounts.',
           instructions: 'Complete the LEFT JOIN and GROUP BY rollup in query.sql and inspect each intermediate clause.',
-          hint: refSql,
+          hint: "Group customers LEFT JOIN orders (AND o.status = 'completed') by customer_id, name, tier and compute COUNT(o.order_id) plus ROUND(COALESCE(SUM(o.total_cents), 0) / 100.0, 2).",
           file: 'query.sql',
           targetFile: 'query.sql',
           starterCode: step2Starter,
@@ -2810,7 +2822,7 @@ const guidedLabsJs = `// Interactive Guided SQL & Engine Topic Labs — SQL In D
           title: 'Step 3: Production Query & Execution Plan Verification (' + safeTitle + ')',
           concept: 'Verify final column projections, ordering, and physical B+Tree access paths.',
           instructions: 'Execute the complete production query in query.sql and run automated SQL assertions.',
-          hint: refSql,
+          hint: 'Include c.tier, completed_orders, and spend_usd ordered by spend_usd DESC.',
           file: 'query.sql',
           targetFile: 'query.sql',
           starterCode: step3Starter,

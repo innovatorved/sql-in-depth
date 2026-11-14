@@ -31,7 +31,7 @@
   <link rel="preload" href="fonts/geist-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
 
   <!-- Stylesheets: Shared Design System + Self-Hosted KaTeX + Product Styles -->
-  <link rel="stylesheet" href="design-system/tokens.css?v=3bc26075fb">
+  <link rel="stylesheet" href="design-system/tokens.css?v=dee287f0ce">
   <link rel="stylesheet" href="design-system/components.css?v=606a179125">
   <link rel="stylesheet" href="css/vendor/katex/katex.min.css?v=83121916c0" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="css/variables.css?v=98985bd48f">
@@ -43,7 +43,7 @@
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=d98d79ab7a"></script>
-  <script src="js/manifest.js?v=cd330e015c"></script>
+  <script src="js/manifest.js?v=839298cb0a"></script>
 
   <script type="application/ld+json">
 {
@@ -91,7 +91,7 @@
     </div>
 
     <div class="topbar__actions">
-      <nav class="topbar__nav" aria-label="Primary navigation">
+      <nav class="topbar__nav" aria-label="Primary">
         <a href="/roadmap/" class="topbar__nav-link" data-nav="roadmap">Roadmap</a>
         <a href="/challenges/" class="topbar__nav-link" data-nav="challenges">Challenges</a>
         <a href="/sandbox/" class="topbar__nav-link" data-nav="sandbox">SQL Studio</a>
@@ -118,7 +118,7 @@
   </header>
 
   <!-- Sidebar -->
-  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+  <aside class="sidebar" id="sidebar" aria-label="Curriculum">
     <div class="sidebar__tabs">
       <div role="tablist" aria-label="Sidebar sections" style="display:flex;align-items:center;">
         <button class="sidebar__tab active" data-tab="curriculum" role="tab" aria-selected="true">Curriculum</button>
@@ -801,7 +801,7 @@
   <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
   <!-- Main Content -->
-  <main class="main" id="main-content">
+  <main class="main" id="main-content" tabindex="-1">
     <div class="main__content" id="reader" data-prerendered="build-scd-type2-warehouse-pipeline">
 
       <div class="ds-lesson-shell ds-lesson-shell--with-toc">
@@ -1304,9 +1304,9 @@ erDiagram
             <h2 class="build-lab-card__title">Hands-On Build: Star Schema with Automated SCD Type 2 Dimension Pipeline — Interactive Guided SQL Lab</h2>
             <p class="build-lab-card__desc">Build a Kimball star schema and write the idempotent SCD Type 2 merge pipeline that expires old dimension versions and inserts new historical rows.</p>
             <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;">
-              <span class="badge">Target time: <code>O(H log H) temporal sort + join</code></span>
-              <span class="badge">Extra space: <code>O(E) employee state</code></span>
-              <span class="badge">Pattern: Dimensional Modeling &amp; Analytical Schema Design · star-schema</span>
+              <span class="badge">Target time: <code>O(H log H) window LEAD interval build</code></span>
+              <span class="badge">Extra space: <code>O(H) version chain</code></span>
+              <span class="badge">Pattern: SCD Type 2 (valid_from, valid_to, is_current) via LEAD()</span>
               <span class="badge">Dataset: <code>org_hr</code></span>
             </div>
           </div>
@@ -1332,25 +1332,15 @@ erDiagram
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">01</span>
-                    <span class="build-lab-step-card__target">Phase 1 · Hands-On Build: Star Schema with Automated SCD Type 2 Dimension Pipeline: Historical Compensation Change Scan</span>
+                    <span class="build-lab-step-card__target">Phase 1 · Change Event Delta Extraction</span>
                   </div>
-                  <div class="build-lab-step-card__title">Inspect Salary History Audit Records</div>
-                  <div class="build-lab-step-card__invariant">Examine <code>salary_history</code> to compute absolute raise deltas (<code>new_salary_usd - old_salary_usd</code>) and effective dates.</div>
-                  <div class="build-lab-step-card__concept">Update the starter query in <code>query.sql</code> to compute <code>raise_delta_usd</code> and <code>raise_pct</code> ordered chronologically.</div>
+                  <div class="build-lab-step-card__title">Compute Historical Compensation Deltas (build-scd-type2-warehouse-pipeline)</div>
+                  <div class="build-lab-step-card__invariant">Extract immutable compensation change events from <code>salary_history</code> with net raise amounts before constructing SCD Type 2 validity intervals.</div>
+                  <div class="build-lab-step-card__concept">Project <code>history_id</code>, <code>emp_id</code>, <code>old_salary_usd</code>, <code>new_salary_usd</code>, <code>(new_salary_usd - old_salary_usd) AS raise_usd</code>, and <code>effective_date</code> ordered by <code>emp_id ASC, effective_date ASC</code>.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>Show hint for step 1</summary>
-                      <pre><code>-- Step 1 Solution (build-scd-type2-warehouse-pipeline): Computed raise delta and percentage growth
-SELECT
-  history_id,
-  emp_id,
-  old_salary_usd,
-  new_salary_usd,
-  (new_salary_usd - old_salary_usd) AS raise_delta_usd,
-  ROUND(((new_salary_usd - old_salary_usd) * 100.0) / old_salary_usd, 1) AS raise_pct,
-  effective_date
-FROM salary_history
-ORDER BY effective_date ASC, raise_delta_usd DESC;</code></pre>
+                      <pre><code>Add `(new_salary_usd - old_salary_usd) AS raise_usd` and order by `emp_id ASC, effective_date ASC`.</code></pre>
                     </details>
                   
                 </div>
@@ -1366,26 +1356,15 @@ ORDER BY effective_date ASC, raise_delta_usd DESC;</code></pre>
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">02</span>
-                    <span class="build-lab-step-card__target">Phase 2 · Hands-On Build: Star Schema with Automated SCD Type 2 Dimension Pipeline: Cross-Project Allocation Aggregation</span>
+                    <span class="build-lab-step-card__target">Phase 2 · Constructing [valid_from, valid_to) Intervals with LEAD()</span>
                   </div>
-                  <div class="build-lab-step-card__title">Aggregate Employee Project Allocations (Hands-On Build: Star Schema with Automated SCD Type 2 Dimension Pipeline)</div>
-                  <div class="build-lab-step-card__invariant">Join <code>employees</code>, <code>employee_projects</code>, and <code>projects</code> to calculate total allocation percentage per engineer.</div>
-                  <div class="build-lab-step-card__concept">Complete the multi-table join in <code>query.sql</code> to aggregate <code>assigned_projects</code> and <code>total_allocation_pct</code>.</div>
+                  <div class="build-lab-step-card__title">Derive SCD Type 2 Validity Windows (build-scd-type2-warehouse-pipeline)</div>
+                  <div class="build-lab-step-card__invariant">Use <code>LEAD(effective_date) OVER (PARTITION BY emp_id ORDER BY effective_date ASC)</code> to close superseded dimension rows and mark open rows with <code>&#039;9999-12-31&#039;</code>.</div>
+                  <div class="build-lab-step-card__concept">Project <code>emp_id</code>, <code>new_salary_usd AS band_salary_usd</code>, <code>effective_date AS valid_from</code>, <code>COALESCE(LEAD(effective_date) OVER (PARTITION BY emp_id ORDER BY effective_date ASC), &#039;9999-12-31&#039;) AS valid_to</code>, and <code>is_current</code> (<code>1</code> when <code>LEAD(...) IS NULL</code> else <code>0</code>) ordered by <code>emp_id ASC, valid_from ASC</code>.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>Show hint for step 2</summary>
-                      <pre><code>-- Step 2 Solution (build-scd-type2-warehouse-pipeline): Engineer workload &amp; project allocation rollup
-SELECT
-  e.emp_id,
-  e.name AS employee_name,
-  e.title,
-  COUNT(ep.project_id) AS assigned_projects,
-  COALESCE(SUM(ep.allocation_pct), 0) AS total_allocation_pct
-FROM employees AS e
-LEFT JOIN employee_projects AS ep
-  ON ep.emp_id = e.emp_id
-GROUP BY e.emp_id, e.name, e.title
-ORDER BY total_allocation_pct DESC, e.emp_id ASC;</code></pre>
+                      <pre><code>Use `LEAD(effective_date) OVER (PARTITION BY emp_id ORDER BY effective_date ASC)` inside both `COALESCE(..., &#039;9999-12-31&#039;)` and `CASE WHEN LEAD(...) IS NULL THEN 1 ELSE 0 END AS is_current`.</code></pre>
                     </details>
                   
                 </div>
@@ -1401,30 +1380,15 @@ ORDER BY total_allocation_pct DESC, e.emp_id ASC;</code></pre>
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">03</span>
-                    <span class="build-lab-step-card__target">Phase 3 · Hands-On Build: Star Schema with Automated SCD Type 2 Dimension Pipeline: SCD Type 2 Compensation &amp; Department Audit</span>
+                    <span class="build-lab-step-card__target">Phase 3 · Enriched SCD Type 2 Dimension Mart</span>
                   </div>
-                  <div class="build-lab-step-card__title">Production SCD2 Compensation Progression Query (Hands-On Build: Star Schema with Automated SCD Type 2 Dimension Pipeline)</div>
-                  <div class="build-lab-step-card__invariant">Join <code>salary_history</code>, <code>employees</code>, and <code>departments</code> to audit historical compensation changes alongside current salary.</div>
-                  <div class="build-lab-step-card__concept">Run the production compensation history query in <code>query.sql</code> and verify the output schema and ordering.</div>
+                  <div class="build-lab-step-card__title">Build Enriched SCD2 Employee Dimension View (build-scd-type2-warehouse-pipeline)</div>
+                  <div class="build-lab-step-card__invariant">Join the SCD Type 2 versioned intervals with conformed <code>employees</code> and <code>departments</code> attributes and assign surrogate version numbers (<code>ROW_NUMBER()</code>).</div>
+                  <div class="build-lab-step-card__concept">Wrap the SCD2 query or join directly with <code>employees</code> and <code>departments</code> to project <code>e.name AS employee_name</code>, <code>d.name AS dept_name</code>, <code>version_num</code>, <code>band_salary_usd</code>, <code>valid_from</code>, <code>valid_to</code>, and <code>is_current</code> ordered by <code>e.emp_id ASC, version_num ASC</code>.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>Show hint for step 3</summary>
-                      <pre><code>-- Dataset: org_hr | Hands-On Build: Star Schema with Automated SCD Type 2 Dimension Pipeline (build-scd-type2-warehouse-pipeline) — SCD Type 2 Compensation History Audit
-SELECT
-  e.name AS employee_name,
-  d.name AS department_name,
-  e.title,
-  sh.old_salary_usd,
-  sh.new_salary_usd,
-  (sh.new_salary_usd - sh.old_salary_usd) AS raise_delta_usd,
-  ROUND(((sh.new_salary_usd - sh.old_salary_usd) * 100.0) / sh.old_salary_usd, 1) AS raise_pct,
-  sh.effective_date
-FROM salary_history AS sh
-INNER JOIN employees AS e
-  ON e.emp_id = sh.emp_id
-INNER JOIN departments AS d
-  ON d.dept_id = e.dept_id
-ORDER BY sh.effective_date ASC, raise_delta_usd DESC;</code></pre>
+                      <pre><code>Add `ROW_NUMBER() OVER (PARTITION BY sh.emp_id ORDER BY sh.effective_date ASC) AS version_num`, join `employees` and `departments`, and keep the `valid_from`, `valid_to`, and `is_current` window columns.</code></pre>
                     </details>
                   
                 </div>
@@ -1734,7 +1698,7 @@ ORDER BY sh.effective_date ASC, raise_delta_usd DESC;</code></pre>
       </aside>
       </div>
     </div>
-    <footer class="ds-footer" aria-label="Site footer">
+    <footer class="ds-footer" aria-label="Site">
       <div class="ds-footer__inner">
         <div class="ds-footer__family">
           <span class="ds-footer__label">In Depth Learning Family</span>
@@ -1820,8 +1784,8 @@ ORDER BY sh.effective_date ASC, raise_delta_usd DESC;</code></pre>
   <script type="text/plain" data-defer src="js/progress.js?v=20e4822556"></script>
   <script type="text/plain" data-defer src="js/search.js?v=cfb7464ca7"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
-  <script type="text/plain" data-defer src="js/renderer.js?v=fd623be208"></script>
-  <script type="text/plain" data-defer src="js/landing.js?v=ab352e39f9"></script>
+  <script type="text/plain" data-defer src="js/renderer.js?v=36f6f37691"></script>
+  <script type="text/plain" data-defer src="js/landing.js?v=51833858e9"></script>
   <script type="text/plain" data-defer src="js/quiz.js?v=5b300d9b3d"></script>
   <script type="text/plain" data-defer src="js/app.js?v=d7a48f58f9"></script>
 
@@ -1831,8 +1795,8 @@ ORDER BY sh.effective_date ASC, raise_delta_usd DESC;</code></pre>
   <script type="text/plain" data-lazy src="data/challenges.js?v=784587e93a"></script>
   <script type="text/plain" data-lazy src="data/srs-cards.js?v=fabc47dd9c"></script>
   <script type="text/plain" data-lazy src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
-  <script type="text/plain" data-lazy src="data/implementations_code.js?v=fce884f8a8"></script>
-  <script type="text/plain" data-lazy src="data/topic_guided_labs.js?v=5b7d013daa"></script>
+  <script type="text/plain" data-lazy src="data/implementations_code.js?v=1211e1feca"></script>
+  <script type="text/plain" data-lazy src="data/topic_guided_labs.js?v=f0e6a07f8d"></script>
   <script type="text/plain" data-lazy src="data/projects.js?v=2280ac085f"></script>
   <script type="text/plain" data-lazy src="data/glossary.js?v=cbce13b203"></script>
   <script type="text/plain" data-lazy src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>

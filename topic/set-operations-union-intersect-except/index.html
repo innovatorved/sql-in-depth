@@ -31,7 +31,7 @@
   <link rel="preload" href="fonts/geist-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
 
   <!-- Stylesheets: Shared Design System + Self-Hosted KaTeX + Product Styles -->
-  <link rel="stylesheet" href="design-system/tokens.css?v=3bc26075fb">
+  <link rel="stylesheet" href="design-system/tokens.css?v=dee287f0ce">
   <link rel="stylesheet" href="design-system/components.css?v=606a179125">
   <link rel="stylesheet" href="css/vendor/katex/katex.min.css?v=83121916c0" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="css/variables.css?v=98985bd48f">
@@ -43,7 +43,7 @@
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=d98d79ab7a"></script>
-  <script src="js/manifest.js?v=cd330e015c"></script>
+  <script src="js/manifest.js?v=839298cb0a"></script>
 
   <script type="application/ld+json">
 {
@@ -91,7 +91,7 @@
     </div>
 
     <div class="topbar__actions">
-      <nav class="topbar__nav" aria-label="Primary navigation">
+      <nav class="topbar__nav" aria-label="Primary">
         <a href="/roadmap/" class="topbar__nav-link" data-nav="roadmap">Roadmap</a>
         <a href="/challenges/" class="topbar__nav-link" data-nav="challenges">Challenges</a>
         <a href="/sandbox/" class="topbar__nav-link" data-nav="sandbox">SQL Studio</a>
@@ -118,7 +118,7 @@
   </header>
 
   <!-- Sidebar -->
-  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+  <aside class="sidebar" id="sidebar" aria-label="Curriculum">
     <div class="sidebar__tabs">
       <div role="tablist" aria-label="Sidebar sections" style="display:flex;align-items:center;">
         <button class="sidebar__tab active" data-tab="curriculum" role="tab" aria-selected="true">Curriculum</button>
@@ -801,7 +801,7 @@
   <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
   <!-- Main Content -->
-  <main class="main" id="main-content">
+  <main class="main" id="main-content" tabindex="-1">
     <div class="main__content" id="reader" data-prerendered="set-operations-union-intersect-except">
 
       <div class="ds-lesson-shell ds-lesson-shell--with-toc">
@@ -1356,23 +1356,13 @@ erDiagram
                     <span class="build-lab-step-card__num">01</span>
                     <span class="build-lab-step-card__target">Phase 1 · Set Operations: UNION vs UNION ALL, INTERSECT &amp; EXCEPT: Creator Profile &amp; Reputation Scan</span>
                   </div>
-                  <div class="build-lab-step-card__title">Inspect Creator Profiles &amp; Reputation Scores</div>
+                  <div class="build-lab-step-card__title">Inspect Creator Profiles &amp; Reputation Scores (set-operations-union-intersect-except)</div>
                   <div class="build-lab-step-card__invariant">Query <code>profiles</code> in <code>social_graph</code> to rank database engineering creators by reputation score.</div>
                   <div class="build-lab-step-card__concept">Refine the starter <code>profiles</code> query in <code>query.sql</code> to classify creators with <code>reputation &gt;= 500</code> as <code>&#039;CORE_MAINTAINER&#039;</code>.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>Show hint for step 1</summary>
-                      <pre><code>-- Step 1 Solution (set-operations-union-intersect-except): Creator reputation ranking &amp; tier classification
-SELECT
-  user_id,
-  handle,
-  reputation,
-  CASE
-    WHEN reputation &gt;= 500 THEN &#039;CORE_MAINTAINER&#039;
-    ELSE &#039;COMMUNITY_AUTHOR&#039;
-  END AS contributor_tier
-FROM profiles
-ORDER BY reputation DESC, user_id ASC;</code></pre>
+                      <pre><code>Add `CASE WHEN reputation &gt;= 500 THEN &#039;CORE_MAINTAINER&#039; ELSE &#039;COMMUNITY_AUTHOR&#039; END AS contributor_tier` and sort by `reputation DESC, user_id ASC`.</code></pre>
                     </details>
                   
                 </div>
@@ -1396,17 +1386,7 @@ ORDER BY reputation DESC, user_id ASC;</code></pre>
                   
                     <details class="quiz-hint-details">
                       <summary>Show hint for step 2</summary>
-                      <pre><code>-- Step 2 Solution (set-operations-union-intersect-except): Follower fan-in count per creator profile
-SELECT
-  p.user_id,
-  p.handle,
-  p.reputation,
-  COUNT(f.follower_id) AS follower_count
-FROM profiles AS p
-LEFT JOIN follows AS f
-  ON f.followee_id = p.user_id
-GROUP BY p.user_id, p.handle, p.reputation
-ORDER BY follower_count DESC, p.reputation DESC;</code></pre>
+                      <pre><code>Group `profiles LEFT JOIN follows` by `p.user_id, p.handle, p.reputation` and project `COUNT(f.follower_id) AS follower_count` ordered by `follower_count DESC, p.reputation DESC`.</code></pre>
                     </details>
                   
                 </div>
@@ -1430,21 +1410,7 @@ ORDER BY follower_count DESC, p.reputation DESC;</code></pre>
                   
                     <details class="quiz-hint-details">
                       <summary>Show hint for step 3</summary>
-                      <pre><code>-- Dataset: social_graph | Set Operations: UNION vs UNION ALL, INTERSECT &amp; EXCEPT (set-operations-union-intersect-except) — Post Engagement &amp; Author Reputation
-SELECT
-  po.post_id,
-  pr.handle AS author_handle,
-  pr.reputation AS author_reputation,
-  po.topic_tag,
-  COUNT(pl.user_id) AS like_count,
-  po.published_at
-FROM posts AS po
-INNER JOIN profiles AS pr
-  ON pr.user_id = po.author_id
-LEFT JOIN post_likes AS pl
-  ON pl.post_id = po.post_id
-GROUP BY po.post_id, pr.handle, pr.reputation, po.topic_tag, po.published_at
-ORDER BY like_count DESC, pr.reputation DESC, po.post_id ASC;</code></pre>
+                      <pre><code>Add `LEFT JOIN post_likes AS pl ON pl.post_id = po.post_id`, include `pr.reputation AS author_reputation`, and group to compute `COUNT(pl.user_id) AS like_count` ordered by `like_count DESC, pr.reputation DESC, po.post_id ASC`.</code></pre>
                     </details>
                   
                 </div>
@@ -1742,7 +1708,7 @@ ORDER BY like_count DESC, pr.reputation DESC, po.post_id ASC;</code></pre>
       </aside>
       </div>
     </div>
-    <footer class="ds-footer" aria-label="Site footer">
+    <footer class="ds-footer" aria-label="Site">
       <div class="ds-footer__inner">
         <div class="ds-footer__family">
           <span class="ds-footer__label">In Depth Learning Family</span>
@@ -1828,8 +1794,8 @@ ORDER BY like_count DESC, pr.reputation DESC, po.post_id ASC;</code></pre>
   <script type="text/plain" data-defer src="js/progress.js?v=20e4822556"></script>
   <script type="text/plain" data-defer src="js/search.js?v=cfb7464ca7"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
-  <script type="text/plain" data-defer src="js/renderer.js?v=fd623be208"></script>
-  <script type="text/plain" data-defer src="js/landing.js?v=ab352e39f9"></script>
+  <script type="text/plain" data-defer src="js/renderer.js?v=36f6f37691"></script>
+  <script type="text/plain" data-defer src="js/landing.js?v=51833858e9"></script>
   <script type="text/plain" data-defer src="js/quiz.js?v=5b300d9b3d"></script>
   <script type="text/plain" data-defer src="js/app.js?v=d7a48f58f9"></script>
 
@@ -1839,8 +1805,8 @@ ORDER BY like_count DESC, pr.reputation DESC, po.post_id ASC;</code></pre>
   <script type="text/plain" data-lazy src="data/challenges.js?v=784587e93a"></script>
   <script type="text/plain" data-lazy src="data/srs-cards.js?v=fabc47dd9c"></script>
   <script type="text/plain" data-lazy src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
-  <script type="text/plain" data-lazy src="data/implementations_code.js?v=fce884f8a8"></script>
-  <script type="text/plain" data-lazy src="data/topic_guided_labs.js?v=5b7d013daa"></script>
+  <script type="text/plain" data-lazy src="data/implementations_code.js?v=1211e1feca"></script>
+  <script type="text/plain" data-lazy src="data/topic_guided_labs.js?v=f0e6a07f8d"></script>
   <script type="text/plain" data-lazy src="data/projects.js?v=2280ac085f"></script>
   <script type="text/plain" data-lazy src="data/glossary.js?v=cbce13b203"></script>
   <script type="text/plain" data-lazy src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>

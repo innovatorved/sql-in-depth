@@ -213,7 +213,7 @@ window.Landing = (() => {
         <div class="landing-hero__grid">
           <div class="landing-hero__copy">
             <h1 class="landing-hero__title">SQL &amp; database internals, from 8KB pages to query plans.</h1>
-            <p class="landing-hero__subtitle">Built for backend, data, and full-stack engineers moving past surface syntax. Step through slotted pages, B+Tree splits, MVCC snapshots, and relational joins—and run real SQLite &amp; PostgreSQL 18 in WebAssembly.</p>
+            <p class="landing-hero__subtitle">An open-source interactive guide to relational databases. Step through slotted pages, B+Tree splits, MVCC snapshots, and relational joins — and run SQLite 3 and PostgreSQL 18 directly in your browser.</p>
 
             <div class="landing-resume" id="landing-resume" hidden>
               <a class="landing-resume__link" id="landing-resume-link" href="/topic/${esc(first?.slug || 'why-databases-exist')}/">

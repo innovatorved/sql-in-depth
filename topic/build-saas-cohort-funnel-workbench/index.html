@@ -31,7 +31,7 @@
   <link rel="preload" href="fonts/geist-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
 
   <!-- Stylesheets: Shared Design System + Self-Hosted KaTeX + Product Styles -->
-  <link rel="stylesheet" href="design-system/tokens.css?v=3bc26075fb">
+  <link rel="stylesheet" href="design-system/tokens.css?v=dee287f0ce">
   <link rel="stylesheet" href="design-system/components.css?v=606a179125">
   <link rel="stylesheet" href="css/vendor/katex/katex.min.css?v=83121916c0" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="css/variables.css?v=98985bd48f">
@@ -43,7 +43,7 @@
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=d98d79ab7a"></script>
-  <script src="js/manifest.js?v=cd330e015c"></script>
+  <script src="js/manifest.js?v=839298cb0a"></script>
 
   <script type="application/ld+json">
 {
@@ -91,7 +91,7 @@
     </div>
 
     <div class="topbar__actions">
-      <nav class="topbar__nav" aria-label="Primary navigation">
+      <nav class="topbar__nav" aria-label="Primary">
         <a href="/roadmap/" class="topbar__nav-link" data-nav="roadmap">Roadmap</a>
         <a href="/challenges/" class="topbar__nav-link" data-nav="challenges">Challenges</a>
         <a href="/sandbox/" class="topbar__nav-link" data-nav="sandbox">SQL Studio</a>
@@ -118,7 +118,7 @@
   </header>
 
   <!-- Sidebar -->
-  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+  <aside class="sidebar" id="sidebar" aria-label="Curriculum">
     <div class="sidebar__tabs">
       <div role="tablist" aria-label="Sidebar sections" style="display:flex;align-items:center;">
         <button class="sidebar__tab active" data-tab="curriculum" role="tab" aria-selected="true">Curriculum</button>
@@ -801,7 +801,7 @@
   <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
   <!-- Main Content -->
-  <main class="main" id="main-content">
+  <main class="main" id="main-content" tabindex="-1">
     <div class="main__content" id="reader" data-prerendered="build-saas-cohort-funnel-workbench">
 
       <div class="ds-lesson-shell ds-lesson-shell--with-toc">
@@ -1280,9 +1280,9 @@ flowchart LR
             <h2 class="build-lab-card__title">Hands-On Build: Complete SaaS Analytics Engine (MRR, Cohorts &amp; Funnels) — Interactive Guided SQL Lab</h2>
             <p class="build-lab-card__desc">Build an end-to-end SaaS analytics SQL suite calculating MRR expansion/churn movements, cohort retention triangles, and step-by-step funnel conversion.</p>
             <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;">
-              <span class="badge">Target time: <code>O(E) single-pass conditional pivot</code></span>
-              <span class="badge">Extra space: <code>O(U) user funnel state</code></span>
-              <span class="badge">Pattern: Advanced SQL Patterns, Temporal Queries &amp; Programmability · build</span>
+              <span class="badge">Target time: <code>O(U + E + I) cohort &amp; funnel rollup</code></span>
+              <span class="badge">Extra space: <code>O(U) per-tenant funnel flags</code></span>
+              <span class="badge">Pattern: Cohort MRR Retention + Multi-Stage Conversion Funnel</span>
               <span class="badge">Dataset: <code>saas_telemetry</code></span>
             </div>
           </div>
@@ -1308,24 +1308,15 @@ flowchart LR
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">01</span>
-                    <span class="build-lab-step-card__target">Phase 1 · Hands-On Build: Complete SaaS Analytics Engine (MRR, Cohorts &amp; Funnels): Telemetry Event Stream &amp; Null Latency Guard</span>
+                    <span class="build-lab-step-card__target">Phase 1 · Monthly Signup Cohort &amp; Active MRR Baseline</span>
                   </div>
-                  <div class="build-lab-step-card__title">Filter Non-Null Telemetry Latency Events</div>
-                  <div class="build-lab-step-card__invariant">Inspect <code>user_events</code> in <code>saas_telemetry</code> and apply an explicit <code>latency_ms IS NOT NULL</code> guard before computing latency statistics.</div>
-                  <div class="build-lab-step-card__concept">Update the starter query in <code>query.sql</code> to filter out <code>NULL</code> latency rows and order by <code>latency_ms DESC</code>.</div>
+                  <div class="build-lab-step-card__title">Aggregate Cohort Signups &amp; Active MRR (build-saas-cohort-funnel-workbench)</div>
+                  <div class="build-lab-step-card__invariant">Join <code>saas_users</code> and <code>subscriptions</code> grouped by <code>cohort_month</code> to measure initial tenant volume vs active contracted MRR.</div>
+                  <div class="build-lab-step-card__concept">Group <code>saas_users AS u INNER JOIN subscriptions AS s</code> by <code>u.cohort_month</code> to return <code>cohort_tenants</code>, <code>active_subs</code>, and <code>active_mrr_usd</code> ordered by <code>u.cohort_month ASC</code>.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>Show hint for step 1</summary>
-                      <pre><code>-- Step 1 Solution (build-saas-cohort-funnel-workbench): NULL-safe telemetry event latency filter
-SELECT
-  event_id,
-  user_id,
-  event_type,
-  latency_ms,
-  event_ts
-FROM user_events
-WHERE latency_ms IS NOT NULL
-ORDER BY latency_ms DESC, event_id ASC;</code></pre>
+                      <pre><code>Use `COUNT(u.user_id) AS cohort_tenants`, `SUM(CASE WHEN s.status = &#039;active&#039; THEN 1 ELSE 0 END) AS active_subs`, and `SUM(CASE WHEN s.status = &#039;active&#039; THEN s.mrr_usd ELSE 0 END) AS active_mrr_usd`.</code></pre>
                     </details>
                   
                 </div>
@@ -1341,30 +1332,15 @@ ORDER BY latency_ms DESC, event_id ASC;</code></pre>
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">02</span>
-                    <span class="build-lab-step-card__target">Phase 2 · Hands-On Build: Complete SaaS Analytics Engine (MRR, Cohorts &amp; Funnels): Subscription MRR &amp; Invoice Settlement Join</span>
+                    <span class="build-lab-step-card__target">Phase 2 · Per-Tenant Multi-Step Funnel Flagging</span>
                   </div>
-                  <div class="build-lab-step-card__title">Correlate SaaS Tenants with Subscriptions &amp; Invoices (Hands-On Build: Complete SaaS Analytics Engine (MRR, Cohorts &amp; Funnels))</div>
-                  <div class="build-lab-step-card__invariant">Join <code>saas_users</code>, <code>subscriptions</code>, and <code>invoices</code> to compare contracted MRR against paid vs unpaid billing invoices.</div>
-                  <div class="build-lab-step-card__concept">Complete the tenant revenue rollup in <code>query.sql</code> to aggregate <code>paid_invoices_usd</code> and <code>unpaid_invoices_usd</code>.</div>
+                  <div class="build-lab-step-card__title">Flag 4-Stage Product Activation Funnel per Org (build-saas-cohort-funnel-workbench)</div>
+                  <div class="build-lab-step-card__invariant">Use <code>MAX(CASE WHEN e.event_type = ... THEN 1 ELSE 0 END)</code> per user so multiple <code>query_run</code> events do not double-count funnel progression.</div>
+                  <div class="build-lab-step-card__concept">Group <code>saas_users LEFT JOIN user_events</code> by <code>u.user_id, u.org_name, u.cohort_month</code> to compute binary flags <code>did_signup</code>, <code>did_connect</code>, <code>did_query</code>, and <code>did_upgrade</code> ordered by <code>u.user_id ASC</code>.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>Show hint for step 2</summary>
-                      <pre><code>-- Step 2 Solution (build-saas-cohort-funnel-workbench): Tenant MRR and invoice collection reconciliation
-SELECT
-  u.user_id,
-  u.org_name,
-  u.plan_tier,
-  s.mrr_usd,
-  COUNT(i.invoice_id) AS invoice_count,
-  COALESCE(SUM(CASE WHEN i.paid = 1 THEN i.amount_usd ELSE 0 END), 0) AS collected_usd,
-  COALESCE(SUM(CASE WHEN i.paid = 0 THEN i.amount_usd ELSE 0 END), 0) AS overdue_usd
-FROM saas_users AS u
-INNER JOIN subscriptions AS s
-  ON s.user_id = u.user_id
-LEFT JOIN invoices AS i
-  ON i.sub_id = s.sub_id
-GROUP BY u.user_id, u.org_name, u.plan_tier, s.mrr_usd
-ORDER BY s.mrr_usd DESC, u.user_id ASC;</code></pre>
+                      <pre><code>Apply `MAX(CASE WHEN e.event_type = &#039;...&#039; THEN 1 ELSE 0 END)` for `&#039;signup&#039;`, `&#039;schema_connect&#039;`, `&#039;query_run&#039;`, and `&#039;upgrade_pro&#039;`.</code></pre>
                     </details>
                   
                 </div>
@@ -1380,27 +1356,15 @@ ORDER BY s.mrr_usd DESC, u.user_id ASC;</code></pre>
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">03</span>
-                    <span class="build-lab-step-card__target">Phase 3 · Hands-On Build: Complete SaaS Analytics Engine (MRR, Cohorts &amp; Funnels): Cohort Funnel &amp; Telemetry Latency Profile</span>
+                    <span class="build-lab-step-card__target">Phase 3 · Cohort Funnel Conversion &amp; Collected Revenue Matrix</span>
                   </div>
-                  <div class="build-lab-step-card__title">Production SaaS Telemetry Latency &amp; Plan Profile (Hands-On Build: Complete SaaS Analytics Engine (MRR, Cohorts &amp; Funnels))</div>
-                  <div class="build-lab-step-card__invariant">Aggregate event volume, average latency, and peak latency across <code>plan_tier</code> and <code>event_type</code> to verify SLA compliance.</div>
-                  <div class="build-lab-step-card__concept">Execute the production telemetry aggregation in <code>query.sql</code> and inspect the grouped buckets in the Table Visualizer.</div>
+                  <div class="build-lab-step-card__title">Build Cohort Conversion &amp; Paid Revenue Workbench (build-saas-cohort-funnel-workbench)</div>
+                  <div class="build-lab-step-card__invariant">Roll up the per-tenant funnel CTE by <code>cohort_month</code> alongside collected invoice revenue without event-to-invoice fanout.</div>
+                  <div class="build-lab-step-card__concept">Combine <code>tenant_funnel</code> and <code>tenant_billing</code> CTEs grouped by <code>cohort_month</code> to project <code>tenants</code>, <code>activated_query_orgs</code>, <code>upgraded_orgs</code>, and <code>collected_revenue_usd</code> ordered by <code>cohort_month ASC</code>.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>Show hint for step 3</summary>
-                      <pre><code>-- Dataset: saas_telemetry | Hands-On Build: Complete SaaS Analytics Engine (MRR, Cohorts &amp; Funnels) (build-saas-cohort-funnel-workbench) — Telemetry Latency Profile by Tier
-SELECT
-  u.plan_tier,
-  e.event_type,
-  COUNT(*) AS event_count,
-  ROUND(AVG(e.latency_ms), 2) AS avg_latency_ms,
-  MAX(e.latency_ms) AS max_latency_ms,
-  MIN(e.latency_ms) AS min_latency_ms
-FROM user_events AS e
-INNER JOIN saas_users AS u
-  ON u.user_id = e.user_id
-GROUP BY u.plan_tier, e.event_type
-ORDER BY event_count DESC, avg_latency_ms DESC;</code></pre>
+                      <pre><code>Pre-aggregate funnel flags per user in `tenant_funnel` and paid invoice sums per user in `tenant_billing`, join them on `user_id`, and group by `cohort_month`.</code></pre>
                     </details>
                   
                 </div>
@@ -1710,7 +1674,7 @@ ORDER BY event_count DESC, avg_latency_ms DESC;</code></pre>
       </aside>
       </div>
     </div>
-    <footer class="ds-footer" aria-label="Site footer">
+    <footer class="ds-footer" aria-label="Site">
       <div class="ds-footer__inner">
         <div class="ds-footer__family">
           <span class="ds-footer__label">In Depth Learning Family</span>
@@ -1796,8 +1760,8 @@ ORDER BY event_count DESC, avg_latency_ms DESC;</code></pre>
   <script type="text/plain" data-defer src="js/progress.js?v=20e4822556"></script>
   <script type="text/plain" data-defer src="js/search.js?v=cfb7464ca7"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
-  <script type="text/plain" data-defer src="js/renderer.js?v=fd623be208"></script>
-  <script type="text/plain" data-defer src="js/landing.js?v=ab352e39f9"></script>
+  <script type="text/plain" data-defer src="js/renderer.js?v=36f6f37691"></script>
+  <script type="text/plain" data-defer src="js/landing.js?v=51833858e9"></script>
   <script type="text/plain" data-defer src="js/quiz.js?v=5b300d9b3d"></script>
   <script type="text/plain" data-defer src="js/app.js?v=d7a48f58f9"></script>
 
@@ -1807,8 +1771,8 @@ ORDER BY event_count DESC, avg_latency_ms DESC;</code></pre>
   <script type="text/plain" data-lazy src="data/challenges.js?v=784587e93a"></script>
   <script type="text/plain" data-lazy src="data/srs-cards.js?v=fabc47dd9c"></script>
   <script type="text/plain" data-lazy src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
-  <script type="text/plain" data-lazy src="data/implementations_code.js?v=fce884f8a8"></script>
-  <script type="text/plain" data-lazy src="data/topic_guided_labs.js?v=5b7d013daa"></script>
+  <script type="text/plain" data-lazy src="data/implementations_code.js?v=1211e1feca"></script>
+  <script type="text/plain" data-lazy src="data/topic_guided_labs.js?v=f0e6a07f8d"></script>
   <script type="text/plain" data-lazy src="data/projects.js?v=2280ac085f"></script>
   <script type="text/plain" data-lazy src="data/glossary.js?v=cbce13b203"></script>
   <script type="text/plain" data-lazy src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>

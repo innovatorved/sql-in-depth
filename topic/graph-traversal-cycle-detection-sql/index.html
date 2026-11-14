@@ -31,7 +31,7 @@
   <link rel="preload" href="fonts/geist-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
 
   <!-- Stylesheets: Shared Design System + Self-Hosted KaTeX + Product Styles -->
-  <link rel="stylesheet" href="design-system/tokens.css?v=3bc26075fb">
+  <link rel="stylesheet" href="design-system/tokens.css?v=dee287f0ce">
   <link rel="stylesheet" href="design-system/components.css?v=606a179125">
   <link rel="stylesheet" href="css/vendor/katex/katex.min.css?v=83121916c0" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="css/variables.css?v=98985bd48f">
@@ -43,7 +43,7 @@
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=d98d79ab7a"></script>
-  <script src="js/manifest.js?v=cd330e015c"></script>
+  <script src="js/manifest.js?v=839298cb0a"></script>
 
   <script type="application/ld+json">
 {
@@ -91,7 +91,7 @@
     </div>
 
     <div class="topbar__actions">
-      <nav class="topbar__nav" aria-label="Primary navigation">
+      <nav class="topbar__nav" aria-label="Primary">
         <a href="/roadmap/" class="topbar__nav-link" data-nav="roadmap">Roadmap</a>
         <a href="/challenges/" class="topbar__nav-link" data-nav="challenges">Challenges</a>
         <a href="/sandbox/" class="topbar__nav-link" data-nav="sandbox">SQL Studio</a>
@@ -118,7 +118,7 @@
   </header>
 
   <!-- Sidebar -->
-  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+  <aside class="sidebar" id="sidebar" aria-label="Curriculum">
     <div class="sidebar__tabs">
       <div role="tablist" aria-label="Sidebar sections" style="display:flex;align-items:center;">
         <button class="sidebar__tab active" data-tab="curriculum" role="tab" aria-selected="true">Curriculum</button>
@@ -801,7 +801,7 @@
   <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
   <!-- Main Content -->
-  <main class="main" id="main-content">
+  <main class="main" id="main-content" tabindex="-1">
     <div class="main__content" id="reader" data-prerendered="graph-traversal-cycle-detection-sql">
 
       <div class="ds-lesson-shell ds-lesson-shell--with-toc">
@@ -1316,27 +1316,13 @@ flowchart LR
                     <span class="build-lab-step-card__num">01</span>
                     <span class="build-lab-step-card__target">Phase 1 · Graph Traversal, Bill-of-Materials (BOM) &amp; Cycle Detection in SQL: Product Review &amp; Rating Domain Scan</span>
                   </div>
-                  <div class="build-lab-step-card__title">Inspect Verified Customer Product Reviews</div>
+                  <div class="build-lab-step-card__title">Inspect Verified Customer Product Reviews (graph-traversal-cycle-detection-sql)</div>
                   <div class="build-lab-step-card__invariant">Examine the <code>product_reviews</code> relation to evaluate rating distribution and nullable review comments.</div>
                   <div class="build-lab-step-card__concept">Refine the starter query on <code>product_reviews</code> to classify ratings &gt;= 4 as <code>&#039;POSITIVE&#039;</code> and replace <code>NULL</code> comments via <code>COALESCE</code>.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>Show hint for step 1</summary>
-                      <pre><code>-- Step 1 Solution (graph-traversal-cycle-detection-sql): Normalized review sentiment &amp; NULL-safe comment
-SELECT
-  review_id,
-  product_id,
-  customer_id,
-  rating,
-  CASE
-    WHEN rating &gt;= 4 THEN &#039;POSITIVE&#039;
-    WHEN rating = 3 THEN &#039;NEUTRAL&#039;
-    ELSE &#039;CRITICAL&#039;
-  END AS sentiment_band,
-  COALESCE(comment, &#039;No written comment&#039;) AS review_text,
-  created_at
-FROM product_reviews
-ORDER BY rating DESC, review_id ASC;</code></pre>
+                      <pre><code>Add a 3-way `CASE` (`&gt;= 4` -&gt; `&#039;POSITIVE&#039;`, `= 3` -&gt; `&#039;NEUTRAL&#039;`, else `&#039;CRITICAL&#039;`) as `sentiment_band`, `COALESCE(comment, &#039;No written comment&#039;) AS review_text`, and `created_at` ordered by `rating DESC, review_id ASC`.</code></pre>
                     </details>
                   
                 </div>
@@ -1360,19 +1346,7 @@ ORDER BY rating DESC, review_id ASC;</code></pre>
                   
                     <details class="quiz-hint-details">
                       <summary>Show hint for step 2</summary>
-                      <pre><code>-- Step 2 Solution (graph-traversal-cycle-detection-sql): Line-item subtotal vs order header audit
-SELECT
-  o.order_id,
-  o.customer_id,
-  COUNT(oi.order_item_id) AS line_item_count,
-  SUM(oi.quantity * oi.unit_price_cents) AS line_subtotal_cents,
-  o.total_cents AS header_total_cents,
-  (o.total_cents - SUM(oi.quantity * oi.unit_price_cents)) AS adjustment_delta_cents
-FROM orders AS o
-INNER JOIN order_items AS oi
-  ON oi.order_id = o.order_id
-GROUP BY o.order_id, o.customer_id, o.total_cents
-ORDER BY o.order_id ASC;</code></pre>
+                      <pre><code>Group `orders INNER JOIN order_items` by `o.order_id, o.customer_id, o.total_cents` and compute `COUNT(oi.order_item_id)`, `SUM(oi.quantity * oi.unit_price_cents)`, and `(o.total_cents - SUM(oi.quantity * oi.unit_price_cents)) AS adjustment_delta_cents`.</code></pre>
                     </details>
                   
                 </div>
@@ -1396,22 +1370,7 @@ ORDER BY o.order_id ASC;</code></pre>
                   
                     <details class="quiz-hint-details">
                       <summary>Show hint for step 3</summary>
-                      <pre><code>-- Dataset: ecommerce | Graph Traversal, Bill-of-Materials (BOM) &amp; Cycle Detection in SQL (graph-traversal-cycle-detection-sql) — Product Demand &amp; Review Quality Audit
-SELECT
-  p.product_id,
-  p.sku,
-  p.name AS product_name,
-  ROUND(p.price_cents / 100.0, 2) AS price_usd,
-  COUNT(DISTINCT oi.order_item_id) AS order_appearances,
-  COUNT(DISTINCT r.review_id) AS review_count,
-  ROUND(COALESCE(AVG(r.rating), 0), 2) AS avg_rating
-FROM products AS p
-LEFT JOIN order_items AS oi
-  ON oi.product_id = p.product_id
-LEFT JOIN product_reviews AS r
-  ON r.product_id = p.product_id
-GROUP BY p.product_id, p.sku, p.name, p.price_cents
-ORDER BY avg_rating DESC, order_appearances DESC, p.product_id ASC;</code></pre>
+                      <pre><code>Left join both `order_items` and `product_reviews` onto `products`, using `COUNT(DISTINCT oi.order_item_id)` and `COUNT(DISTINCT r.review_id)` plus `ROUND(COALESCE(AVG(r.rating), 0), 2) AS avg_rating`.</code></pre>
                     </details>
                   
                 </div>
@@ -1733,7 +1692,7 @@ ORDER BY avg_rating DESC, order_appearances DESC, p.product_id ASC;</code></pre>
       </aside>
       </div>
     </div>
-    <footer class="ds-footer" aria-label="Site footer">
+    <footer class="ds-footer" aria-label="Site">
       <div class="ds-footer__inner">
         <div class="ds-footer__family">
           <span class="ds-footer__label">In Depth Learning Family</span>
@@ -1819,8 +1778,8 @@ ORDER BY avg_rating DESC, order_appearances DESC, p.product_id ASC;</code></pre>
   <script type="text/plain" data-defer src="js/progress.js?v=20e4822556"></script>
   <script type="text/plain" data-defer src="js/search.js?v=cfb7464ca7"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
-  <script type="text/plain" data-defer src="js/renderer.js?v=fd623be208"></script>
-  <script type="text/plain" data-defer src="js/landing.js?v=ab352e39f9"></script>
+  <script type="text/plain" data-defer src="js/renderer.js?v=36f6f37691"></script>
+  <script type="text/plain" data-defer src="js/landing.js?v=51833858e9"></script>
   <script type="text/plain" data-defer src="js/quiz.js?v=5b300d9b3d"></script>
   <script type="text/plain" data-defer src="js/app.js?v=d7a48f58f9"></script>
 
@@ -1830,8 +1789,8 @@ ORDER BY avg_rating DESC, order_appearances DESC, p.product_id ASC;</code></pre>
   <script type="text/plain" data-lazy src="data/challenges.js?v=784587e93a"></script>
   <script type="text/plain" data-lazy src="data/srs-cards.js?v=fabc47dd9c"></script>
   <script type="text/plain" data-lazy src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
-  <script type="text/plain" data-lazy src="data/implementations_code.js?v=fce884f8a8"></script>
-  <script type="text/plain" data-lazy src="data/topic_guided_labs.js?v=5b7d013daa"></script>
+  <script type="text/plain" data-lazy src="data/implementations_code.js?v=1211e1feca"></script>
+  <script type="text/plain" data-lazy src="data/topic_guided_labs.js?v=f0e6a07f8d"></script>
   <script type="text/plain" data-lazy src="data/projects.js?v=2280ac085f"></script>
   <script type="text/plain" data-lazy src="data/glossary.js?v=cbce13b203"></script>
   <script type="text/plain" data-lazy src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>

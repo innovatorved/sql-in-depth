@@ -31,7 +31,7 @@
   <link rel="preload" href="fonts/geist-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
 
   <!-- Stylesheets: Shared Design System + Self-Hosted KaTeX + Product Styles -->
-  <link rel="stylesheet" href="design-system/tokens.css?v=3bc26075fb">
+  <link rel="stylesheet" href="design-system/tokens.css?v=dee287f0ce">
   <link rel="stylesheet" href="design-system/components.css?v=606a179125">
   <link rel="stylesheet" href="css/vendor/katex/katex.min.css?v=83121916c0" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="css/variables.css?v=98985bd48f">
@@ -43,7 +43,7 @@
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=d98d79ab7a"></script>
-  <script src="js/manifest.js?v=cd330e015c"></script>
+  <script src="js/manifest.js?v=839298cb0a"></script>
 
   <script type="application/ld+json">
 {
@@ -91,7 +91,7 @@
     </div>
 
     <div class="topbar__actions">
-      <nav class="topbar__nav" aria-label="Primary navigation">
+      <nav class="topbar__nav" aria-label="Primary">
         <a href="/roadmap/" class="topbar__nav-link" data-nav="roadmap">Roadmap</a>
         <a href="/challenges/" class="topbar__nav-link" data-nav="challenges">Challenges</a>
         <a href="/sandbox/" class="topbar__nav-link" data-nav="sandbox">SQL Studio</a>
@@ -118,7 +118,7 @@
   </header>
 
   <!-- Sidebar -->
-  <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+  <aside class="sidebar" id="sidebar" aria-label="Curriculum">
     <div class="sidebar__tabs">
       <div role="tablist" aria-label="Sidebar sections" style="display:flex;align-items:center;">
         <button class="sidebar__tab active" data-tab="curriculum" role="tab" aria-selected="true">Curriculum</button>
@@ -801,7 +801,7 @@
   <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
   <!-- Main Content -->
-  <main class="main" id="main-content">
+  <main class="main" id="main-content" tabindex="-1">
     <div class="main__content" id="reader" data-prerendered="case-stripe-ledger-precision">
 
       <div class="ds-lesson-shell ds-lesson-shell--with-toc">
@@ -1285,10 +1285,10 @@ erDiagram
             <h2 class="build-lab-card__title">Production Case Study: Why Floating-Point Corrupts Financial Ledgers — Interactive Guided SQL Lab</h2>
             <p class="build-lab-card__desc">How binary IEEE-754 floating-point rounding drift causes penny imbalances at scale and how integer cents + exact NUMERIC enforce ledger invariants.</p>
             <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;">
-              <span class="badge">Target time: <code>O(N log N) hash aggregate + sort</code></span>
-              <span class="badge">Extra space: <code>O(G) customer group table</code></span>
-              <span class="badge">Pattern: The Relational Model, Tables &amp; SELECT Foundations · fintech</span>
-              <span class="badge">Dataset: <code>ecommerce</code></span>
+              <span class="badge">Target time: <code>O(N) exact integer-cents scan</code></span>
+              <span class="badge">Extra space: <code>O(1) tuple projection</code></span>
+              <span class="badge">Pattern: Exact Integer Cents vs IEEE-754 Float Drift</span>
+              <span class="badge">Dataset: <code>fintech_ledger</code></span>
             </div>
           </div>
           <div class="build-lab-card__cta-col">
@@ -1313,26 +1313,15 @@ erDiagram
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">01</span>
-                    <span class="build-lab-step-card__target">Phase 1 · Production Case Study: Why Floating-Point Corrupts Financial Ledgers: Customer Relation Projection</span>
+                    <span class="build-lab-step-card__target">Phase 1 · Production Case Study: Why Floating-Point Corrupts Financial Ledgers: Integer-Cents Ledger Inspection</span>
                   </div>
-                  <div class="build-lab-step-card__title">Project Customer Domain Attributes</div>
-                  <div class="build-lab-step-card__invariant">Inspect the <code>customers</code> relation for Production Case Study: Why Floating-Point Corrupts Financial Ledgers and isolate target regional cohorts with explicit <code>COALESCE</code> referral defaults.</div>
-                  <div class="build-lab-step-card__concept">Start from the baseline <code>customers</code> projection in <code>query.sql</code>, then filter to core markets (<code>&#039;US&#039;</code>, <code>&#039;IN&#039;</code>, <code>&#039;GB&#039;</code>, <code>&#039;DE&#039;</code>) and normalize <code>referred_by</code> with <code>COALESCE</code>.</div>
+                  <div class="build-lab-step-card__title">Inspect Integer-Cents Account Balances (case-stripe-ledger-precision)</div>
+                  <div class="build-lab-step-card__invariant">Financial ledgers store integer <code>posted_balance_cents</code> (<code>BIGINT</code>/<code>INTEGER</code>) rather than binary floating-point to prevent <code>0.1 + 0.2 != 0.3</code> rounding drift.</div>
+                  <div class="build-lab-step-card__concept">Project <code>account_id</code>, <code>owner_name</code>, <code>account_type</code>, <code>currency</code>, and <code>posted_balance_cents</code> from <code>accounts</code> ordered by <code>posted_balance_cents DESC</code>.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>Show hint for step 1</summary>
-                      <pre><code>-- Step 1 Solution (case-stripe-ledger-precision): Regional cohort filter &amp; NULL-safe referral attribute
-SELECT
-  customer_id,
-  name AS customer_name,
-  tier,
-  country,
-  COALESCE(referred_by, 0) AS referrer_id,
-  created_at
-FROM customers
-WHERE country IN (&#039;US&#039;, &#039;IN&#039;, &#039;GB&#039;, &#039;DE&#039;)
-ORDER BY customer_id ASC
-LIMIT 9;</code></pre>
+                      <pre><code>Add `currency` to the `SELECT` list and change `ORDER BY` to `posted_balance_cents DESC`.</code></pre>
                     </details>
                   
                 </div>
@@ -1348,28 +1337,15 @@ LIMIT 9;</code></pre>
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">02</span>
-                    <span class="build-lab-step-card__target">Phase 2 · Production Case Study: Why Floating-Point Corrupts Financial Ledgers: Outer Join &amp; Order Fold</span>
+                    <span class="build-lab-step-card__target">Phase 2 · Production Case Study: Why Floating-Point Corrupts Financial Ledgers: Exact Decimal Presentation</span>
                   </div>
-                  <div class="build-lab-step-card__title">Left Join Completed Orders for Production Case Study: Why Floating-Point Corrupts Financial Ledgers</div>
-                  <div class="build-lab-step-card__invariant">Preserve zero-order customers via <code>LEFT JOIN</code> with the <code>o.status = &#039;completed&#039;</code> predicate inside the <code>ON</code> clause rather than <code>WHERE</code>.</div>
-                  <div class="build-lab-step-card__concept">Extend the join scaffold in <code>query.sql</code> to aggregate <code>COUNT(o.order_id)</code> and <code>COALESCE(SUM(o.total_cents), 0)</code> per customer.</div>
+                  <div class="build-lab-step-card__title">Format Cents into Exact 2-Decimal USD (case-stripe-ledger-precision)</div>
+                  <div class="build-lab-step-card__invariant">Keep storage and arithmetic in integer cents, dividing by exact decimal <code>100.0</code> with <code>ROUND(..., 2)</code> only at presentation time.</div>
+                  <div class="build-lab-step-card__concept">Project <code>transfer_id</code>, <code>idempotency_key</code>, <code>amount_cents</code>, and <code>ROUND(amount_cents / 100.0, 2) AS amount_usd</code> from <code>transfers</code> where <code>amount_cents &gt;= 50000</code> ordered by <code>amount_cents DESC, transfer_id ASC</code>.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>Show hint for step 2</summary>
-                      <pre><code>-- Step 2 Solution (case-stripe-ledger-precision): Customer-level completed order count &amp; spend rollup
-SELECT
-  c.customer_id,
-  c.name AS customer_name,
-  c.tier,
-  c.country,
-  COUNT(o.order_id) AS completed_orders,
-  ROUND(COALESCE(SUM(o.total_cents), 0) / 100.0, 2) AS settled_spend_usd
-FROM customers AS c
-LEFT JOIN orders AS o
-  ON o.customer_id = c.customer_id
-  AND o.status = &#039;completed&#039;
-GROUP BY c.customer_id, c.name, c.tier, c.country
-ORDER BY settled_spend_usd DESC, c.customer_id ASC;</code></pre>
+                      <pre><code>Filter `WHERE amount_cents &gt;= 50000`, add `ROUND(amount_cents / 100.0, 2) AS amount_usd`, and order by `amount_cents DESC, transfer_id ASC`.</code></pre>
                     </details>
                   
                 </div>
@@ -1385,31 +1361,15 @@ ORDER BY settled_spend_usd DESC, c.customer_id ASC;</code></pre>
                 <div class="build-lab-step-card__body">
                   <div class="build-lab-step-card__header">
                     <span class="build-lab-step-card__num">03</span>
-                    <span class="build-lab-step-card__target">Phase 3 · Production Case Study: Why Floating-Point Corrupts Financial Ledgers: Tier Benchmark &amp; Plan Verification</span>
+                    <span class="build-lab-step-card__target">Phase 3 · Production Case Study: Why Floating-Point Corrupts Financial Ledgers: Signed Cents Direction Expressions</span>
                   </div>
-                  <div class="build-lab-step-card__title">Production LTV &amp; Tier Window Benchmark (Production Case Study: Why Floating-Point Corrupts Financial Ledgers)</div>
-                  <div class="build-lab-step-card__invariant">Combine grouped customer LTV with a partitioned window average <code>AVG(...) OVER (PARTITION BY c.tier)</code> to benchmark each customer against their tier cohort.</div>
-                  <div class="build-lab-step-card__concept">Complete the production query in <code>query.sql</code> by adding the <code>tier_avg_usd</code> window column and deterministic ordering.</div>
+                  <div class="build-lab-step-card__title">Compute Signed Debit/Credit Cents Without Floats (case-stripe-ledger-precision)</div>
+                  <div class="build-lab-step-card__invariant">Use a <code>CASE</code> expression over integer <code>amount_cents</code> (<code>+amount_cents</code> for credits, <code>-amount_cents</code> for debits) to preserve exact cent precision.</div>
+                  <div class="build-lab-step-card__concept">Project <code>entry_id</code>, <code>transfer_id</code>, <code>account_id</code>, <code>direction</code>, <code>amount_cents</code>, and <code>CASE WHEN direction = &#039;credit&#039; THEN amount_cents ELSE -amount_cents END AS signed_cents</code> from <code>journal_entries</code> ordered by <code>entry_id ASC</code>.</div>
                   
                     <details class="quiz-hint-details">
                       <summary>Show hint for step 3</summary>
-                      <pre><code>-- Dataset: ecommerce | Production Case Study: Why Floating-Point Corrupts Financial Ledgers (case-stripe-ledger-precision) — Production LTV &amp; Tier Benchmark
-SELECT
-  c.customer_id,
-  c.name AS customer_name,
-  c.tier,
-  c.country,
-  COUNT(o.order_id) AS completed_orders,
-  ROUND(COALESCE(SUM(o.total_cents), 0) / 100.0, 2) AS lifetime_value_usd,
-  ROUND(AVG(COALESCE(SUM(o.total_cents), 0)) OVER (PARTITION BY c.tier) / 100.0, 2) AS tier_avg_usd
-FROM customers AS c
-LEFT JOIN orders AS o
-  ON o.customer_id = c.customer_id
-  AND o.status = &#039;completed&#039;
-WHERE c.country IN (&#039;US&#039;, &#039;IN&#039;, &#039;GB&#039;, &#039;DE&#039;)
-GROUP BY c.customer_id, c.name, c.tier, c.country
-ORDER BY lifetime_value_usd DESC, c.customer_id ASC
-LIMIT 9;</code></pre>
+                      <pre><code>Append `CASE WHEN direction = &#039;credit&#039; THEN amount_cents ELSE -amount_cents END AS signed_cents` to the `SELECT` list.</code></pre>
                     </details>
                   
                 </div>
@@ -1719,7 +1679,7 @@ LIMIT 9;</code></pre>
       </aside>
       </div>
     </div>
-    <footer class="ds-footer" aria-label="Site footer">
+    <footer class="ds-footer" aria-label="Site">
       <div class="ds-footer__inner">
         <div class="ds-footer__family">
           <span class="ds-footer__label">In Depth Learning Family</span>
@@ -1805,8 +1765,8 @@ LIMIT 9;</code></pre>
   <script type="text/plain" data-defer src="js/progress.js?v=20e4822556"></script>
   <script type="text/plain" data-defer src="js/search.js?v=cfb7464ca7"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
-  <script type="text/plain" data-defer src="js/renderer.js?v=fd623be208"></script>
-  <script type="text/plain" data-defer src="js/landing.js?v=ab352e39f9"></script>
+  <script type="text/plain" data-defer src="js/renderer.js?v=36f6f37691"></script>
+  <script type="text/plain" data-defer src="js/landing.js?v=51833858e9"></script>
   <script type="text/plain" data-defer src="js/quiz.js?v=5b300d9b3d"></script>
   <script type="text/plain" data-defer src="js/app.js?v=d7a48f58f9"></script>
 
@@ -1816,8 +1776,8 @@ LIMIT 9;</code></pre>
   <script type="text/plain" data-lazy src="data/challenges.js?v=784587e93a"></script>
   <script type="text/plain" data-lazy src="data/srs-cards.js?v=fabc47dd9c"></script>
   <script type="text/plain" data-lazy src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
-  <script type="text/plain" data-lazy src="data/implementations_code.js?v=fce884f8a8"></script>
-  <script type="text/plain" data-lazy src="data/topic_guided_labs.js?v=5b7d013daa"></script>
+  <script type="text/plain" data-lazy src="data/implementations_code.js?v=1211e1feca"></script>
+  <script type="text/plain" data-lazy src="data/topic_guided_labs.js?v=f0e6a07f8d"></script>
   <script type="text/plain" data-lazy src="data/projects.js?v=2280ac085f"></script>
   <script type="text/plain" data-lazy src="data/glossary.js?v=cbce13b203"></script>
   <script type="text/plain" data-lazy src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>
