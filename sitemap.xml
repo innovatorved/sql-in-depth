@@ -13,6 +13,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://sql-in-depth.vedgupta.in/postgres/</loc>
+    <lastmod>2026-10-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
     <loc>https://sql-in-depth.vedgupta.in/challenges/</loc>
     <lastmod>2026-10-26</lastmod>
     <changefreq>weekly</changefreq>
@@ -110,6 +116,54 @@
   </url>
   <url>
     <loc>https://sql-in-depth.vedgupta.in/challenges/chal-12-zero-downtime-ddl-lock-queue/</loc>
+    <lastmod>2026-10-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sql-in-depth.vedgupta.in/challenges/chal-13-lock-convoy-blocker/</loc>
+    <lastmod>2026-10-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sql-in-depth.vedgupta.in/challenges/chal-14-unindexed-fk-audit/</loc>
+    <lastmod>2026-10-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sql-in-depth.vedgupta.in/challenges/chal-15-xid-wraparound-triage/</loc>
+    <lastmod>2026-10-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sql-in-depth.vedgupta.in/challenges/chal-16-redundant-invalid-indexes/</loc>
+    <lastmod>2026-10-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sql-in-depth.vedgupta.in/challenges/chal-17-work-mem-temp-spill/</loc>
+    <lastmod>2026-10-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sql-in-depth.vedgupta.in/challenges/chal-18-orphaned-slot-wal-bloat/</loc>
+    <lastmod>2026-10-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sql-in-depth.vedgupta.in/challenges/chal-19-gist-booking-overlap/</loc>
+    <lastmod>2026-10-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sql-in-depth.vedgupta.in/challenges/chal-20-merge-ledger-reconcile/</loc>
     <lastmod>2026-10-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>

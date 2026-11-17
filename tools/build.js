@@ -34,6 +34,7 @@ const PUBLIC_ITEMS = [
   'fonts',
   'glossary',
   'js',
+  'postgres',
   'projects',
   'roadmap',
   'sandbox',

@@ -10,11 +10,12 @@
 
 - [Home & Interactive Clause Stepper](https://sql-in-depth.vedgupta.in/): Overview, live clause-by-clause SQL evaluator, simulator previews, and full 6-track curriculum index.
 - [Learning Roadmap](https://sql-in-depth.vedgupta.in/roadmap/): Dependency DAG across all 6 tracks and 18 modules (180 units).
-- [Browser SQL Studio](https://sql-in-depth.vedgupta.in/sandbox/): Dual-engine SQLite 3 and PostgreSQL 18 WASM playground with 5 pre-seeded relational schemas (26 tables) and visual EXPLAIN plans.
-- [Production Incident Challenges](https://sql-in-depth.vedgupta.in/challenges/): 12 interactive SQL debugging scenarios covering NULL anti-joins, fan-out traps, recursive CTE cycles, SARGability, and deadlocks.
+- [PostgreSQL 18 Learn-by-Doing Mastery](https://sql-in-depth.vedgupta.in/postgres/): 10 tracks, 80 interactive practice topics, and 240 progressive SQL missions running on PostgreSQL 18.6 WASM (including `pg_catalog` introspection, `pageinspect` slotted pages, and DBRE troubleshooting clinics).
+- [Browser SQL Studio](https://sql-in-depth.vedgupta.in/sandbox/): Dual-engine SQLite 3 and PostgreSQL 18 WASM playground with 5 pre-seeded relational schemas (26 tables), `pg_ops` DBRE telemetry schema, Learn Postgres workbench, and visual EXPLAIN plans.
+- [Production Incident Challenges](https://sql-in-depth.vedgupta.in/challenges/): 20 interactive SQL & PostgreSQL 18 debugging scenarios covering NULL anti-joins, fan-out traps, recursive CTE cycles, SARGability, lock convoys, XID wraparound, and deadlocks.
 - [Capstone Builds](https://sql-in-depth.vedgupta.in/projects/): 18 guided SQL and storage-engine build labs.
 - [Database Glossary](https://sql-in-depth.vedgupta.in/glossary/): Concise definitions of relational algebra, optimizer, indexing, MVCC, and WAL terminology.
-- [Sitemap](https://sql-in-depth.vedgupta.in/sitemap.xml): Complete list of all 218 pre-rendered URLs.
+- [Sitemap](https://sql-in-depth.vedgupta.in/sitemap.xml): Complete list of all 227 pre-rendered URLs.
 
 ## Curriculum Tracks (18 Modules · 180 Units)
 

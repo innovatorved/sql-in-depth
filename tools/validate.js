@@ -70,7 +70,11 @@ if (fs.existsSync(challengesFile)) {
     reportError(`Failed to load challenges.js: ${e.message}`);
   }
 }
-const allChallengeIds = new Set((global.window.CHALLENGES_DATA || []).map(c => c.id).filter(Boolean));
+const allChallengeIds = new Set(
+  [...(global.window.CHALLENGES_DATA || []), ...(global.window.PG_CHALLENGES_DATA || [])]
+    .map(c => c && c.id)
+    .filter(Boolean)
+);
 
 // 1. Validate curriculum structure
 const allSlugs = new Set();
@@ -516,6 +520,73 @@ if (!fs.existsSync(topicGuidedLabsFile)) {
   }
 }
 
+// PostgreSQL 18 Learn-by-Doing Curriculum & Lab Schema Validation (10 tracks, 80 topics, 240 steps)
+const pgCurriculumFile = path.join(dataDir, 'pg_mastery_curriculum.js');
+if (!fs.existsSync(pgCurriculumFile)) {
+  reportError(`PostgreSQL Mastery Curriculum file not found: ${pgCurriculumFile}`);
+} else {
+  try {
+    eval(fs.readFileSync(pgCurriculumFile, 'utf8'));
+  } catch (e) {
+    reportError(`Failed to load pg_mastery_curriculum.js: ${e.message}`);
+  }
+  const pgCur = global.PG_MASTERY_CURRICULUM || global.window.PG_MASTERY_CURRICULUM;
+  let pgErrors = 0;
+  if (!pgCur || !Array.isArray(pgCur.modules) || pgCur.modules.length !== 10 || !Array.isArray(pgCur.topics) || pgCur.topics.length !== 80) {
+    reportError('PG_MASTERY_CURRICULUM must define 10 modules and 80 topics');
+    pgErrors++;
+  } else {
+    global.PG_LAB_MODULES = global.PG_LAB_MODULES || {};
+    global.window.PG_LAB_MODULES = global.PG_LAB_MODULES;
+    for (const mod of pgCur.modules) {
+      const modFile = path.join(__dirname, '..', mod.dataFile);
+      if (!fs.existsSync(modFile)) {
+        reportError(`Missing PostgreSQL lab module file: ${mod.dataFile}`);
+        pgErrors++;
+        continue;
+      }
+      try {
+        eval(fs.readFileSync(modFile, 'utf8'));
+      } catch (e) {
+        reportError(`Failed to parse ${mod.dataFile}: ${e.message}`);
+        pgErrors++;
+        continue;
+      }
+      const modLabs = (global.PG_LAB_MODULES && global.PG_LAB_MODULES[mod.id]) || (global.window.PG_LAB_MODULES && global.window.PG_LAB_MODULES[mod.id]);
+      if (!Array.isArray(modLabs) || modLabs.length !== 8) {
+        reportError(`${mod.dataFile}: expected 8 labs for ${mod.id}, found ${Array.isArray(modLabs) ? modLabs.length : 'non-array'}`);
+        pgErrors++;
+        continue;
+      }
+      for (const lab of modLabs) {
+        if (!Array.isArray(lab.steps) || lab.steps.length !== 3) {
+          reportError(`${mod.id}/${lab.id}: expected 3 progressive SQL steps`);
+          pgErrors++;
+          continue;
+        }
+        lab.steps.forEach((st, idx) => {
+          if (!String(st.starterCode || '').trim() || !String(st.solutionCode || '').trim() || String(st.starterCode).trim() === String(st.solutionCode).trim()) {
+            reportError(`${mod.id}/${lab.id} step-${idx + 1}: starterCode and solutionCode must be distinct non-empty SQL strings`);
+            pgErrors++;
+          }
+          if (!Array.isArray(st.hints) || st.hints.length < 3) {
+            reportError(`${mod.id}/${lab.id} step-${idx + 1}: expected 3-tier hints array`);
+            pgErrors++;
+          }
+        });
+      }
+    }
+  }
+  const pgChals = global.PG_CHALLENGES_DATA || global.window.PG_CHALLENGES_DATA || [];
+  if (pgChals.length !== 8) {
+    reportError(`Expected 8 PostgreSQL 18 production challenges in PG_CHALLENGES_DATA, found ${pgChals.length}`);
+    pgErrors++;
+  }
+  if (pgErrors === 0) {
+    reportSuccess('PostgreSQL 18 Mastery: all 10 tracks, 80 topics (240 progressive SQL steps), and 8 PG18 incident challenges validated');
+  }
+}
+
 // Asset stamps
 if (!process.argv.includes('--skip-stamp-check')) {
   try {
@@ -640,7 +711,7 @@ if (fs.existsSync(buildBaseDir)) {
 if (fs.existsSync(sitemapFile)) {
   const sitemapContent = fs.readFileSync(sitemapFile, 'utf8');
   let missingSitemapUrls = 0;
-  const hubPaths = ['/roadmap/', '/challenges/', '/sandbox/', '/dashboard/', '/projects/', '/glossary/'];
+  const hubPaths = ['/roadmap/', '/postgres/', '/challenges/', '/sandbox/', '/dashboard/', '/projects/', '/glossary/'];
   for (const hub of hubPaths) {
     const expectedLoc = `<loc>https://sql-in-depth.vedgupta.in${hub}</loc>`;
     if (!sitemapContent.includes(expectedLoc)) {
@@ -688,6 +759,7 @@ const allHtmlFiles = [
   'index.html',
   '404.html',
   'roadmap/index.html',
+  'postgres/index.html',
   'challenges/index.html',
   'sandbox/index.html',
   'dashboard/index.html',

@@ -122,6 +122,34 @@ if (!fs.existsSync(indexPath)) {
   checkLegacyBoilerplate('index.html', html);
 }
 
+// 1b. Check Postgres Mastery Hub (postgres/index.html)
+console.log('Checking postgres/index.html...');
+const postgresIndexPath = path.join(ROOT, 'postgres', 'index.html');
+if (!fs.existsSync(postgresIndexPath)) {
+  reportError('postgres/index.html', 'postgres/index.html not found');
+} else {
+  checkedPages++;
+  const pgHtml = fs.readFileSync(postgresIndexPath, 'utf8');
+  if (!pgHtml.includes(`<link rel="canonical" href="${BASE_URL}/postgres/">`)) {
+    reportError('postgres/index.html', `Missing or incorrect canonical link (expected ${BASE_URL}/postgres/)`);
+  }
+  const pgLabLinks = [...pgHtml.matchAll(/mode=postgres-labs&amp;lab=/g)];
+  if (pgLabLinks.length < 80) {
+    reportError('postgres/index.html', `Expected >= 80 crawlable Postgres lab links, found ${pgLabLinks.length}`);
+  }
+  const pgReaderMatch = pgHtml.match(/id="reader"[^>]*>([\s\S]*?)<\/div>\s*(?:<footer\b[\s\S]*?<\/footer>\s*)?<\/main>/i);
+  if (!pgReaderMatch) {
+    reportError('postgres/index.html', 'Missing #reader container');
+  } else {
+    const pgWords = pgReaderMatch[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().split(/\s+/).length;
+    if (pgWords < 300) {
+      reportError('postgres/index.html', `Word count too low: ${pgWords} words (< 300 required)`);
+    }
+  }
+  checkDuplicateParagraphs('postgres/index.html', pgHtml);
+  checkLegacyBoilerplate('postgres/index.html', pgHtml);
+}
+
 // 2. Check Topic Pages (topic/*/index.html)
 console.log('Checking topic pages...');
 const topicDir = path.join(ROOT, 'topic');

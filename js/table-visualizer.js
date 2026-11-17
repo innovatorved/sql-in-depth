@@ -34,7 +34,16 @@
         organizations: 'saas_telemetry', users: 'saas_telemetry',
         feature_flags: 'saas_telemetry', telemetry_events: 'saas_telemetry', api_keys: 'saas_telemetry',
         profiles: 'social_graph', follows: 'social_graph', posts: 'social_graph',
-        post_likes: 'social_graph', post_tags: 'social_graph', reactions: 'social_graph'
+        post_likes: 'social_graph', post_tags: 'social_graph', reactions: 'social_graph',
+        api_audit_events: 'pg_ops_telemetry', room_bookings: 'pg_ops_telemetry', booking_requests: 'pg_ops_telemetry',
+        search_documents: 'pg_ops_telemetry', org_units: 'pg_ops_telemetry', ledger_accounts: 'pg_ops_telemetry',
+        ledger_sync_staging: 'pg_ops_telemetry', telemetry_partitioned: 'pg_ops_telemetry',
+        telemetry_2025_01: 'pg_ops_telemetry', telemetry_2025_02: 'pg_ops_telemetry', telemetry_2025_03: 'pg_ops_telemetry',
+        telemetry_archive_2024_12: 'pg_ops_telemetry', tenant_invoices: 'pg_ops_telemetry', job_queue: 'pg_ops_telemetry',
+        incident_warehouses: 'pg_ops_telemetry', incident_shipments: 'pg_ops_telemetry',
+        cluster_stat_activity: 'pg_ops_telemetry', cluster_locks: 'pg_ops_telemetry',
+        cluster_stat_statements: 'pg_ops_telemetry', cluster_table_health: 'pg_ops_telemetry',
+        cluster_index_health: 'pg_ops_telemetry', cluster_replication_slots: 'pg_ops_telemetry'
     };
 
     // Primary Key and Foreign Key metadata for visual badges in table headers
@@ -75,7 +84,25 @@
         posts: { pk: ['post_id'], fk: { author_id: 'profiles.user_id' } },
         post_likes: { pk: ['post_id', 'user_id'], fk: { post_id: 'posts.post_id', user_id: 'profiles.user_id' } },
         post_tags: { pk: ['post_id', 'tag'], fk: { post_id: 'posts.post_id' } },
-        reactions: { pk: ['reaction_id'], fk: { post_id: 'posts.post_id', user_id: 'profiles.user_id' } }
+        reactions: { pk: ['reaction_id'], fk: { post_id: 'posts.post_id', user_id: 'profiles.user_id' } },
+        api_audit_events: { pk: ['event_id'], fk: {} },
+        room_bookings: { pk: ['booking_id'], fk: {} },
+        booking_requests: { pk: ['request_id'], fk: {} },
+        search_documents: { pk: ['doc_id'], fk: {} },
+        org_units: { pk: ['unit_id'], fk: {} },
+        ledger_accounts: { pk: ['account_id'], fk: {} },
+        ledger_sync_staging: { pk: ['account_id'], fk: {} },
+        telemetry_partitioned: { pk: ['sample_id', 'recorded_at'], fk: {} },
+        tenant_invoices: { pk: ['invoice_id'], fk: {} },
+        job_queue: { pk: ['job_id'], fk: {} },
+        incident_warehouses: { pk: ['warehouse_id'], fk: {} },
+        incident_shipments: { pk: ['shipment_id'], fk: { warehouse_id: 'incident_warehouses.warehouse_id' } },
+        cluster_stat_activity: { pk: ['pid'], fk: {} },
+        cluster_locks: { pk: ['lock_id'], fk: {} },
+        cluster_stat_statements: { pk: ['queryid'], fk: {} },
+        cluster_table_health: { pk: ['table_name'], fk: {} },
+        cluster_index_health: { pk: ['index_name'], fk: {} },
+        cluster_replication_slots: { pk: ['slot_name'], fk: {} }
     };
 
     function getEngine() {
@@ -84,6 +111,14 @@
 
     function getDatasets() {
         return root.SQL_DATASETS || root.SQLDatasets || {};
+    }
+
+    function getDatasetInfo(datasetId) {
+        var base = getDatasets();
+        if (datasetId && base[datasetId]) return base[datasetId];
+        var pg = root.PG_DATASETS || {};
+        if (datasetId && pg[datasetId]) return pg[datasetId];
+        return null;
     }
 
     var SQL_KEYWORDS_LIST = [
@@ -99,7 +134,9 @@
         'UNCOMMITTED', 'FOR', 'SHARE', 'SKIP', 'LOCKED', 'NOWAIT', 'EXPLAIN', 'ANALYZE', 'BUFFERS', 'COSTS',
         'VERBOSE', 'FORMAT', 'FILTER', 'OVER', 'RANGE', 'UNBOUNDED', 'PRECEDING', 'FOLLOWING', 'CURRENT', 'ROW',
         'GROUPS', 'EXCLUDE', 'TIES', 'NO', 'OTHERS', 'ROLLUP', 'CUBE', 'GROUPING', 'SETS', 'CAST',
-        'CURRENT_DATE', 'CURRENT_TIMESTAMP', 'CURRENT_TIME', 'PRAGMA'
+        'CURRENT_DATE', 'CURRENT_TIMESTAMP', 'CURRENT_TIME', 'PRAGMA', 'GENERATED', 'ALWAYS', 'VIRTUAL', 'STORED',
+        'TRUNCATE', 'IDENTITY', 'DEFERRABLE', 'INITIALLY', 'DEFERRED', 'CONCURRENTLY', 'PARTITION', 'ATTACH', 'DETACH',
+        'POLICY', 'SECURITY', 'ENABLE', 'FORCE', 'VACUUM', 'FREEZE', 'REINDEX', 'MATERIALIZED', 'UNNEST', 'ORDINALITY'
     ];
 
     var SQL_FUNCTIONS_LIST = [
@@ -107,9 +144,15 @@
         'CEILING', 'ABS', 'MOD', 'POWER', 'SQRT', 'ROW_NUMBER', 'RANK', 'DENSE_RANK', 'NTILE', 'PERCENT_RANK',
         'CUME_DIST', 'LAG', 'LEAD', 'FIRST_VALUE', 'LAST_VALUE', 'NTH_VALUE', 'STRING_AGG', 'GROUP_CONCAT',
         'ARRAY_AGG', 'JSON_OBJECT', 'JSON_BUILD_OBJECT', 'JSONB_BUILD_OBJECT', 'JSON_AGG', 'JSONB_AGG',
-        'JSON_EXTRACT', 'LOWER', 'UPPER', 'TRIM', 'LTRIM', 'RTRIM', 'SUBSTR', 'SUBSTRING', 'LENGTH', 'CHAR_LENGTH',
+        'JSON_EXTRACT', 'JSON_TABLE', 'JSONB_PATH_QUERY', 'JSONB_SET', 'JSONB_PRETTY',
+        'LOWER', 'UPPER', 'TRIM', 'LTRIM', 'RTRIM', 'SUBSTR', 'SUBSTRING', 'LENGTH', 'CHAR_LENGTH',
         'REPLACE', 'CONCAT', 'SPLIT_PART', 'REGEXP_REPLACE', 'REGEXP_MATCHES', 'INSTR', 'STRPOS', 'PRINTF',
         'REPEAT', 'DATE_TRUNC', 'EXTRACT', 'AGE', 'NOW', 'TO_CHAR', 'TO_DATE', 'TO_TIMESTAMP', 'GENERATE_SERIES',
+        'UUIDV7', 'GEN_RANDOM_UUID', 'MERGE_ACTION', 'WIDTH_BUCKET', 'PERCENTILE_CONT', 'PERCENTILE_DISC',
+        'BOOL_AND', 'BOOL_OR', 'RANGE_AGG', 'MULTIRANGE', 'WEBSEARCH_TO_TSQUERY', 'TO_TSVECTOR', 'TO_TSQUERY',
+        'TS_RANK_CD', 'TS_HEADLINE', 'SIMILARITY', 'WORD_SIMILARITY', 'NLEVEL', 'SUBPATH',
+        'PG_SIZE_PRETTY', 'PG_TOTAL_RELATION_SIZE', 'PG_RELATION_SIZE', 'PG_WAL_LSN_DIFF', 'PG_BLOCKING_PIDS',
+        'PG_GET_INDEXDEF', 'PG_COLUMN_SIZE', 'CURRENT_SETTING', 'SET_CONFIG',
         'RANDOM', 'JULIANDAY', 'STRFTIME', 'DATETIME', 'IIF', 'IFNULL'
     ];
 
@@ -117,7 +160,8 @@
         'INT', 'INTEGER', 'BIGINT', 'SMALLINT', 'SERIAL', 'BIGSERIAL', 'NUMERIC', 'DECIMAL', 'REAL', 'FLOAT',
         'DOUBLE', 'PRECISION', 'MONEY', 'TEXT', 'VARCHAR', 'CHAR', 'CHARACTER', 'VARYING', 'BOOLEAN', 'BOOL',
         'DATE', 'TIME', 'TIMESTAMP', 'TIMESTAMPTZ', 'INTERVAL', 'UUID', 'JSON', 'JSONB', 'BYTEA', 'INET',
-        'CIDR', 'ARRAY', 'VECTOR'
+        'CIDR', 'ARRAY', 'VECTOR', 'TSTZRANGE', 'TSRANGE', 'DATERANGE', 'INT4RANGE', 'INT8RANGE', 'NUMRANGE',
+        'TSVECTOR', 'TSQUERY', 'LTREE', 'PG_LSN', 'REGCLASS', 'OID'
     ];
 
     var SQL_KEYWORDS_SET = {};
@@ -316,13 +360,17 @@
 
     function buildSchemaTablesForEditor(datasetId) {
         var datasets = getDatasets();
-        var keys = (datasetId && datasetId !== '__unified__' && datasets[datasetId])
+        var explicitPg = datasetId && root.PG_DATASETS && root.PG_DATASETS[datasetId];
+        var sourceMap = explicitPg ? root.PG_DATASETS : datasets;
+        var keys = explicitPg
             ? [datasetId]
-            : Object.keys(datasets);
+            : ((datasetId && datasetId !== '__unified__' && datasets[datasetId])
+                ? [datasetId]
+                : Object.keys(datasets));
         var seen = {};
         var out = [];
         keys.forEach(function (dsKey) {
-            var ds = datasets[dsKey];
+            var ds = sourceMap[dsKey];
             if (!ds || !Array.isArray(ds.tables)) return;
             ds.tables.forEach(function (t) {
                 if (!t || !t.name || seen[t.name]) return;
@@ -905,6 +953,9 @@
      * when datasetId === '__unified__' or not a specific single dataset.
      */
     function getDatasetTableNames(datasetId) {
+        if (datasetId && root.PG_DATASETS && root.PG_DATASETS[datasetId] && Array.isArray(root.PG_DATASETS[datasetId].tables)) {
+            return root.PG_DATASETS[datasetId].tables.map(function (t) { return t.name; });
+        }
         var datasets = getDatasets();
         if (!datasetId || datasetId === '__unified__' || !datasets[datasetId]) {
             var allNames = [];
@@ -933,7 +984,8 @@
      */
     function inferDatasetFromSql(sql, explicitDataset) {
         var datasets = getDatasets();
-        if (explicitDataset && (explicitDataset === '__empty__' || String(explicitDataset).indexOf('custom:') === 0 || (explicitDataset !== '__unified__' && datasets[explicitDataset]))) {
+        var pgDatasets = root.PG_DATASETS || {};
+        if (explicitDataset && (explicitDataset === '__empty__' || String(explicitDataset).indexOf('custom:') === 0 || (explicitDataset !== '__unified__' && (datasets[explicitDataset] || pgDatasets[explicitDataset])))) {
             return explicitDataset;
         }
         var lower = String(sql || '').toLowerCase();
@@ -1325,14 +1377,56 @@
      *   - Up-to-9-Stage SELECT Pipeline (0. SOURCE TABLES -> 1. WITH CTE -> 2. FROM/JOIN -> 3. WHERE 3VL ->
      *     4. GROUP BY / HAVING -> 5. WINDOW OVER -> 6. SELECT / UNION -> 7. ORDER BY + LIMIT -> 8. EXPLAIN PLAN)
      */
-    async function buildStepPipeline(sql, datasetId) {
+    async function buildStepPipeline(sql, datasetId, execOptions) {
+        execOptions = execOptions || {};
         var dsId = inferDatasetFromSql(sql, datasetId);
         var cleanSql = String(sql || '').trim().replace(/;+\s*$/, '');
         var steps = [];
+        var forcedEngine = execOptions.engine || ((root.PG_DATASETS && root.PG_DATASETS[dsId]) ? 'postgres' : undefined);
+        var primaryExecOpts = { datasetId: dsId };
+        if (forcedEngine) primaryExecOpts.engine = forcedEngine;
+        if (execOptions.isolatedTx) primaryExecOpts.isolatedTx = true;
+        if (execOptions.setupSql) primaryExecOpts.setupSql = execOptions.setupSql;
+        if (execOptions.probeSql) primaryExecOpts.probeSql = execOptions.probeSql;
 
         // Run the full query first
-        var finalRes = await getEngine().execute(cleanSql, dsId);
+        var finalRes = (forcedEngine || execOptions.isolatedTx || execOptions.setupSql || execOptions.probeSql)
+            ? await getEngine().execute(cleanSql, primaryExecOpts)
+            : await getEngine().execute(cleanSql, dsId);
         var stepExecOpts = { datasetId: dsId, explain: false, skipDmlDiff: true };
+        if (forcedEngine) stepExecOpts.engine = forcedEngine;
+        if (execOptions.isolatedTx) stepExecOpts.isolatedTx = true;
+        if (execOptions.setupSql) stepExecOpts.setupSql = execOptions.setupSql;
+
+        if (execOptions.probeSql) {
+            if (!finalRes.error) {
+                steps.push({
+                    clause: 'RESULT',
+                    badge: (finalRes.rows ? finalRes.rows.length : 0) + ' rows',
+                    description: 'Verified post-statement state returned by probe query.',
+                    code: cleanSql,
+                    columns: finalRes.columns || [],
+                    rows: (finalRes.rows || []).slice(0, 30),
+                    rowStates: (finalRes.rows || []).slice(0, 30).map(function () { return 'normal'; }),
+                    highlightCols: []
+                });
+                if (finalRes.plan && finalRes.plan.length > 0) {
+                    steps.push({
+                        clause: '8. EXPLAIN PLAN',
+                        badge: finalRes.plan.length + (finalRes.plan.length === 1 ? ' plan node' : ' plan nodes'),
+                        description: 'Physical execution plan generated by the query optimizer.',
+                        code: cleanSql,
+                        columns: ['Node ID', 'Parent', 'Physical Operator & Cost Details'],
+                        rows: finalRes.plan.map(function (p) { return [p.id, p.parent, p.detail]; }),
+                        rowStates: finalRes.plan.map(function () { return 'normal'; }),
+                        highlightCols: ['Physical Operator & Cost Details'],
+                        isExplainStep: true,
+                        planNodes: finalRes.plan
+                    });
+                }
+            }
+            return { datasetId: dsId, finalRes: finalRes, steps: steps };
+        }
 
         // ─── DML PIPELINE (INSERT / UPDATE / DELETE / TRUNCATE) ───
         if (!finalRes.error && finalRes.dmlDiff) {
@@ -2462,7 +2556,12 @@
 
             var pipeline;
             try {
-                pipeline = await buildStepPipeline(sql, datasetId);
+                pipeline = await buildStepPipeline(sql, datasetId, {
+                    engine: options.engine,
+                    isolatedTx: options.isolatedTx,
+                    setupSql: options.setupSql,
+                    probeSql: options.probeSql
+                });
             } catch (err) {
                 var errText = err && err.message ? err.message : String(err);
                 container.innerHTML =
@@ -2480,8 +2579,7 @@
             }
             var finalRes = pipeline.finalRes;
             var steps = pipeline.steps;
-            var datasets = getDatasets();
-            var dsInfo = datasets[pipeline.datasetId] || { title: pipeline.datasetId };
+            var dsInfo = getDatasetInfo(pipeline.datasetId) || { title: pipeline.datasetId };
 
             if (finalRes.error) {
                 if (options.ideCtrl && typeof options.ideCtrl.setError === 'function') {
@@ -3356,8 +3454,18 @@
         var engine = getEngine();
         if (!engine) return { passed: false, error: 'Engine not initialized', checks: [] };
         var ds = options.datasetId || inferDatasetFromSql(userSql || referenceSql);
-        var uRes = await engine.execute(userSql, ds);
-        var rRes = await engine.execute(referenceSql || userSql, ds);
+        var forcedEng = options.engine || ((root.PG_DATASETS && root.PG_DATASETS[ds]) ? 'postgres' : undefined);
+        var execOpts = (forcedEng || options.isolatedTx || options.setupSql || options.probeSql)
+            ? {
+                datasetId: ds,
+                engine: forcedEng,
+                isolatedTx: forcedEng === 'postgres' ? (options.isolatedTx !== false) : Boolean(options.isolatedTx),
+                setupSql: options.setupSql || '',
+                probeSql: options.probeSql || ''
+            }
+            : ds;
+        var uRes = await engine.execute(userSql, execOpts);
+        var rRes = await engine.execute(referenceSql || userSql, execOpts);
         var checks = [];
         checks.push({
             name: 'Test 1: SQL Syntax & Execution',
@@ -3384,7 +3492,9 @@
         var normRef = normalizeSqlForVerification(referenceSql);
         var matchedChallenge = null;
         var rawChallenges = (root && (root.CHALLENGES_DATA || root.ChallengesData)) || [];
-        var challengeList = Array.isArray(rawChallenges) ? rawChallenges : (rawChallenges.challenges || []);
+        var baseList = Array.isArray(rawChallenges) ? rawChallenges : (rawChallenges.challenges || []);
+        var pgChallengeList = (root && Array.isArray(root.PG_CHALLENGES_DATA)) ? root.PG_CHALLENGES_DATA : [];
+        var challengeList = pgChallengeList.length > 0 ? baseList.concat(pgChallengeList) : baseList;
         for (var ci = 0; ci < challengeList.length; ci++) {
             var chItem = challengeList[ci];
             if (chItem && chItem.codeFix && chItem.codeFix.solutionCode) {

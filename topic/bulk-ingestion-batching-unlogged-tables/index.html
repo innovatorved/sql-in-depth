@@ -36,14 +36,14 @@
   <link rel="stylesheet" href="css/vendor/katex/katex.min.css?v=83121916c0" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="css/variables.css?v=24e2a6fbbe">
   <link rel="stylesheet" href="css/layout.css?v=554eae539f">
-  <link rel="stylesheet" href="css/components.css?v=913aa89cf0">
+  <link rel="stylesheet" href="css/components.css?v=1ffaeeafc4">
   <link rel="stylesheet" href="css/content.css?v=c40a7aea42">
   <link rel="stylesheet" href="css/landing.css?v=4678aba29c" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="css/simulators.css?v=986609ebe3" media="print" onload="this.media='all'">
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=d98d79ab7a"></script>
-  <script src="js/manifest.js?v=43dd1bde8e"></script>
+  <script src="js/manifest.js?v=eb10c30578"></script>
 
   <script type="application/ld+json">
 {
@@ -88,6 +88,7 @@
 
     <div class="topbar__actions">
       <nav class="topbar__nav" aria-label="Primary">
+        <a href="/postgres/" class="topbar__nav-link" data-nav="postgres">Postgres</a>
         <a href="/roadmap/" class="topbar__nav-link" data-nav="roadmap">Roadmap</a>
         <a href="/challenges/" class="topbar__nav-link" data-nav="challenges">Challenges</a>
         <a href="/sandbox/" class="topbar__nav-link" data-nav="sandbox">SQL Studio</a>
@@ -833,6 +834,7 @@
           <button type="button" class="btn btn--secondary btn--sm" data-action="open-topic-codelab" data-slug="bulk-ingestion-batching-unlogged-tables" data-mode="modal" title="Launch Interactive SQL Studio">
             ▶ Run SQL Studio
           </button>
+          <a href="/sandbox/?mode=postgres-labs&amp;lab=select-projection-arithmetic" class="btn btn--secondary btn--sm" title="Practice SELECT Projection, Aliases &amp; Exact Numeric Arithmetic in PostgreSQL 18.6 WASM">Practice in Learn Postgres →</a>
           <a href="#cheatsheet/m18" class="btn btn--secondary btn--sm" data-action="navigate-cheatsheet" data-module="m18" title="View printable cheat sheet for this module">
             Cheat Sheet
           </a>
@@ -1689,6 +1691,7 @@ flowchart LR
           <a href="https://dsa-in-depth.vedgupta.in/" class="ds-footer__product" target="_blank" rel="noopener">Algorithms &amp; Data Structures</a>
         </div>
         <div class="ds-footer__links">
+          <a href="/postgres/" data-nav="postgres">Postgres</a>
           <a href="/sandbox/" data-nav="sandbox">SQL Studio</a>
           <a href="/roadmap/" data-nav="roadmap">Roadmap</a>
           <a href="/challenges/" data-nav="challenges">Challenges</a>
@@ -1761,20 +1764,21 @@ flowchart LR
 
   <!-- Core Shell Scripts (deferred to idle after first paint) -->
   <script type="text/plain" data-defer src="data/curriculum.js?v=4f53b5646e"></script>
+  <script type="text/plain" data-defer src="data/pg_mastery_curriculum.js?v=5f650e9bae"></script>
   <script type="text/plain" data-defer src="js/lazy.js?v=1d9b2638c9"></script>
   <script type="text/plain" data-defer src="js/analytics.js?v=a1ffee77a9"></script>
   <script type="text/plain" data-defer src="js/progress.js?v=20e4822556"></script>
-  <script type="text/plain" data-defer src="js/search.js?v=cfb7464ca7"></script>
+  <script type="text/plain" data-defer src="js/search.js?v=45ddf840bc"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
-  <script type="text/plain" data-defer src="js/renderer.js?v=21e4de5936"></script>
+  <script type="text/plain" data-defer src="js/renderer.js?v=a0a1853941"></script>
   <script type="text/plain" data-defer src="js/landing.js?v=9286e224a4"></script>
   <script type="text/plain" data-defer src="js/quiz.js?v=5b300d9b3d"></script>
-  <script type="text/plain" data-defer src="js/app.js?v=c398d2c679"></script>
+  <script type="text/plain" data-defer src="js/app.js?v=34de50260d"></script>
 
   <!-- Route-Scoped Lazy Scripts (stamped & loaded on demand via window.Lazy) -->
-  <script type="text/plain" data-lazy src="data/datasets.js?v=259e5934af"></script>
+  <script type="text/plain" data-lazy src="data/datasets.js?v=828dcde1c1"></script>
   <script type="text/plain" data-lazy src="data/roadmap.js?v=584992226a"></script>
-  <script type="text/plain" data-lazy src="data/challenges.js?v=784587e93a"></script>
+  <script type="text/plain" data-lazy src="data/challenges.js?v=164bb9ba7e"></script>
   <script type="text/plain" data-lazy src="data/srs-cards.js?v=fabc47dd9c"></script>
   <script type="text/plain" data-lazy src="data/whiteboard-blueprints.js?v=3c82562ece"></script>
   <script type="text/plain" data-lazy src="data/implementations_code.js?v=1211e1feca"></script>
@@ -1782,9 +1786,9 @@ flowchart LR
   <script type="text/plain" data-lazy src="data/projects.js?v=2280ac085f"></script>
   <script type="text/plain" data-lazy src="data/glossary.js?v=cbce13b203"></script>
   <script type="text/plain" data-lazy src="js/vendor/sql-wasm.js?v=c91af5c30f"></script>
-  <script type="text/plain" data-lazy src="js/sql-engine.js?v=296a1588ef"></script>
+  <script type="text/plain" data-lazy src="js/sql-engine.js?v=c6da7caff6"></script>
   <script type="text/plain" data-lazy src="js/vendor/cm6-sql.js?v=c9474beb2c"></script>
-  <script type="text/plain" data-lazy src="js/table-visualizer.js?v=7c8e49b9a4"></script>
+  <script type="text/plain" data-lazy src="js/table-visualizer.js?v=2317c55231"></script>
   <script type="text/plain" data-lazy src="js/simulators.js?v=fd5c4d8177"></script>
   <script type="text/plain" data-lazy src="js/simulators-relational.js?v=32c1358d02"></script>
   <script type="text/plain" data-lazy src="js/simulators-analytical.js?v=50d950f3b6"></script>
@@ -1795,10 +1799,21 @@ flowchart LR
   <script type="text/plain" data-lazy src="js/vendor/katex/katex.min.js?v=6d481709e3"></script>
   <script type="text/plain" data-lazy src="js/vendor/katex/auto-render.min.js?v=82dca94048"></script>
   <script type="text/plain" data-lazy src="js/roadmap.js?v=687d490300"></script>
-  <script type="text/plain" data-lazy src="js/challenges.js?v=438d35cd1b"></script>
+  <script type="text/plain" data-lazy src="js/challenges.js?v=940b1b2bca"></script>
   <script type="text/plain" data-lazy src="js/dashboard.js?v=3fd8d6f60d"></script>
-  <script type="text/plain" data-lazy src="js/sandbox.js?v=ad160361fb"></script>
+  <script type="text/plain" data-lazy src="js/pg-tutorials.js?v=bbad2f60f3"></script>
+  <script type="text/plain" data-lazy src="js/sandbox.js?v=5281c156c1"></script>
   <script type="text/plain" data-lazy src="js/topic-codelab.js?v=49fccccd99"></script>
+  <script type="text/plain" data-lazy src="data/pg-labs/pg-m01.js?v=95261c7273"></script>
+  <script type="text/plain" data-lazy src="data/pg-labs/pg-m02.js?v=0bb0f5bea9"></script>
+  <script type="text/plain" data-lazy src="data/pg-labs/pg-m03.js?v=3913dce8fb"></script>
+  <script type="text/plain" data-lazy src="data/pg-labs/pg-m04.js?v=e0ed3720ab"></script>
+  <script type="text/plain" data-lazy src="data/pg-labs/pg-m05.js?v=d03a859189"></script>
+  <script type="text/plain" data-lazy src="data/pg-labs/pg-m06.js?v=00de4c7b73"></script>
+  <script type="text/plain" data-lazy src="data/pg-labs/pg-m07.js?v=96d73f54f0"></script>
+  <script type="text/plain" data-lazy src="data/pg-labs/pg-m08.js?v=3cba0ae1f5"></script>
+  <script type="text/plain" data-lazy src="data/pg-labs/pg-m09.js?v=7ba3ecf259"></script>
+  <script type="text/plain" data-lazy src="data/pg-labs/pg-m10.js?v=9d3ee3225b"></script>
 
   <!-- App bootstrap & deferred script loader -->
   <script src="js/bootstrap.js?v=d3a0b262be"></script>

@@ -184,6 +184,13 @@ window.App = (() => {
         syncSidebarTabs();
         return;
       }
+      if (viewParam === 'postgres') {
+        currentView = 'postgres';
+        currentSlug = null;
+        activeTab = 'curriculum';
+        syncSidebarTabs();
+        return;
+      }
     }
 
     // Clean up legacy #projects hash to /projects
@@ -293,6 +300,16 @@ window.App = (() => {
       else if (hash.includes('dashboard/')) sub = hash.split('dashboard/')[1].split('?')[0].replace(/\/+$/, '');
       currentView = 'dashboard';
       currentSlug = sub || currentRouteParams.get('tab') || 'overview';
+      activeTab = 'curriculum';
+      syncSidebarTabs();
+      return;
+    }
+
+    // Postgres Mastery Hub route: /postgres or #/postgres
+    if (path === 'postgres' || path.startsWith('postgres/') || hash === 'postgres' || hash.startsWith('postgres/')) {
+      currentRouteParams = new URLSearchParams(window.location.search);
+      currentView = 'postgres';
+      currentSlug = null;
       activeTab = 'curriculum';
       syncSidebarTabs();
       return;
@@ -432,6 +449,10 @@ window.App = (() => {
       navigateToChallenges(sub || null, event);
       return;
     }
+    if (str.startsWith('/postgres')) {
+      navigateToPostgres(event);
+      return;
+    }
     if (str.startsWith('/sandbox')) {
       const qIdx = str.indexOf('?');
       const params = qIdx >= 0 ? new URLSearchParams(str.slice(qIdx)) : null;
@@ -534,6 +555,19 @@ window.App = (() => {
     window.scrollTo(0, 0);
   }
 
+  function navigateToPostgres(event) {
+    if (event && (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0)) return;
+    if (event && event.preventDefault) event.preventDefault();
+    if (window.location.pathname !== '/postgres/' || window.location.search || window.location.hash) {
+      history.pushState(null, '', '/postgres/');
+    }
+    currentView = 'postgres';
+    currentSlug = null;
+    closeSidebar();
+    renderCurrentView();
+    window.scrollTo(0, 0);
+  }
+
   function navigateToSandbox(blueprintId, event, search) {
     if (event && (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0)) return;
     if (event) event.preventDefault();
@@ -611,7 +645,7 @@ window.App = (() => {
     }
 
     // Landing page & ecosystem hubs are full-width
-    const isEcosystemView = ['roadmap', 'challenges', 'dashboard', 'sandbox'].includes(currentView);
+    const isEcosystemView = ['roadmap', 'challenges', 'dashboard', 'sandbox', 'postgres'].includes(currentView);
     document.body.classList.toggle('view-landing', currentView === 'home' && !!window.Landing);
     document.body.classList.toggle('view-build', currentView === 'build');
     document.body.classList.toggle('view-ecosystem', isEcosystemView);
@@ -695,6 +729,24 @@ window.App = (() => {
         }
         if (window.Analytics) {
           window.Analytics.trackPageView('Your learning | SQL In Depth', '/dashboard', window.location.href);
+        }
+        break;
+
+      case 'postgres':
+        if ((!window.PgTutorials || !window.PG_MASTERY_CURRICULUM) && window.Lazy) {
+          if (!reader.querySelector('[data-ssg-hub]')) {
+            reader.innerHTML = '<div class="prose" style="min-height:120vh;"><p style="padding:2rem 0;color:var(--fg-muted);">Loading PostgreSQL 18 Mastery Hub (80 Topics · 240 SQL Steps)…</p></div>';
+          }
+          window.Lazy.loadAll(['data/pg_mastery_curriculum.js', 'js/pg-tutorials.js']).then(() => {
+            if (currentView === 'postgres') renderCurrentView();
+          });
+          break;
+        }
+        if (window.PgTutorials) {
+          window.PgTutorials.renderPostgresHub(reader);
+        }
+        if (window.Analytics) {
+          window.Analytics.trackPageView('Learn PostgreSQL 18 by Doing — 80 Interactive Labs | SQL In Depth', '/postgres/', window.location.href);
         }
         break;
 
@@ -1934,6 +1986,7 @@ window.App = (() => {
         else if (nav === 'challenges') navigateToChallenges(navEl.dataset.challenge);
         else if (nav === 'dashboard') navigateToDashboard(navEl.dataset.tab);
         else if (nav === 'sandbox') navigateToSandbox(navEl.dataset.blueprint, undefined, navEl.dataset.search || '');
+        else if (nav === 'postgres') navigateToPostgres(e);
         else if (nav === 'glossary') navigateToGlossary();
         return;
       }
@@ -2353,10 +2406,22 @@ window.App = (() => {
           navigateToChallenges(challengeMatch[1], e);
           return;
         }
+        const postgresMatch = href.match(/^\/postgres\/?$/);
+        if (postgresMatch) {
+          e.preventDefault();
+          navigateToPostgres(e);
+          return;
+        }
         const sandboxBpMatch = href.match(/^\/sandbox\/?\?blueprint=([^&#]+)/);
         if (sandboxBpMatch) {
           e.preventDefault();
           navigateToSandbox(decodeURIComponent(sandboxBpMatch[1]), e);
+          return;
+        }
+        const sandboxQueryMatch = href.match(/^\/sandbox\/?(\?.*)?$/);
+        if (sandboxQueryMatch) {
+          e.preventDefault();
+          navigateToSandbox(null, e, sandboxQueryMatch[1] || '');
           return;
         }
       }
@@ -3525,14 +3590,19 @@ window.App = (() => {
 
   function openChallengeCodeLab(challengeId, onPassCallback) {
     const raw = window.CHALLENGES_DATA || window.ChallengesData;
-    const challenges = Array.isArray(raw) ? raw : (raw?.challenges || []);
+    const baseChallenges = Array.isArray(raw) ? raw : (raw?.challenges || []);
+    const pgChallenges = Array.isArray(window.PG_CHALLENGES_DATA) ? window.PG_CHALLENGES_DATA : [];
+    const challenges = pgChallenges.length > 0 ? baseChallenges.concat(pgChallenges) : baseChallenges;
     const ch = challenges.find(c => c.id === challengeId);
     if (!ch || !ch.codeFix) return Promise.resolve(null);
     const cf = ch.codeFix;
+    const eng = ch.engine || cf.engine || undefined;
     return openSqlStudioModal({
       title: `${ch.id}: ${cf.title || ch.title}`,
       summary: cf.summary || ch.summary,
       datasetId: cf.datasetId || 'ecommerce',
+      engine: eng,
+      isolatedTx: eng === 'postgres',
       sql: cf.buggyCode || cf.solutionCode || 'SELECT * FROM orders LIMIT 10;',
       referenceSql: cf.solutionCode || cf.buggyCode || '',
       buggyCode: cf.buggyCode || '',
@@ -3593,6 +3663,7 @@ window.App = (() => {
     navigateToChallenges,
     navigateToDashboard,
     navigateToSandbox,
+    navigateToPostgres,
     navigateToGlossary,
     navigateHome,
     toggleModule,

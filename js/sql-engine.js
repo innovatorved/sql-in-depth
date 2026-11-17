@@ -147,23 +147,97 @@
 
   var PG_OID_MAP = {
     16: 'BOOL',
+    17: 'BYTEA',
     20: 'BIGINT',
     21: 'SMALLINT',
     23: 'INTEGER',
     25: 'TEXT',
+    26: 'OID',
+    27: 'TID',
+    28: 'XID',
     114: 'JSON',
     700: 'REAL',
     701: 'DOUBLE',
+    1000: 'BOOL[]',
+    1007: 'INT4[]',
+    1009: 'TEXT[]',
+    1016: 'INT8[]',
     1042: 'CHAR',
     1043: 'VARCHAR',
     1082: 'DATE',
     1083: 'TIME',
     1114: 'TIMESTAMP',
     1184: 'TIMESTAMPTZ',
+    1186: 'INTERVAL',
     1700: 'NUMERIC',
     2950: 'UUID',
-    3802: 'JSONB'
+    3220: 'PG_LSN',
+    3614: 'TSVECTOR',
+    3615: 'TSQUERY',
+    3802: 'JSONB',
+    3904: 'INT4RANGE',
+    3906: 'NUMRANGE',
+    3908: 'TSRANGE',
+    3910: 'TSTZRANGE',
+    3912: 'DATERANGE'
   };
+
+  var PG_CONTRIB_NAMES = [
+    'pg_trgm',
+    'btree_gist',
+    'ltree',
+    'pageinspect',
+    'pg_buffercache',
+    'pg_freespacemap',
+    'pg_visibility'
+  ];
+
+  function serializePgCell(cell) {
+    if (cell === null || typeof cell === 'undefined') return null;
+    if (cell instanceof Date) return cell.toISOString();
+    if (typeof cell === 'bigint') return Number(cell);
+    if (typeof Uint8Array !== 'undefined' && cell instanceof Uint8Array) {
+      var hex = '';
+      var cap = Math.min(cell.length, 64);
+      for (var i = 0; i < cap; i++) {
+        hex += cell[i].toString(16).padStart(2, '0');
+      }
+      return '\\x' + hex + (cell.length > cap ? '…' : '');
+    }
+    if (Array.isArray(cell)) {
+      return JSON.stringify(cell.map(serializePgCell));
+    }
+    if (typeof cell === 'object') return JSON.stringify(cell);
+    return cell;
+  }
+
+  function buildPgliteExtensionsConfig() {
+    var extMap = {};
+    var originUrl = (root && root.location && root.location.origin && /^https?:/i.test(root.location.origin))
+      ? root.location.origin
+      : null;
+
+    PG_CONTRIB_NAMES.forEach(function (extName) {
+      if ((isBrowserEnv || isWorkerEnv) && originUrl) {
+        var extHash = encodeURIComponent(getAssetHash('js/vendor/pglite/' + extName + '.tar.gz'));
+        var bundleUrl = new URL('/js/vendor/pglite/' + extName + '.tar.gz?v=' + extHash, originUrl);
+        extMap[extName] = {
+          name: extName,
+          setup: function () {
+            return Promise.resolve({ bundlePath: bundleUrl });
+          }
+        };
+      } else if (typeof require === 'function') {
+        try {
+          var contribMod = require('@electric-sql/pglite/contrib/' + extName);
+          if (contribMod && contribMod[extName]) {
+            extMap[extName] = contribMod[extName];
+          }
+        } catch (e) {}
+      }
+    });
+    return extMap;
+  }
 
   function resolveWasmUrl(file) {
     if ((typeof window !== 'undefined' && window.location) || isWorkerEnv) {
@@ -303,12 +377,20 @@
     return s === '__empty__' || s.indexOf('custom:') === 0;
   }
 
+  function isPgOpsDataset(dsId) {
+    var s = String(dsId || '');
+    return Boolean(s && root.PG_DATASETS && root.PG_DATASETS[s]);
+  }
+
   function pgSchemaForDataset(dsId) {
     var s = String(dsId || '');
     if (s === '__empty__') return 'ws_empty';
     if (s.indexOf('custom:') === 0) {
       var slug = s.slice(7).toLowerCase().replace(/[^a-z0-9_]/g, '_').replace(/^_+|_+$/g, '').slice(0, 48);
       return 'ws_' + (slug || 'custom');
+    }
+    if (isPgOpsDataset(s)) {
+      return root.PG_DATASETS[s].schema || 'pg_ops';
     }
     return 'public';
   }
@@ -327,6 +409,37 @@
         return pgDb;
       });
     }
+
+    if (isPgOpsDataset(dsId)) {
+      var pgDs = root.PG_DATASETS[dsId];
+      var pgSchema = pgDs.schema || 'pg_ops';
+      var ensurePublic = seedPostgresDataset(pgDb, '__unified__', false);
+      return ensurePublic.then(function () {
+        if (!forceReset && _pgSeededDatasets[dsId]) {
+          return pgDb.exec('SET search_path TO "' + pgSchema + '", public;').catch(function () {}).then(function () {
+            return pgDb;
+          });
+        }
+        var opsParts = [];
+        if (forceReset || _pgSeededDatasets[dsId]) {
+          opsParts.push('DROP SCHEMA IF EXISTS "' + pgSchema + '" CASCADE;');
+        }
+        opsParts.push(cleanDdlForPostgres(pgDs.ddl));
+        opsParts.push('SET search_path TO "' + pgSchema + '", public;');
+        opsParts.push('ANALYZE;');
+        return pgDb.exec(opsParts.join('\n')).then(function () {
+          _pgSeededDatasets[dsId] = true;
+          return pgDb;
+        }).catch(function () {
+          var retryOps = 'DROP SCHEMA IF EXISTS "' + pgSchema + '" CASCADE;\n' + cleanDdlForPostgres(pgDs.ddl) + '\nSET search_path TO "' + pgSchema + '", public;\nANALYZE;';
+          return pgDb.exec(retryOps).then(function () {
+            _pgSeededDatasets[dsId] = true;
+            return pgDb;
+          });
+        });
+      });
+    }
+
     var datasets = root.SQL_DATASETS || {};
     var targetKeys = (dsId === '__unified__' || !datasets[dsId])
       ? Object.keys(datasets)
@@ -357,6 +470,7 @@
         sqlParts.push(cleanDdlForPostgres(ds.ddl));
       }
     });
+    sqlParts.push('ANALYZE;');
 
     var combinedSql = sqlParts.join('\n');
     if (!combinedSql.trim()) {
@@ -370,7 +484,7 @@
       return pgDb;
     }).catch(function (err) {
       // If a table already existed from a partial run, drop and retry cleanly
-      var retryParts = [];
+      var retryParts = ['SET search_path TO public;'];
       toSeed.forEach(function (k) {
         var ds = datasets[k];
         if (!ds) return;
@@ -381,6 +495,7 @@
         }
         if (ds.ddl) retryParts.push(cleanDdlForPostgres(ds.ddl));
       });
+      retryParts.push('ANALYZE;');
       return pgDb.exec(retryParts.join('\n')).then(function () {
         toSeed.forEach(function (k) {
           _pgSeededDatasets[k] = true;
@@ -393,7 +508,7 @@
   }
 
   /**
-   * Initializes PostgreSQL 18.6 (PGlite WASM) and seeds all 5 datasets.
+   * Initializes PostgreSQL 18.6 (PGlite WASM), loads contrib extensions, and seeds datasets.
    */
   function initPglite() {
     if (canUseWorker && !_workerFailed) {
@@ -431,16 +546,36 @@
       if (!_PGliteClass) {
         throw new Error('PGlite constructor not found in module exports.');
       }
-      var instance = new _PGliteClass();
+      var extConfig = buildPgliteExtensionsConfig();
+      var hasExts = Object.keys(extConfig).length > 0;
+      var instance = hasExts ? new _PGliteClass({ extensions: extConfig }) : new _PGliteClass();
       return withTimeout(instance.waitReady || Promise.resolve(), 25000, 'PostgreSQL WASM initialization timed out').then(function () {
-        // Install compatibility helper overloads so both PostgreSQL and SQLite idioms work seamlessly
-        var compatSql = [
-          'CREATE OR REPLACE FUNCTION pg_catalog.round(double precision, integer) RETURNS numeric AS $$ SELECT pg_catalog.round($1::numeric, $2); $$ LANGUAGE SQL IMMUTABLE;',
-          'CREATE OR REPLACE FUNCTION datetime(text) RETURNS timestamp AS $$ SELECT CURRENT_TIMESTAMP::timestamp; $$ LANGUAGE SQL STABLE;',
-          'CREATE OR REPLACE FUNCTION instr(text, text) RETURNS integer AS $$ SELECT pg_catalog.strpos($1, $2); $$ LANGUAGE SQL IMMUTABLE;'
-        ].join('\n');
-        return instance.exec(compatSql).catch(function () {}).then(function () {
+        // Install contrib extensions one by one so any missing optional bundle never blocks startup
+        var extChain = Promise.resolve();
+        PG_CONTRIB_NAMES.forEach(function (extName) {
+          if (extConfig[extName]) {
+            extChain = extChain.then(function () {
+              return instance.exec('CREATE EXTENSION IF NOT EXISTS "' + extName + '" WITH SCHEMA public;').catch(function () {});
+            });
+          }
+        });
+        return extChain.then(function () {
+          // Install compatibility helper overloads so both PostgreSQL and SQLite idioms work seamlessly
+          var compatSql = [
+            'CREATE OR REPLACE FUNCTION pg_catalog.round(double precision, integer) RETURNS numeric AS $$ SELECT pg_catalog.round($1::numeric, $2); $$ LANGUAGE SQL IMMUTABLE;',
+            'CREATE OR REPLACE FUNCTION datetime(text) RETURNS timestamp AS $$ SELECT CURRENT_TIMESTAMP::timestamp; $$ LANGUAGE SQL STABLE;',
+            'CREATE OR REPLACE FUNCTION instr(text, text) RETURNS integer AS $$ SELECT pg_catalog.strpos($1, $2); $$ LANGUAGE SQL IMMUTABLE;'
+          ].join('\n');
+          return instance.exec(compatSql).catch(function () {});
+        }).then(function () {
           return seedPostgresDataset(instance, '__unified__', false);
+        }).then(function () {
+          if (root.PG_DATASETS && root.PG_DATASETS.pg_ops_telemetry) {
+            return seedPostgresDataset(instance, 'pg_ops_telemetry', false).then(function () {
+              return instance.exec('SET search_path TO public;').catch(function () {});
+            });
+          }
+          return null;
         }).then(function () {
           _pgDb = instance;
           notifyEngineListeners();
@@ -606,30 +741,34 @@
   function detectDmlTarget(sql) {
     if (!sql || typeof sql !== 'string') return null;
     var clean = sql.trim().replace(/^\s*(?:--[^\n]*\n\s*|\/\*[\s\S]*?\*\/\s*)+/g, '');
-    var mInsert = /^\s*INSERT\s+(?:OR\s+\w+\s+)?INTO\s+["`]?([a-zA-Z_][a-zA-Z0-9_]*)["`]?/i.exec(clean);
+    var mInsert = /^\s*INSERT\s+(?:OR\s+\w+\s+)?INTO\s+(?:[a-zA-Z_][a-zA-Z0-9_]*\.)?["`]?([a-zA-Z_][a-zA-Z0-9_]*)["`]?/i.exec(clean);
     if (mInsert) return { operation: 'INSERT', tableName: mInsert[1] };
-    var mUpdate = /^\s*UPDATE\s+(?:OR\s+\w+\s+)?["`]?([a-zA-Z_][a-zA-Z0-9_]*)["`]?/i.exec(clean);
+    var mUpdate = /^\s*UPDATE\s+(?:OR\s+\w+\s+|ONLY\s+)?(?:[a-zA-Z_][a-zA-Z0-9_]*\.)?["`]?([a-zA-Z_][a-zA-Z0-9_]*)["`]?/i.exec(clean);
     if (mUpdate) return { operation: 'UPDATE', tableName: mUpdate[1] };
-    var mDelete = /^\s*DELETE\s+FROM\s+["`]?([a-zA-Z_][a-zA-Z0-9_]*)["`]?/i.exec(clean);
+    var mDelete = /^\s*DELETE\s+FROM\s+(?:ONLY\s+)?(?:[a-zA-Z_][a-zA-Z0-9_]*\.)?["`]?([a-zA-Z_][a-zA-Z0-9_]*)["`]?/i.exec(clean);
     if (mDelete) return { operation: 'DELETE', tableName: mDelete[1] };
-    var mTrunc = /^\s*TRUNCATE\s+(?:TABLE\s+)?["`]?([a-zA-Z_][a-zA-Z0-9_]*)["`]?/i.exec(clean);
+    var mMerge = /^\s*MERGE\s+INTO\s+(?:[a-zA-Z_][a-zA-Z0-9_]*\.)?["`]?([a-zA-Z_][a-zA-Z0-9_]*)["`]?/i.exec(clean);
+    if (mMerge) return { operation: 'MERGE', tableName: mMerge[1] };
+    var mTrunc = /^\s*TRUNCATE\s+(?:TABLE\s+)?(?:[a-zA-Z_][a-zA-Z0-9_]*\.)?["`]?([a-zA-Z_][a-zA-Z0-9_]*)["`]?/i.exec(clean);
     if (mTrunc) return { operation: 'DELETE', tableName: mTrunc[1] };
     return null;
   }
 
   /**
-   * Finds primary key column names for a given table from `root.SQL_DATASETS` or heuristics.
+   * Finds primary key column names for a given table from `root.SQL_DATASETS`, `root.PG_DATASETS`, or heuristics.
    */
   function findPrimaryKeyColumns(tableName, columns) {
-    var datasets = root.SQL_DATASETS || {};
+    var allDatasetMaps = [root.SQL_DATASETS || {}, root.PG_DATASETS || {}];
     var pkCols = [];
-    Object.keys(datasets).forEach(function (dsKey) {
-      var ds = datasets[dsKey];
-      if (!ds || !Array.isArray(ds.tables)) return;
-      ds.tables.forEach(function (t) {
-        if (t && t.name && t.name.toLowerCase() === String(tableName).toLowerCase() && t.pk) {
-          pkCols = String(t.pk).split(',').map(function (s) { return s.trim(); }).filter(Boolean);
-        }
+    allDatasetMaps.forEach(function (datasets) {
+      Object.keys(datasets).forEach(function (dsKey) {
+        var ds = datasets[dsKey];
+        if (!ds || !Array.isArray(ds.tables)) return;
+        ds.tables.forEach(function (t) {
+          if (t && t.name && t.name.toLowerCase() === String(tableName).toLowerCase() && t.pk) {
+            pkCols = String(t.pk).split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+          }
+        });
       });
     });
 
@@ -876,158 +1015,237 @@
     });
   }
 
+  function formatPgResultSet(r) {
+    var cols = (r && r.fields ? r.fields : []).map(function (f) { return f.name; });
+    var colTypes = (r && r.fields ? r.fields : []).map(function (f) { return PG_OID_MAP[f.dataTypeID] || 'ANY'; });
+    var rows = (r && r.rows ? r.rows : []).map(function (row) {
+      return row.map(serializePgCell);
+    });
+    return {
+      columns: cols,
+      columnTypes: colTypes,
+      values: rows,
+      rowCount: rows.length,
+      affectedRows: (r && r.affectedRows) || 0
+    };
+  }
+
   /**
    * Executes a SQL string on PostgreSQL 18 (PGlite WASM).
+   * Supports `options.isolatedTx` (savepoint rollback after execution & optional `options.probeSql`),
+   * `options.setupSql` (pre-execution setup statements), and `pg_ops_telemetry` search_path routing.
    */
   function executePostgres(pgDb, sql, options) {
     var datasetId = options.datasetId || '__unified__';
     var includeExplain = options.explain !== false;
+    var isolatedTx = Boolean(options.isolatedTx || options.rollbackAfter);
+    var setupSql = options.setupSql ? String(options.setupSql) : '';
+    var probeSql = options.probeSql ? String(options.probeSql) : '';
     var dmlInfo = !options.skipDmlDiff ? detectDmlTarget(sql) : null;
 
     return seedPostgresDataset(pgDb, datasetId, Boolean(options.reset)).then(function () {
       var norm = normalizeDialect(sql, true);
-      var beforePromise = dmlInfo
-        ? pgDb.exec('SELECT * FROM "' + dmlInfo.tableName + '" LIMIT 50;', { rowMode: 'array' }).catch(function () { return []; })
-        : Promise.resolve(null);
+      var combinedCheck = setupSql + '\n' + norm.sql;
+      var hasExplicitTxOrVacuum = /\b(VACUUM\b|BEGIN\b|START\s+TRANSACTION\b|COMMIT\b|ROLLBACK\b|CONCURRENTLY\b)/i.test(combinedCheck);
+      var useTxWrap = isolatedTx && !hasExplicitTxOrVacuum;
+      var needsHardResetAfter = isolatedTx && hasExplicitTxOrVacuum;
 
-      return beforePromise.then(function (beforeRaw) {
-        var beforeCols = (beforeRaw && beforeRaw[0] && beforeRaw[0].fields)
-          ? beforeRaw[0].fields.map(function (f) { return f.name; })
-          : [];
-        var beforeRows = (beforeRaw && beforeRaw[0] && beforeRaw[0].rows)
-          ? beforeRaw[0].rows.map(function (r) { return r.slice(); })
-          : [];
-
-        var t0 = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
-
-        return pgDb.exec(norm.sql, { rowMode: 'array' }).then(function (rawResults) {
-          var t1 = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
-          var elapsedMs = Math.max(0.05, Number((t1 - t0).toFixed(2)));
-
-          var resultSets = (rawResults || []).filter(function (r) {
-            return (r.fields && r.fields.length > 0) || (r.rows && r.rows.length > 0);
-          }).map(function (r) {
-            var cols = (r.fields || []).map(function (f) { return f.name; });
-            var colTypes = (r.fields || []).map(function (f) { return PG_OID_MAP[f.dataTypeID] || 'ANY'; });
-            var rows = (r.rows || []).map(function (row) {
-              return row.map(function (cell) {
-                if (cell instanceof Date) return cell.toISOString();
-                if (typeof cell === 'bigint') return Number(cell);
-                if (cell && typeof cell === 'object') return JSON.stringify(cell);
-                return cell;
-              });
-            });
-            return {
-              columns: cols,
-              columnTypes: colTypes,
-              values: rows,
-              rowCount: rows.length,
-              affectedRows: r.affectedRows || 0
-            };
+      function finishCleanup(passthroughVal, isErr) {
+        var cleanPromise = Promise.resolve();
+        if (useTxWrap) {
+          cleanPromise = pgDb.exec('ROLLBACK;').catch(function () {});
+        } else if (needsHardResetAfter) {
+          cleanPromise = pgDb.exec('ROLLBACK;').catch(function () {}).then(function () {
+            return seedPostgresDataset(pgDb, datasetId, true).catch(function () {});
           });
-
-          var afterPromise = dmlInfo
-            ? pgDb.exec('SELECT * FROM "' + dmlInfo.tableName + '" LIMIT 50;', { rowMode: 'array' }).catch(function () { return []; })
-            : Promise.resolve(null);
-
-          return afterPromise.then(function (afterRaw) {
-            var explainPromise = includeExplain ? explainQueryPlanPg(pgDb, norm.sql) : Promise.resolve([]);
-            return explainPromise.then(function (explainRes) {
-              return [afterRaw, explainRes];
-            });
-          }).then(function (postPair) {
-            var afterRaw = postPair[0];
-            var explainNodes = postPair[1] || [];
-            var dmlDiff = null;
-
-            if (dmlInfo && afterRaw && afterRaw[0]) {
-              var afterCols = (afterRaw[0].fields || []).map(function (f) { return f.name; });
-              var afterColTypes = (afterRaw[0].fields || []).map(function (f) { return PG_OID_MAP[f.dataTypeID] || 'ANY'; });
-              var afterRows = (afterRaw[0].rows || []).map(function (row) {
-                return row.map(function (cell) {
-                  if (cell instanceof Date) return cell.toISOString();
-                  if (typeof cell === 'bigint') return Number(cell);
-                  if (cell && typeof cell === 'object') return JSON.stringify(cell);
-                  return cell;
-                });
-              });
-              var retCols = resultSets[0] ? resultSets[0].columns : [];
-              var retRows = resultSets[0] ? resultSets[0].values : [];
-              dmlDiff = computeDmlDiff(
-                dmlInfo,
-                afterCols.length ? afterCols : beforeCols,
-                beforeRows,
-                afterRows,
-                retCols,
-                retRows
-              );
-              if (resultSets.length === 0) {
-                resultSets.push({
-                  columns: dmlDiff.columns,
-                  columnTypes: afterColTypes,
-                  values: dmlDiff.afterRows,
-                  rowCount: dmlDiff.afterRows.length
-                });
-              }
-            }
-
-            var primarySet = resultSets[resultSets.length - 1] || resultSets[0] || null;
-            return {
-              ok: true,
-              error: null,
-              engine: 'postgres',
-              engineLabel: 'PostgreSQL 18.6 (PGlite WASM)',
-              sql: sql,
-              normalizedSql: norm.sql,
-              dialectNotes: norm.notes,
-              elapsedMs: elapsedMs,
-              durationMs: elapsedMs,
-              resultSets: resultSets,
-              columns: primarySet ? primarySet.columns : [],
-              columnTypes: primarySet ? primarySet.columnTypes : [],
-              rows: primarySet ? primarySet.values : [],
-              rowCount: primarySet ? primarySet.rowCount : 0,
-              dmlDiff: dmlDiff,
-              explain: explainNodes,
-              plan: explainNodes
-            };
-          });
-        }).catch(function (err) {
-          var t1 = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
-          var elapsedMs = Math.max(0.05, Number((t1 - t0).toFixed(2)));
-          var errMsg = err && err.message ? err.message : String(err);
-          return {
-            ok: false,
-            error: errMsg,
-            errorHint: getErrorHint(errMsg, sql),
-            engine: 'postgres',
-            engineLabel: 'PostgreSQL 18.6 (PGlite WASM)',
-            sql: sql,
-            normalizedSql: norm.sql,
-            dialectNotes: norm.notes,
-            elapsedMs: elapsedMs,
-            durationMs: elapsedMs,
-            resultSets: [],
-            columns: [],
-            columnTypes: [],
-            rows: [],
-            rowCount: 0,
-            dmlDiff: null,
-            explain: [],
-            plan: []
-          };
+        }
+        return cleanPromise.then(function () {
+          if (isErr) throw passthroughVal;
+          return passthroughVal;
         });
+      }
+
+      var txStartPromise = useTxWrap
+        ? pgDb.exec('ROLLBACK;').catch(function () {}).then(function () {
+            return pgDb.exec('BEGIN; SAVEPOINT _sid_lab_sp;');
+          })
+        : Promise.resolve();
+
+      return txStartPromise.then(function () {
+        if (!setupSql.trim()) return null;
+        return pgDb.exec(setupSql);
+      }).then(function () {
+        var beforePromise = dmlInfo
+          ? pgDb.exec('SELECT * FROM "' + dmlInfo.tableName + '" LIMIT 50;', { rowMode: 'array' }).catch(function () { return []; })
+          : Promise.resolve(null);
+
+        return beforePromise.then(function (beforeRaw) {
+          var beforeCols = (beforeRaw && beforeRaw[0] && beforeRaw[0].fields)
+            ? beforeRaw[0].fields.map(function (f) { return f.name; })
+            : [];
+          var beforeRows = (beforeRaw && beforeRaw[0] && beforeRaw[0].rows)
+            ? beforeRaw[0].rows.map(function (r) { return r.map(serializePgCell); })
+            : [];
+
+          var t0 = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+
+          return pgDb.exec(norm.sql, { rowMode: 'array' }).then(function (rawResults) {
+            var t1 = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+            var elapsedMs = Math.max(0.05, Number((t1 - t0).toFixed(2)));
+
+            var resultSets = (rawResults || []).filter(function (r) {
+              return (r.fields && r.fields.length > 0) || (r.rows && r.rows.length > 0);
+            }).map(formatPgResultSet);
+
+            var afterPromise = dmlInfo
+              ? pgDb.exec('SELECT * FROM "' + dmlInfo.tableName + '" LIMIT 50;', { rowMode: 'array' }).catch(function () { return []; })
+              : Promise.resolve(null);
+
+            var probePromise = probeSql.trim()
+              ? pgDb.exec(probeSql, { rowMode: 'array' }).then(function (pRaw) {
+                  var pSets = (pRaw || []).filter(function (r) {
+                    return (r.fields && r.fields.length > 0) || (r.rows && r.rows.length > 0);
+                  }).map(formatPgResultSet);
+                  var lastP = pSets[pSets.length - 1] || pSets[0] || null;
+                  return lastP ? {
+                    columns: lastP.columns,
+                    columnTypes: lastP.columnTypes,
+                    rows: lastP.values,
+                    rowCount: lastP.rowCount
+                  } : { columns: [], columnTypes: [], rows: [], rowCount: 0 };
+                }).catch(function (pErr) {
+                  return { error: pErr && pErr.message ? pErr.message : String(pErr), columns: [], rows: [], rowCount: 0 };
+                })
+              : Promise.resolve(null);
+
+            return afterPromise.then(function (afterRaw) {
+              return probePromise.then(function (probeRes) {
+                var explainTarget = probeSql && !/^(SELECT|WITH)\b/i.test(norm.sql.trim()) ? probeSql : norm.sql;
+                var explainPromise = includeExplain ? explainQueryPlanPg(pgDb, explainTarget) : Promise.resolve([]);
+                return explainPromise.then(function (explainRes) {
+                  return [afterRaw, explainRes, probeRes];
+                });
+              });
+            }).then(function (postTriple) {
+              var afterRaw = postTriple[0];
+              var explainNodes = postTriple[1] || [];
+              var probeRes = postTriple[2] || null;
+              var dmlDiff = null;
+
+              if (dmlInfo && afterRaw && afterRaw[0]) {
+                var formattedAfter = formatPgResultSet(afterRaw[0]);
+                var retCols = resultSets[0] ? resultSets[0].columns : [];
+                var retRows = resultSets[0] ? resultSets[0].values : [];
+                dmlDiff = computeDmlDiff(
+                  dmlInfo,
+                  formattedAfter.columns.length ? formattedAfter.columns : beforeCols,
+                  beforeRows,
+                  formattedAfter.values,
+                  retCols,
+                  retRows
+                );
+                if (resultSets.length === 0) {
+                  resultSets.push({
+                    columns: dmlDiff.columns,
+                    columnTypes: formattedAfter.columnTypes,
+                    values: dmlDiff.afterRows,
+                    rowCount: dmlDiff.afterRows.length
+                  });
+                }
+              }
+
+              var primarySet = resultSets[resultSets.length - 1] || resultSets[0] || null;
+              var payload = {
+                ok: true,
+                error: null,
+                engine: 'postgres',
+                engineLabel: 'PostgreSQL 18.6 (PGlite WASM)',
+                sql: sql,
+                normalizedSql: norm.sql,
+                dialectNotes: norm.notes,
+                elapsedMs: elapsedMs,
+                durationMs: elapsedMs,
+                resultSets: resultSets,
+                columns: primarySet ? primarySet.columns : [],
+                columnTypes: primarySet ? primarySet.columnTypes : [],
+                rows: primarySet ? primarySet.values : [],
+                rowCount: primarySet ? primarySet.rowCount : 0,
+                dmlDiff: dmlDiff,
+                probeResult: probeRes,
+                explain: explainNodes,
+                plan: explainNodes
+              };
+              return finishCleanup(payload, false);
+            });
+          });
+        });
+      }).catch(function (err) {
+        var errMsg = err && err.message ? err.message : String(err);
+        var failPayload = {
+          ok: false,
+          error: errMsg,
+          errorHint: getErrorHint(errMsg, sql),
+          engine: 'postgres',
+          engineLabel: 'PostgreSQL 18.6 (PGlite WASM)',
+          sql: sql,
+          normalizedSql: norm.sql,
+          dialectNotes: norm.notes,
+          elapsedMs: 0.1,
+          durationMs: 0.1,
+          resultSets: [],
+          columns: [],
+          columnTypes: [],
+          rows: [],
+          rowCount: 0,
+          dmlDiff: null,
+          probeResult: null,
+          explain: [],
+          plan: []
+        };
+        return finishCleanup(failPayload, false);
       });
     });
   }
 
   /**
-   * Produces a concise, pedagogical fix hint for common SQL errors and anti-patterns.
+   * Produces a concise, pedagogical fix hint for common SQL and PostgreSQL 18 errors.
    */
   function getErrorHint(errorMessage, sql) {
     if (!errorMessage) return null;
     var msg = String(errorMessage);
     var query = String(sql || '');
+
+    if (/current transaction is aborted/i.test(msg)) {
+      return 'PostgreSQL aborted the open transaction after an earlier error. Run `ROLLBACK;` (or click **Reset DB**) to clear the aborted transaction block before running new queries.';
+    }
+
+    if (/cannot execute VACUUM inside a transaction block/i.test(msg)) {
+      return '`VACUUM` and `VACUUM FULL` cannot run inside an explicit `BEGIN ... COMMIT` transaction block in PostgreSQL. Run `VACUUM` as a standalone top-level command.';
+    }
+
+    if (/violates exclusion constraint/i.test(msg)) {
+      return 'GiST `EXCLUDE` constraint rejected an overlapping range (e.g., double-booking the same room during overlapping `TSTZRANGE` bounds). Check `[start, end)` half-open interval bounds or filter overlaps with `NOT EXISTS (... && ...)`.';
+    }
+
+    if (/violates row-level security policy/i.test(msg)) {
+      return 'Row-Level Security (`RLS`) blocked this row visibility or write. Verify `SET LOCAL app.tenant_id = \'...\'` matches the policy\'s `USING` / `WITH CHECK` predicate.';
+    }
+
+    if (/no unique or exclusion constraint matching the ON CONFLICT/i.test(msg)) {
+      return '`INSERT ... ON CONFLICT (col)` requires a `PRIMARY KEY` or `UNIQUE` index on the conflict target column(s) so PostgreSQL can detect duplicates atomically.';
+    }
+
+    if (/ON CONFLICT DO UPDATE command cannot affect row a second time/i.test(msg)) {
+      return 'Your single `INSERT` batch contains duplicate keys for the same conflict target. Deduplicate the source rows (for example with `DISTINCT ON`) before upserting.';
+    }
+
+    if (/operator does not exist:\s*jsonb\s*=/i.test(msg) || /operator does not exist:\s*json\s*=/i.test(msg)) {
+      return 'Use `->>` (text extraction) when comparing a JSON scalar to `TEXT`, or `@>` (JSONB containment, e.g. `payload @> \'{"role":"admin"}\'::jsonb`) so GIN indexes remain SARGable.';
+    }
+
+    if (/operator does not exist|function .* does not exist/i.test(msg)) {
+      return 'PostgreSQL enforces strict static typing and does not silently coerce mismatched types. Add an explicit cast (such as `::text`, `::numeric`, `::timestamptz`, or `::jsonb`).';
+    }
 
     var colMatch = /(?:no such column:\s*|column\s+"?)([a-zA-Z0-9_.]+)"?\s*(?:does not exist|$)/i.exec(msg);
     if (colMatch) {
@@ -1041,7 +1259,7 @@
 
     var tblMatch = /(?:no such table:\s*|relation\s+"?)([a-zA-Z0-9_.]+)"?\s*(?:does not exist|$)/i.exec(msg);
     if (tblMatch) {
-      return 'Table `' + tblMatch[1] + '` does not exist in the current scope. Check spelling in the Schema Browser or switch the dataset selector to "All 26 Tables".';
+      return 'Table `' + tblMatch[1] + '` does not exist in the current scope. Check spelling in the Schema Browser or verify the active dataset.';
     }
 
     if (/misuse of aggregate|aggregate functions are not allowed in WHERE/i.test(msg)) {
@@ -1081,7 +1299,7 @@
     options = options || {};
     var datasetId = options.datasetId || '__unified__';
     var includeExplain = options.explain !== false;
-    var explicitEngine = options.engine || null;
+    var explicitEngine = options.engine || (isPgOpsDataset(datasetId) ? 'postgres' : null);
     var forceEngine = explicitEngine || _engineMode;
 
     if (canUseWorker && !_workerFailed) {
@@ -1192,11 +1410,33 @@
       });
     }
 
-    // Use PostgreSQL 18 when explicitly requested or when PGlite is already warm in postgres mode
-    if (explicitEngine === 'postgres' || (forceEngine === 'postgres' && Boolean(_pgDb))) {
+    // Use PostgreSQL 18 when explicitly requested, when pg_ops dataset is used, or when PGlite is warm in postgres mode
+    if (explicitEngine === 'postgres' || isPgOpsDataset(datasetId) || (forceEngine === 'postgres' && Boolean(_pgDb))) {
       return initPgliteLocal().then(function (pgDb) {
         return executePostgres(pgDb, sql, options);
-      }).catch(function () {
+      }).catch(function (bootErr) {
+        if (explicitEngine === 'postgres' || isPgOpsDataset(datasetId)) {
+          return {
+            ok: false,
+            error: bootErr && bootErr.message ? bootErr.message : String(bootErr),
+            errorHint: 'PostgreSQL 18 WASM engine failed to initialize.',
+            engine: 'postgres',
+            engineLabel: 'PostgreSQL 18.6 (PGlite WASM)',
+            sql: sql,
+            normalizedSql: sql,
+            dialectNotes: [],
+            elapsedMs: 0.1,
+            durationMs: 0.1,
+            resultSets: [],
+            columns: [],
+            columnTypes: [],
+            rows: [],
+            rowCount: 0,
+            dmlDiff: null,
+            explain: [],
+            plan: []
+          };
+        }
         return runSqliteFallback();
       });
     }
@@ -1251,6 +1491,9 @@
   function introspectSchema(datasetId, options) {
     var dsId = datasetId || _activeDatasetId || 'ecommerce';
     var opts = options || {};
+    if (isPgOpsDataset(dsId) && !opts.engine) {
+      opts = Object.assign({}, opts, { engine: 'postgres' });
+    }
     if (canUseWorker && !_workerFailed) {
       return workerCall('introspectSchema', { datasetId: dsId, options: opts }).catch(function () {
         return introspectSchemaLocal(dsId, opts);
@@ -1264,9 +1507,12 @@
     var tablesSql = "SELECT table_name FROM information_schema.tables WHERE table_schema = '" + schemaName.replace(/'/g, "''") + "' AND table_type = 'BASE TABLE' ORDER BY table_name;";
     return pgDb.exec(tablesSql, { rowMode: 'array' }).then(function (tRes) {
       var tableNames = (tRes && tRes[0] && tRes[0].rows) ? tRes[0].rows.map(function (r) { return r[0]; }) : [];
-      if (!isCustomOrEmptyDataset(dsId) && dsId && dsId !== '__unified__' && root.SQL_DATASETS && root.SQL_DATASETS[dsId] && Array.isArray(root.SQL_DATASETS[dsId].tables)) {
+      var targetMeta = (!isCustomOrEmptyDataset(dsId) && dsId && dsId !== '__unified__')
+        ? ((root.SQL_DATASETS && root.SQL_DATASETS[dsId]) || (root.PG_DATASETS && root.PG_DATASETS[dsId]) || null)
+        : null;
+      if (targetMeta && Array.isArray(targetMeta.tables)) {
         var allowedSet = {};
-        root.SQL_DATASETS[dsId].tables.forEach(function (t) {
+        targetMeta.tables.forEach(function (t) {
           if (t && t.name) allowedSet[String(t.name).toLowerCase()] = true;
         });
         tableNames = tableNames.filter(function (name) {
@@ -1278,7 +1524,7 @@
         chain = chain.then(function (acc) {
           var safeTbl = String(tableName).replace(/'/g, "''");
           var safeSch = schemaName.replace(/'/g, "''");
-          var colSql = "SELECT column_name, data_type, is_nullable, column_default FROM information_schema.columns WHERE table_schema = '" + safeSch + "' AND table_name = '" + safeTbl + "' ORDER BY ordinal_position;";
+          var colSql = "SELECT column_name, CASE WHEN data_type = 'USER-DEFINED' THEN udt_name WHEN data_type = 'ARRAY' THEN udt_name ELSE data_type END AS dtype, is_nullable, column_default FROM information_schema.columns WHERE table_schema = '" + safeSch + "' AND table_name = '" + safeTbl + "' ORDER BY ordinal_position;";
           var pkSql = "SELECT kcu.column_name FROM information_schema.table_constraints tc JOIN information_schema.key_column_usage kcu ON tc.constraint_name = kcu.constraint_name AND tc.table_schema = kcu.table_schema WHERE tc.constraint_type = 'PRIMARY KEY' AND tc.table_schema = '" + safeSch + "' AND tc.table_name = '" + safeTbl + "';";
           var countSql = 'SELECT COUNT(*)::int FROM "' + schemaName + '"."' + String(tableName).replace(/"/g, '""') + '";';
           return pgDb.exec(colSql, { rowMode: 'array' }).then(function (cRes) {
@@ -1289,10 +1535,12 @@
                   pRes[0].rows.forEach(function (r) { pkSet[String(r[0]).toLowerCase()] = true; });
                 }
                 var cols = (cRes && cRes[0] && cRes[0].rows ? cRes[0].rows : []).map(function (c, idx) {
+                  var rawType = String(c[1] || 'TEXT');
+                  var prettyType = rawType.indexOf('_') === 0 ? (rawType.slice(1).toUpperCase() + '[]') : rawType.toUpperCase();
                   return {
                     cid: idx,
                     name: c[0],
-                    type: String(c[1] || 'TEXT').toUpperCase(),
+                    type: prettyType,
                     notNull: c[2] === 'NO',
                     defaultValue: c[3],
                     isPk: Boolean(pkSet[String(c[0]).toLowerCase()]),
@@ -1320,7 +1568,7 @@
 
   function introspectSchemaLocal(dsId, options) {
     var opts = options || {};
-    var requestedEngine = opts.engine || _engineMode;
+    var requestedEngine = opts.engine || (isPgOpsDataset(dsId) ? 'postgres' : _engineMode);
     if (requestedEngine === 'postgres') {
       return initPglite().then(function (pgDb) {
         if (!pgDb) return introspectSchemaLocal(dsId, { engine: 'sqlite' });
@@ -1406,6 +1654,11 @@
   }
 
   function resetDatasetLocal(dsId) {
+    if (isPgOpsDataset(dsId)) {
+      return initPgliteLocal().then(function (pgDb) {
+        return seedPostgresDataset(pgDb, dsId, true);
+      });
+    }
     var sqlitePromise = (!dsId || dsId === '__unified__')
       ? getUnifiedDatabase(true)
       : createDatabaseForDataset(dsId, true);
@@ -1422,7 +1675,7 @@
   }
 
   function setActiveDataset(datasetId) {
-    if (root.SQL_DATASETS && root.SQL_DATASETS[datasetId]) {
+    if ((root.SQL_DATASETS && root.SQL_DATASETS[datasetId]) || isPgOpsDataset(datasetId)) {
       _activeDatasetId = datasetId;
     }
     return _activeDatasetId;

@@ -73,11 +73,29 @@ function generateManifest() {
     'data/topic_guided_labs.js',
     'data/projects.js',
     'data/glossary.js',
+    'data/pg_mastery_curriculum.js',
+    'data/pg-labs/pg-m01.js',
+    'data/pg-labs/pg-m02.js',
+    'data/pg-labs/pg-m03.js',
+    'data/pg-labs/pg-m04.js',
+    'data/pg-labs/pg-m05.js',
+    'data/pg-labs/pg-m06.js',
+    'data/pg-labs/pg-m07.js',
+    'data/pg-labs/pg-m08.js',
+    'data/pg-labs/pg-m09.js',
+    'data/pg-labs/pg-m10.js',
     'js/vendor/sql-wasm.js',
     'js/vendor/cm6-sql.js',
     'js/vendor/pglite/index.js',
     'js/vendor/pglite/chunk-NNS5RQRF.js',
     'js/vendor/pglite/chunk-YWK3W5RG.js',
+    'js/vendor/pglite/btree_gist.tar.gz',
+    'js/vendor/pglite/ltree.tar.gz',
+    'js/vendor/pglite/pageinspect.tar.gz',
+    'js/vendor/pglite/pg_buffercache.tar.gz',
+    'js/vendor/pglite/pg_freespacemap.tar.gz',
+    'js/vendor/pglite/pg_trgm.tar.gz',
+    'js/vendor/pglite/pg_visibility.tar.gz',
     'js/vendor/katex/katex.min.js',
     'js/vendor/katex/auto-render.min.js',
     'js/sql-engine.js',
@@ -96,12 +114,16 @@ function generateManifest() {
     'js/challenges.js',
     'js/dashboard.js',
     'js/sandbox.js',
+    'js/pg-tutorials.js',
     'js/topic-codelab.js'
   ];
   for (const extra of extraLazyFiles) {
     const abs = path.join(root, extra);
     if (fs.existsSync(abs)) {
-      manifest[extra] = hashOf(fs.readFileSync(abs));
+      const buf = fs.readFileSync(abs);
+      manifest[extra] = extra.endsWith('.tar.gz')
+        ? crypto.createHash('sha1').update(buf).digest('hex').slice(0, 10)
+        : hashOf(buf);
     }
   }
   const videos = new Set();

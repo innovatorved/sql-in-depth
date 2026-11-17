@@ -3,4 +3,5 @@
 /roadmap/* /roadmap/ 200
 /dashboard/* /dashboard/ 200
 /sandbox/* /sandbox/ 200
+/postgres/* /postgres/ 200
 /projects/* /projects/ 200

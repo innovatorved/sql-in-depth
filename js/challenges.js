@@ -63,7 +63,9 @@
     },
 
     _getChallenges: function() {
-      return Array.isArray(root.CHALLENGES_DATA) ? root.CHALLENGES_DATA : [];
+      var base = Array.isArray(root.CHALLENGES_DATA) ? root.CHALLENGES_DATA : [];
+      var pgExtra = Array.isArray(root.PG_CHALLENGES_DATA) ? root.PG_CHALLENGES_DATA : [];
+      return pgExtra.length > 0 ? base.concat(pgExtra) : base;
     },
 
     _findChallenge: function(id) {
@@ -196,6 +198,7 @@
               '<p class="chal-row__desc">' + escapeHtml(c.subtitle || c.summary || '') + '</p>' +
               '<div class="chal-row__meta">' +
                 '<span class="chal-level chal-level--' + escapeHtml(c.difficulty) + '">' + escapeHtml(levelLabel[c.difficulty] || c.difficulty) + '</span>' +
+                (c.engine === 'postgres' ? '<span class="chal-engine-pill">PostgreSQL 18</span>' : '') +
                 '<span>' + escapeHtml(c.category || '') + '</span>' +
                 '<span>~' + (c.estimatedMinutes || 15) + ' min</span>' +
                 (lessonName
@@ -583,6 +586,8 @@
         var sampleSql = (ch.codeFix && (ch.codeFix.buggyCode || ch.codeFix.solutionCode || ch.codeFix.sqlQuery)) || 'SELECT a.account_id, a.owner_name, a.posted_balance_cents, COUNT(j.entry_id) AS postings FROM accounts a LEFT JOIN journal_entries j ON j.account_id = a.account_id GROUP BY a.account_id, a.owner_name, a.posted_balance_cents ORDER BY a.account_id ASC;';
         root.TableVisualizer.mountClauseVisualizer(mountEl, {
           datasetId: (ch.codeFix && ch.codeFix.datasetId) || 'ecommerce',
+          engine: ch.engine || (ch.codeFix && ch.codeFix.engine) || undefined,
+          isolatedTx: ch.engine === 'postgres',
           sql: sampleSql,
           referenceSql: (ch.codeFix && ch.codeFix.solutionCode) || sampleSql,
           buggyCode: (ch.codeFix && ch.codeFix.buggyCode) || '',

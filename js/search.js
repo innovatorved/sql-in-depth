@@ -57,13 +57,14 @@ window.Search = (() => {
 
     // Ecosystem views
     const ecosystemViews = [
+      { slug: '', title: 'Learn PostgreSQL 18 by Doing — 80 Interactive SQL, Catalog & Troubleshooting Labs', kind: 'postgres', moduleTitle: '10 Tracks · 80 Topics · 240 Verified SQL Missions in PGlite 18.6 WASM', tags: ['postgres', 'postgresql', 'pg18', 'pglite', 'labs', 'practice', 'tutorial', 'catalog', 'troubleshooting'] },
       { slug: 'graph', title: 'Interactive Visual SQL & Database Roadmap', kind: 'roadmap', moduleTitle: 'Interactive Dependency DAG & Career Paths', tags: ['roadmap', 'dag', 'graph', 'career', 'paths'] },
       { slug: 'paths', title: 'Database Engineering & Analytics Career Paths', kind: 'roadmap', moduleTitle: '5 Curated Engineering Tracks', tags: ['roadmap', 'career', 'paths', 'tracks', 'dba', 'data-engineer'] },
-      { slug: '', title: 'Production Database Incident & Slow-Query Challenges', kind: 'challenge', moduleTitle: '12 Hands-On DB Outage Simulators', tags: ['challenges', 'incidents', 'outage', 'troubleshooting', 'sre', 'dba'] },
+      { slug: '', title: 'Production Database Incident & Slow-Query Challenges', kind: 'challenge', moduleTitle: '20 Hands-On DB Outage & PostgreSQL 18 Triage Simulators', tags: ['challenges', 'incidents', 'outage', 'troubleshooting', 'sre', 'dba', 'postgres'] },
       { slug: 'overview', title: 'Your learning progress', kind: 'dashboard', moduleTitle: 'Continue where you left off', tags: ['dashboard', 'progress', 'continue', 'streak'] },
       { slug: 'srs', title: 'Flashcards for review', kind: 'dashboard', moduleTitle: 'Spaced repetition', tags: ['srs', 'flashcards', 'spaced', 'repetition', 'review'] },
       { slug: 'notes', title: 'Your notes and bookmarks', kind: 'dashboard', moduleTitle: 'Saved lessons', tags: ['notes', 'bookmarks', 'saved'] },
-      { slug: '', title: 'Interactive SQL Workbench, Schema ERD & Clause Visualizer Sandbox', kind: 'sandbox', moduleTitle: 'Live Browser WASM SQLite Engine & Step-by-Step Table Visualizer', tags: ['sandbox', 'sql', 'workbench', 'schema', 'visualizer', 'explain', 'wasm'] }
+      { slug: '', title: 'Interactive SQL Workbench, Schema ERD & Clause Visualizer Sandbox', kind: 'sandbox', moduleTitle: 'Live Browser WASM PostgreSQL 18 & SQLite Engine', tags: ['sandbox', 'sql', 'workbench', 'schema', 'visualizer', 'explain', 'wasm'] }
     ];
     for (const v of ecosystemViews) {
       index.push({
@@ -77,6 +78,25 @@ window.Search = (() => {
         excerpt: v.moduleTitle,
         searchText: [v.title, v.moduleTitle, ...v.tags].join(' ').toLowerCase()
       });
+    }
+
+    // PostgreSQL 18 Learn-by-Doing Practice Topics (80 Labs)
+    if (window.PG_MASTERY_CURRICULUM && Array.isArray(window.PG_MASTERY_CURRICULUM.topics)) {
+      const modMap = window.PG_MASTERY_CURRICULUM.moduleById || {};
+      for (const t of window.PG_MASTERY_CURRICULUM.topics) {
+        const mod = modMap[t.moduleId] || {};
+        index.push({
+          slug: t.slug,
+          title: t.title,
+          kind: 'postgres-lab',
+          moduleTitle: `Postgres Lab · ${mod.shortTitle || mod.title || 'PostgreSQL 18'}`,
+          moduleNumber: t.id,
+          partTitle: 'Learn Postgres',
+          tags: ['postgres', 'postgresql', 'lab', 'practice', ...(t.tags || [])],
+          excerpt: t.summary || '',
+          searchText: [t.title, t.summary || '', mod.title || '', t.slug.replace(/-/g, ' '), ...(t.tags || []), 'postgres postgresql 18 lab practice'].join(' ').toLowerCase()
+        });
+      }
     }
 
     // Career Paths
@@ -96,19 +116,24 @@ window.Search = (() => {
       }
     }
 
-    // Incident Challenges
-    if (window.CHALLENGES_DATA && Array.isArray(window.CHALLENGES_DATA.challenges)) {
-      for (const c of window.CHALLENGES_DATA.challenges) {
+    // Incident Challenges (Cross-Engine + PostgreSQL 18 Production Incidents)
+    const baseChallenges = (window.CHALLENGES_DATA && Array.isArray(window.CHALLENGES_DATA.challenges))
+      ? window.CHALLENGES_DATA.challenges
+      : (Array.isArray(window.CHALLENGES_DATA) ? window.CHALLENGES_DATA : []);
+    const extraPgChallenges = Array.isArray(window.PG_CHALLENGES_DATA) ? window.PG_CHALLENGES_DATA : [];
+    const allChallenges = baseChallenges.concat(extraPgChallenges);
+    if (allChallenges.length > 0) {
+      for (const c of allChallenges) {
         index.push({
           slug: c.id,
           title: c.title,
           kind: 'challenge',
-          moduleTitle: `Incident Challenge (${c.difficulty.toUpperCase()} · +${c.xp} XP)`,
+          moduleTitle: `Incident Challenge (${String(c.difficulty || 'hard').toUpperCase()}${c.engine === 'postgres' ? ' · PG 18' : ''})`,
           moduleNumber: 'Incident',
           partTitle: 'Challenges',
-          tags: ['challenge', 'incident', c.difficulty, c.category, c.id],
+          tags: ['challenge', 'incident', c.difficulty || 'hard', c.category || 'sql', c.id, ...(c.engine === 'postgres' ? ['postgres', 'postgresql'] : [])],
           excerpt: c.summary || '',
-          searchText: [c.title, c.summary, c.category, c.difficulty, c.id, 'incident challenge outage'].join(' ').toLowerCase()
+          searchText: [c.title, c.summary || '', c.category || '', c.difficulty || '', c.id, 'incident challenge outage', c.engine || ''].join(' ').toLowerCase()
         });
       }
     }
@@ -172,7 +197,11 @@ window.Search = (() => {
   }
 
   function navigateResult(kind, slug) {
-    if (kind === 'build-lab' && window.App?.navigateToBuild) {
+    if (kind === 'postgres' && window.App?.navigateToPostgres) {
+      window.App.navigateToPostgres();
+    } else if (kind === 'postgres-lab' && window.App?.navigateToSandbox) {
+      window.App.navigateToSandbox(null, null, '?mode=postgres-labs&lab=' + encodeURIComponent(slug));
+    } else if (kind === 'build-lab' && window.App?.navigateToBuild) {
       window.App.navigateToBuild(slug);
     } else if (kind === 'roadmap' && window.App?.navigateToRoadmap) {
       window.App.navigateToRoadmap(slug || 'graph');
@@ -200,6 +229,8 @@ window.Search = (() => {
       lesson: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
       system: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>',
       'build-lab': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
+      postgres: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3"/></svg>',
+      'postgres-lab': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3"/></svg>',
       roadmap: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/></svg>',
       challenge: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
       exam: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
@@ -207,18 +238,19 @@ window.Search = (() => {
       sandbox: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>'
     };
 
-    const customMetaKinds = new Set(['build-lab', 'roadmap', 'challenge', 'exam', 'dashboard', 'sandbox']);
+    const customMetaKinds = new Set(['build-lab', 'postgres', 'postgres-lab', 'roadmap', 'challenge', 'exam', 'dashboard', 'sandbox']);
 
     container.innerHTML = results.map((r, i) => {
       const icon = kindIcons[r.kind] || kindIcons.lesson;
       const metaLabel = customMetaKinds.has(r.kind) ? r.moduleTitle : `Module ${r.moduleNumber}: ${r.moduleTitle}`;
+      const badgeKind = r.kind === 'build-lab' ? 'build' : (r.kind === 'postgres-lab' ? 'pg lab' : r.kind);
       return `<div class="search-result${i === focusedIdx ? ' focused' : ''}" data-slug="${r.slug}" data-kind="${r.kind}" data-idx="${i}">
         <div class="search-result__icon">${icon}</div>
         <div class="search-result__info">
           <div class="search-result__title">${highlightText(r.title, query)}</div>
           <div class="search-result__module">${metaLabel}</div>
         </div>
-        <span class="search-result__kind">${r.kind === 'build-lab' ? 'build' : r.kind}</span>
+        <span class="search-result__kind">${badgeKind}</span>
       </div>`;
     }).join('');
 

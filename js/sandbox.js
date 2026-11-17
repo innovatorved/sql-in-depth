@@ -101,6 +101,14 @@
     _renameFileBarOpen: false,
     _sqlStudioQuery: '',
     _sqlStudioVizHandle: null,
+    _activePgLabSlug: 'select-projection-arithmetic',
+    _activePgLabStep: 0,
+    _activePgGuideTab: 'practice',
+    _pgRevealedHints: {},
+    _loadedPgLab: null,
+    _loadingPgLabSlug: null,
+    _activeChalTab: 'brief',
+    _chalRevealedHints: {},
 
     // Active canvas state (synced with active board)
     _activeBlueprintId: 'sargable-composite-index-selector',
@@ -171,7 +179,25 @@
         if (root.location && root.location.search) {
           var urlParams = new URLSearchParams(root.location.search);
           var modeParam = urlParams.get('mode') || urlParams.get('tab');
-          if (modeParam === 'challenges' || modeParam === 'sql-challenges') {
+          var labParam = urlParams.get('lab');
+          var stepParam = urlParams.get('step');
+          if (modeParam === 'postgres-labs' || modeParam === 'learn-postgres' || modeParam === 'postgres' || labParam) {
+            this._activeWorkbenchMode = 'postgres-labs';
+            if (labParam) {
+              this._activePgLabSlug = labParam;
+              this._loadedPgLab = null;
+            }
+            if (stepParam) {
+              var parsedStep = parseInt(stepParam, 10);
+              if (!isNaN(parsedStep) && parsedStep >= 1) {
+                this._activePgLabStep = Math.min(2, Math.max(0, parsedStep - 1));
+              }
+            }
+            this._sqlStudioEngine = 'postgres';
+            if (root.SQLEngine && typeof root.SQLEngine.setEngineMode === 'function') {
+              root.SQLEngine.setEngineMode('postgres');
+            }
+          } else if (modeParam === 'challenges' || modeParam === 'sql-challenges') {
             this._activeWorkbenchMode = 'sql-challenges';
           } else if (modeParam === 'architecture' || modeParam === 'architecture-canvas' || queryBp) {
             this._activeWorkbenchMode = 'architecture-canvas';
@@ -1613,6 +1639,20 @@
         );
       }
 
+      if (root.PG_DATASETS && root.PG_DATASETS[activeDs]) {
+        var pgDs = root.PG_DATASETS[activeDs];
+        var pgTables = pgDs.tables || [];
+        return (
+          '<details class="schema-ds sql-schema-ds-group" open>' +
+            '<summary class="schema-ds__summary">' +
+              '<span class="schema-ds__title">' + escapeHtml(pgDs.title || activeDs) + '</span>' +
+              '<span class="schema-ds__meta">' + pgTables.length + ' tables</span>' +
+            '</summary>' +
+            '<div class="schema-ds__tables">' + self._renderTableItemsHtml(pgTables, activeDs) + '</div>' +
+          '</details>'
+        );
+      }
+
       return dsKeys.map(function(dsKey) {
         var ds = datasets[dsKey];
         if (!ds) return '';
@@ -1637,7 +1677,7 @@
         var n = Array.isArray(this._liveSchemaTables) ? this._liveSchemaTables.length : 0;
         return n + (n === 1 ? ' Table' : ' Tables');
       }
-      var ds = (root.SQL_DATASETS || {})[activeDs];
+      var ds = (root.SQL_DATASETS || {})[activeDs] || (root.PG_DATASETS || {})[activeDs];
       var cnt = ds && Array.isArray(ds.tables) ? ds.tables.length : 0;
       return cnt + (cnt === 1 ? ' Table' : ' Tables');
     },
@@ -2024,7 +2064,9 @@
     _getChallengesList: function() {
       var raw = (root && (root.CHALLENGES_DATA || root.ChallengesData)) || [];
       var arr = Array.isArray(raw) ? raw : (raw.challenges || []);
-      return arr.filter(function(c) { return c && c.codeFix && c.codeFix.solutionCode; });
+      var pgExtra = (root && Array.isArray(root.PG_CHALLENGES_DATA)) ? root.PG_CHALLENGES_DATA : [];
+      var combined = pgExtra.length > 0 ? arr.concat(pgExtra) : arr;
+      return combined.filter(function(c) { return c && c.codeFix && c.codeFix.solutionCode; });
     },
 
     _getSolvedChallengesMap: function() {
@@ -2136,6 +2178,387 @@
       });
     },
 
+    _renderDatasetQuickPeekHtml: function(dsKey) {
+      var self = this;
+      var targetKey = dsKey || '__unified__';
+      var datasets = root.SQL_DATASETS || {};
+      var pgDatasets = root.PG_DATASETS || {};
+      var groups = [];
+      if (targetKey === '__unified__') {
+        Object.keys(datasets).forEach(function(k) {
+          if (datasets[k]) groups.push({ key: k, title: datasets[k].title || k, tables: datasets[k].tables || [] });
+        });
+      } else if (pgDatasets[targetKey]) {
+        groups.push({ key: targetKey, title: pgDatasets[targetKey].title || targetKey, tables: pgDatasets[targetKey].tables || [] });
+      } else if (datasets[targetKey]) {
+        groups.push({ key: targetKey, title: datasets[targetKey].title || targetKey, tables: datasets[targetKey].tables || [] });
+      }
+      if (groups.length === 0) return '';
+      var totalTables = groups.reduce(function(acc, g) { return acc + g.tables.length; }, 0);
+      return (
+        '<details class="pg-schema-peek">' +
+          '<summary class="pg-schema-peek__summary">' +
+            '<span class="schema-table__chevron" aria-hidden="true"></span>' +
+            '<span>Dataset Schema (<code>' + escapeHtml(targetKey) + '</code>)</span>' +
+            '<span class="pg-schema-peek__count">' + totalTables + (totalTables === 1 ? ' table' : ' tables') + '</span>' +
+          '</summary>' +
+          '<div class="pg-schema-peek__body">' +
+            groups.map(function(g) {
+              return self._renderTableItemsHtml(g.tables, g.key);
+            }).join('') +
+          '</div>' +
+        '</details>'
+      );
+    },
+
+    _renderPostgresLabsWorkbench: function(ctx) {
+      var self = this;
+      if ((!root.PG_MASTERY_CURRICULUM || !root.PgTutorials) && root.Lazy && typeof root.Lazy.loadAll === 'function') {
+        this._container.innerHTML =
+          '<div class="view-canvas sql-studio studio-app studio-app--pg-labs">' +
+            '<header class="studio-toolbar">' +
+              '<div class="studio-toolbar__group"><h1 class="studio-title">SQL Studio</h1>' + ctx.modeSwitcherHtml + '</div>' +
+            '</header>' +
+            '<div class="pg-lab-loading-state">Loading PostgreSQL 18 Mastery Curriculum (80 Topics · 240 SQL Steps)…</div>' +
+          '</div>';
+        root.Lazy.loadAll(['data/pg_mastery_curriculum.js', 'js/pg-tutorials.js']).then(function() {
+          self.render();
+        });
+        return;
+      }
+
+      var pgt = root.PgTutorials;
+      var cur = pgt ? pgt.getCurriculum() : { modules: [], topics: [], bySlug: {}, byId: {}, moduleById: {} };
+      var requestedSlug = this._activePgLabSlug || 'select-projection-arithmetic';
+      var metaTopic = cur.bySlug[requestedSlug] || cur.byId[requestedSlug] || cur.topics[0];
+      if (!metaTopic) {
+        this._container.innerHTML = '<div class="view-canvas sandbox-view"><p style="padding:2rem;color:var(--fg-muted);">No PostgreSQL topics found.</p></div>';
+        return;
+      }
+
+      if (!this._loadedPgLab || (this._loadedPgLab.slug !== metaTopic.slug && this._loadedPgLab.id !== metaTopic.id)) {
+        if (this._loadingPgLabSlug !== metaTopic.slug) {
+          this._loadingPgLabSlug = metaTopic.slug;
+          this._container.innerHTML =
+            '<div class="view-canvas sql-studio studio-app studio-app--pg-labs">' +
+              '<header class="studio-toolbar">' +
+                '<div class="studio-toolbar__group"><h1 class="studio-title">SQL Studio</h1>' + ctx.modeSwitcherHtml + '</div>' +
+              '</header>' +
+              '<div class="pg-lab-loading-state">Loading interactive PostgreSQL 18 lab: <strong>' + escapeHtml(metaTopic.title) + '</strong>…</div>' +
+            '</div>';
+          pgt.loadLabBySlugOrId(metaTopic.slug).then(function(labObj) {
+            self._loadingPgLabSlug = null;
+            if (labObj) {
+              self._loadedPgLab = labObj;
+              self._activePgLabSlug = labObj.slug;
+              self._sqlStudioEngine = 'postgres';
+              if (root.SQLEngine && typeof root.SQLEngine.setEngineMode === 'function') {
+                root.SQLEngine.setEngineMode('postgres');
+              }
+            }
+            self.render();
+          }).catch(function(err) {
+            self._loadingPgLabSlug = null;
+            if (self._container) {
+              self._container.innerHTML = '<div class="view-canvas sandbox-view"><p style="padding:2rem;color:var(--danger);">Failed to load lab: ' + escapeHtml(err && err.message || String(err)) + '</p></div>';
+            }
+          });
+        }
+        return;
+      }
+
+      var lab = this._loadedPgLab;
+      var steps = Array.isArray(lab.steps) ? lab.steps : [];
+      var stepIdx = Math.min(Math.max(0, this._activePgLabStep || 0), Math.max(0, steps.length - 1));
+      this._activePgLabStep = stepIdx;
+      var activeStep = steps[stepIdx] || { title: 'Step 1', mission: '', starterCode: '', solutionCode: '', hints: [] };
+      pgt.recordLastVisited(lab.slug, stepIdx);
+
+      var progSummary = pgt.getProgressSummary();
+      var rawProg = progSummary.raw;
+      var topicIdx = Math.max(0, cur.topics.findIndex(function(t) { return t.id === lab.id; }));
+      var totalTopics = cur.topics.length || 80;
+      var topicStepDone = pgt.getTopicCompletedStepCount(lab.id, steps.length || 3, rawProg);
+      var modMeta = cur.moduleById[lab.moduleId || metaTopic.moduleId] || { title: 'PostgreSQL 18', shortTitle: 'Postgres 18' };
+
+      var optGroupsHtml = cur.modules.map(function(m, mIndex) {
+        var opts = (m.topics || []).map(function(t, tLocalIdx) {
+          var isDone = pgt.getTopicCompletedStepCount(t.id, 3, rawProg) >= 3;
+          return '<option value="' + escapeHtml(t.slug) + '"' + (t.id === lab.id ? ' selected' : '') + '>' +
+            (isDone ? '[Done] ' : '') + (mIndex + 1) + '.' + (tLocalIdx + 1) + ' ' + escapeHtml(t.title) +
+          '</option>';
+        }).join('');
+        return '<optgroup label="Track ' + (mIndex + 1) + ' · ' + escapeHtml(m.shortTitle || m.title) + '">' + opts + '</optgroup>';
+      }).join('');
+
+      var checkSvg = '<svg class="pg-inline-check" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
+      var stepPillsHtml = steps.map(function(st, idx) {
+        var done = pgt.isStepCompleted(lab.id, idx, rawProg);
+        var active = idx === stepIdx;
+        return '<button type="button" class="pg-step-pill' + (active ? ' is-active' : '') + (done ? ' is-done' : '') + '" data-pg-lab-step="' + idx + '" aria-current="' + (active ? 'step' : 'false') + '">' +
+          (done ? checkSvg : '<span class="pg-step-pill__num">' + (idx + 1) + '</span>') +
+          '<span class="pg-step-pill__label">Step ' + (idx + 1) + '</span>' +
+        '</button>';
+      }).join('');
+
+      var activeGuideTab = this._activePgGuideTab || 'practice';
+      var gTabBtn = function(tabKey, label) {
+        var sel = activeGuideTab === tabKey;
+        return '<button type="button" role="tab" id="pg-tab-' + tabKey + '" aria-controls="pg-panel-' + tabKey + '" aria-selected="' + sel + '" tabindex="' + (sel ? '0' : '-1') + '" class="pg-guide-tabs__tab' + (sel ? ' is-active' : '') + '" data-pg-guide-tab="' + tabKey + '">' + label + '</button>';
+      };
+
+      var hintKey = lab.id + ':s' + stepIdx;
+      var revealedHintCount = Number(this._pgRevealedHints[hintKey] || 0);
+      var stepHints = Array.isArray(activeStep.hints) ? activeStep.hints : [];
+      var hintsSectionHtml = '';
+      if (stepHints.length > 0) {
+        var revealedItemsHtml = stepHints.slice(0, revealedHintCount).map(function(h, hIdx) {
+          return '<li class="pg-hint-list__item"><span class="pg-hint-list__tier">Hint ' + (hIdx + 1) + '</span><div>' + pgt.formatInlineProse(h) + '</div></li>';
+        }).join('');
+        var nextHintBtnHtml = revealedHintCount < stepHints.length
+          ? '<button type="button" class="studio-btn studio-btn--ghost studio-btn--sm" data-pg-lab-action="reveal-hint">Reveal Hint ' + (revealedHintCount + 1) + ' of ' + stepHints.length + '</button>'
+          : '<span class="pg-hint-exhausted">All ' + stepHints.length + ' hints revealed</span>';
+        hintsSectionHtml =
+          '<div class="pg-hint-box">' +
+            '<div class="pg-hint-box__head">' +
+              '<span class="pg-section-heading">Progressive Hints</span>' +
+              nextHintBtnHtml +
+            '</div>' +
+            (revealedHintCount > 0 ? '<ol class="pg-hint-list">' + revealedItemsHtml + '</ol>' : '') +
+          '</div>';
+      }
+
+      var activeDs = activeStep.datasetId || lab.datasetId || metaTopic.datasetId || 'ecommerce';
+      var assertions = activeStep.assertions || {};
+      var expectedCols = Array.isArray(assertions.expectedColumns) && assertions.expectedColumns.length > 0
+        ? '<div class="pg-contract-chip"><span>Expected columns:</span> <code>' + assertions.expectedColumns.map(escapeHtml).join(', ') + '</code></div>'
+        : '';
+      var scenario = lab.scenario || {};
+      var guide = lab.guide || {};
+      var gotchasHtml = Array.isArray(guide.internalsAndGotchas)
+        ? '<ul class="pg-gotchas-list">' + guide.internalsAndGotchas.map(function(g) { return '<li>' + pgt.formatInlineProse(g) + '</li>'; }).join('') + '</ul>'
+        : '';
+
+      var savedDraft = pgt.getStepDraft(lab.id, stepIdx);
+      var editorSql = (savedDraft !== null && savedDraft !== undefined) ? savedDraft : (activeStep.starterCode || '');
+      var diffRaw = String(lab.difficulty || metaTopic.difficulty || 'Beginner');
+      var diffSlug = diffRaw.toLowerCase().indexOf('adv') === 0 || diffRaw.toLowerCase().indexOf('prod') === 0 ? 'hard'
+        : diffRaw.toLowerCase().indexOf('inter') === 0 ? 'medium' : 'easy';
+
+      this._container.innerHTML =
+        '<div class="view-canvas sql-studio studio-app studio-app--pg-labs">' +
+          '<header class="studio-toolbar">' +
+            '<div class="studio-toolbar__group">' +
+              '<h1 class="studio-title">SQL Studio</h1>' +
+              ctx.modeSwitcherHtml +
+            '</div>' +
+            '<div class="studio-toolbar__group studio-toolbar__group--end">' +
+              '<span class="chal-engine-pill">PostgreSQL 18.6 WASM</span>' +
+              '<a href="/postgres/" class="studio-btn studio-btn--ghost studio-btn--sm" data-pg-hub-nav="true">All 80 Topics</a>' +
+            '</div>' +
+          '</header>' +
+          '<div class="studio-body studio-body--challenge' + (ctx.sidebarCollapsed ? ' is-sidebar-collapsed' : '') + '" id="sandbox-mount-target">' +
+            ctx.sidebarReopenRailHtml +
+            '<aside class="studio-panel studio-brief pg-lab-guide" aria-label="PostgreSQL practice guide">' +
+              '<div class="studio-panel__head studio-brief__nav">' +
+                '<button type="button" class="studio-icon-btn" data-pg-lab-action="prev-lab" aria-label="Previous topic" title="Previous topic"' + (topicIdx === 0 ? ' disabled' : '') + '>‹</button>' +
+                '<select id="wb-pg-lab-select" aria-label="Select PostgreSQL topic" class="studio-select studio-select--flush">' +
+                  optGroupsHtml +
+                '</select>' +
+                '<button type="button" class="studio-icon-btn" data-pg-lab-action="next-lab" aria-label="Next topic" title="Next topic"' + (topicIdx >= totalTopics - 1 ? ' disabled' : '') + '>›</button>' +
+                ctx.sidebarCollapseBtnHtml +
+              '</div>' +
+              '<div class="studio-panel__scroll studio-brief__body">' +
+                '<div class="studio-progress pg-lab-progress" title="' + progSummary.completedStepsCount + ' of ' + progSummary.totalSteps + ' total SQL steps verified">' +
+                  '<span class="studio-progress__label">Topic ' + (topicIdx + 1) + ' of ' + totalTopics + '</span>' +
+                  '<span class="studio-progress__value">' + progSummary.completedStepsCount + '/' + progSummary.totalSteps + ' steps</span>' +
+                  '<span class="studio-progress__track"><span class="studio-progress__fill" style="width:' + progSummary.pctSteps + '%"></span></span>' +
+                '</div>' +
+                '<h2 class="studio-brief__title">' + escapeHtml(lab.title) + '</h2>' +
+                '<div class="studio-brief__meta">' +
+                  '<span class="studio-tag studio-tag--' + diffSlug + '">' + escapeHtml(diffRaw) + '</span>' +
+                  '<span class="studio-tag">' + escapeHtml(modMeta.shortTitle || modMeta.title) + '</span>' +
+                  '<span class="studio-tag' + (topicStepDone >= steps.length ? ' studio-tag--solved' : '') + '" id="wb-pg-topic-status-pill">' +
+                    (topicStepDone >= steps.length ? 'Mastered (3/3)' : (topicStepDone + '/' + steps.length + ' steps')) +
+                  '</span>' +
+                '</div>' +
+                '<div class="pg-step-pills" role="group" aria-label="Topic practice steps">' + stepPillsHtml + '</div>' +
+                '<div class="pg-guide-tabs" role="tablist" aria-label="Topic guide sections">' +
+                  gTabBtn('practice', 'Mission') +
+                  gTabBtn('guide', 'Internals Guide') +
+                  gTabBtn('solution', 'Solution') +
+                '</div>' +
+                '<div id="pg-panel-practice" role="tabpanel" aria-labelledby="pg-tab-practice" class="pg-guide-panel"' + (activeGuideTab === 'practice' ? '' : ' hidden="until-found"') + '>' +
+                  '<div class="pg-guide-panel__inner">' +
+                    '<div class="pg-scenario-card">' +
+                      '<div class="pg-scenario-card__role">' + escapeHtml(scenario.role || 'Staff Database Engineer') + '</div>' +
+                      '<p class="pg-scenario-card__goal">' + pgt.formatInlineProse(scenario.incidentOrGoal || lab.summary || '') + '</p>' +
+                      (scenario.stakeholderNeed ? '<p class="pg-scenario-card__need">' + pgt.formatInlineProse(scenario.stakeholderNeed) + '</p>' : '') +
+                    '</div>' +
+                    '<div class="studio-brief__task pg-step-mission">' +
+                      '<div class="pg-step-mission__head">' +
+                        '<span class="pg-step-mission__badge">Step ' + (stepIdx + 1) + ' of ' + steps.length + '</span>' +
+                        '<strong>' + escapeHtml(activeStep.title || ('Step ' + (stepIdx + 1))) + '</strong>' +
+                      '</div>' +
+                      '<div class="pg-step-mission__prose">' + pgt.formatProseParagraphs(activeStep.mission || '') + '</div>' +
+                      expectedCols +
+                    '</div>' +
+                    hintsSectionHtml +
+                    this._renderDatasetQuickPeekHtml(activeDs) +
+                  '</div>' +
+                '</div>' +
+                '<div id="pg-panel-guide" role="tabpanel" aria-labelledby="pg-tab-guide" class="pg-guide-panel"' + (activeGuideTab === 'guide' ? '' : ' hidden="until-found"') + '>' +
+                  '<div class="pg-guide-panel__inner">' +
+                    '<h3 class="pg-guide-h3">First-Principles Mental Model</h3>' +
+                    '<div class="pg-guide-prose">' + pgt.formatProseParagraphs(guide.mentalModel || '') + '</div>' +
+                    (guide.syntaxAnatomy
+                      ? '<h3 class="pg-guide-h3">PostgreSQL 18 Syntax Anatomy</h3><pre class="pg-syntax-pre"><code>' + escapeHtml(guide.syntaxAnatomy) + '</code></pre>'
+                      : '') +
+                    (gotchasHtml ? '<h3 class="pg-guide-h3">Engine Internals &amp; Production Gotchas</h3>' + gotchasHtml : '') +
+                    (guide.whenToUse
+                      ? '<div class="pg-when-card"><span class="pg-section-heading">Architectural Trade-Off &amp; When to Use</span><p>' + pgt.formatInlineProse(guide.whenToUse) + '</p></div>'
+                      : '') +
+                  '</div>' +
+                '</div>' +
+                '<div id="pg-panel-solution" role="tabpanel" aria-labelledby="pg-tab-solution" class="pg-guide-panel"' + (activeGuideTab === 'solution' ? '' : ' hidden') + '>' +
+                  '<div class="pg-guide-panel__inner">' +
+                    '<div class="pg-solution-header">' +
+                      '<h3 class="pg-guide-h3">Step ' + (stepIdx + 1) + ' Reference Solution</h3>' +
+                      '<button type="button" class="studio-btn studio-btn--sm" data-pg-lab-action="load-solution">Load into Editor</button>' +
+                    '</div>' +
+                    '<pre class="pg-syntax-pre"><code>' + escapeHtml(activeStep.solutionCode || '') + '</code></pre>' +
+                    '<h3 class="pg-guide-h3">Why This Works in PostgreSQL 18</h3>' +
+                    '<div class="pg-guide-prose">' + pgt.formatProseParagraphs(activeStep.solutionExplanation || '') + '</div>' +
+                  '</div>' +
+                '</div>' +
+              '</div>' +
+            '</aside>' +
+            '<section class="studio-work wb-sql-main">' +
+              '<div class="studio-pane studio-pane--editor studio-editor">' +
+                '<div class="studio-pane__bar">' +
+                  '<span class="studio-file-tab">' + ctx.sqlFileIconSvg + 'step-' + (stepIdx + 1) + '.sql <span class="pg-ds-chip">' + escapeHtml(activeDs) + '</span></span>' +
+                  '<div class="studio-pane__actions">' +
+                    '<button type="button" class="studio-btn studio-btn--sm" data-pg-lab-action="run-preview" title="Execute SQL in isolated savepoint without grading">Run</button>' +
+                    '<button type="button" class="studio-btn studio-btn--sm studio-btn--primary" data-pg-lab-action="verify-step">Verify Step ' + ctx.runKbdHtml + '</button>' +
+                    '<details class="wb-tools-menu studio-menu">' +
+                      '<summary class="studio-icon-btn studio-menu__trigger" aria-label="Editor actions" title="More actions">' + ctx.dotsIconSvg + '</summary>' +
+                      '<div class="wb-tools-popover studio-menu__panel">' +
+                        '<button type="button" class="studio-menu__item" data-pg-lab-action="format">Format SQL</button>' +
+                        '<button type="button" class="studio-menu__item" data-pg-lab-action="explain">Explain query plan</button>' +
+                        '<button type="button" class="studio-menu__item" data-pg-lab-action="share-lab">Copy topic link</button>' +
+                        '<div class="studio-menu__sep" role="separator"></div>' +
+                        '<button type="button" class="studio-menu__item" data-pg-lab-action="reset-step">Reset starter SQL</button>' +
+                        '<button type="button" class="studio-menu__item" data-pg-lab-action="load-solution">Load reference solution</button>' +
+                      '</div>' +
+                    '</details>' +
+                  '</div>' +
+                '</div>' +
+                '<div class="studio-pane__editor">' +
+                  '<textarea class="sql-studio-editor sql-inline-workbench__editor" id="wb-pg-lab-editor" aria-label="PostgreSQL practice SQL editor" spellcheck="false" rows="9">' + escapeHtml(editorSql) + '</textarea>' +
+                '</div>' +
+                '<div id="wb-pg-lab-verdict" class="studio-verdict pg-lab-verdict" hidden></div>' +
+              '</div>' +
+              ctx.splitterHtml +
+              '<div class="studio-pane studio-pane--results">' +
+                '<div id="wb-pg-lab-visualizer-slot" class="studio-results"></div>' +
+              '</div>' +
+            '</section>' +
+          '</div>' +
+        '</div>';
+
+      this._initStudioSplitter();
+      try {
+        if (root.history && typeof root.history.replaceState === 'function' && root.location && /^\/sandbox/i.test(root.location.pathname || '')) {
+          var nextUrl = '/sandbox/?mode=postgres-labs&lab=' + encodeURIComponent(lab.slug) + '&step=' + (stepIdx + 1);
+          root.history.replaceState(null, '', nextUrl);
+        }
+      } catch (e) {}
+
+      var pgEditor = this._container.querySelector('#wb-pg-lab-editor');
+      var pgSlot = this._container.querySelector('#wb-pg-lab-visualizer-slot');
+      var pgVerdict = this._container.querySelector('#wb-pg-lab-verdict');
+
+      this._runPgLabStep = function(onlyPreview, focusExplain) {
+        var curSql = pgEditor ? pgEditor.value : editorSql;
+        pgt.saveStepDraft(lab.id, stepIdx, curSql);
+        if (root.TableVisualizer && pgSlot) {
+          root.TableVisualizer.mountClauseVisualizer(pgSlot, curSql, {
+            datasetId: activeDs,
+            engine: 'postgres',
+            isolatedTx: true,
+            setupSql: activeStep.setupSql || '',
+            probeSql: activeStep.probeSql || '',
+            ideCtrl: self._pgLabIdeCtrl || null,
+            startAtFinal: true,
+            focusExplain: Boolean(focusExplain),
+            compactHeader: true
+          });
+        }
+        if (onlyPreview) return;
+        if (pgVerdict) {
+          pgVerdict.hidden = false;
+          pgVerdict.className = 'studio-verdict pg-lab-verdict is-checking';
+          pgVerdict.textContent = 'Running 5-gate PostgreSQL 18.6 WASM verification…';
+        }
+        pgt.verifyLabStep(lab, stepIdx, curSql).then(function(verdict) {
+          if (!pgVerdict) return;
+          var gatesListHtml = Array.isArray(verdict.gates) && verdict.gates.length > 0
+            ? '<ul class="pg-gate-checklist">' + verdict.gates.map(function(g) {
+                return '<li class="pg-gate-checklist__item ' + (g.passed ? 'is-pass' : 'is-fail') + '">' +
+                  '<span class="pg-gate-checklist__icon" aria-hidden="true">' + (g.passed ? '✓' : '✕') + '</span>' +
+                  '<strong>' + escapeHtml(g.label) + ':</strong> ' +
+                  '<span>' + escapeHtml(g.detail || '') + '</span>' +
+                '</li>';
+              }).join('') + '</ul>'
+            : '';
+          if (verdict.passed) {
+            pgt.markStepCompleted(lab.id, lab.slug, stepIdx, steps.length);
+            var activeStepBtn = self._container ? self._container.querySelector('[data-pg-lab-step="' + stepIdx + '"]') : null;
+            if (activeStepBtn && !activeStepBtn.classList.contains('is-done')) {
+              activeStepBtn.classList.add('is-done');
+            }
+            var updatedDone = pgt.getTopicCompletedStepCount(lab.id, steps.length);
+            var statusPill = self._container ? self._container.querySelector('#wb-pg-topic-status-pill') : null;
+            if (statusPill) {
+              statusPill.className = 'studio-tag' + (updatedDone >= steps.length ? ' studio-tag--solved' : '');
+              statusPill.textContent = updatedDone >= steps.length ? 'Mastered (3/3)' : (updatedDone + '/' + steps.length + ' steps');
+            }
+            var hasNextStep = stepIdx + 1 < steps.length;
+            var hasNextTopic = topicIdx + 1 < totalTopics;
+            var nextCtaHtml = hasNextStep
+              ? '<button type="button" class="studio-btn studio-btn--sm studio-btn--primary" data-pg-lab-action="next-step">Next Step (' + (stepIdx + 2) + '/' + steps.length + ') →</button>'
+              : (hasNextTopic
+                ? '<button type="button" class="studio-btn studio-btn--sm studio-btn--primary" data-pg-lab-action="next-lab">Next Topic →</button>'
+                : '<a href="/postgres/" class="studio-btn studio-btn--sm studio-btn--primary">Curriculum Complete — View Hub</a>');
+            pgVerdict.className = 'studio-verdict pg-lab-verdict is-pass';
+            pgVerdict.innerHTML =
+              '<div class="pg-lab-verdict__head">' +
+                '<strong>Step ' + (stepIdx + 1) + ' Verified — All ' + verdict.gates.length + ' PostgreSQL 18 Gates Passed</strong>' +
+                nextCtaHtml +
+              '</div>' +
+              gatesListHtml;
+          } else {
+            pgVerdict.className = 'studio-verdict pg-lab-verdict is-fail';
+            pgVerdict.innerHTML =
+              '<div class="pg-lab-verdict__head">' +
+                '<strong>Verification Incomplete:</strong> <span>' + escapeHtml(verdict.message || 'Output did not match expected specification.') + '</span>' +
+              '</div>' +
+              (verdict.hint ? '<div class="pg-lab-verdict__hint">' + escapeHtml(verdict.hint) + '</div>' : '') +
+              gatesListHtml;
+          }
+        });
+      };
+
+      if (pgEditor && root.TableVisualizer && typeof root.TableVisualizer.enhanceTextareaToIde === 'function') {
+        this._pgLabIdeCtrl = root.TableVisualizer.enhanceTextareaToIde(pgEditor, {
+          datasetId: activeDs,
+          ariaLabel: 'PostgreSQL practice SQL editor',
+          onRun: function() { self._runPgLabStep(false, false); }
+        });
+      }
+      this._runPgLabStep(true, false);
+    },
+
     // ── Rendering ──────────────────────────────────────────────
     render: function() {
       if (!this._container) return;
@@ -2201,6 +2624,11 @@
       var challengesList = this._getChallengesList();
       var solvedCount = challengesList.filter(function(c) { return Boolean(solvedMap[c.id]); }).length;
 
+      var pgProgressBadge = '80';
+      if (root.PgTutorials && typeof root.PgTutorials.getProgressSummary === 'function') {
+        var pgSum = root.PgTutorials.getProgressSummary();
+        pgProgressBadge = pgSum.completedTopicsCount + '/' + (pgSum.totalTopics || 80);
+      }
       var activeMode = this._activeWorkbenchMode;
       var modeTab = function(mode, label, extra) {
         var isActive = activeMode === mode;
@@ -2211,7 +2639,8 @@
       var modeSwitcherHtml =
         '<div class="studio-tabs wb-mode-switcher" role="tablist" aria-label="Studio mode">' +
           modeTab('sql-studio', 'Playground') +
-          modeTab('sql-challenges', 'Challenges', solvedCount + '/' + (challengesList.length || 12)) +
+          modeTab('postgres-labs', 'Learn Postgres', pgProgressBadge) +
+          modeTab('sql-challenges', 'Challenges', solvedCount + '/' + (challengesList.length || 20)) +
           modeTab('architecture-canvas', 'Architecture') +
         '</div>';
       var isMacPlatform = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent || '');
@@ -2240,6 +2669,20 @@
       var splitterHtml =
         '<div class="studio-splitter" role="separator" aria-orientation="horizontal" aria-label="Resize editor and results" tabindex="0" title="Drag to resize · double-click to reset"></div>';
 
+      if (this._activeWorkbenchMode === 'postgres-labs') {
+        this._renderPostgresLabsWorkbench({
+          modeSwitcherHtml: modeSwitcherHtml,
+          runKbdHtml: runKbdHtml,
+          sidebarCollapsed: sidebarCollapsed,
+          sidebarCollapseBtnHtml: sidebarCollapseBtnHtml,
+          sidebarReopenRailHtml: sidebarReopenRailHtml,
+          sqlFileIconSvg: sqlFileIconSvg,
+          dotsIconSvg: dotsIconSvg,
+          splitterHtml: splitterHtml
+        });
+        return;
+      }
+
       if (this._activeWorkbenchMode === 'sql-challenges') {
         if (challengesList.length === 0 && root.Lazy && typeof root.Lazy.load === 'function') {
           this._container.innerHTML = '<div class="view-canvas sandbox-view"><p style="padding:2rem;color:var(--fg-muted);">Loading SQL Challenges…</p></div>';
@@ -2261,24 +2704,55 @@
         };
         this._activeChallengeId = activeChal.id;
         var cf = activeChal.codeFix || {};
+        var chalEngine = activeChal.engine || cf.engine || null;
+        if (chalEngine === 'postgres' && this._sqlStudioEngine !== 'postgres') {
+          this._sqlStudioEngine = 'postgres';
+          if (root.SQLEngine && typeof root.SQLEngine.setEngineMode === 'function') {
+            root.SQLEngine.setEngineMode('postgres');
+          }
+        }
         var chalDs = cf.datasetId || 'ecommerce';
         var draftSql = this._challengeDrafts[activeChal.id] !== undefined
           ? this._challengeDrafts[activeChal.id]
           : (cf.buggyCode || cf.solutionCode || '');
         var isSolved = Boolean(solvedMap[activeChal.id]);
-        var hintsHtml = Array.isArray(activeChal.invariants) && activeChal.invariants.length > 0
+        var invariantsHtml = Array.isArray(activeChal.invariants) && activeChal.invariants.length > 0
           ? '<ul class="studio-hints__list">' +
               activeChal.invariants.map(function(h) { return '<li>' + escapeHtml(h) + '</li>'; }).join('') +
             '</ul>'
           : '<p class="studio-hints__text">' + escapeHtml(cf.summary || activeChal.summary || '') + '</p>';
 
+        var chalHintsArr = Array.isArray(activeChal.hints) ? activeChal.hints : [];
+        var chalRevealedCount = Number(this._chalRevealedHints[activeChal.id] || 0);
+        var chalProgressiveHintsHtml = '';
+        if (chalHintsArr.length > 0) {
+          var chalHintItems = chalHintsArr.slice(0, chalRevealedCount).map(function(h, idx) {
+            return '<li class="pg-hint-list__item"><span class="pg-hint-list__tier">Hint ' + (idx + 1) + '</span><div>' + escapeHtml(h) + '</div></li>';
+          }).join('');
+          var chalHintBtn = chalRevealedCount < chalHintsArr.length
+            ? '<button type="button" class="studio-btn studio-btn--ghost studio-btn--sm" data-chal-action="reveal-hint">Reveal Hint ' + (chalRevealedCount + 1) + ' of ' + chalHintsArr.length + '</button>'
+            : '<span class="pg-hint-exhausted">All ' + chalHintsArr.length + ' hints revealed</span>';
+          chalProgressiveHintsHtml =
+            '<div class="pg-hint-box">' +
+              '<div class="pg-hint-box__head"><span class="pg-section-heading">3-Tier Diagnostic Hints</span>' + chalHintBtn + '</div>' +
+              (chalRevealedCount > 0 ? '<ol class="pg-hint-list">' + chalHintItems + '</ol>' : '') +
+            '</div>';
+        }
+
+        var chalActiveTab = this._activeChalTab || 'brief';
+        var chalTabBtn = function(tKey, label) {
+          var isAct = chalActiveTab === tKey;
+          return '<button type="button" role="tab" id="chal-tab-' + tKey + '" aria-controls="chal-panel-' + tKey + '" aria-selected="' + isAct + '" tabindex="' + (isAct ? '0' : '-1') + '" class="pg-guide-tabs__tab' + (isAct ? ' is-active' : '') + '" data-chal-tab="' + tKey + '">' + label + '</button>';
+        };
+
         var chalLevelNames = { easy: 'Beginner', medium: 'Intermediate', hard: 'Advanced', insane: 'Expert' };
         var chalOptionsHtml = challengesList.map(function(ch, idx) {
-          var doneMark = solvedMap[ch.id] ? '✓ ' : '';
+          var doneMark = solvedMap[ch.id] ? '[Solved] ' : '';
           var rawDiff = String(ch.difficulty || 'medium').toLowerCase();
           var friendlyDiff = chalLevelNames[rawDiff] || ch.difficulty || 'Intermediate';
+          var engTag = (ch.engine === 'postgres') ? ' · PG 18' : '';
           return '<option value="' + escapeHtml(ch.id) + '" ' + (ch.id === activeChal.id ? 'selected' : '') + '>' +
-            doneMark + (idx + 1) + '. ' + escapeHtml(ch.title) + ' (' + escapeHtml(friendlyDiff) + ')' +
+            doneMark + (idx + 1) + '. ' + escapeHtml(ch.title) + ' (' + escapeHtml(friendlyDiff) + engTag + ')' +
           '</option>';
         }).join('');
 
@@ -2287,6 +2761,10 @@
         var chalIndex = Math.max(0, challengesList.findIndex(function(c) { return c.id === activeChal.id; }));
         var chalTotal = challengesList.length || 1;
         var solvedPct = Math.round((solvedCount / chalTotal) * 100);
+        var chalHeaderEngineHtml = chalEngine === 'postgres'
+          ? '<span class="chal-engine-pill">PostgreSQL 18.6 WASM</span>'
+          : engineSelectHtml;
+
         this._container.innerHTML =
           '<div class="view-canvas sql-studio studio-app studio-app--challenges">' +
             '<header class="studio-toolbar">' +
@@ -2295,7 +2773,7 @@
                 modeSwitcherHtml +
               '</div>' +
               '<div class="studio-toolbar__group studio-toolbar__group--end">' +
-                engineSelectHtml +
+                chalHeaderEngineHtml +
               '</div>' +
             '</header>' +
             '<div class="studio-body studio-body--challenge' + (sidebarCollapsed ? ' is-sidebar-collapsed' : '') + '" id="sandbox-mount-target">' +
@@ -2319,26 +2797,53 @@
                   '<div class="studio-brief__meta">' +
                     '<span class="studio-tag studio-tag--' + escapeHtml(difficultyLabel) + '">' + escapeHtml(difficultyDisplay) + '</span>' +
                     '<span class="studio-tag">' + escapeHtml(activeChal.category || 'SQL Challenge') + '</span>' +
-                    (isSolved ? '<span class="studio-tag studio-tag--solved" id="wb-chal-solved-pill">✓ Solved</span>' : '<span class="studio-tag" id="wb-chal-solved-pill">Unsolved</span>') +
+                    (chalEngine === 'postgres' ? '<span class="chal-engine-pill">PostgreSQL 18</span>' : '') +
+                    (isSolved ? '<span class="studio-tag studio-tag--solved" id="wb-chal-solved-pill">Solved</span>' : '<span class="studio-tag" id="wb-chal-solved-pill">Unsolved</span>') +
                   '</div>' +
-                  '<p class="studio-brief__summary">' + escapeHtml(cf.summary || activeChal.subtitle || '') + '</p>' +
-                  '<div class="studio-brief__task">' +
-                    '<span class="studio-label">Your task</span>' +
-                    '<p>Fix the starter query in the editor so its output matches the expected result, then press <strong>Check</strong>.</p>' +
+                  '<div class="pg-guide-tabs" role="tablist" aria-label="Incident challenge guide">' +
+                    chalTabBtn('brief', 'Incident Brief') +
+                    chalTabBtn('hints', 'Hints &amp; Invariants') +
+                    chalTabBtn('postmortem', 'Postmortem') +
                   '</div>' +
-                  '<details class="studio-hints sql-lab-hint-details">' +
-                    '<summary class="studio-hints__summary">Hints</summary>' +
-                    '<div class="studio-hints__body">' + hintsHtml + '</div>' +
-                  '</details>' +
-                  '<dl class="studio-brief__facts">' +
-                    '<div><dt>Dataset</dt><dd><code>' + escapeHtml(chalDs) + '</code></dd></div>' +
-                  '</dl>' +
+                  '<div id="chal-panel-brief" role="tabpanel" aria-labelledby="chal-tab-brief" class="pg-guide-panel"' + (chalActiveTab === 'brief' ? '' : ' hidden="until-found"') + '>' +
+                    '<div class="pg-guide-panel__inner">' +
+                      '<p class="studio-brief__summary">' + escapeHtml(cf.summary || activeChal.subtitle || '') + '</p>' +
+                      (activeChal.rootCause ? '<div class="pg-scenario-card"><div class="pg-scenario-card__role">Production Symptom &amp; Root Cause</div><p class="pg-scenario-card__goal">' + escapeHtml(activeChal.subtitle || '') + '</p></div>' : '') +
+                      '<div class="studio-brief__task">' +
+                        '<span class="studio-label">Remediation Mission</span>' +
+                        '<p>Fix the starter query in the editor so its output satisfies all invariants and matches the expected result, then press <strong>Check</strong>.</p>' +
+                      '</div>' +
+                      this._renderDatasetQuickPeekHtml(chalDs) +
+                    '</div>' +
+                  '</div>' +
+                  '<div id="chal-panel-hints" role="tabpanel" aria-labelledby="chal-tab-hints" class="pg-guide-panel"' + (chalActiveTab === 'hints' ? '' : ' hidden="until-found"') + '>' +
+                    '<div class="pg-guide-panel__inner">' +
+                      chalProgressiveHintsHtml +
+                      '<h3 class="pg-guide-h3">Verification Invariants</h3>' +
+                      invariantsHtml +
+                    '</div>' +
+                  '</div>' +
+                  '<div id="chal-panel-postmortem" role="tabpanel" aria-labelledby="chal-tab-postmortem" class="pg-guide-panel"' + (chalActiveTab === 'postmortem' ? '' : ' hidden') + '>' +
+                    '<div class="pg-guide-panel__inner">' +
+                      '<div class="pg-solution-header">' +
+                        '<h3 class="pg-guide-h3">Reference Remediation SQL</h3>' +
+                        '<button type="button" class="studio-btn studio-btn--sm" data-chal-action="reveal">Load into Editor</button>' +
+                      '</div>' +
+                      '<pre class="pg-syntax-pre"><code>' + escapeHtml(cf.solutionCode || '') + '</code></pre>' +
+                      (activeChal.postmortemExplanation
+                        ? '<h3 class="pg-guide-h3">Staff Engineer Postmortem</h3><p class="studio-brief__summary">' + escapeHtml(activeChal.postmortemExplanation) + '</p>'
+                        : '') +
+                      (activeChal.rootCause
+                        ? '<h3 class="pg-guide-h3">Engine Root Cause</h3><p class="studio-brief__summary">' + escapeHtml(activeChal.rootCause) + '</p>'
+                        : '') +
+                    '</div>' +
+                  '</div>' +
                 '</div>' +
               '</aside>' +
               '<section class="studio-work wb-sql-main">' +
                 '<div class="studio-pane studio-pane--editor studio-editor">' +
                   '<div class="studio-pane__bar">' +
-                    '<span class="studio-file-tab">' + sqlFileIconSvg + 'solution.sql</span>' +
+                    '<span class="studio-file-tab">' + sqlFileIconSvg + 'solution.sql <span class="pg-ds-chip">' + escapeHtml(chalDs) + '</span></span>' +
                     '<div class="studio-pane__actions">' +
                       '<button type="button" class="studio-btn studio-btn--sm" data-chal-action="run-only" title="Run without checking">Run</button>' +
                       '<button type="button" class="studio-btn studio-btn--sm studio-btn--primary" data-chal-action="check">Check ' + runKbdHtml + '</button>' +
@@ -2379,6 +2884,8 @@
           if (!root.TableVisualizer) return;
           root.TableVisualizer.mountClauseVisualizer(chalSlot, curVal, {
             datasetId: chalDs,
+            engine: chalEngine || undefined,
+            isolatedTx: chalEngine === 'postgres',
             ideCtrl: self._chalIdeCtrl || null,
             startAtFinal: true,
             focusExplain: Boolean(focusExplain),
@@ -2392,6 +2899,8 @@
           }
           root.TableVisualizer.verifyQueryAgainstReference(curVal, cf.solutionCode, {
             datasetId: chalDs,
+            engine: chalEngine || undefined,
+            isolatedTx: chalEngine === 'postgres',
             buggyCode: cf.buggyCode
           }).then(function(vRes) {
             if (!chalVerdict) return;
@@ -2528,6 +3037,7 @@
                         dsOption('fintech_ledger', 'Fintech ledger') +
                         dsOption('saas_telemetry', 'SaaS telemetry') +
                         dsOption('social_graph', 'Social graph') +
+                        dsOption('pg_ops_telemetry', 'Postgres 18 Ops &amp; Rich Types (17 Tables)') +
                       '</optgroup>' +
                     '</select>' +
                     '<button type="button" class="studio-btn studio-btn--sm studio-db-add-btn" data-sql-studio-action="toggle-new-db" aria-expanded="' + Boolean(this._newDbBarOpen) + '" title="Create a new custom database">+ DB</button>' +
@@ -3250,16 +3760,136 @@
           });
         }
 
-        // Top-level Workbench Mode Switcher (SQL Studio vs Architecture Canvas)
+        // Top-level Workbench Mode Switcher (SQL Studio vs Learn Postgres vs Challenges vs Architecture Canvas)
         var modeBtn = e.target.closest('[data-workbench-mode]');
         if (modeBtn) {
           var nextMode = modeBtn.getAttribute('data-workbench-mode');
           if (nextMode && nextMode !== self._activeWorkbenchMode) {
             var ed = container.querySelector('#wb-sql-studio-editor');
             if (ed && ed.value.trim()) self._sqlStudioQuery = ed.value;
+            var pgEdSave = container.querySelector('#wb-pg-lab-editor');
+            if (pgEdSave && self._loadedPgLab && root.PgTutorials) {
+              root.PgTutorials.saveStepDraft(self._loadedPgLab.id, self._activePgLabStep || 0, pgEdSave.value);
+            }
+            if (nextMode === 'postgres-labs') {
+              self._sqlStudioEngine = 'postgres';
+              if (root.SQLEngine && typeof root.SQLEngine.setEngineMode === 'function') {
+                root.SQLEngine.setEngineMode('postgres');
+              }
+            }
             self._activeWorkbenchMode = nextMode;
             self.render();
           }
+          return;
+        }
+
+        // Learn Postgres & Challenges Guide Tab Switchers
+        var pgGuideTabBtn = e.target.closest('[data-pg-guide-tab]');
+        if (pgGuideTabBtn) {
+          var nextGTab = pgGuideTabBtn.getAttribute('data-pg-guide-tab');
+          if (nextGTab && nextGTab !== self._activePgGuideTab) {
+            var pgEdT = container.querySelector('#wb-pg-lab-editor');
+            if (pgEdT && self._loadedPgLab && root.PgTutorials) {
+              root.PgTutorials.saveStepDraft(self._loadedPgLab.id, self._activePgLabStep || 0, pgEdT.value);
+            }
+            self._activePgGuideTab = nextGTab;
+            self.render();
+          }
+          return;
+        }
+
+        var chalTabBtnEl = e.target.closest('[data-chal-tab]');
+        if (chalTabBtnEl) {
+          var nextCTab = chalTabBtnEl.getAttribute('data-chal-tab');
+          if (nextCTab && nextCTab !== self._activeChalTab) {
+            var cEdSave = container.querySelector('#wb-challenge-editor');
+            if (cEdSave && self._activeChallengeId) {
+              self._challengeDrafts[self._activeChallengeId] = cEdSave.value;
+            }
+            self._activeChalTab = nextCTab;
+            self.render();
+          }
+          return;
+        }
+
+        // Learn Postgres Step Pill Switcher
+        var pgStepBtn = e.target.closest('[data-pg-lab-step]');
+        if (pgStepBtn) {
+          var nextStepIdx = parseInt(pgStepBtn.getAttribute('data-pg-lab-step'), 10);
+          if (!isNaN(nextStepIdx) && nextStepIdx !== self._activePgLabStep) {
+            var pgEdSt = container.querySelector('#wb-pg-lab-editor');
+            if (pgEdSt && self._loadedPgLab && root.PgTutorials) {
+              root.PgTutorials.saveStepDraft(self._loadedPgLab.id, self._activePgLabStep || 0, pgEdSt.value);
+            }
+            self._activePgLabStep = nextStepIdx;
+            if (self._activePgGuideTab === 'solution') self._activePgGuideTab = 'practice';
+            self.render();
+          }
+          return;
+        }
+
+        // Learn Postgres Actions
+        var pgActBtn = e.target.closest('[data-pg-lab-action]');
+        if (pgActBtn && self._loadedPgLab && root.PgTutorials) {
+          var pgAct = pgActBtn.getAttribute('data-pg-lab-action');
+          var pgEdAct = container.querySelector('#wb-pg-lab-editor');
+          var curLab = self._loadedPgLab;
+          var curStepIdx = self._activePgLabStep || 0;
+          var curStepObj = (curLab.steps && curLab.steps[curStepIdx]) || {};
+          var allTopics = root.PgTutorials.getCurriculum().topics || [];
+          var curTopIdx = allTopics.findIndex(function(t) { return t.id === curLab.id; });
+
+          if (pgAct === 'verify-step' && typeof self._runPgLabStep === 'function') {
+            self._runPgLabStep(false, false);
+          } else if (pgAct === 'run-preview' && typeof self._runPgLabStep === 'function') {
+            self._runPgLabStep(true, false);
+          } else if (pgAct === 'explain' && typeof self._runPgLabStep === 'function') {
+            self._runPgLabStep(true, true);
+          } else if (pgAct === 'format' && pgEdAct && root.TableVisualizer && typeof root.TableVisualizer.formatSql === 'function') {
+            pgEdAct.value = root.TableVisualizer.formatSql(pgEdAct.value);
+            pgEdAct.dispatchEvent(new Event('input', { bubbles: true }));
+            root.PgTutorials.saveStepDraft(curLab.id, curStepIdx, pgEdAct.value);
+          } else if (pgAct === 'reset-step' && pgEdAct) {
+            pgEdAct.value = curStepObj.starterCode || '';
+            pgEdAct.dispatchEvent(new Event('input', { bubbles: true }));
+            root.PgTutorials.clearStepDraft(curLab.id, curStepIdx);
+            if (typeof self._runPgLabStep === 'function') self._runPgLabStep(true, false);
+          } else if (pgAct === 'load-solution' && pgEdAct) {
+            pgEdAct.value = curStepObj.solutionCode || '';
+            pgEdAct.dispatchEvent(new Event('input', { bubbles: true }));
+            root.PgTutorials.saveStepDraft(curLab.id, curStepIdx, pgEdAct.value);
+            if (typeof self._runPgLabStep === 'function') self._runPgLabStep(true, false);
+          } else if (pgAct === 'reveal-hint') {
+            if (pgEdAct) root.PgTutorials.saveStepDraft(curLab.id, curStepIdx, pgEdAct.value);
+            var hKey = curLab.id + ':s' + curStepIdx;
+            self._pgRevealedHints[hKey] = (self._pgRevealedHints[hKey] || 0) + 1;
+            self.render();
+          } else if (pgAct === 'next-step') {
+            if (pgEdAct) root.PgTutorials.saveStepDraft(curLab.id, curStepIdx, pgEdAct.value);
+            if (curLab.steps && curStepIdx + 1 < curLab.steps.length) {
+              self._activePgLabStep = curStepIdx + 1;
+              if (self._activePgGuideTab === 'solution') self._activePgGuideTab = 'practice';
+              self.render();
+            }
+          } else if (pgAct === 'prev-lab' || pgAct === 'next-lab') {
+            if (pgEdAct) root.PgTutorials.saveStepDraft(curLab.id, curStepIdx, pgEdAct.value);
+            var targetTopic = allTopics[curTopIdx + (pgAct === 'next-lab' ? 1 : -1)];
+            if (targetTopic) {
+              self._activePgLabSlug = targetTopic.slug;
+              self._activePgLabStep = 0;
+              self._loadedPgLab = null;
+              if (self._activePgGuideTab === 'solution') self._activePgGuideTab = 'practice';
+              self.render();
+            }
+          } else if (pgAct === 'share-lab') {
+            var labShareUrl = ((root.location && root.location.origin && root.location.origin !== 'null') ? root.location.origin : 'https://sql-in-depth.vedgupta.in') +
+              '/sandbox/?mode=postgres-labs&lab=' + encodeURIComponent(curLab.slug) + '&step=' + (curStepIdx + 1);
+            if (root.App && typeof root.App.sharePageUrl === 'function') {
+              root.App.sharePageUrl({ title: curLab.title + ' — Learn Postgres', url: labShareUrl });
+            }
+          }
+          var parentPgMenu = pgActBtn.closest('details.studio-menu');
+          if (parentPgMenu) parentPgMenu.removeAttribute('open');
           return;
         }
 
@@ -3268,10 +3898,10 @@
         if (insertTblEl) {
           e.stopPropagation();
           var tNameInsert = insertTblEl.getAttribute('data-insert-table');
-          var edTblTa = container.querySelector('#wb-sql-studio-editor');
+          var edTblTa = container.querySelector('#wb-sql-studio-editor, #wb-pg-lab-editor, #wb-challenge-editor');
           if (tNameInsert && edTblTa && root.TableVisualizer && typeof root.TableVisualizer.insertSqlSnippet === 'function') {
             root.TableVisualizer.insertSqlSnippet(edTblTa, tNameInsert);
-            self._sqlStudioQuery = edTblTa.value;
+            if (edTblTa.id === 'wb-sql-studio-editor') self._sqlStudioQuery = edTblTa.value;
           }
           return;
         }
@@ -3312,6 +3942,10 @@
             cEd.dispatchEvent(new Event('input', { bubbles: true }));
             self._challengeDrafts[self._activeChallengeId] = cEd.value;
             if (typeof self._runChallengeCheck === 'function') self._runChallengeCheck(true, false);
+          } else if (cAct === 'reveal-hint') {
+            if (cEd) self._challengeDrafts[self._activeChallengeId] = cEd.value;
+            self._chalRevealedHints[self._activeChallengeId] = (self._chalRevealedHints[self._activeChallengeId] || 0) + 1;
+            self.render();
           } else if (cAct === 'share-challenge') {
             var chUrl = ((root.location && root.location.origin && root.location.origin !== 'null') ? root.location.origin : 'https://sql-in-depth.vedgupta.in') +
               '/sandbox/?mode=challenges&challenge=' + encodeURIComponent(self._activeChallengeId);
@@ -3335,7 +3969,7 @@
         var insertColEl = e.target.closest('[data-insert-col]');
         if (insertColEl) {
           var colName = insertColEl.getAttribute('data-insert-col');
-          var editorTa = container.querySelector('#wb-sql-studio-editor');
+          var editorTa = container.querySelector('#wb-sql-studio-editor, #wb-pg-lab-editor, #wb-challenge-editor');
           if (colName && editorTa) {
             if (root.TableVisualizer && typeof root.TableVisualizer.insertSqlSnippet === 'function') {
               root.TableVisualizer.insertSqlSnippet(editorTa, colName);
@@ -3346,7 +3980,7 @@
               editorTa.selectionStart = editorTa.selectionEnd = s + colName.length;
               editorTa.focus();
             }
-            self._sqlStudioQuery = editorTa.value;
+            if (editorTa.id === 'wb-sql-studio-editor') self._sqlStudioQuery = editorTa.value;
           }
           return;
         }
@@ -3433,6 +4067,20 @@
         if (previewTblBtn) {
           var tblName = previewTblBtn.getAttribute('data-sql-preview-table');
           var previewDs = previewTblBtn.getAttribute('data-sql-preview-ds');
+          if (self._activeWorkbenchMode === 'postgres-labs' || self._activeWorkbenchMode === 'sql-challenges') {
+            var targetSlot = container.querySelector('#wb-pg-lab-visualizer-slot, #wb-challenge-visualizer-slot');
+            if (tblName && targetSlot && root.TableVisualizer) {
+              var pSql = 'SELECT * FROM "' + tblName.replace(/"/g, '""') + '" LIMIT 15;';
+              root.TableVisualizer.mountClauseVisualizer(targetSlot, pSql, {
+                datasetId: previewDs || '__unified__',
+                engine: self._activeWorkbenchMode === 'postgres-labs' ? 'postgres' : (self._sqlStudioEngine || 'postgres'),
+                isolatedTx: true,
+                startAtFinal: true,
+                compactHeader: true
+              });
+            }
+            return;
+          }
           if (previewDs && self._sqlStudioDatasetId !== '__unified__' && self._sqlStudioDatasetId !== previewDs) {
             self._sqlStudioDatasetId = previewDs;
             self._saveStudioWorkspace();
@@ -4092,6 +4740,18 @@
           readNext();
           return;
         }
+        if (e.target.id === 'wb-pg-lab-select') {
+          var prevPgEd = container.querySelector('#wb-pg-lab-editor');
+          if (prevPgEd && self._loadedPgLab && root.PgTutorials) {
+            root.PgTutorials.saveStepDraft(self._loadedPgLab.id, self._activePgLabStep || 0, prevPgEd.value);
+          }
+          self._activePgLabSlug = e.target.value;
+          self._activePgLabStep = 0;
+          self._loadedPgLab = null;
+          if (self._activePgGuideTab === 'solution') self._activePgGuideTab = 'practice';
+          self.render();
+          return;
+        }
         if (e.target.id === 'wb-challenge-select') {
           var prevEd = container.querySelector('#wb-challenge-editor');
           if (prevEd && self._activeChallengeId) {
@@ -4126,6 +4786,12 @@
         if (e.target.id === 'wb-sql-dataset-select') {
           self._syncEditorToActiveFile();
           self._sqlStudioDatasetId = e.target.value || '__empty__';
+          if (root.PG_DATASETS && root.PG_DATASETS[self._sqlStudioDatasetId] && self._sqlStudioEngine !== 'postgres') {
+            self._sqlStudioEngine = 'postgres';
+            if (root.SQLEngine && typeof root.SQLEngine.setEngineMode === 'function') {
+              root.SQLEngine.setEngineMode('postgres');
+            }
+          }
           self._liveSchemaTables = null;
           self._saveStudioWorkspace();
           self.render();
@@ -4279,14 +4945,111 @@
             return;
           }
         }
+        // Accessible roving tablist keyboard navigation on .pg-guide-tabs [role="tab"]
+        var focusedGuideTab = e.target.closest && e.target.closest('.pg-guide-tabs [role="tab"]');
+        if (focusedGuideTab && (e.key === 'ArrowRight' || e.key === 'ArrowLeft' || e.key === 'Home' || e.key === 'End')) {
+          var gListEl = focusedGuideTab.closest('.pg-guide-tabs');
+          var gTabs = gListEl ? Array.prototype.slice.call(gListEl.querySelectorAll('[role="tab"]')) : [];
+          var gIdx = gTabs.indexOf(focusedGuideTab);
+          if (gIdx !== -1 && gTabs.length > 1) {
+            e.preventDefault();
+            var nextGIdx = e.key === 'Home' ? 0
+              : e.key === 'End' ? gTabs.length - 1
+              : (gIdx + (e.key === 'ArrowRight' ? 1 : -1) + gTabs.length) % gTabs.length;
+            var targetGTab = gTabs[nextGIdx];
+            if (targetGTab) {
+              var gAttr = targetGTab.getAttribute('data-pg-guide-tab');
+              var cAttr = targetGTab.getAttribute('data-chal-tab');
+              targetGTab.click();
+              setTimeout(function() {
+                var selQuery = gAttr
+                  ? '.pg-guide-tabs [data-pg-guide-tab="' + gAttr + '"]'
+                  : '.pg-guide-tabs [data-chal-tab="' + cAttr + '"]';
+                var refocused = container.querySelector(selQuery);
+                if (refocused) refocused.focus();
+              }, 0);
+            }
+          }
+          return;
+        }
+        if (e.target.id === 'wb-pg-lab-editor' && (e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+          e.preventDefault();
+          if (typeof self._runPgLabStep === 'function') self._runPgLabStep(false, false);
+          return;
+        }
+        if (e.target.id === 'wb-challenge-editor' && (e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+          e.preventDefault();
+          if (typeof self._runChallengeCheck === 'function') self._runChallengeCheck(false, false);
+          return;
+        }
         if (e.target.id === 'wb-sql-studio-editor' && (e.metaKey || e.ctrlKey) && e.key === 'Enter') {
           e.preventDefault();
           self._executeActiveStudioFile({ startAtFinal: true });
         }
       }, sig);
 
+      // 2c. beforematch listener so browser Find-in-Page (Cmd+F) seamlessly switches hidden="until-found" non-spoiler guide tabs
+      container.addEventListener('beforematch', function(e) {
+        var panelEl = e.target && e.target.closest ? e.target.closest('.pg-guide-panel[id]') : null;
+        if (!panelEl) return;
+        var pid = panelEl.id || '';
+        if (pid.indexOf('pg-panel-') === 0) {
+          var nextTab = pid.slice(9);
+          if (nextTab && nextTab !== 'solution' && nextTab !== self._activePgGuideTab) {
+            self._activePgGuideTab = nextTab;
+            container.querySelectorAll('[data-pg-guide-tab]').forEach(function(btn) {
+              var act = btn.getAttribute('data-pg-guide-tab') === nextTab;
+              btn.classList.toggle('is-active', act);
+              btn.setAttribute('aria-selected', String(act));
+              btn.setAttribute('tabindex', act ? '0' : '-1');
+            });
+            container.querySelectorAll('[id^="pg-panel-"]').forEach(function(pnl) {
+              if (pnl.id === pid) {
+                pnl.removeAttribute('hidden');
+              } else if (pnl.id === 'pg-panel-solution') {
+                pnl.setAttribute('hidden', '');
+              } else {
+                pnl.setAttribute('hidden', 'until-found');
+              }
+            });
+          }
+        } else if (pid.indexOf('chal-panel-') === 0) {
+          var nextChTab = pid.slice(11);
+          if (nextChTab && nextChTab !== 'postmortem' && nextChTab !== self._activeChalTab) {
+            self._activeChalTab = nextChTab;
+            container.querySelectorAll('[data-chal-tab]').forEach(function(btn) {
+              var act = btn.getAttribute('data-chal-tab') === nextChTab;
+              btn.classList.toggle('is-active', act);
+              btn.setAttribute('aria-selected', String(act));
+              btn.setAttribute('tabindex', act ? '0' : '-1');
+            });
+            container.querySelectorAll('[id^="chal-panel-"]').forEach(function(pnl) {
+              if (pnl.id === pid) {
+                pnl.removeAttribute('hidden');
+              } else if (pnl.id === 'chal-panel-postmortem') {
+                pnl.setAttribute('hidden', '');
+              } else {
+                pnl.setAttribute('hidden', 'until-found');
+              }
+            });
+          }
+        }
+      }, sig);
+
       // 3. Input handler for Studio editor, Inspector fields & Capacity Estimator fields
       container.addEventListener('input', function(e) {
+        if (e.target.id === 'wb-pg-lab-editor') {
+          if (self._loadedPgLab && root.PgTutorials) {
+            root.PgTutorials.saveStepDraft(self._loadedPgLab.id, self._activePgLabStep || 0, e.target.value);
+          }
+          return;
+        }
+        if (e.target.id === 'wb-challenge-editor') {
+          if (self._activeChallengeId) {
+            self._challengeDrafts[self._activeChallengeId] = e.target.value;
+          }
+          return;
+        }
         if (e.target.id === 'wb-sql-studio-editor') {
           var activeF = self._getActiveStudioFile();
           activeF.content = e.target.value;

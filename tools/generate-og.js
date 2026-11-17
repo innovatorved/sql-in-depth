@@ -182,7 +182,7 @@ function renderPng(svgStr, outPath) {
   }
 }
 
-const ctx = { window: { MODULE_CONTENT: {}, IMPLEMENTATIONS_DATA: {}, CURRICULUM_DATA: null, CHALLENGES_DATA: [] } };
+const ctx = { window: { MODULE_CONTENT: {}, IMPLEMENTATIONS_DATA: {}, CURRICULUM_DATA: null, CHALLENGES_DATA: [], PG_CHALLENGES_DATA: [] } };
 vm.runInNewContext(fs.readFileSync(path.join(ROOT, 'data/curriculum.js'), 'utf8'), ctx);
 vm.runInNewContext(fs.readFileSync(path.join(ROOT, 'data/implementations_code.js'), 'utf8'), ctx);
 if (fs.existsSync(path.join(ROOT, 'data/challenges.js'))) {
@@ -209,8 +209,15 @@ const cards = [
     variant: 'pipeline'
   },
   {
+    name: 'postgres',
+    badge: '10 Tracks · 80 Topics · 240 SQL Steps',
+    title: 'Learn PostgreSQL 18 by Doing',
+    subtitle: 'Interactive SQL tutorials, MVCC internals, pg_catalog diagnostics, and DBRE incident labs.',
+    variant: 'mvcc'
+  },
+  {
     name: 'challenges',
-    badge: '12 Production SQL Scenarios',
+    badge: '20 Production SQL Scenarios',
     title: 'SQL & Database Challenges',
     subtitle: 'Debug NULL traps, SARGable predicates, window analytics, and MVCC concurrency bugs.',
     variant: 'mvcc'
@@ -252,14 +259,15 @@ const cards = [
   }
 ];
 
-for (const ch of (ctx.window.CHALLENGES_DATA || [])) {
+const allOgChallenges = [...(ctx.window.CHALLENGES_DATA || []), ...(ctx.window.PG_CHALLENGES_DATA || [])];
+for (const ch of allOgChallenges) {
   if (!ch || !ch.id) continue;
   cards.push({
     name: ch.id,
     badge: `SQL Challenge · ${String(ch.category || 'Production Debugging')}`,
     title: ch.title,
-    subtitle: String(ch.context || 'Write and verify the production SQL fix in the browser playground.').slice(0, 140),
-    variant: /index|sarg|btree/i.test(ch.id) ? 'btree' : /mvcc|lock|tx|isolation/i.test(ch.id) ? 'mvcc' : 'pipeline'
+    subtitle: String(ch.context || ch.summary || 'Write and verify the production SQL fix in the browser playground.').slice(0, 140),
+    variant: /index|sarg|btree|bloat|fsm/i.test(ch.id) ? 'btree' : /mvcc|lock|tx|isolation|wraparound/i.test(ch.id) ? 'mvcc' : 'pipeline'
   });
 }
 

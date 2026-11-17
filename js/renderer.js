@@ -819,6 +819,12 @@ window.Renderer = (() => {
           <button type="button" class="btn btn--secondary btn--sm" data-action="open-topic-codelab" data-slug="${slug}" data-mode="modal" title="Launch Interactive SQL Studio">
             ▶ Run SQL Studio
           </button>
+          ${(() => {
+            const pgLab = window.PG_MASTERY_CURRICULUM?.findRelatedPostgresLab?.(slug, mod?.id);
+            return pgLab
+              ? `<a href="/sandbox/?mode=postgres-labs&amp;lab=${escapeHtml(pgLab.slug)}" class="btn btn--secondary btn--sm" title="Practice ${escapeHtml(pgLab.title)} in PostgreSQL 18.6 WASM">Practice in Learn Postgres →</a>`
+              : '';
+          })()}
           <a href="#cheatsheet/${mod.id}" class="btn btn--secondary btn--sm" data-action="navigate-cheatsheet" data-module="${mod.id}" title="View printable cheat sheet for this module">
             Cheat Sheet
           </a>

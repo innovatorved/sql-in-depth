@@ -213,6 +213,7 @@ async function runSuite() {
   loadGlobalScript('data/implementations_code.js');
   loadGlobalScript('data/challenges.js');
   loadGlobalScript('data/projects.js');
+  loadGlobalScript('data/pg_mastery_curriculum.js');
 
   for (const dir of ['data/content', 'data/archive', 'data/questions']) {
     const abs = path.join(ROOT, dir);
@@ -233,6 +234,7 @@ async function runSuite() {
   loadGlobalScript('js/simulators-olap-ops.js');
   loadGlobalScript('js/challenges.js');
   loadGlobalScript('js/search.js');
+  loadGlobalScript('js/pg-tutorials.js');
 
   const TableVisualizer = global.window.TableVisualizer;
   const Renderer = global.window.Renderer;
@@ -2242,6 +2244,60 @@ async function runSuite() {
     );
   } catch (_) {}
   assertCheck(4, 'T4-J23', 'Multi-File SQL Studio Workspace, Isolated Custom/Empty Databases (PG18 & SQLite3) & Multi-Format Runner Journey', j23Ok);
+
+  // Journey 24: PostgreSQL 18 Learn-by-Doing Mastery Hub (80 Topics / 240 Steps), 7 Contrib Extensions & 8 PG18 Incident Challenges
+  let j24Ok = false;
+  let j24Detail = '';
+  try {
+    const pgCur = global.window.PG_MASTERY_CURRICULUM;
+    const pgTut = global.window.PgTutorials;
+    const pgChals = global.window.PG_CHALLENGES_DATA || [];
+
+    // 1. Verify 7 contrib extensions load cleanly in PostgreSQL 18.6 WASM
+    const extRes = await SqlEngine.execute(
+      "CREATE EXTENSION IF NOT EXISTS pg_trgm; CREATE EXTENSION IF NOT EXISTS btree_gist; CREATE EXTENSION IF NOT EXISTS ltree; CREATE EXTENSION IF NOT EXISTS pageinspect; CREATE EXTENSION IF NOT EXISTS pg_buffercache; CREATE EXTENSION IF NOT EXISTS pg_visibility; CREATE EXTENSION IF NOT EXISTS pg_freespacemap; SELECT COUNT(*) FROM pg_extension WHERE extname IN ('pg_trgm','btree_gist','ltree','pageinspect','pg_buffercache','pg_visibility','pg_freespacemap');",
+      { datasetId: 'pg_ops_telemetry', engine: 'postgres', explain: false }
+    );
+    const extCount = extRes && !extRes.error && extRes.rows && extRes.rows[0] ? Number(extRes.rows[0][0]) : 0;
+
+    // 2. Verify all 8 PG_CHALLENGES_DATA pass on solutionCode and reject buggyCode
+    let pgChalsPassed = 0;
+    for (const ch of pgChals) {
+      const cf = ch.codeFix;
+      const solVer = await TableVisualizer.verifyQueryAgainstReference(cf.solutionCode, cf.solutionCode, { datasetId: cf.datasetId, engine: 'postgres', buggyCode: cf.buggyCode });
+      const bugVer = await TableVisualizer.verifyQueryAgainstReference(cf.buggyCode, cf.solutionCode, { datasetId: cf.datasetId, engine: 'postgres', buggyCode: cf.buggyCode });
+      const solRows = solVer && solVer.userResult && Array.isArray(solVer.userResult.rows) ? solVer.userResult.rows.length : 0;
+      if (solVer.passed && !bugVer.passed && solRows > 0) pgChalsPassed++;
+    }
+
+    // 3. Verify representative lab steps via PgTutorials.verifyLabStep (starter rejected, solution passes 5/5 gates)
+    const sampleLab1 = await pgTut.loadLabBySlugOrId('select-projection-arithmetic');
+    const sampleLab10 = await pgTut.loadLabBySlugOrId('clinic-lock-convoy-blocker-tree');
+    const v1Starter = sampleLab1 ? await pgTut.verifyLabStep(sampleLab1, 0, sampleLab1.steps[0].starterCode) : { passed: true };
+    const v1Sol = sampleLab1 ? await pgTut.verifyLabStep(sampleLab1, 0, sampleLab1.steps[0].solutionCode) : { passed: false };
+    const v10Starter = sampleLab10 ? await pgTut.verifyLabStep(sampleLab10, 0, sampleLab10.steps[0].starterCode) : { passed: true };
+    const v10Sol = sampleLab10 ? await pgTut.verifyLabStep(sampleLab10, 0, sampleLab10.steps[0].solutionCode) : { passed: false };
+
+    j24Ok = Boolean(
+      pgCur &&
+      pgCur.modules.length === 10 &&
+      pgCur.topics.length === 80 &&
+      extCount === 7 &&
+      pgChals.length === 8 &&
+      pgChalsPassed === 8 &&
+      !v1Starter.passed &&
+      v1Sol.passed &&
+      !v10Starter.passed &&
+      v10Sol.passed &&
+      fs.existsSync(path.join(ROOT, 'postgres/index.html'))
+    );
+    if (!j24Ok) {
+      j24Detail = `ext=${extCount}/7, pgChals=${pgChalsPassed}/8, v1=${!v1Starter.passed}/${v1Sol.passed}, v10=${!v10Starter.passed}/${v10Sol.passed}`;
+    }
+  } catch (err) {
+    j24Detail = err.message;
+  }
+  assertCheck(4, 'T4-J24', 'PostgreSQL 18 Learn-by-Doing Mastery Hub (80 Topics / 240 Steps), 7 Contrib Extensions & 8 PG18 Incident Challenges Journey', j24Ok, j24Detail);
 
   // =========================================================================
   // SUMMARY REPORT

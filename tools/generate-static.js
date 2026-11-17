@@ -164,6 +164,9 @@ if (fs.existsSync(path.join(root, 'data/topic_guided_labs.js'))) {
 if (fs.existsSync(path.join(root, 'data/challenges.js'))) {
   vm.runInNewContext(fs.readFileSync(path.join(root, 'data/challenges.js'), 'utf8'), context);
 }
+if (fs.existsSync(path.join(root, 'data/pg_mastery_curriculum.js'))) {
+  vm.runInNewContext(fs.readFileSync(path.join(root, 'data/pg_mastery_curriculum.js'), 'utf8'), context);
+}
 if (fs.existsSync(path.join(root, 'data/roadmap.js'))) {
   vm.runInNewContext(fs.readFileSync(path.join(root, 'data/roadmap.js'), 'utf8'), context);
 }
@@ -283,6 +286,7 @@ const defaultLastmod = '2026-10-26';
 const sitemapUrls = [
   { loc: `${baseUrl}/`, priority: '1.0', changefreq: 'weekly', lastmod: defaultLastmod },
   { loc: `${baseUrl}/roadmap/`, priority: '0.8', changefreq: 'weekly', lastmod: defaultLastmod },
+  { loc: `${baseUrl}/postgres/`, priority: '0.9', changefreq: 'weekly', lastmod: defaultLastmod },
   { loc: `${baseUrl}/challenges/`, priority: '0.8', changefreq: 'weekly', lastmod: defaultLastmod },
   { loc: `${baseUrl}/sandbox/`, priority: '0.8', changefreq: 'weekly', lastmod: defaultLastmod },
   { loc: `${baseUrl}/dashboard/`, priority: '0.7', changefreq: 'weekly', lastmod: defaultLastmod },
@@ -290,7 +294,10 @@ const sitemapUrls = [
   { loc: `${baseUrl}/glossary/`, priority: '0.7', changefreq: 'monthly', lastmod: defaultLastmod }
 ];
 
-const challengesData = context.window.CHALLENGES_DATA || [];
+const challengesData = [
+  ...(context.window.CHALLENGES_DATA || []),
+  ...(context.window.PG_CHALLENGES_DATA || [])
+];
 for (const challenge of challengesData) {
   if (challenge && challenge.id) {
     sitemapUrls.push({
@@ -777,6 +784,56 @@ const glossaryHtml = context.window.Renderer && typeof context.window.Renderer.r
   ? context.window.Renderer.renderGlossary()
   : '';
 
+function renderStaticPostgresHub(pgCur) {
+  if (!pgCur || !Array.isArray(pgCur.modules)) return '';
+  const tracksHtml = pgCur.modules.map((mod, idx) => {
+    const cards = (mod.topics || []).map((t) => {
+      const clauses = (t.clauses || []).slice(0, 4).map((cl) => `<code class="pg-topic-clause">${escapeHtml(cl)}</code>`).join('');
+      return `<a href="/sandbox/?mode=postgres-labs&amp;lab=${encodeURIComponent(t.slug)}" class="pg-topic-card">
+        <div class="pg-topic-card-top">
+          <span class="pg-topic-num">${String(t.globalOrder).padStart(2, '0')}</span>
+          <span class="pg-topic-diff pg-diff-${escapeAttr(String(t.difficulty || 'Intermediate').toLowerCase())}">${escapeHtml(t.difficulty)}</span>
+          <span class="pg-topic-steps-status"><span class="pg-topic-steps-num">0/3</span></span>
+        </div>
+        <div class="pg-topic-card-title">${escapeHtml(t.title)}</div>
+        <p class="pg-topic-card-summary">${escapeHtml(t.summary)}</p>
+        <div class="pg-topic-card-footer">
+          <div class="pg-topic-clauses">${clauses}</div>
+          <span class="pg-topic-open-label">Practice →</span>
+        </div>
+      </a>`;
+    }).join('\n');
+    return `<details id="track-${escapeAttr(mod.id)}" class="pg-track-accordion" data-module-id="${escapeAttr(mod.id)}"${idx < 2 || idx === 9 ? ' open' : ''}>
+      <summary class="pg-track-summary">
+        <svg class="pg-track-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+        <span class="pg-track-num">${escapeHtml(mod.num)}</span>
+        <span class="pg-track-heading-group">
+          <span class="pg-track-title">${escapeHtml(mod.title)}</span>
+          <span class="pg-track-desc">${escapeHtml(mod.summary)}</span>
+        </span>
+        <span class="pg-track-progress-pill">0/${(mod.topics || []).length} topics · 0/24 steps</span>
+      </summary>
+      <div class="pg-track-body"><div class="pg-topic-grid">${cards}</div></div>
+    </details>`;
+  }).join('\n');
+
+  return `<section class="view-canvas pg-hub" data-ssg-hub="postgres">
+    <header class="pg-hub-hero">
+      <div class="pg-hub-hero-main">
+        <h1 class="pg-hub-title">PostgreSQL 18 Learn-by-Doing Mastery</h1>
+        <p class="pg-hub-subtitle">Practice every SQL and PostgreSQL 18 concept directly against a real in-browser PostgreSQL 18.6 WebAssembly engine—from foundational <code>SELECT</code>, <code>JOIN</code>, and window frames to <code>JSONB</code>, <code>MERGE</code>, <code>pageinspect</code> slotted pages, <code>pg_catalog</code> system views, and PagerDuty DBRE troubleshooting clinics.</p>
+        <div class="pg-hub-cta-row">
+          <a href="/sandbox/?mode=postgres-labs&amp;lab=select-projection-arithmetic" class="btn btn-primary pg-hub-primary-cta"><span>Start Track 01: SELECT &amp; Expressions</span></a>
+          <a href="/sandbox/?mode=postgres-labs&amp;lab=clinic-lock-convoy-blocker-tree" class="btn btn-secondary"><span>Jump to Production DBRE Clinics</span></a>
+        </div>
+      </div>
+    </header>
+    <div id="pg-hub-tracks-list" class="pg-hub-tracks-list">${tracksHtml}</div>
+  </section>`;
+}
+
+const postgresHubHtml = renderStaticPostgresHub(context.window.PG_MASTERY_CURRICULUM);
+
 const hubDefs = [
   {
     routeDir: 'roadmap',
@@ -784,6 +841,15 @@ const hubDefs = [
     desc: 'Visual 6-track dependency DAG, role-based career tracks, and weekly study planner across 180 SQL and storage engine topics.',
     ogSlug: 'roadmap',
     h1: 'SQL & Database Internals Roadmap'
+  },
+  {
+    routeDir: 'postgres',
+    title: 'PostgreSQL 18 Learn-by-Doing Mastery — 80 Interactive SQL Labs | SQL In Depth',
+    desc: 'Practice 80 PostgreSQL 18 topics and 240 live WASM SQL steps from SELECT foundations and window functions to MVCC, pg_catalog, and DBRE troubleshooting.',
+    ogSlug: 'postgres',
+    h1: 'PostgreSQL 18 Learn-by-Doing Mastery',
+    bodyHtml: postgresHubHtml,
+    schemaType: 'Course'
   },
   {
     routeDir: 'challenges',
