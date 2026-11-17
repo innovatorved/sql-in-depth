@@ -438,7 +438,9 @@ for (const { unit, mod } of units) {
   unit.archive.wordCount = actualWords;
 
   let audioSecs = 0;
-  if (audioManifest[slug]?.size) {
+  if (audioManifest[slug]?.duration) {
+    audioSecs = Math.round(audioManifest[slug].duration);
+  } else if (audioManifest[slug]?.size) {
     audioSecs = Math.round(audioManifest[slug].size / 6000);
   } else {
     const mp3Path = path.join(root, 'audio', `${slug}.mp3`);

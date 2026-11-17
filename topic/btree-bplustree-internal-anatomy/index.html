@@ -32,7 +32,7 @@
 
   <!-- Stylesheets: Shared Design System + Self-Hosted KaTeX + Product Styles -->
   <link rel="stylesheet" href="design-system/tokens.css?v=b774bbc99d">
-  <link rel="stylesheet" href="design-system/components.css?v=606a179125">
+  <link rel="stylesheet" href="design-system/components.css?v=751aa6693e">
   <link rel="stylesheet" href="css/vendor/katex/katex.min.css?v=83121916c0" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="css/variables.css?v=24e2a6fbbe">
   <link rel="stylesheet" href="css/layout.css?v=554eae539f">
@@ -43,7 +43,7 @@
 
   <!-- Core scripts: head initializer & asset manifest -->
   <script src="js/init.js?v=d98d79ab7a"></script>
-  <script src="js/manifest.js?v=c07e8eab07"></script>
+  <script src="js/manifest.js?v=43dd1bde8e"></script>
 
   <script type="application/ld+json">
 {
@@ -855,44 +855,13 @@
             <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
           </svg>
         </button>
-        <span class="audio-player__time" id="audio-time-btree-bplustree-internal-anatomy">0:00 / 3:49</span>
+        <span class="audio-player__time" id="audio-time-btree-bplustree-internal-anatomy">0:00 / 1:45</span>
         <div class="audio-player__track" data-action="seek-audio" data-slug="btree-bplustree-internal-anatomy" id="audio-track-btree-bplustree-internal-anatomy">
           <div class="audio-player__progress" id="audio-bar-btree-bplustree-internal-anatomy" style="width: 0%;"></div>
         </div>
         <button class="audio-player__speed-btn" data-action="cycle-audio-speed" data-slug="btree-bplustree-internal-anatomy" id="audio-speed-btree-bplustree-internal-anatomy" title="Playback speed">1x</button>
         <audio id="audio-btree-bplustree-internal-anatomy" data-src="audio/btree-bplustree-internal-anatomy.mp3" preload="none"></audio>
       </div>
-      <section class="ds-video-stage" id="sec-video-explainer" aria-label="Inside a B+Tree: Fanout 500, Routing Keys &amp; Leaf Scans">
-        <div class="ds-video-stage__header">
-          <div class="ds-video-stage__title">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="color:var(--accent);" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"/></svg>
-            <span>Inside a B+Tree: Fanout 500, Routing Keys &amp; Leaf Scans</span>
-          </div>
-          <span class="ds-pill ds-pill--accent">0:53 · CC</span>
-        </div>
-        <div class="ds-video-stage__player">
-          <video
-            controls
-            loading="lazy"
-            preload="none"
-            playsinline
-            width="1280"
-            height="720"
-            poster="/assets/videos/btree-bplustree-internal-anatomy-poster.webp"
-          >
-            <source src="/assets/videos/btree-bplustree-internal-anatomy.mp4" type="video/mp4">
-            <track src="/assets/videos/btree-bplustree-internal-anatomy.vtt" kind="captions" srclang="en" label="English" default>
-          </video>
-        </div>
-        
-          <details class="ds-video-stage__transcript">
-            <summary>Transcript &amp; scene breakdown (4 chapters)</summary>
-            <div class="ds-video-stage__transcript-body">
-              <p><strong>[0:00] High Page Fanout Collapses Tree Height from 20 to 3:</strong> A balanced binary tree over ten million rows is twenty-four levels deep, costing twenty-four slow random disk seeks. A B-plus-tree packs five hundred routing keys into each eight kilobyte internal page, shrinking height to just three!</p><p><strong>[0:14] Internal Pages Hold Only Separator Keys; Leaves Hold Tuple Pointers:</strong> Unlike a classic B-tree, a B-plus-tree never stores bulky row payloads in internal nodes. Internal pages hold only compact separator keys and child page IDs, maximizing fanout on every upper level.</p><p><strong>[0:27] Seek Once from the Root, Then Walk Sibling Leaf Pointers:</strong> Every leaf page stores forward and backward sibling page pointers. To evaluate a range predicate like created-at between January and March, the engine descends from the root once and glides horizontally across sorted leaves.</p><p><strong>[0:40] Sequential Keys Append Cleanly; Random UUIDv4 Splits Mid-Tree Pages:</strong> When a leaf page fills up, inserting a random UUIDv4 splits the page fifty-fifty and dirties buffers across the entire tree. Time-ordered BIGINT or UUIDv7 keys append cleanly to the rightmost leaf page.</p>
-            </div>
-          </details>
-        
-      </section>
       <details class="ds-external-lecture">
         <summary>
           <span style="display:flex;align-items:center;gap:8px;min-width:0;">
@@ -1673,10 +1642,6 @@ flowchart LR
             </li>
           
             <li>
-              <a class="ds-toc__link" href="#sec-video-explainer">Visual Video Explainer</a>
-            </li>
-          
-            <li>
               <a class="ds-toc__link" href="#topic-sec-1">Core Idea &amp; First-Principles Mechanics</a>
             </li>
           
@@ -1819,7 +1784,7 @@ flowchart LR
   <script type="text/plain" data-defer src="js/progress.js?v=20e4822556"></script>
   <script type="text/plain" data-defer src="js/search.js?v=cfb7464ca7"></script>
   <script type="text/plain" data-defer src="js/exercises.js?v=fc95117c6f"></script>
-  <script type="text/plain" data-defer src="js/renderer.js?v=dde19fa7e5"></script>
+  <script type="text/plain" data-defer src="js/renderer.js?v=21e4de5936"></script>
   <script type="text/plain" data-defer src="js/landing.js?v=9286e224a4"></script>
   <script type="text/plain" data-defer src="js/quiz.js?v=5b300d9b3d"></script>
   <script type="text/plain" data-defer src="js/app.js?v=c398d2c679"></script>
@@ -1838,7 +1803,7 @@ flowchart LR
   <script type="text/plain" data-lazy src="js/sql-engine.js?v=296a1588ef"></script>
   <script type="text/plain" data-lazy src="js/vendor/cm6-sql.js?v=c9474beb2c"></script>
   <script type="text/plain" data-lazy src="js/table-visualizer.js?v=7c8e49b9a4"></script>
-  <script type="text/plain" data-lazy src="js/simulators.js?v=4cf0ceeb96"></script>
+  <script type="text/plain" data-lazy src="js/simulators.js?v=fd5c4d8177"></script>
   <script type="text/plain" data-lazy src="js/simulators-relational.js?v=32c1358d02"></script>
   <script type="text/plain" data-lazy src="js/simulators-analytical.js?v=50d950f3b6"></script>
   <script type="text/plain" data-lazy src="js/simulators-modeling.js?v=1962947dcb"></script>

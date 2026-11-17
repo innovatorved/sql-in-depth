@@ -1,4 +1,5 @@
 window.MODULE_CONTENT = window.MODULE_CONTENT || {};
+window.MODULE_CONTENT = window.MODULE_CONTENT || {};
 window.MODULE_CONTENT["m10"] = {
   "why-indexes-work-io-cost-model": {
     "title": "Why Indexes Work: Full Table Scan O(N) vs Index Seek O(log_B N) I/O Physics",
@@ -61,45 +62,7 @@ window.MODULE_CONTENT["m10"] = {
         "url": "https://www.postgresql.org/docs/current/sql.html"
       }
     ],
-    "promise": "Understand why databases use B+Trees instead of binary trees or B-Trees: packing ~500 separator keys per 8KB internal page and linking leaf pages for range scans—and verify it on live tables and execution plans.",
-    "flagshipVideo": {
-      "slug": "btree-bplustree-internal-anatomy",
-      "title": "Inside a B+Tree: Fanout 500, Routing Keys & Leaf Scans",
-      "src": "/assets/videos/btree-bplustree-internal-anatomy.mp4",
-      "poster": "/assets/videos/btree-bplustree-internal-anatomy-poster.webp",
-      "captions": "/assets/videos/btree-bplustree-internal-anatomy.vtt",
-      "duration": "0:53",
-      "durationSeconds": 53,
-      "width": 1280,
-      "height": 720,
-      "chapters": [
-        {
-          "step": "Scene 1 · Why Binary Trees Fail on Disk",
-          "heading": "High Page Fanout Collapses Tree Height from 20 to 3",
-          "start": "0:00",
-          "text": "A balanced binary tree over ten million rows is twenty-four levels deep, costing twenty-four slow random disk seeks. A B-plus-tree packs five hundred routing keys into each eight kilobyte internal page, shrinking height to just three!"
-        },
-        {
-          "step": "Scene 2 · B-Tree vs. B+Tree Key Separation",
-          "heading": "Internal Pages Hold Only Separator Keys; Leaves Hold Tuple Pointers",
-          "start": "0:14",
-          "text": "Unlike a classic B-tree, a B-plus-tree never stores bulky row payloads in internal nodes. Internal pages hold only compact separator keys and child page IDs, maximizing fanout on every upper level."
-        },
-        {
-          "step": "Scene 3 · Doubly-Linked Leaf Range Scans",
-          "heading": "Seek Once from the Root, Then Walk Sibling Leaf Pointers",
-          "start": "0:27",
-          "text": "Every leaf page stores forward and backward sibling page pointers. To evaluate a range predicate like created-at between January and March, the engine descends from the root once and glides horizontally across sorted leaves."
-        },
-        {
-          "step": "Scene 4 · Page Splits & UUIDv7 Locality",
-          "heading": "Sequential Keys Append Cleanly; Random UUIDv4 Splits Mid-Tree Pages",
-          "start": "0:40",
-          "text": "When a leaf page fills up, inserting a random UUIDv4 splits the page fifty-fifty and dirties buffers across the entire tree. Time-ordered BIGINT or UUIDv7 keys append cleanly to the rightmost leaf page."
-        }
-      ],
-      "transcript": "A balanced binary tree over ten million rows is twenty-four levels deep, costing twenty-four slow random disk seeks. A B-plus-tree packs five hundred routing keys into each eight kilobyte internal page, shrinking height to just three! Unlike a classic B-tree, a B-plus-tree never stores bulky row payloads in internal nodes. Internal pages hold only compact separator keys and child page IDs, maximizing fanout on every upper level. Every leaf page stores forward and backward sibling page pointers. To evaluate a range predicate like created-at between January and March, the engine descends from the root once and glides horizontally across sorted leaves. When a leaf page fills up, inserting a random UUIDv4 splits the page fifty-fifty and dirties buffers across the entire tree. Time-ordered BIGINT or UUIDv7 keys append cleanly to the rightmost leaf page."
-    }
+    "promise": "Understand why databases use B+Trees instead of binary trees or B-Trees: packing ~500 separator keys per 8KB internal page and linking leaf pages for range scans—and verify it on live tables and execution plans."
   },
   "clustered-vs-secondary-indexes": {
     "title": "Clustered Indexes (InnoDB / WITHOUT ROWID) vs Heap + Secondary Index (Postgres)",

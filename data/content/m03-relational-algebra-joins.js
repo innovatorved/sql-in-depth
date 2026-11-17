@@ -1,4 +1,5 @@
 window.MODULE_CONTENT = window.MODULE_CONTENT || {};
+window.MODULE_CONTENT = window.MODULE_CONTENT || {};
 window.MODULE_CONTENT["m03"] = {
   "relational-algebra-set-theory": {
     "title": "Relational Algebra: Selection (σ), Projection (π), Product (×) & Rename (ρ)",
@@ -52,45 +53,7 @@ window.MODULE_CONTENT["m03"] = {
         "url": "https://use-the-index-luke.com/"
       }
     ],
-    "promise": "Understand how INNER JOIN pairs matching tuples across tables, why explicit ANSI JOIN syntax replaced comma joins, and multi-hop table traversal—and verify it on live tables and execution plans.",
-    "flagshipVideo": {
-      "slug": "inner-join-equi-joins",
-      "title": "Equi-Joins Under the Hood: Hash Build, Probe & Fan-Out",
-      "src": "/assets/videos/inner-join-equi-joins.mp4",
-      "poster": "/assets/videos/inner-join-equi-joins-poster.webp",
-      "captions": "/assets/videos/inner-join-equi-joins.vtt",
-      "duration": "0:48",
-      "durationSeconds": 48,
-      "width": 1280,
-      "height": 720,
-      "chapters": [
-        {
-          "step": "Scene 1 · Relational Key Matching",
-          "heading": "How INNER JOIN Pairs Parent and Child Tuples",
-          "start": "0:00",
-          "text": "An inner equi-join pairs rows from two tables wherever their join keys test equal. Unmatched parent rows and NULL join keys evaluate to unknown under three-valued logic and are excluded from the output."
-        },
-        {
-          "step": "Scene 2 · Physical Hash Join Pipeline",
-          "heading": "Hash Build on the Smaller Table, Stream Probe on the Larger",
-          "start": "0:12",
-          "text": "For large unindexed joins, the engine builds an in-memory hash table on the smaller relation in O of M time, then streams the larger table through in O of N time, probing each key in constant time."
-        },
-        {
-          "step": "Scene 3 · The 1:N Fan-Out Trap",
-          "heading": "Joining Two Child Tables Multiplies Row Cardinality",
-          "start": "0:23",
-          "text": "Watch out for join fan-out! If an order has three line items and two payment attempts, joining both child tables directly produces six rows for one order, silently doubling or tripling your SUM totals."
-        },
-        {
-          "step": "Scene 4 · Pre-Aggregate Before Joining",
-          "heading": "Fix Fan-Out by Aggregating Each 1:N Relation to 1:1 First",
-          "start": "0:36",
-          "text": "Eliminate fan-out by grouping each child table to the shared parent key inside a CTE before joining. When both sides have one row per order ID, every aggregate stays one hundred percent exact."
-        }
-      ],
-      "transcript": "An inner equi-join pairs rows from two tables wherever their join keys test equal. Unmatched parent rows and NULL join keys evaluate to unknown under three-valued logic and are excluded from the output. For large unindexed joins, the engine builds an in-memory hash table on the smaller relation in O of M time, then streams the larger table through in O of N time, probing each key in constant time. Watch out for join fan-out! If an order has three line items and two payment attempts, joining both child tables directly produces six rows for one order, silently doubling or tripling your SUM totals. Eliminate fan-out by grouping each child table to the shared parent key inside a CTE before joining. When both sides have one row per order ID, every aggregate stays one hundred percent exact."
-    }
+    "promise": "Understand how INNER JOIN pairs matching tuples across tables, why explicit ANSI JOIN syntax replaced comma joins, and multi-hop table traversal—and verify it on live tables and execution plans."
   },
   "left-right-full-outer-joins": {
     "title": "Outer Joins: LEFT, RIGHT & FULL OUTER JOIN with NULL Extension",

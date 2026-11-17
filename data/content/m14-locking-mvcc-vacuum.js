@@ -1,4 +1,5 @@
 window.MODULE_CONTENT = window.MODULE_CONTENT || {};
+window.MODULE_CONTENT = window.MODULE_CONTENT || {};
 window.MODULE_CONTENT["m14"] = {
   "multi-version-concurrency-control-mvcc": {
     "title": "MVCC Architecture: Why Readers Never Block Writers and Writers Never Block Readers",
@@ -25,45 +26,7 @@ window.MODULE_CONTENT["m14"] = {
         "url": "https://www.sqlite.org/fileformat2.html"
       }
     ],
-    "promise": "Compare append-version heap MVCC (PostgreSQL) against in-place clustered update + rollback segment undo logs (MySQL InnoDB & Oracle) with predictable I/O cost and zero silent NULL traps.",
-    "flagshipVideo": {
-      "slug": "multi-version-concurrency-control-mvcc",
-      "title": "MVCC Snapshot Isolation: Tuple xmin/xmax Without Read Locks",
-      "src": "/assets/videos/multi-version-concurrency-control-mvcc.mp4",
-      "poster": "/assets/videos/multi-version-concurrency-control-mvcc-poster.webp",
-      "captions": "/assets/videos/multi-version-concurrency-control-mvcc.vtt",
-      "duration": "0:51",
-      "durationSeconds": 51,
-      "width": 1280,
-      "height": 720,
-      "chapters": [
-        {
-          "step": "Scene 1 · Readers Never Block Writers",
-          "heading": "Why Modern Databases Version Rows Instead of Locking Readers",
-          "start": "0:00",
-          "text": "If a dashboard query locked an entire orders table while computing revenue, checkout writes would grind to a halt. Multi-Version Concurrency Control solves this by keeping multiple timestamped versions of a row."
-        },
-        {
-          "step": "Scene 2 · Tuple Header xmin & xmax",
-          "heading": "Every UPDATE Writes a New Tuple Version and Marks xmax on the Old",
-          "start": "0:12",
-          "text": "In PostgreSQL, updating a balance from one hundred to eighty dollars does not overwrite bytes in place. Transaction five-oh-two stamps xmax equal to five-oh-two on the old tuple and appends a fresh tuple with xmin five-oh-two."
-        },
-        {
-          "step": "Scene 3 · Snapshot Visibility Check",
-          "heading": "Your Transaction Snapshot Decides Which Version Is Visible",
-          "start": "0:26",
-          "text": "When transaction five-oh-one started before five-oh-two committed, its snapshot treats five-oh-two as still in flight. Five-oh-one cleanly reads Version One at one hundred dollars, with zero lock contention."
-        },
-        {
-          "step": "Scene 4 · Dead Tuples & Autovacuum",
-          "heading": "Once No Active Snapshot Needs Version 1, Autovacuum Reclaims Space",
-          "start": "0:39",
-          "text": "Version chains are not free. Once every transaction older than five-oh-two finishes, Version One becomes a dead tuple. Background autovacuum workers reclaim those dead slots so heap pages do not bloat."
-        }
-      ],
-      "transcript": "If a dashboard query locked an entire orders table while computing revenue, checkout writes would grind to a halt. Multi-Version Concurrency Control solves this by keeping multiple timestamped versions of a row. In PostgreSQL, updating a balance from one hundred to eighty dollars does not overwrite bytes in place. Transaction five-oh-two stamps xmax equal to five-oh-two on the old tuple and appends a fresh tuple with xmin five-oh-two. When transaction five-oh-one started before five-oh-two committed, its snapshot treats five-oh-two as still in flight. Five-oh-one cleanly reads Version One at one hundred dollars, with zero lock contention. Version chains are not free. Once every transaction older than five-oh-two finishes, Version One becomes a dead tuple. Background autovacuum workers reclaim those dead slots so heap pages do not bloat."
-    }
+    "promise": "Compare append-version heap MVCC (PostgreSQL) against in-place clustered update + rollback segment undo logs (MySQL InnoDB & Oracle) with predictable I/O cost and zero silent NULL traps."
   },
   "tuple-headers-xmin-xmax-visibility": {
     "title": "Tuple Headers Under the Microscope: xmin, xmax, ctid & Infomask Hint Bits",

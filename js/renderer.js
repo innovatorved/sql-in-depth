@@ -858,12 +858,6 @@ window.Renderer = (() => {
         <audio id="audio-${slug}" data-src="audio/${slug}.mp3" preload="none"></audio>
       </div>`;
 
-    // Flagship Original Video Stage (100% self-hosted MP4 + WebP poster + WebVTT captions + collapsible transcript)
-    const hasFlagshipVideo = Boolean(moduleContent?.flagshipVideo?.src);
-    if (hasFlagshipVideo) {
-      articleCol += renderFlagshipVideoStage(moduleContent.flagshipVideo);
-    }
-
     // Curated Reference Lecture tucked cleanly inside a collapsible <details> disclosure
     if (moduleContent?.video?.youtubeId) {
       articleCol += renderVideoEmbed(moduleContent.video);
@@ -986,7 +980,6 @@ window.Renderer = (() => {
 
     const tocEntries = [];
     if (moduleContent?.intuition) tocEntries.push({ id: 'sec-why-it-matters', label: 'Why It Matters' });
-    if (hasFlagshipVideo) tocEntries.push({ id: 'sec-video-explainer', label: 'Visual Video Explainer' });
     headings.forEach(h => {
       tocEntries.push({ id: h.id, label: h.title.replace(/^\d+\.\s*/, '') });
     });
@@ -1258,48 +1251,6 @@ window.Renderer = (() => {
     return html;
   }
 
-
-  /**
-   * Render Flagship Self-Hosted Animated Explainer Video Stage (MP4 + WebP poster + WebVTT + Transcript)
-   */
-  function renderFlagshipVideoStage(fv) {
-    if (!fv?.src) return '';
-    const chapters = Array.isArray(fv.chapters) ? fv.chapters : [];
-    return `
-      <section class="ds-video-stage" id="sec-video-explainer" aria-label="${escapeHtml(fv.title || 'Visual Explainer Video')}">
-        <div class="ds-video-stage__header">
-          <div class="ds-video-stage__title">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="color:var(--accent);" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"/></svg>
-            <span>${escapeHtml(fv.title || 'Visual Explainer')}</span>
-          </div>
-          <span class="ds-pill ds-pill--accent">${escapeHtml(fv.duration || '0:50')} · CC</span>
-        </div>
-        <div class="ds-video-stage__player">
-          <video
-            controls
-            loading="lazy"
-            preload="none"
-            playsinline
-            width="${Number(fv.width) || 1280}"
-            height="${Number(fv.height) || 720}"
-            poster="${escapeHtml(fv.poster || '')}"
-          >
-            <source src="${escapeHtml(fv.src)}" type="video/mp4">
-            ${fv.captions ? `<track src="${escapeHtml(fv.captions)}" kind="captions" srclang="en" label="English" default>` : ''}
-          </video>
-        </div>
-        ${(chapters.length || fv.transcript) ? `
-          <details class="ds-video-stage__transcript">
-            <summary>Transcript &amp; scene breakdown (${chapters.length || 4} chapters)</summary>
-            <div class="ds-video-stage__transcript-body">
-              ${chapters.length
-                ? chapters.map(ch => `<p><strong>[${escapeHtml(ch.start || '0:00')}] ${escapeHtml(ch.heading || ch.step || '')}:</strong> ${escapeHtml(ch.text || '')}</p>`).join('')
-                : `<p>${escapeHtml(fv.transcript)}</p>`}
-            </div>
-          </details>
-        ` : ''}
-      </section>`;
-  }
 
   /**
    * Render Curated External Reference Lecture (collapsed secondary disclosure)
@@ -1766,7 +1717,28 @@ window.Renderer = (() => {
     return 180;
   }
 
+  function _pickBestEnglishVoice() {
+    if (typeof window === 'undefined' || !window.speechSynthesis || typeof window.speechSynthesis.getVoices !== 'function') return null;
+    const voices = window.speechSynthesis.getVoices() || [];
+    const en = voices.filter(v => /^en[-_](US|GB|AU|IN|CA)/i.test(v.lang) || /^en$/i.test(v.lang));
+    if (!en.length) return null;
+    const score = (v) => {
+      const n = String(v.name || '');
+      let s = /en[-_]US/i.test(v.lang) ? 20 : /en[-_]GB/i.test(v.lang) ? 15 : 10;
+      if (/Natural|Neural|Online|Premium|Enhanced/i.test(n)) s += 50;
+      if (/Ava|Allison|Samantha|Zoe|Evan|Nathan|Tom|Serena|Daniel|Google US English|Google UK English/i.test(n)) s += 30;
+      if (/Compact|Albert|Bad News|Bahh|Bells|Boing|Bubbles|Cellos|Fred|Good News|Jester|Organ|Trinoids|Whisper|Zarvox/i.test(n)) s -= 100;
+      return s;
+    };
+    return en.slice().sort((a, b) => score(b) - score(a))[0] || null;
+  }
+
   function _extractLessonSpeechText(slug) {
+    const proseNodes = document.querySelectorAll('.intuition__body p, .lesson-content > p, .lesson-content > ul > li, .callout p');
+    if (proseNodes && proseNodes.length > 0) {
+      const joined = Array.from(proseNodes).map(n => n.textContent || '').join(' ').replace(/\s+/g, ' ').trim();
+      if (joined.length > 40) return joined.slice(0, 6000);
+    }
     const article = document.querySelector('.lesson-content, article.prose, #main-content');
     if (article && article.textContent && article.textContent.trim().length > 40) {
       return article.textContent.replace(/\s+/g, ' ').trim().slice(0, 6000);
@@ -1843,6 +1815,9 @@ window.Renderer = (() => {
       if (typeof window.speechSynthesis !== 'undefined' && typeof window.SpeechSynthesisUtterance === 'function') {
         window.speechSynthesis.cancel();
         const utter = new window.SpeechSynthesisUtterance(st.text);
+        const bestVoice = _pickBestEnglishVoice();
+        if (bestVoice) utter.voice = bestVoice;
+        utter.lang = (bestVoice && bestVoice.lang) || 'en-US';
         utter.rate = st.playbackRate || 1;
         utter.onend = () => {
           if (_audioSynthState[slug]?.playing) {

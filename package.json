@@ -15,7 +15,7 @@
     "stamp:check": "node tools/stamp-assets.js --check",
     "prerender": "node tools/generate-static.js",
     "og": "node tools/generate-og.js",
-    "videos": "node tools/generate-videos.js",
+    "audio": "python3 tools/generate_audio.py --changed",
     "serve": "python3 -m http.server 8000"
   },
   "repository": {

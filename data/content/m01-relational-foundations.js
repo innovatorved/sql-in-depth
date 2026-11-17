@@ -1,4 +1,5 @@
 window.MODULE_CONTENT = window.MODULE_CONTENT || {};
+window.MODULE_CONTENT = window.MODULE_CONTENT || {};
 window.MODULE_CONTENT["m01"] = {
   "why-databases-exist": {
     "title": "Filesystems vs. Relational DBMS, Codd's 12 Rules & Declarative SQL",
@@ -34,45 +35,7 @@ window.MODULE_CONTENT["m01"] = {
         "url": "https://clickhouse.com/docs/en/engines/table-engines/mergetree-family/mergetree"
       }
     ],
-    "promise": "Understand why ad-hoc CSV/JSON files fail under concurrent mutations and how Edgar Codd's relational model separated physical storage from declarative queries—and verify it on live tables and execution plans.",
-    "flagshipVideo": {
-      "slug": "why-databases-exist",
-      "title": "Why Databases Exist: Flat Files vs. ACID 8KB Pages",
-      "src": "/assets/videos/why-databases-exist.mp4",
-      "poster": "/assets/videos/why-databases-exist-poster.webp",
-      "captions": "/assets/videos/why-databases-exist.vtt",
-      "duration": "0:54",
-      "durationSeconds": 54,
-      "width": 1280,
-      "height": 720,
-      "chapters": [
-        {
-          "step": "Scene 1 · The Flat-File Trap",
-          "heading": "Why CSV & JSON Files Break in Production",
-          "start": "0:00",
-          "text": "Why not store application data in a CSV or JSON file? Every lookup parses the entire file in linear O of N time, and two concurrent writers overwrite each other or leave torn lines if the process crashes."
-        },
-        {
-          "step": "Scene 2 · Fixed 8KB Slotted Pages",
-          "heading": "The Storage Engine Divides Disk into 8KB Slotted Pages",
-          "start": "0:13",
-          "text": "A relational storage engine organizes files into fixed eight kilobyte slotted pages. Line pointers at the front grow forward while tuple bytes pack from the back, enabling direct slot addressing without rewriting the file."
-        },
-        {
-          "step": "Scene 3 · ACID via WAL & MVCC",
-          "heading": "Write-Ahead Logging & Multi-Version Snapshots",
-          "start": "0:26",
-          "text": "Before mutating any data page, the engine flushes an append-only Write-Ahead Log record to disk. Readers inspect consistent MVCC tuple snapshots while writers commit atomically, guaranteeing durability across power loss."
-        },
-        {
-          "step": "Scene 4 · Physical Data Independence",
-          "heading": "Codd’s Core Insight: Declare What, Not How",
-          "start": "0:40",
-          "text": "Edgar Codd separated logical relations from physical storage. You write declarative SQL describing what rows you want, and the cost-based optimizer automatically chooses B-plus-tree seeks, hash joins, or parallel scans."
-        }
-      ],
-      "transcript": "Why not store application data in a CSV or JSON file? Every lookup parses the entire file in linear O of N time, and two concurrent writers overwrite each other or leave torn lines if the process crashes. A relational storage engine organizes files into fixed eight kilobyte slotted pages. Line pointers at the front grow forward while tuple bytes pack from the back, enabling direct slot addressing without rewriting the file. Before mutating any data page, the engine flushes an append-only Write-Ahead Log record to disk. Readers inspect consistent MVCC tuple snapshots while writers commit atomically, guaranteeing durability across power loss. Edgar Codd separated logical relations from physical storage. You write declarative SQL describing what rows you want, and the cost-based optimizer automatically chooses B-plus-tree seeks, hash joins, or parallel scans."
-    }
+    "promise": "Understand why ad-hoc CSV/JSON files fail under concurrent mutations and how Edgar Codd's relational model separated physical storage from declarative queries—and verify it on live tables and execution plans."
   },
   "tables-rows-columns-types": {
     "title": "Relations, Tuples, Attributes, Domains & SQL Data Types",
@@ -126,45 +89,7 @@ window.MODULE_CONTENT["m01"] = {
         "url": "https://www.sqlite.org/fileformat2.html"
       }
     ],
-    "promise": "Understand how the SQL engine binds FROM before evaluating SELECT projections, why column aliases fail inside WHERE, and expression evaluation pipelines—and verify it on live tables and execution plans.",
-    "flagshipVideo": {
-      "slug": "select-projection-aliases",
-      "title": "SQL Logical Execution Order vs. Written Syntax Order",
-      "src": "/assets/videos/select-projection-aliases.mp4",
-      "poster": "/assets/videos/select-projection-aliases-poster.webp",
-      "captions": "/assets/videos/select-projection-aliases.vtt",
-      "duration": "0:49",
-      "durationSeconds": 49,
-      "width": 1280,
-      "height": 720,
-      "chapters": [
-        {
-          "step": "Scene 1 · The Syntax Illusion",
-          "heading": "SQL Is Written Top-to-Bottom, But Never Runs Start-to-Finish",
-          "start": "0:00",
-          "text": "Every SQL query begins with the word SELECT, tricking engineers into thinking column aliases exist right away. In reality, the database binder evaluates FROM and WHERE long before SELECT ever runs."
-        },
-        {
-          "step": "Scene 2 · Stages 1 to 4 (Row & Group Filtering)",
-          "heading": "FROM → JOIN → WHERE → GROUP BY → HAVING",
-          "start": "0:12",
-          "text": "First, FROM and JOIN assemble candidate rows. Second, WHERE discards rows where predicates are false or unknown. Third, GROUP BY buckets surviving rows, and fourth, HAVING filters whole buckets."
-        },
-        {
-          "step": "Scene 3 · Stages 5 to 7 (Window, Projection & Sort)",
-          "heading": "WINDOW → SELECT Projection → DISTINCT → ORDER BY → LIMIT",
-          "start": "0:25",
-          "text": "Window functions execute after HAVING, right alongside SELECT projection where output aliases are finally bound. That is why ORDER BY can sort by a SELECT alias, while WHERE and HAVING cannot."
-        },
-        {
-          "step": "Scene 4 · Logical Order vs. Physical Pushdown",
-          "heading": "The Optimizer Reorders Execution Only When Results Stay Identical",
-          "start": "0:37",
-          "text": "Logical order defines exact query meaning, while the physical planner takes safe shortcuts—like pushing a WHERE predicate into a B-plus-tree index seek before joining, without ever changing your answer."
-        }
-      ],
-      "transcript": "Every SQL query begins with the word SELECT, tricking engineers into thinking column aliases exist right away. In reality, the database binder evaluates FROM and WHERE long before SELECT ever runs. First, FROM and JOIN assemble candidate rows. Second, WHERE discards rows where predicates are false or unknown. Third, GROUP BY buckets surviving rows, and fourth, HAVING filters whole buckets. Window functions execute after HAVING, right alongside SELECT projection where output aliases are finally bound. That is why ORDER BY can sort by a SELECT alias, while WHERE and HAVING cannot. Logical order defines exact query meaning, while the physical planner takes safe shortcuts—like pushing a WHERE predicate into a B-plus-tree index seek before joining, without ever changing your answer."
-    }
+    "promise": "Understand how the SQL engine binds FROM before evaluating SELECT projections, why column aliases fail inside WHERE, and expression evaluation pipelines—and verify it on live tables and execution plans."
   },
   "where-filtering-predicates": {
     "title": "WHERE Clause, Comparison Operators, BETWEEN, IN, LIKE & SARGability",

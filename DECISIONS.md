@@ -56,18 +56,9 @@ All product, UX, engineering, and infrastructure ambiguities encountered during 
 
 ---
 
-## ADR-006: Flagship Explainer Videos — Programmatic Canvas + `ffmpeg` + Open TTS + WebVTT Captions
-- **Decision**: Build a deterministic, repeatable Node video pipeline (`tools/generate-videos.js`) that renders high-DPI original animated technical frames (using our exact Geist/Geist Mono design tokens, B+Tree/page/join/MVCC vector state machines), synthesizes clear narration audio (`macOS/system TTS -> AAC/Opus` with deterministic timing + fallback silent/tone track support in headless CI), muxes via `ffmpeg` into ultra-compact `.mp4` (H.264 `yuv420p`, `-movflags +faststart`) + `.webm` (`< 800 KB` per video), generates `.webp` poster frames, and outputs synchronized `.vtt` WebVTT captions + inline HTML transcripts for **5 flagship topics**:
-  1. `why-databases-exist` (*Why Databases Exist: 8KB Slotted Pages, ACID & Codd's Contract*)
-  2. `select-projection-aliases` (*SQL Logical Execution Order: How Queries Actually Run*)
-  3. `inner-join-equi-joins` (*Physical Join Algorithms: Nested Loop, Hash & Sort-Merge*)
-  4. `btree-bplustree-internal-anatomy` (*Inside a B+Tree Index Lookup: O(log_B N) Page Hops*)
-  5. `multi-version-concurrency-control-mvcc` (*MVCC Snapshot Isolation: Readers Never Block Writers*)
-- **Why**: Produces 100% original, cohesive, dark-slate diagrammatic videos that match the site's own visual language without third-party YouTube ad clutter, clickbait thumbnails, or heavy React/Remotion runtime bloat. Keeping each video `45s–70s` at crisp vector bitrates keeps git repository size lean (`< 4 MB` total across all 5 videos) while loading zero bytes until the learner clicks Play (`preload="none"`).
-- **Alternatives Rejected**:
-  - *Remotion full dependency tree*: Adds Chromium/React heavyweight dependencies (`~300 MB` `node_modules`) for deterministic 2D technical animations that pure Canvas/SVG + `ffmpeg` renders faster and cleaner.
-  - *Animations-only with no video/narration*: Misses the multi-modal spoken walkthrough experience highlighted in Phase 4 (captioned video explainers).
-  - *External YouTube embeds as primary hero media*: Hurts visual trust, injects clickbait thumbnails above the fold, and breaks offline/privacy guarantees. Curated English YouTube lectures are retained strictly as optional secondary reference links below the core lesson.
+## ADR-006: Human-Like Lesson Narration via `edge-tts` (`tools/generate_audio.py`)
+- **Decision**: Remove synthesized explainer `.mp4` videos (`assets/videos/`, `tools/generate-videos.js`, `data/flagship_videos.json`) and standardize spoken lesson narration across all 180 curriculum units on open-source `edge-tts` (`en-US-AvaMultilingualNeural` conversational voice, 24 kHz 48 kbps MP3 under `audio/<slug>.mp3` + `audio/manifest.json`), while retaining curated real human lectures (e.g., CMU 15-445) as optional collapsible reference disclosures and keeping a natural-voice-ranked Web Speech API fallback when offline or missing static audio.
+- **Why**: System-TTS video narration sounded synthetic and distracted from the interactive clause-by-clause visualizers and simulators. `en-US-AvaMultilingualNeural` via `edge-tts` delivers natural, human podcast-grade English prosody with domain-tuned SQL/storage pronunciation rules, generates asynchronously with near-zero local CPU/GPU load, and loads zero bytes in the browser until the learner clicks Play (`preload="none"`).
 
 ---
 

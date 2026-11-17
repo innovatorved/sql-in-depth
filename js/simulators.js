@@ -215,9 +215,22 @@ window.Simulators = (() => {
           utter.pitch = 1.02;
           utter.rate = speedMs <= 200 ? 1.6 : speedMs <= 400 ? 1.32 : speedMs <= 800 ? 1.12 : 0.98;
           const voices = synth.getVoices ? synth.getVoices() : [];
-          const preferred = voices.find(v => /en[-_](US|GB)/i.test(v.lang) && /Samantha|Daniel|Google|Natural|Alex|Siri|Guy/i.test(v.name))
-            || voices.find(v => /^en/i.test(v.lang));
-          if (preferred) utter.voice = preferred;
+          const enVoices = voices.filter(v => /^en/i.test(v.lang));
+          const rankVoice = (v) => {
+            const n = String(v.name || '');
+            let s = /en[-_]US/i.test(v.lang) ? 20 : /en[-_]GB/i.test(v.lang) ? 15 : 10;
+            if (/Natural|Neural|Online|Premium|Enhanced/i.test(n)) s += 50;
+            if (/Ava|Allison|Samantha|Zoe|Evan|Nathan|Serena|Daniel|Google US English/i.test(n)) s += 30;
+            if (/Compact|Fred|Albert|Whisper|Zarvox|Bells|Boing|Trinoids/i.test(n)) s -= 100;
+            return s;
+          };
+          const preferred = enVoices.sort((a, b) => rankVoice(b) - rankVoice(a))[0];
+          if (preferred) {
+            utter.voice = preferred;
+            utter.lang = preferred.lang;
+          } else {
+            utter.lang = 'en-US';
+          }
 
           const wordCount = phrase.split(/\s+/).length;
           const estMs = Math.max(1600, Math.min(7500, Math.round((wordCount * 360) / utter.rate) + 600));
