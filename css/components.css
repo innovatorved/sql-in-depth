@@ -9078,257 +9078,91 @@ body.view-ecosystem .main__content:has(.dashboard-view) {
    PostgreSQL 18 Learn-by-Doing Hub (/postgres/) & Studio Guide (Learn Postgres)
    ═══════════════════════════════════════════════════════════════════════════ */
 
-.pg-hub-shell {
-  max-width: 1180px;
-  margin: 0 auto;
-  padding: 28px 24px 64px;
+body.view-ecosystem .main__content:has(.postgres-view) {
+  max-width: 960px;
 }
 
-.pg-hub-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1.55fr) minmax(290px, 0.95fr);
-  gap: 24px;
-  align-items: stretch;
-  padding-bottom: 24px;
-  border-bottom: 1px solid var(--border);
+.pg-view-header .view-subtitle {
+  max-width: 64ch;
 }
 
-.pg-hub-title {
-  margin: 0 0 10px;
-  font-size: clamp(1.55rem, 2.5vw, 2.15rem);
-  font-weight: 700;
-  letter-spacing: -0.025em;
-  line-height: 1.18;
-  color: var(--fg);
-}
-
-.pg-hub-subtitle {
-  margin: 0 0 18px;
-  font-size: 0.96rem;
-  line-height: 1.62;
-  color: var(--fg-muted);
-  max-width: 68ch;
-}
-
-.pg-hub-cta-row {
+.pg-header-bar {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
   align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
 }
 
-.pg-hub-cta-row .btn {
-  display: inline-flex;
+.pg-header-bar .chal-steps {
+  margin: 0;
+}
+
+.pg-header-actions {
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
-  padding: 9px 15px;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  text-decoration: none;
-  border: 1px solid var(--border-strong, var(--border));
-  color: var(--fg);
-  background: var(--surface, var(--bg-elevated));
-  transition: border-color 0.15s ease, background 0.15s ease;
-}
-
-.pg-hub-cta-row .btn-primary,
-.pg-hub-cta-row .pg-hub-primary-cta {
-  background: var(--accent, #c2410c);
-  border-color: var(--accent, #c2410c);
-  color: var(--accent-fg, #ffffff);
-}
-
-.pg-hub-cta-row .btn:hover {
-  border-color: var(--fg-muted);
-}
-
-.pg-hub-cta-row .pg-hub-primary-cta:hover {
-  filter: brightness(1.06);
-  border-color: var(--accent, #c2410c);
-}
-
-.pg-hub-progress-card {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 18px 20px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--surface, var(--bg-elevated));
-}
-
-.pg-hub-stat-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.pg-hub-stat-right {
-  text-align: right;
-}
-
-.pg-hub-stat-value {
-  font-family: var(--font-mono);
-  font-size: 1.45rem;
-  font-weight: 700;
-  line-height: 1.15;
-  color: var(--fg);
+  gap: 14px;
   font-variant-numeric: tabular-nums;
 }
 
-.pg-hub-stat-denom {
-  font-size: 0.92rem;
-  font-weight: 500;
-  color: var(--fg-muted);
+.pg-header-actions .chal-progress {
+  margin-top: 0;
 }
 
-.pg-hub-stat-label {
-  margin-top: 3px;
-  font-size: 0.78rem;
-  color: var(--fg-muted);
+.pg-header-actions .chal-progress__track {
+  width: 108px;
+  flex: 0 0 108px;
 }
 
-.pg-hub-meter {
-  height: 6px;
-  border-radius: 999px;
-  background: var(--border);
-  overflow: hidden;
+.pg-hub-body {
+  gap: 14px;
 }
 
-.pg-hub-meter-fill {
-  height: 100%;
-  border-radius: 999px;
-  background: var(--accent, #c2410c);
-  transition: width 0.25s ease;
-}
-
-.pg-hub-engine-meta {
-  font-size: 0.76rem;
-  line-height: 1.45;
-  color: var(--fg-muted);
-}
-
-.pg-hub-jump-strip {
+.pg-tracks-bar {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  padding: 16px 0 12px;
-}
-
-.pg-hub-jump-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 10px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--fg-muted);
-  font-size: 0.78rem;
-  text-decoration: none;
-  font-variant-numeric: tabular-nums;
-  transition: border-color 0.15s ease, color 0.15s ease;
-}
-
-.pg-hub-jump-pill:hover {
-  border-color: var(--fg-muted);
-  color: var(--fg);
-}
-
-.pg-hub-jump-num {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--accent, #c2410c);
-}
-
-.pg-hub-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 0 18px;
-}
-
-.pg-hub-search-wrap {
-  position: relative;
-  flex: 1 1 320px;
-}
-
-.pg-hub-search-icon {
-  position: absolute;
-  left: 11px;
-  top: 50%;
-  transform: translateY(-50%);
+  gap: 8px 16px;
+  font-size: 12px;
   color: var(--fg-muted);
-  pointer-events: none;
 }
 
-.pg-hub-search-input {
-  width: 100%;
-  height: 36px;
-  padding: 0 12px 0 34px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  background: var(--surface, var(--bg));
-  color: var(--fg);
-  font-size: 0.85rem;
+.pg-tracks-meta {
+  line-height: 1.5;
 }
 
-.pg-hub-search-input:focus {
-  outline: 2px solid var(--accent, #c2410c);
-  outline-offset: -1px;
-}
-
-.pg-hub-filter-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-}
-
-.pg-hub-chip {
-  height: 32px;
-  padding: 0 11px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  background: var(--bg);
+.pg-tracks-meta code {
+  font-family: var(--font-mono);
+  font-size: 11px;
   color: var(--fg-muted);
-  font-size: 0.78rem;
+}
+
+.pg-toggle-all-btn {
+  height: 28px;
+  padding: 0 10px;
+  font-family: var(--font-sans);
+  font-size: 12px;
   font-weight: 500;
-  cursor: pointer;
-}
-
-.pg-hub-chip.is-active {
-  border-color: var(--accent, #c2410c);
-  color: var(--fg);
-  background: var(--surface, var(--bg-elevated));
-}
-
-.pg-hub-expand-actions {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.8rem;
-}
-
-.pg-hub-link-btn {
-  border: 0;
-  background: none;
-  padding: 4px 2px;
   color: var(--fg-muted);
-  font-size: 0.8rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 7px;
   cursor: pointer;
+  white-space: nowrap;
+  transition: color var(--dur-fast) var(--ease-out),
+              border-color var(--dur-fast) var(--ease-out),
+              background var(--dur-fast) var(--ease-out);
 }
 
-.pg-hub-link-btn:hover {
+.pg-toggle-all-btn:hover {
   color: var(--fg);
-  text-decoration: underline;
+  border-color: var(--border-strong);
+  background: var(--surface-hover);
 }
 
-.pg-hub-tracks-list {
+.pg-tracks-stack {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -9336,9 +9170,30 @@ body.view-ecosystem .main__content:has(.dashboard-view) {
 
 .pg-track-accordion {
   border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--surface, var(--bg));
+  border-radius: 12px;
+  background: var(--surface);
   overflow: hidden;
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+
+.pg-track-accordion:hover {
+  border-color: var(--border-strong);
+}
+
+.pg-track-accordion::details-content {
+  interpolate-size: allow-keywords;
+  overflow: clip;
+  contain: layout;
+}
+
+.pg-track-accordion:not([open])::details-content {
+  block-size: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pg-track-accordion::details-content {
+    transition: block-size 0.22s ease-in-out, content-visibility 0.22s ease-in-out allow-discrete;
+  }
 }
 
 .pg-track-summary {
@@ -9346,31 +9201,41 @@ body.view-ecosystem .main__content:has(.dashboard-view) {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 18px;
+  padding: 16px 20px;
   cursor: pointer;
   user-select: none;
+  transition: background var(--dur-fast) var(--ease-out);
 }
 
 .pg-track-summary::-webkit-details-marker {
   display: none;
 }
 
+.pg-track-summary:hover {
+  background: var(--surface-hover);
+}
+
+.pg-track-accordion[open] > .pg-track-summary {
+  background: var(--bg-alt);
+}
+
 .pg-track-chevron {
   flex-shrink: 0;
   color: var(--fg-muted);
-  transition: transform 0.16s ease;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pg-track-chevron {
+    transition: transform 0.18s ease;
+  }
 }
 
 .pg-track-accordion[open] > .pg-track-summary .pg-track-chevron {
   transform: rotate(90deg);
 }
 
-.pg-track-num {
+.pg-track-pill {
   flex-shrink: 0;
-  font-family: var(--font-mono);
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--accent, #c2410c);
   font-variant-numeric: tabular-nums;
 }
 
@@ -9383,156 +9248,119 @@ body.view-ecosystem .main__content:has(.dashboard-view) {
 }
 
 .pg-track-title {
-  font-size: 0.98rem;
+  font-size: 15px;
   font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.005em;
   color: var(--fg);
 }
 
 .pg-track-desc {
-  font-size: 0.81rem;
+  font-size: 13px;
+  line-height: 1.45;
   color: var(--fg-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.pg-track-progress-pill {
+.pg-track-right {
   flex-shrink: 0;
-  padding: 3px 9px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  font-family: var(--font-mono);
-  font-size: 0.74rem;
-  color: var(--fg-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
   font-variant-numeric: tabular-nums;
+}
+
+.pg-track-bar {
+  width: 96px;
 }
 
 .pg-track-body {
-  padding: 4px 18px 18px;
-  border-top: 1px solid var(--border);
-  background: var(--bg);
+  border-top: 1px solid var(--divider);
+  background: var(--surface);
 }
 
-.pg-topic-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(265px, 1fr));
-  gap: 12px;
-  padding-top: 14px;
+.pg-track-body .pg-track-list {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
 
-.pg-topic-card {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 14px 15px;
-  border-radius: 7px;
-  border: 1px solid var(--border);
-  background: var(--surface, var(--bg-elevated));
-  text-decoration: none;
-  color: inherit;
-  transition: border-color 0.15s ease;
-}
-
-.pg-topic-card:hover {
-  border-color: var(--fg-muted);
-}
-
-.pg-topic-card.is-completed {
-  border-color: rgba(22, 163, 74, 0.45);
-}
-
-.pg-topic-card-top {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.pg-topic-num {
+.pg-row-steps {
   font-family: var(--font-mono);
-  font-size: 0.74rem;
-  font-weight: 600;
-  color: var(--fg-muted);
+  font-size: 11px;
   font-variant-numeric: tabular-nums;
 }
 
-.pg-topic-diff {
-  padding: 1px 7px;
-  border-radius: 4px;
-  font-size: 0.7rem;
-  font-weight: 600;
-  border: 1px solid var(--border);
-  color: var(--fg-muted);
-}
-
-.pg-topic-steps-status {
-  margin-left: auto;
+.pg-row-clauses {
   display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  color: var(--fg-muted);
-  font-variant-numeric: tabular-nums;
-}
-
-.pg-step-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--border-strong, var(--border));
-}
-
-.pg-step-dot.is-done {
-  background: #16a34a;
-}
-
-.pg-topic-card-title {
-  font-size: 0.92rem;
-  font-weight: 600;
-  line-height: 1.35;
-  color: var(--fg);
-  margin-bottom: 6px;
-}
-
-.pg-topic-card-summary {
-  margin: 0 0 12px;
-  font-size: 0.8rem;
-  line-height: 1.5;
-  color: var(--fg-muted);
-}
-
-.pg-topic-card-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding-top: 9px;
-  border-top: 1px solid var(--border);
-}
-
-.pg-topic-clauses {
-  display: flex;
   flex-wrap: wrap;
   gap: 4px;
-  min-width: 0;
 }
 
-.pg-topic-clause {
-  font-family: var(--font-mono);
-  font-size: 0.69rem;
-  padding: 1px 5px;
+.pg-row-clause {
+  padding: 1px 6px;
   border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--fg-muted);
   background: var(--bg);
   border: 1px solid var(--border);
-  color: var(--fg-muted);
 }
 
-.pg-topic-open-label {
-  flex-shrink: 0;
-  font-size: 0.76rem;
-  font-weight: 600;
-  color: var(--accent, #c2410c);
+.pg-clinics-callout__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.pg-clinics-callout__row .eco-card__desc {
+  margin-top: 4px;
+  max-width: 60ch;
+}
+
+.pg-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.pg-empty-state p {
+  margin: 0;
+}
+
+@media (max-width: 680px) {
+  .postgres-view {
+    padding-top: 22px;
+  }
+
+  .pg-track-summary {
+    flex-wrap: wrap;
+    padding: 14px 16px;
+    gap: 8px 10px;
+  }
+
+  .pg-track-heading-group {
+    flex: 1 1 100%;
+    order: 3;
+  }
+
+  .pg-track-desc {
+    white-space: normal;
+  }
+
+  .pg-track-right {
+    margin-left: auto;
+  }
+
+  .pg-track-bar {
+    display: none;
+  }
 }
 
 /* ── Studio: Learn Postgres & Upgraded Challenges Guide Tabs ── */

@@ -716,11 +716,23 @@
      ========================================================================== */
 
   var _hubState = {
+    tab: 'tracks',
     search: '',
     difficulty: 'all',
     status: 'all',
-    openTracks: null // Set of open module IDs
+    openTracks: null // Map of open module IDs
   };
+
+  var DIFF_TO_CHAL_LEVEL = {
+    Beginner: 'easy',
+    Intermediate: 'medium',
+    Advanced: 'hard',
+    Staff: 'insane'
+  };
+
+  function getStudioLabSearch(slug) {
+    return '?mode=postgres-labs&lab=' + encodeURIComponent(slug || 'select-projection-arithmetic');
+  }
 
   function renderPostgresHub(container) {
     var rootEl = container || (typeof document !== 'undefined' ? document.getElementById('pg-mastery-root') : null);
@@ -732,85 +744,77 @@
       _hubState.openTracks = {};
       if (summary.resumeTopic && summary.resumeTopic.moduleId) {
         _hubState.openTracks[summary.resumeTopic.moduleId] = true;
+      } else if (cur.modules[0]) {
+        _hubState.openTracks[cur.modules[0].id] = true;
       }
-      if (cur.modules[0]) _hubState.openTracks[cur.modules[0].id] = true;
-      if (cur.modules[9]) _hubState.openTracks[cur.modules[9].id] = true;
     }
 
-    var resumeSlug = summary.resumeTopic ? summary.resumeTopic.slug : 'select-projection-arithmetic';
+    var resumeTopic = summary.resumeTopic || cur.topics[0] || null;
+    var resumeSlug = resumeTopic ? resumeTopic.slug : 'select-projection-arithmetic';
+    var resumeSearch = getStudioLabSearch(resumeSlug);
+    var resumeNum = resumeTopic ? String(resumeTopic.globalOrder || 1).padStart(2, '0') : '01';
     var resumeLabel = summary.completedStepsCount > 0
-      ? ('Continue: ' + summary.resumeTopic.title)
-      : 'Start Lab 01: SELECT Projection & Arithmetic';
+      ? ('Continue Lab ' + resumeNum + ' →')
+      : 'Start Lab 01 →';
 
-    var trackJumpPills = cur.modules.map(function (mod) {
-      return '<a href="#track-' + escapeHtml(mod.id) + '" class="pg-hub-jump-pill" data-pg-jump="' + escapeHtml(mod.id) + '">' +
-        '<span class="pg-hub-jump-num">' + escapeHtml(mod.num) + '</span>' +
-        '<span>' + escapeHtml(mod.shortTitle) + '</span>' +
-      '</a>';
+    var activeTab = _hubState.tab || 'tracks';
+    var baseTopics = activeTab === 'clinics'
+      ? cur.topics.filter(function (t) { return t.moduleId === 'pg-m09' || t.moduleId === 'pg-m10'; })
+      : cur.topics;
+
+    var levels = ['all', 'Beginner', 'Intermediate', 'Advanced', 'Staff'];
+    var filterButtonsHtml = levels.map(function (lvl) {
+      var count = lvl === 'all'
+        ? baseTopics.length
+        : baseTopics.filter(function (t) { return t.difficulty === lvl; }).length;
+      if (lvl !== 'all' && count === 0) return '';
+      var active = _hubState.difficulty === lvl;
+      var label = lvl === 'all' ? 'All' : lvl;
+      return '<button type="button" class="chal-filter' + (active ? ' is-active' : '') + '" data-pg-diff="' + escapeHtml(lvl) + '" aria-pressed="' + (active ? 'true' : 'false') + '">' +
+        escapeHtml(label) + ' <span class="chal-filter__count">' + count + '</span>' +
+      '</button>';
     }).join('');
 
     rootEl.innerHTML = [
-      '<section class="pg-hub-shell">',
-      '  <header class="pg-hub-hero">',
-      '    <div class="pg-hub-hero-main">',
-      '      <h1 class="pg-hub-title">PostgreSQL 18 Learn-by-Doing Mastery</h1>',
-      '      <p class="pg-hub-subtitle">Practice every SQL and PostgreSQL 18 concept directly against a real in-browser PostgreSQL 18.6 WebAssembly engine—from foundational <code>SELECT</code>, <code>JOIN</code>, and window frames to <code>JSONB</code>, <code>MERGE</code>, <code>pageinspect</code> slotted pages, <code>pg_catalog</code> system views, and PagerDuty DBRE troubleshooting clinics.</p>',
-      '      <div class="pg-hub-cta-row">',
-      '        <a href="/sandbox/?mode=postgres-labs&lab=' + encodeURIComponent(resumeSlug) + '" class="btn btn-primary pg-hub-primary-cta">',
-      '          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"/></svg>',
-      '          <span>' + escapeHtml(resumeLabel) + '</span>',
-      '        </a>',
-      '        <a href="/sandbox/?mode=postgres-labs&lab=clinic-lock-convoy-blocker-tree" class="btn btn-secondary">',
-      '          <span>Jump to Production DBRE Clinics</span>',
-      '        </a>',
+      '<div class="view-canvas postgres-view chal-page">',
+      '  <header class="view-header pg-view-header">',
+      '    <div class="view-header__top">',
+      '      <div class="view-header__content">',
+      '        <h1 class="view-title">PostgreSQL 18 Mastery</h1>',
+      '        <p class="view-subtitle">80 hands-on labs and 240 live SQL missions across 10 tracks — from <code>SELECT</code>, <code>JOIN</code>, and window frames to <code>JSONB</code>, MVCC storage, <code>pg_catalog</code>, and DBRE clinics.</p>',
+      '      </div>',
+      '      <div class="view-tabs" role="tablist" aria-label="PostgreSQL mastery views">',
+      '        <button type="button" class="view-tab' + (activeTab === 'tracks' ? ' active' : '') + '" data-pg-tab="tracks" role="tab" aria-selected="' + (activeTab === 'tracks' ? 'true' : 'false') + '">Curriculum Tracks</button>',
+      '        <button type="button" class="view-tab' + (activeTab === 'labs' ? ' active' : '') + '" data-pg-tab="labs" role="tab" aria-selected="' + (activeTab === 'labs' ? 'true' : 'false') + '">All 80 Labs</button>',
+      '        <button type="button" class="view-tab' + (activeTab === 'clinics' ? ' active' : '') + '" data-pg-tab="clinics" role="tab" aria-selected="' + (activeTab === 'clinics' ? 'true' : 'false') + '">DBRE Clinics</button>',
       '      </div>',
       '    </div>',
-      '    <aside class="pg-hub-progress-card" aria-label="PostgreSQL Mastery Progress">',
-      '      <div class="pg-hub-stat-row">',
-      '        <div>',
-      '          <div class="pg-hub-stat-value">' + summary.completedTopicsCount + ' <span class="pg-hub-stat-denom">/ ' + summary.totalTopics + '</span></div>',
-      '          <div class="pg-hub-stat-label">Practice Topics Mastered</div>',
+      '    <div class="pg-header-bar">',
+      '      <ol class="chal-steps" aria-label="How PostgreSQL labs work">',
+      '        <li><span>1</span>Read the scenario &amp; internals guide</li>',
+      '        <li><span>2</span>Write PostgreSQL 18 SQL in Studio</li>',
+      '        <li><span>3</span>Verify all 3 steps</li>',
+      '      </ol>',
+      '      <div class="pg-header-actions">',
+      '        <div class="chal-progress" role="group" aria-label="Your PostgreSQL progress">',
+      '          <div class="chal-progress__text"><strong>' + summary.completedTopicsCount + ' of ' + summary.totalTopics + '</strong> labs · <strong>' + summary.completedStepsCount + ' of ' + summary.totalSteps + '</strong> steps</div>',
+      '          <div class="chal-progress__track"><span style="width:' + summary.pctSteps + '%"></span></div>',
       '        </div>',
-      '        <div class="pg-hub-stat-right">',
-      '          <div class="pg-hub-stat-value">' + summary.completedStepsCount + ' <span class="pg-hub-stat-denom">/ ' + summary.totalSteps + '</span></div>',
-      '          <div class="pg-hub-stat-label">Verified SQL Missions</div>',
-      '        </div>',
+      '        <a href="/sandbox/' + escapeHtml(resumeSearch) + '" class="eco-btn eco-btn--sm eco-btn--primary" data-nav="sandbox" data-search="' + escapeHtml(resumeSearch) + '">' + escapeHtml(resumeLabel) + '</a>',
       '      </div>',
-      '      <div class="pg-hub-meter" role="progressbar" aria-valuenow="' + summary.pctSteps + '" aria-valuemin="0" aria-valuemax="100" aria-label="Verified SQL missions completion">',
-      '        <div class="pg-hub-meter-fill" style="width:' + summary.pctSteps + '%"></div>',
-      '      </div>',
-      '      <div class="pg-hub-engine-meta">PostgreSQL 18.6 WASM · 7 Extensions (<code>pg_trgm</code>, <code>btree_gist</code>, <code>ltree</code>, <code>pageinspect</code>, <code>pg_buffercache</code>, <code>pg_visibility</code>, <code>pg_freespacemap</code>)</div>',
-      '    </aside>',
+      '    </div>',
       '  </header>',
       '',
-      '  <nav class="pg-hub-jump-strip" aria-label="Curriculum Tracks">',
-      trackJumpPills,
-      '  </nav>',
-      '',
-      '  <div class="pg-hub-toolbar" role="region" aria-label="Filter practice topics">',
-      '    <div class="pg-hub-search-wrap">',
-      '      <svg class="pg-hub-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
-      '      <input type="search" id="pg-hub-search" class="pg-hub-search-input" placeholder="Filter 80 practice topics by SQL clause, catalog view, or incident (e.g. LATERAL, JSON_TABLE, pg_constraint, wraparound)…" value="' + escapeHtml(_hubState.search) + '" autocomplete="off" />',
-      '    </div>',
-      '    <div class="pg-hub-filter-group" role="group" aria-label="Difficulty filter">',
-      ['all', 'Beginner', 'Intermediate', 'Advanced', 'Staff'].map(function (lvl) {
-        var active = _hubState.difficulty === lvl;
-        var label = lvl === 'all' ? 'All Levels' : lvl;
-        return '<button type="button" class="pg-hub-chip' + (active ? ' is-active' : '') + '" data-pg-diff="' + escapeHtml(lvl) + '" aria-pressed="' + (active ? 'true' : 'false') + '">' + escapeHtml(label) + '</button>';
-      }).join(''),
-      '    </div>',
-      '    <div class="pg-hub-expand-actions">',
-      '      <button type="button" class="pg-hub-link-btn" id="pg-hub-expand-all">Expand All</button>',
-      '      <span class="pg-hub-sep" aria-hidden="true">·</span>',
-      '      <button type="button" class="pg-hub-link-btn" id="pg-hub-collapse-all">Collapse All</button>',
-      '    </div>',
+      '  <div class="chal-controls">',
+      '    <input type="search" id="pg-hub-search" class="chal-search" placeholder="Search by clause, view, or topic, e.g. LATERAL, JSONB, pg_locks" aria-label="Search PostgreSQL labs" value="' + escapeHtml(_hubState.search) + '" autocomplete="off" />',
+      '    <div class="chal-filters" id="pg-hub-filters" role="group" aria-label="Filter by level">' + filterButtonsHtml + '</div>',
       '  </div>',
       '',
-      '  <div id="pg-hub-tracks-list" class="pg-hub-tracks-list"></div>',
-      '</section>'
+      '  <div id="pg-hub-tracks-list" class="view-body pg-hub-body"></div>',
+      '</div>'
     ].join('\n');
 
-    renderTrackAccordions(rootEl);
+    renderHubBody(rootEl);
     bindHubEvents(rootEl);
   }
 
@@ -830,7 +834,49 @@
     return hay.indexOf(queryLower) !== -1;
   }
 
-  function renderTrackAccordions(rootEl) {
+  function renderLabRow(topic, st, showTrackBadge) {
+    var stepDone = getTopicCompletedStepCount(topic.id, 3, st);
+    var isDone = stepDone >= 3;
+    var chalTier = DIFF_TO_CHAL_LEVEL[topic.difficulty] || 'medium';
+    var studioSearch = getStudioLabSearch(topic.slug);
+    var ctaLabel = isDone ? 'Review' : (stepDone > 0 ? 'Continue' : 'Practice');
+    var clauseChips = (topic.clauses || []).slice(0, 4).map(function (cl) {
+      return '<code class="pg-row-clause">' + escapeHtml(cl) + '</code>';
+    }).join('');
+
+    return [
+      '<li class="chal-row pg-lab-row' + (isDone ? ' is-solved' : '') + '">',
+      '  <span class="chal-row__num" aria-hidden="true">' + (isDone ? '✓' : String(topic.globalOrder).padStart(2, '0')) + '</span>',
+      '  <div class="chal-row__main">',
+      '    <div class="chal-row__title">',
+      '      <a href="/sandbox/' + escapeHtml(studioSearch) + '" data-nav="sandbox" data-search="' + escapeHtml(studioSearch) + '">' + escapeHtml(topic.title) + '</a>',
+      '    </div>',
+      '    <p class="chal-row__desc">' + escapeHtml(topic.summary) + '</p>',
+      '    <div class="chal-row__meta">',
+      '      <span class="chal-level chal-level--' + escapeHtml(chalTier) + '">' + escapeHtml(topic.difficulty) + '</span>',
+      (showTrackBadge ? '      <span>Track ' + escapeHtml(topic.moduleNum || '') + ' · ' + escapeHtml(topic.moduleShortTitle || topic.moduleTitle || '') + '</span>' : ''),
+      '      <span class="pg-row-steps">' + stepDone + '/3 steps</span>',
+      (clauseChips ? '      <span class="pg-row-clauses">' + clauseChips + '</span>' : ''),
+      '    </div>',
+      '  </div>',
+      '  <a class="chal-row__cta" href="/sandbox/' + escapeHtml(studioSearch) + '" data-nav="sandbox" data-search="' + escapeHtml(studioSearch) + '">' + ctaLabel + '</a>',
+      '</li>'
+    ].filter(Boolean).join('\n');
+  }
+
+  function syncToggleAllButton(rootEl) {
+    var toggleBtn = rootEl.querySelector('#pg-hub-toggle-all');
+    if (!toggleBtn) return;
+    var items = rootEl.querySelectorAll('details.pg-track-accordion');
+    var allOpen = items.length > 0 && Array.prototype.every.call(items, function (d) { return d.open; });
+    toggleBtn.setAttribute('aria-expanded', allOpen ? 'true' : 'false');
+    var expandLbl = toggleBtn.querySelector('.pg-toggle-all__expand');
+    var collapseLbl = toggleBtn.querySelector('.pg-toggle-all__collapse');
+    if (expandLbl) expandLbl.hidden = allOpen;
+    if (collapseLbl) collapseLbl.hidden = !allOpen;
+  }
+
+  function renderHubBody(rootEl) {
     var listEl = rootEl.querySelector('#pg-hub-tracks-list');
     if (!listEl) return;
 
@@ -838,10 +884,39 @@
     var st = loadProgress();
     var q = String(_hubState.search || '').trim().toLowerCase();
     var diff = _hubState.difficulty || 'all';
+    var activeTab = _hubState.tab || 'tracks';
     var hasActiveFilter = Boolean(q || diff !== 'all');
-    var totalMatched = 0;
 
-    var html = cur.modules.map(function (mod) {
+    // Flat "All 80 Labs" view (identical scannable list to /challenges/)
+    if (activeTab === 'labs') {
+      var modLookup = cur.moduleById || {};
+      var flatMatches = cur.topics.filter(function (t) {
+        return topicMatchesFilter(t, q, diff);
+      });
+      if (flatMatches.length === 0) {
+        listEl.innerHTML = renderEmptyFilterState();
+        bindEmptyReset(rootEl, listEl);
+        return;
+      }
+      var flatRows = flatMatches.map(function (t) {
+        var mod = modLookup[t.moduleId] || {};
+        var enriched = Object.assign({}, t, {
+          moduleNum: mod.num || '',
+          moduleShortTitle: mod.shortTitle || mod.title || ''
+        });
+        return renderLabRow(enriched, st, true);
+      }).join('\n');
+      listEl.innerHTML = '<ol class="chal-list">' + flatRows + '</ol>';
+      return;
+    }
+
+    // Track-grouped view ("Curriculum Tracks" or "DBRE Clinics")
+    var modulesToRender = activeTab === 'clinics'
+      ? cur.modules.filter(function (m) { return m.id === 'pg-m09' || m.id === 'pg-m10'; })
+      : cur.modules;
+
+    var totalMatched = 0;
+    var accordionsHtml = modulesToRender.map(function (mod) {
       var matchedTopics = mod.topics.filter(function (t) {
         return topicMatchesFilter(t, q, diff);
       });
@@ -855,86 +930,116 @@
         modCompletedSteps += sc;
         if (sc >= 3) modCompletedTopics++;
       });
+      var modTotalSteps = mod.topics.length * 3;
+      var modPct = modTotalSteps > 0 ? Math.round((modCompletedSteps / modTotalSteps) * 100) : 0;
 
-      var isOpen = hasActiveFilter || Boolean(_hubState.openTracks && _hubState.openTracks[mod.id]);
-
-      var cardsHtml = matchedTopics.map(function (topic) {
-        var stepDone = getTopicCompletedStepCount(topic.id, 3, st);
-        var isDone = stepDone >= 3;
-        var diffSlug = String(topic.difficulty || 'Intermediate').toLowerCase();
-        var clauseChips = (topic.clauses || []).slice(0, 4).map(function (cl) {
-          return '<code class="pg-topic-clause">' + escapeHtml(cl) + '</code>';
-        }).join('');
-
-        var dots = [0, 1, 2].map(function (idx) {
-          var sOk = isStepCompleted(topic.id, idx, st);
-          return '<span class="pg-step-dot' + (sOk ? ' is-done' : '') + '" title="Step ' + (idx + 1) + (sOk ? ' verified' : ' pending') + '"></span>';
-        }).join('');
-
-        return [
-          '<a href="/sandbox/?mode=postgres-labs&lab=' + encodeURIComponent(topic.slug) + '" class="pg-topic-card' + (isDone ? ' is-completed' : '') + '">',
-          '  <div class="pg-topic-card-top">',
-          '    <span class="pg-topic-num">' + String(topic.globalOrder).padStart(2, '0') + '</span>',
-          '    <span class="pg-topic-diff pg-diff-' + escapeHtml(diffSlug) + '">' + escapeHtml(topic.difficulty) + '</span>',
-          '    <span class="pg-topic-steps-status" aria-label="' + stepDone + ' of 3 steps verified">' + dots + '<span class="pg-topic-steps-num">' + stepDone + '/3</span></span>',
-          '  </div>',
-          '  <div class="pg-topic-card-title">' + escapeHtml(topic.title) + '</div>',
-          '  <p class="pg-topic-card-summary">' + escapeHtml(topic.summary) + '</p>',
-          '  <div class="pg-topic-card-footer">',
-          '    <div class="pg-topic-clauses">' + clauseChips + '</div>',
-          '    <span class="pg-topic-open-label">' + (isDone ? 'Review Lab' : (stepDone > 0 ? 'Continue' : 'Practice')) + ' →</span>',
-          '  </div>',
-          '</a>'
-        ].join('\n');
+      var isOpen = activeTab === 'clinics' || hasActiveFilter || Boolean(_hubState.openTracks && _hubState.openTracks[mod.id]);
+      var rowsHtml = matchedTopics.map(function (topic) {
+        return renderLabRow(topic, st, false);
       }).join('\n');
 
-      // Modern Web Guidance: chevron BEFORE summary label, NO <h1>-<h6> inside <summary>
+      // Modern Web Guidance: chevron directly before label, NO <h1>-<h6> inside <summary>
       return [
         '<details id="track-' + escapeHtml(mod.id) + '" class="pg-track-accordion" data-module-id="' + escapeHtml(mod.id) + '"' + (isOpen ? ' open' : '') + '>',
         '  <summary class="pg-track-summary">',
         '    <svg class="pg-track-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>',
-        '    <span class="pg-track-num">' + escapeHtml(mod.num) + '</span>',
+        '    <span class="eco-pill eco-pill--accent pg-track-pill">Track ' + escapeHtml(mod.num) + '</span>',
         '    <span class="pg-track-heading-group">',
         '      <span class="pg-track-title">' + escapeHtml(mod.title) + '</span>',
         '      <span class="pg-track-desc">' + escapeHtml(mod.summary) + '</span>',
         '    </span>',
-        '    <span class="pg-track-progress-pill">' + modCompletedTopics + '/' + mod.topics.length + ' topics · ' + modCompletedSteps + '/24 steps</span>',
+        '    <span class="pg-track-right">',
+        '      <span class="progress-stat">' + modCompletedTopics + '/' + mod.topics.length + ' labs · ' + modCompletedSteps + '/' + modTotalSteps + ' steps</span>',
+        '      <span class="eco-progress-bar pg-track-bar" aria-hidden="true"><span class="eco-progress-fill" style="width:' + modPct + '%"></span></span>',
+        '    </span>',
         '  </summary>',
         '  <div class="pg-track-body">',
-        '    <div class="pg-topic-grid">',
-        cardsHtml,
-        '    </div>',
+        '    <ol class="chal-list pg-track-list">',
+        rowsHtml,
+        '    </ol>',
         '  </div>',
         '</details>'
       ].join('\n');
-    }).join('\n');
+    }).filter(Boolean).join('\n');
 
     if (totalMatched === 0) {
-      listEl.innerHTML = '<div class="pg-hub-empty">' +
-        '<p>No PostgreSQL practice topics matched <strong>' + escapeHtml(_hubState.search) + '</strong>.</p>' +
-        '<button type="button" class="btn btn-secondary" id="pg-hub-reset-filters">Reset Filters</button>' +
-      '</div>';
-      var resetBtn = listEl.querySelector('#pg-hub-reset-filters');
-      if (resetBtn) {
-        resetBtn.addEventListener('click', function () {
-          _hubState.search = '';
-          _hubState.difficulty = 'all';
-          renderPostgresHub(rootEl);
-        });
-      }
+      listEl.innerHTML = renderEmptyFilterState();
+      bindEmptyReset(rootEl, listEl);
       return;
     }
 
-    listEl.innerHTML = html;
+    var topMetaHtml = '';
+    if (activeTab === 'tracks') {
+      topMetaHtml = [
+        '<div class="pg-tracks-bar">',
+        '  <span class="pg-tracks-meta">10 tracks · PostgreSQL 18.6 WASM · <code>pg_trgm</code>, <code>btree_gist</code>, <code>ltree</code>, <code>pageinspect</code>, <code>pg_buffercache</code>, <code>pg_visibility</code>, <code>pg_freespacemap</code></span>',
+        '  <button type="button" class="pg-toggle-all-btn" id="pg-hub-toggle-all" aria-expanded="false">',
+        '    <span class="pg-toggle-all__expand">Expand all tracks</span>',
+        '    <span class="pg-toggle-all__collapse" hidden>Collapse all tracks</span>',
+        '  </button>',
+        '</div>'
+      ].join('\n');
+    }
+
+    var clinicsCalloutHtml = '';
+    if (activeTab === 'clinics') {
+      clinicsCalloutHtml = [
+        '<article class="eco-card pg-clinics-callout">',
+        '  <div class="pg-clinics-callout__row">',
+        '    <div>',
+        '      <h2 class="eco-card__title">Ready for unguided incident debugging?</h2>',
+        '      <p class="eco-card__desc">Put your <code>pg_locks</code>, XID wraparound, cardinality skew, and GIN pending-list skills to the test in 8 PostgreSQL 18 production incident challenges.</p>',
+        '    </div>',
+        '    <a href="/challenges/" class="eco-btn eco-btn--primary" data-nav="challenges">Open Challenges →</a>',
+        '  </div>',
+        '</article>'
+      ].join('\n');
+    }
+
+    listEl.innerHTML = topMetaHtml + '<div class="pg-tracks-stack">' + accordionsHtml + '</div>' + clinicsCalloutHtml;
+    syncToggleAllButton(rootEl);
+
+    var toggleBtn = listEl.querySelector('#pg-hub-toggle-all');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function () {
+        var shouldOpen = toggleBtn.getAttribute('aria-expanded') !== 'true';
+        modulesToRender.forEach(function (m) {
+          if (_hubState.openTracks) _hubState.openTracks[m.id] = shouldOpen;
+        });
+        Array.prototype.forEach.call(listEl.querySelectorAll('details.pg-track-accordion'), function (d) {
+          d.open = shouldOpen;
+        });
+        syncToggleAllButton(rootEl);
+      });
+    }
 
     Array.prototype.forEach.call(listEl.querySelectorAll('details.pg-track-accordion'), function (det) {
       det.addEventListener('toggle', function () {
         var mId = det.getAttribute('data-module-id');
-        if (mId && _hubState.openTracks) {
+        if (mId && _hubState.openTracks && !hasActiveFilter && activeTab === 'tracks') {
           _hubState.openTracks[mId] = det.open;
         }
+        syncToggleAllButton(rootEl);
       });
     });
+  }
+
+  function renderEmptyFilterState() {
+    return '<div class="chal-empty pg-empty-state">' +
+      '<p>No PostgreSQL labs match' + (_hubState.search ? (' <strong>' + escapeHtml(_hubState.search) + '</strong>') : '') + '. Try another keyword or difficulty level.</p>' +
+      '<button type="button" class="eco-btn eco-btn--sm" id="pg-hub-reset-filters">Reset filters</button>' +
+    '</div>';
+  }
+
+  function bindEmptyReset(rootEl, listEl) {
+    var resetBtn = listEl.querySelector('#pg-hub-reset-filters');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', function () {
+        _hubState.search = '';
+        _hubState.difficulty = 'all';
+        renderPostgresHub(rootEl);
+      });
+    }
   }
 
   function bindHubEvents(rootEl) {
@@ -942,7 +1047,7 @@
     if (searchInput) {
       searchInput.addEventListener('input', function () {
         _hubState.search = searchInput.value || '';
-        renderTrackAccordions(rootEl);
+        renderHubBody(rootEl);
       });
     }
 
@@ -954,41 +1059,16 @@
           b.classList.toggle('is-active', isAct);
           b.setAttribute('aria-pressed', isAct ? 'true' : 'false');
         });
-        renderTrackAccordions(rootEl);
+        renderHubBody(rootEl);
       });
     });
 
-    var expandBtn = rootEl.querySelector('#pg-hub-expand-all');
-    if (expandBtn) {
-      expandBtn.addEventListener('click', function () {
-        var cur = getCurriculum();
-        cur.modules.forEach(function (m) { _hubState.openTracks[m.id] = true; });
-        Array.prototype.forEach.call(rootEl.querySelectorAll('details.pg-track-accordion'), function (d) {
-          d.open = true;
-        });
-      });
-    }
-
-    var collapseBtn = rootEl.querySelector('#pg-hub-collapse-all');
-    if (collapseBtn) {
-      collapseBtn.addEventListener('click', function () {
-        _hubState.openTracks = {};
-        Array.prototype.forEach.call(rootEl.querySelectorAll('details.pg-track-accordion'), function (d) {
-          d.open = false;
-        });
-      });
-    }
-
-    Array.prototype.forEach.call(rootEl.querySelectorAll('[data-pg-jump]'), function (pill) {
-      pill.addEventListener('click', function (ev) {
-        var modId = pill.getAttribute('data-pg-jump');
-        var det = rootEl.querySelector('#track-' + modId);
-        if (det) {
-          ev.preventDefault();
-          det.open = true;
-          if (_hubState.openTracks) _hubState.openTracks[modId] = true;
-          det.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+    Array.prototype.forEach.call(rootEl.querySelectorAll('[data-pg-tab]'), function (tabBtn) {
+      tabBtn.addEventListener('click', function () {
+        var nextTab = tabBtn.getAttribute('data-pg-tab') || 'tracks';
+        if (_hubState.tab === nextTab) return;
+        _hubState.tab = nextTab;
+        renderPostgresHub(rootEl);
       });
     });
   }

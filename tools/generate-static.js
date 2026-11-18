@@ -786,50 +786,101 @@ const glossaryHtml = context.window.Renderer && typeof context.window.Renderer.r
 
 function renderStaticPostgresHub(pgCur) {
   if (!pgCur || !Array.isArray(pgCur.modules)) return '';
+  const diffTier = { Beginner: 'easy', Intermediate: 'medium', Advanced: 'hard', Staff: 'insane' };
+  const allTopics = Array.isArray(pgCur.topics) ? pgCur.topics : [];
+  const levels = ['all', 'Beginner', 'Intermediate', 'Advanced', 'Staff'];
+  const filtersHtml = levels.map((lvl) => {
+    const cnt = lvl === 'all' ? allTopics.length : allTopics.filter((t) => t.difficulty === lvl).length;
+    if (lvl !== 'all' && cnt === 0) return '';
+    const active = lvl === 'all';
+    const label = lvl === 'all' ? 'All' : lvl;
+    return `<button type="button" class="chal-filter${active ? ' is-active' : ''}" data-pg-diff="${escapeAttr(lvl)}" aria-pressed="${active ? 'true' : 'false'}">${escapeHtml(label)} <span class="chal-filter__count">${cnt}</span></button>`;
+  }).join('');
+
   const tracksHtml = pgCur.modules.map((mod, idx) => {
-    const cards = (mod.topics || []).map((t) => {
-      const clauses = (t.clauses || []).slice(0, 4).map((cl) => `<code class="pg-topic-clause">${escapeHtml(cl)}</code>`).join('');
-      return `<a href="/sandbox/?mode=postgres-labs&amp;lab=${encodeURIComponent(t.slug)}" class="pg-topic-card">
-        <div class="pg-topic-card-top">
-          <span class="pg-topic-num">${String(t.globalOrder).padStart(2, '0')}</span>
-          <span class="pg-topic-diff pg-diff-${escapeAttr(String(t.difficulty || 'Intermediate').toLowerCase())}">${escapeHtml(t.difficulty)}</span>
-          <span class="pg-topic-steps-status"><span class="pg-topic-steps-num">0/3</span></span>
+    const topics = mod.topics || [];
+    const rows = topics.map((t) => {
+      const tier = diffTier[t.difficulty] || 'medium';
+      const search = `?mode=postgres-labs&lab=${encodeURIComponent(t.slug)}`;
+      const clauses = (t.clauses || []).slice(0, 4).map((cl) => `<code class="pg-row-clause">${escapeHtml(cl)}</code>`).join('');
+      return `<li class="chal-row pg-lab-row">
+        <span class="chal-row__num" aria-hidden="true">${String(t.globalOrder).padStart(2, '0')}</span>
+        <div class="chal-row__main">
+          <div class="chal-row__title">
+            <a href="/sandbox/${escapeAttr(search)}" data-nav="sandbox" data-search="${escapeAttr(search)}">${escapeHtml(t.title)}</a>
+          </div>
+          <p class="chal-row__desc">${escapeHtml(t.summary)}</p>
+          <div class="chal-row__meta">
+            <span class="chal-level chal-level--${escapeAttr(tier)}">${escapeHtml(t.difficulty)}</span>
+            <span class="pg-row-steps">0/3 steps</span>
+            ${clauses ? `<span class="pg-row-clauses">${clauses}</span>` : ''}
+          </div>
         </div>
-        <div class="pg-topic-card-title">${escapeHtml(t.title)}</div>
-        <p class="pg-topic-card-summary">${escapeHtml(t.summary)}</p>
-        <div class="pg-topic-card-footer">
-          <div class="pg-topic-clauses">${clauses}</div>
-          <span class="pg-topic-open-label">Practice →</span>
-        </div>
-      </a>`;
+        <a class="chal-row__cta" href="/sandbox/${escapeAttr(search)}" data-nav="sandbox" data-search="${escapeAttr(search)}">Practice</a>
+      </li>`;
     }).join('\n');
-    return `<details id="track-${escapeAttr(mod.id)}" class="pg-track-accordion" data-module-id="${escapeAttr(mod.id)}"${idx < 2 || idx === 9 ? ' open' : ''}>
+
+    return `<details id="track-${escapeAttr(mod.id)}" class="pg-track-accordion" data-module-id="${escapeAttr(mod.id)}"${idx === 0 ? ' open' : ''}>
       <summary class="pg-track-summary">
         <svg class="pg-track-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-        <span class="pg-track-num">${escapeHtml(mod.num)}</span>
+        <span class="eco-pill eco-pill--accent pg-track-pill">Track ${escapeHtml(mod.num)}</span>
         <span class="pg-track-heading-group">
           <span class="pg-track-title">${escapeHtml(mod.title)}</span>
           <span class="pg-track-desc">${escapeHtml(mod.summary)}</span>
         </span>
-        <span class="pg-track-progress-pill">0/${(mod.topics || []).length} topics · 0/24 steps</span>
+        <span class="pg-track-right">
+          <span class="progress-stat">0/${topics.length} labs · 0/${topics.length * 3} steps</span>
+          <span class="eco-progress-bar pg-track-bar" aria-hidden="true"><span class="eco-progress-fill" style="width:0%"></span></span>
+        </span>
       </summary>
-      <div class="pg-track-body"><div class="pg-topic-grid">${cards}</div></div>
+      <div class="pg-track-body"><ol class="chal-list pg-track-list">${rows}</ol></div>
     </details>`;
   }).join('\n');
 
-  return `<section class="view-canvas pg-hub" data-ssg-hub="postgres">
-    <header class="pg-hub-hero">
-      <div class="pg-hub-hero-main">
-        <h1 class="pg-hub-title">PostgreSQL 18 Learn-by-Doing Mastery</h1>
-        <p class="pg-hub-subtitle">Practice every SQL and PostgreSQL 18 concept directly against a real in-browser PostgreSQL 18.6 WebAssembly engine—from foundational <code>SELECT</code>, <code>JOIN</code>, and window frames to <code>JSONB</code>, <code>MERGE</code>, <code>pageinspect</code> slotted pages, <code>pg_catalog</code> system views, and PagerDuty DBRE troubleshooting clinics.</p>
-        <div class="pg-hub-cta-row">
-          <a href="/sandbox/?mode=postgres-labs&amp;lab=select-projection-arithmetic" class="btn btn-primary pg-hub-primary-cta"><span>Start Track 01: SELECT &amp; Expressions</span></a>
-          <a href="/sandbox/?mode=postgres-labs&amp;lab=clinic-lock-convoy-blocker-tree" class="btn btn-secondary"><span>Jump to Production DBRE Clinics</span></a>
+  const firstSearch = '?mode=postgres-labs&lab=select-projection-arithmetic';
+  return `<div class="view-canvas postgres-view chal-page" data-ssg-hub="postgres">
+    <header class="view-header pg-view-header">
+      <div class="view-header__top">
+        <div class="view-header__content">
+          <h1 class="view-title">PostgreSQL 18 Mastery</h1>
+          <p class="view-subtitle">80 hands-on labs and 240 live SQL missions across 10 tracks — from <code>SELECT</code>, <code>JOIN</code>, and window frames to <code>JSONB</code>, MVCC storage, <code>pg_catalog</code>, and DBRE clinics.</p>
+        </div>
+        <div class="view-tabs" role="tablist" aria-label="PostgreSQL mastery views">
+          <button type="button" class="view-tab active" data-pg-tab="tracks" role="tab" aria-selected="true">Curriculum Tracks</button>
+          <button type="button" class="view-tab" data-pg-tab="labs" role="tab" aria-selected="false">All 80 Labs</button>
+          <button type="button" class="view-tab" data-pg-tab="clinics" role="tab" aria-selected="false">DBRE Clinics</button>
+        </div>
+      </div>
+      <div class="pg-header-bar">
+        <ol class="chal-steps" aria-label="How PostgreSQL labs work">
+          <li><span>1</span>Read the scenario &amp; internals guide</li>
+          <li><span>2</span>Write PostgreSQL 18 SQL in Studio</li>
+          <li><span>3</span>Verify all 3 steps</li>
+        </ol>
+        <div class="pg-header-actions">
+          <div class="chal-progress" role="group" aria-label="Your PostgreSQL progress">
+            <div class="chal-progress__text"><strong>0 of ${allTopics.length}</strong> labs · <strong>0 of ${allTopics.length * 3}</strong> steps</div>
+            <div class="chal-progress__track"><span style="width:0%"></span></div>
+          </div>
+          <a href="/sandbox/${escapeAttr(firstSearch)}" class="eco-btn eco-btn--sm eco-btn--primary" data-nav="sandbox" data-search="${escapeAttr(firstSearch)}">Start Lab 01 →</a>
         </div>
       </div>
     </header>
-    <div id="pg-hub-tracks-list" class="pg-hub-tracks-list">${tracksHtml}</div>
-  </section>`;
+    <div class="chal-controls">
+      <input type="search" id="pg-hub-search" class="chal-search" placeholder="Search by clause, view, or topic, e.g. LATERAL, JSONB, pg_locks" aria-label="Search PostgreSQL labs" value="" autocomplete="off" />
+      <div class="chal-filters" id="pg-hub-filters" role="group" aria-label="Filter by level">${filtersHtml}</div>
+    </div>
+    <div id="pg-hub-tracks-list" class="view-body pg-hub-body">
+      <div class="pg-tracks-bar">
+        <span class="pg-tracks-meta">10 tracks · PostgreSQL 18.6 WASM · <code>pg_trgm</code>, <code>btree_gist</code>, <code>ltree</code>, <code>pageinspect</code>, <code>pg_buffercache</code>, <code>pg_visibility</code>, <code>pg_freespacemap</code></span>
+        <button type="button" class="pg-toggle-all-btn" id="pg-hub-toggle-all" aria-expanded="false">
+          <span class="pg-toggle-all__expand">Expand all tracks</span>
+          <span class="pg-toggle-all__collapse" hidden>Collapse all tracks</span>
+        </button>
+      </div>
+      <div class="pg-tracks-stack">${tracksHtml}</div>
+    </div>
+  </div>`;
 }
 
 const postgresHubHtml = renderStaticPostgresHub(context.window.PG_MASTERY_CURRICULUM);
