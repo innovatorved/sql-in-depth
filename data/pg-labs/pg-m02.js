@@ -127,13 +127,9 @@
             'ORDER BY invoice_id ASC;'
           ].join('\n'),
           starterCode: [
-            '-- Create supplier_invoices referencing products(product_id) with exact NUMERIC(10,2) cost',
+            '-- TODO: Add product_id (FK to products), vendor_code (TEXT NOT NULL), unit_cost_usd (NUMERIC(10,2) NOT NULL), and billed_at (TIMESTAMPTZ NOT NULL)',
             'CREATE TABLE supplier_invoices (',
-            '  invoice_id    BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,',
-            '  -- TODO: product_id INTEGER NOT NULL REFERENCES products(product_id)',
-            '  -- TODO: vendor_code TEXT NOT NULL',
-            '  -- TODO: unit_cost_usd NUMERIC(10,2) NOT NULL',
-            '  -- TODO: billed_at TIMESTAMPTZ NOT NULL',
+            '  invoice_id    BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY',
             ');'
           ].join('\n'),
           solutionCode: [
@@ -177,15 +173,14 @@
           ].join('\n'),
           probeSql: '',
           starterCode: [
-            '-- Fix the error: GENERATED ALWAYS AS IDENTITY blocks explicit import_id without OVERRIDING SYSTEM VALUE!',
-            'INSERT INTO legacy_order_import (import_id, customer_id, imported_usd)',
+            '-- TODO: Write INSERT INTO legacy_order_import (import_id, customer_id, imported_usd) OVERRIDING SYSTEM VALUE SELECT ...',
+            '-- (GENERATED ALWAYS AS IDENTITY blocks explicit import_id unless OVERRIDING SYSTEM VALUE is specified)',
             'SELECT order_id,',
             '       customer_id,',
-            '       ROUND(total_cents::numeric / 100, 2)',
+            '       ROUND(total_cents::numeric / 100, 2) AS imported_usd',
             'FROM orders',
             'WHERE status = \'completed\'',
-            'ORDER BY order_id ASC',
-            'RETURNING import_id, customer_id, imported_usd;'
+            'ORDER BY order_id ASC;'
           ].join('\n'),
           solutionCode: [
             'INSERT INTO legacy_order_import (import_id, customer_id, imported_usd)',
@@ -276,12 +271,13 @@
             'ORDER BY product_id ASC;'
           ].join('\n'),
           starterCode: [
-            '-- Evolve products without rewriting existing heap tuples (PG 11+ attmissingval)',
-            'ALTER TABLE products',
-            '  -- TODO: ADD COLUMN weight_grams INTEGER NOT NULL DEFAULT 500',
-            '  -- TODO: ADD COLUMN fulfillment_tier TEXT NOT NULL DEFAULT \'standard\'',
-            '  -- TODO: ALTER COLUMN stock_qty SET DEFAULT 10',
-            ';'
+            '-- TODO: Evolve products with ALTER TABLE products:',
+            '--   ADD COLUMN weight_grams INTEGER NOT NULL DEFAULT 500,',
+            '--   ADD COLUMN fulfillment_tier TEXT NOT NULL DEFAULT \'standard\',',
+            '--   ALTER COLUMN stock_qty SET DEFAULT 10;',
+            'SELECT product_id, sku, stock_qty',
+            'FROM products',
+            'ORDER BY product_id ASC;'
           ].join('\n'),
           solutionCode: [
             'ALTER TABLE products',
@@ -321,9 +317,11 @@
             '  AND conname = \'chk_orders_positive_total\';'
           ].join('\n'),
           starterCode: [
-            '-- Fix the migration failure: historical order #999 has total_cents = 0!',
-            'ALTER TABLE orders',
-            '  ADD CONSTRAINT chk_orders_positive_total CHECK (total_cents > 0); -- FAILS without NOT VALID!'
+            '-- TODO: Add CHECK (total_cents > 0) NOT VALID on orders as chk_orders_positive_total.',
+            '-- (Historical order #999 has total_cents = 0, so a validated CHECK fails unless marked NOT VALID!)',
+            'SELECT order_id, status, total_cents',
+            'FROM orders',
+            'WHERE total_cents <= 0;'
           ].join('\n'),
           solutionCode: [
             'ALTER TABLE orders',
@@ -465,12 +463,9 @@
             'ORDER BY b.beneficiary_id ASC;'
           ].join('\n'),
           starterCode: [
-            '-- Enforce FK ON DELETE CASCADE and domain CHECK invariants in storage',
+            '-- TODO: Add account_id (FK ON DELETE CASCADE), allocation_bps (CHECK 1..10000), and routing_number (LENGTH = 9)',
             'CREATE TABLE account_beneficiaries (',
-            '  beneficiary_id INTEGER PRIMARY KEY,',
-            '  -- TODO: account_id INTEGER NOT NULL REFERENCES accounts(account_id) ON DELETE CASCADE',
-            '  -- TODO: allocation_bps INTEGER NOT NULL CHECK (allocation_bps BETWEEN 1 AND 10000)',
-            '  -- TODO: routing_number TEXT NOT NULL CHECK (LENGTH(routing_number) = 9)',
+            '  beneficiary_id INTEGER PRIMARY KEY',
             ');'
           ].join('\n'),
           solutionCode: [
@@ -569,13 +564,11 @@
             'ORDER BY s.slot_rank ASC;'
           ].join('\n'),
           starterCode: [
-            '-- 1. Add DEFERRABLE INITIALLY DEFERRED unique constraint uq_priority_slot_rank on (slot_rank)',
-            'ALTER TABLE settlement_priority_slots',
-            '  ADD CONSTRAINT uq_priority_slot_rank UNIQUE (slot_rank); -- BUG: immediate check fails on swap!',
-            '',
-            '-- 2. Swap account 100 -> rank 2 and account 101 -> rank 1 across two UPDATEs',
-            'UPDATE settlement_priority_slots SET slot_rank = 2 WHERE account_id = 100;',
-            'UPDATE settlement_priority_slots SET slot_rank = 1 WHERE account_id = 101;'
+            '-- TODO: Add DEFERRABLE INITIALLY DEFERRED unique constraint uq_priority_slot_rank on (slot_rank),',
+            '-- then swap account 100 -> rank 2 and account 101 -> rank 1 across two UPDATEs!',
+            'SELECT account_id, slot_rank',
+            'FROM settlement_priority_slots',
+            'ORDER BY slot_rank ASC;'
           ].join('\n'),
           solutionCode: [
             'ALTER TABLE settlement_priority_slots',
@@ -702,10 +695,14 @@
           ].join('\n'),
           probeSql: '',
           starterCode: [
-            '-- Stream qualifying VIP orders into vip_order_audit and return generated audit_id values',
-            'INSERT INTO vip_order_audit (order_id, customer_id, order_usd)',
-            '-- TODO: SELECT order_id, customer_id, ROUND(total_cents::numeric / 100, 2) FROM orders ...',
-            '-- TODO: RETURNING audit_id, order_id, customer_id, order_usd;'
+            '-- TODO: Stream qualifying VIP orders into vip_order_audit and return generated audit_id values:',
+            '-- INSERT INTO vip_order_audit (order_id, customer_id, order_usd)',
+            '-- SELECT ... RETURNING audit_id, order_id, customer_id, order_usd;',
+            'SELECT o.order_id, o.customer_id, ROUND(o.total_cents::numeric / 100, 2) AS order_usd',
+            'FROM orders o',
+            'JOIN customers c ON c.customer_id = o.customer_id',
+            'WHERE o.status = \'completed\' AND o.total_cents >= 100000 AND c.tier = \'enterprise\'',
+            'ORDER BY o.order_id ASC;'
           ].join('\n'),
           solutionCode: [
             'INSERT INTO vip_order_audit (order_id, customer_id, order_usd)',
@@ -837,11 +834,11 @@
           setupSql: '',
           probeSql: '',
           starterCode: [
-            '-- Reprice scarce active hardware (< 20 units) by +10% and add +5 reserve units',
-            'UPDATE products',
-            '-- TODO: SET price_cents = ROUND(price_cents * 1.10)::integer, stock_qty = stock_qty + 5',
-            '-- TODO: WHERE is_active = 1 AND stock_qty < 20',
-            '-- TODO: RETURNING product_id, sku, price_cents, stock_qty;'
+            '-- TODO: Update scarce active hardware (< 20 units) with +10% price_cents and +5 stock_qty using UPDATE products ... RETURNING',
+            'SELECT product_id, sku, price_cents, stock_qty',
+            'FROM products',
+            'WHERE is_active = 1 AND stock_qty < 20',
+            'ORDER BY product_id ASC;'
           ].join('\n'),
           solutionCode: [
             'UPDATE products',
@@ -920,16 +917,13 @@
           setupSql: '',
           probeSql: '',
           starterCode: [
-            '-- Pre-aggregate completed sold_qty per product_id in FROM (...) before deducting stock_qty!',
-            'UPDATE products p',
-            'SET stock_qty = p.stock_qty - s.sold_qty',
-            'FROM (',
-            '  -- TODO: SELECT oi.product_id, SUM(oi.quantity)::integer AS sold_qty',
-            '  --       FROM order_items oi JOIN orders o ON oi.order_id = o.order_id',
-            '  --       WHERE o.status = \'completed\' GROUP BY oi.product_id',
-            ') s',
-            'WHERE p.product_id = s.product_id',
-            'RETURNING p.product_id, p.sku, s.sold_qty, p.stock_qty AS remaining_stock;'
+            '-- TODO: Deduct aggregated completed sold_qty from products.stock_qty via UPDATE products p SET stock_qty = p.stock_qty - s.sold_qty FROM (...)',
+            'SELECT oi.product_id, SUM(oi.quantity)::integer AS sold_qty',
+            'FROM order_items oi',
+            'JOIN orders o ON oi.order_id = o.order_id',
+            'WHERE o.status = \'completed\'',
+            'GROUP BY oi.product_id',
+            'ORDER BY oi.product_id ASC;'
           ].join('\n'),
           solutionCode: [
             'UPDATE products p',
@@ -1189,13 +1183,16 @@
           setupSql: '',
           probeSql: '',
           starterCode: [
-            '-- Insert 3 webhook rows idempotently on unique column (email); return only newly inserted rows',
-            'INSERT INTO customers (customer_id, email, name, tier, country, referred_by, created_at)',
-            'VALUES',
-            '  (91, \'aravind@acme.io\', \'Aravind Rao\', \'enterprise\', \'IN\', NULL, \'2025-03-28\'),',
-            '  (92, \'elena@vela.dev\', \'Elena Rostova\', \'pro\', \'DE\', 1, \'2025-03-28\'),',
-            '  (9, \'priya@lattice.ai\', \'Priya Nair\', \'enterprise\', \'IN\', 1, \'2025-03-28\')',
-            '-- TODO: ON CONFLICT (email) DO NOTHING RETURNING customer_id, email, name, tier;'
+            '-- TODO: Add ON CONFLICT (email) DO NOTHING RETURNING customer_id, email, name, tier;',
+            '-- Preview incoming emails vs existing customers first:',
+            'SELECT v.customer_id, v.email, (c.customer_id IS NOT NULL) AS already_exists',
+            'FROM (VALUES',
+            '  (91, \'aravind@acme.io\'),',
+            '  (92, \'elena@vela.dev\'),',
+            '  (9, \'priya@lattice.ai\')',
+            ') AS v(customer_id, email)',
+            'LEFT JOIN customers c ON c.email = v.email',
+            'ORDER BY v.customer_id ASC;'
           ].join('\n'),
           solutionCode: [
             'INSERT INTO customers (customer_id, email, name, tier, country, referred_by, created_at)',
@@ -1229,14 +1226,11 @@
           setupSql: '',
           probeSql: '',
           starterCode: [
-            '-- Upsert 3 SKUs: insert net-new SKUs, or update price_cents and ADD incoming stock_qty on existing SKUs',
-            'INSERT INTO products (product_id, sku, name, category_id, price_cents, stock_qty, is_active)',
-            'VALUES',
-            '  (101, \'NVME-4TB-PRO\', \'Enterprise Gen5 NVMe 4TB\', 20, 39900, 15, 1),',
-            '  (107, \'CABLE-DAC-3M\', \'QSFP28 3m Twinax Cable\', 30, 4200, 30, 1),',
-            '  (109, \'NIC-400G-OSFP\', \'Single-Port 400GbE OSFP NIC\', 30, 118000, 8, 1)',
-            '-- TODO: ON CONFLICT (sku) DO UPDATE SET ... using EXCLUDED',
-            '-- TODO: RETURNING product_id, sku, price_cents, stock_qty;'
+            '-- TODO: Write INSERT INTO products (...) VALUES (...) ON CONFLICT (sku) DO UPDATE SET ... RETURNING product_id, sku, price_cents, stock_qty;',
+            'SELECT product_id, sku, price_cents, stock_qty, is_active',
+            'FROM products',
+            'WHERE product_id IN (101, 107)',
+            'ORDER BY product_id ASC;'
           ].join('\n'),
           solutionCode: [
             'INSERT INTO products (product_id, sku, name, category_id, price_cents, stock_qty, is_active)',
@@ -1378,12 +1372,11 @@
           setupSql: '',
           probeSql: '',
           starterCode: [
-            '-- Reconcile ledger_sync_staging into ledger_accounts with MERGE INTO and RETURNING merge_action()',
-            'MERGE INTO ledger_accounts la',
-            'USING ledger_sync_staging s ON la.account_id = s.account_id',
-            '-- TODO: WHEN MATCHED THEN UPDATE SET balance_cents = la.balance_cents + s.delta_cents, status = s.new_status, updated_at = s.synced_at',
-            '-- TODO: WHEN NOT MATCHED THEN INSERT (...) VALUES (...)',
-            '-- TODO: RETURNING merge_action() AS action, la.account_id, la.account_code, la.balance_cents, la.status;'
+            '-- TODO: Reconcile ledger_sync_staging into ledger_accounts with MERGE INTO ... WHEN MATCHED ... WHEN NOT MATCHED ... RETURNING merge_action()',
+            'SELECT s.account_id, s.account_code, s.delta_cents, s.new_status, (la.account_id IS NOT NULL) AS exists_in_ledger',
+            'FROM ledger_sync_staging s',
+            'LEFT JOIN ledger_accounts la ON la.account_id = s.account_id',
+            'ORDER BY s.account_id ASC;'
           ].join('\n'),
           solutionCode: [
             'MERGE INTO ledger_accounts la',

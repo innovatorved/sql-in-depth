@@ -150,17 +150,12 @@
           setupSql: '',
           probeSql: '',
           starterCode: [
-            '-- Walk from true root blockers down every multi-hop lock chain',
-            'WITH RECURSIVE lock_tree AS (',
-            '  SELECT DISTINCT l.blocking_pid AS root_pid, l.pid AS victim_pid, 1 AS chain_depth',
-            '  FROM cluster_locks l',
-            '  WHERE NOT l.granted',
-            '    -- TODO: exclude middle waiters that also have an ungranted lock in cluster_locks',
-            '  UNION ALL',
-            '  -- TODO: step from victim_pid to downstream ungranted waiters (c.blocking_pid = t.victim_pid)',
-            ')',
-            'SELECT r.pid AS root_pid',
-            '-- TODO: project root_app, root_state, victim_count, max_depth and sort;'
+            '-- TODO: Walk from true root blockers down every multi-hop lock chain with WITH RECURSIVE lock_tree',
+            'SELECT DISTINCT l.blocking_pid AS root_pid,',
+            '       l.pid AS victim_pid',
+            'FROM cluster_locks l',
+            'WHERE NOT l.granted',
+            'ORDER BY l.blocking_pid ASC, l.pid ASC;'
           ].join('\n'),
           solutionCode: [
             'WITH RECURSIVE lock_tree AS (',
@@ -292,15 +287,14 @@
           setupSql: '',
           probeSql: '',
           starterCode: [
-            '-- Isolate leaked transactions relative to incident snapshot 2025-03-15 14:30:00+00',
+            '-- TODO: Compute xact_open_sec, idle_in_xact_sec relative to 2025-03-15 14:30:00+00, and query AS last_sql',
             'SELECT pid,',
             '       usename,',
             '       application_name,',
             '       wait_event',
-            '       -- TODO: compute xact_open_sec, idle_in_xact_sec, and query AS last_sql',
             'FROM cluster_stat_activity',
             'WHERE state = \'idle in transaction\'',
-            'ORDER BY xact_open_sec DESC, pid ASC;'
+            'ORDER BY pid ASC;'
           ].join('\n'),
           solutionCode: [
             'SELECT pid,',
@@ -635,14 +629,13 @@
           setupSql: '',
           probeSql: '',
           starterCode: [
-            '-- Normalize cumulative temp spills by execution count to size per-session memory',
+            '-- TODO: Add spill_kb_per_call, spill_mb_per_call, and LEFT(query_text, 60) AS short_sql; sort by spill_mb_per_call DESC',
             'SELECT queryid,',
             '       rolname,',
             '       calls',
-            '       -- TODO: add spill_kb_per_call, spill_mb_per_call, and LEFT(query_text, 60) AS short_sql',
             'FROM cluster_stat_statements',
             'WHERE temp_blks_written > 0',
-            'ORDER BY spill_mb_per_call DESC, queryid ASC;'
+            'ORDER BY queryid ASC;'
           ].join('\n'),
           solutionCode: [
             'SELECT queryid,',
@@ -773,13 +766,12 @@
           setupSql: '',
           probeSql: '',
           starterCode: [
-            '-- Rank cluster tables by dead-tuple density and physical heap size',
+            '-- TODO: Add dead_tup_pct, pg_size_pretty(table_bytes) AS pretty_heap, autovacuum_enabled; sort by dead_tup_pct DESC',
             'SELECT table_name,',
             '       live_tup,',
             '       dead_tup',
-            '       -- TODO: add dead_tup_pct, pg_size_pretty(table_bytes) AS pretty_heap, autovacuum_enabled',
             'FROM cluster_table_health',
-            'ORDER BY dead_tup_pct DESC, table_name ASC;'
+            'ORDER BY table_name ASC;'
           ].join('\n'),
           solutionCode: [
             'SELECT table_name,',
@@ -1297,14 +1289,13 @@
           setupSql: '',
           probeSql: '',
           starterCode: [
-            '-- Compute exact WAL bytes pinned on disk by each physical and logical slot',
+            '-- TODO: Add retained_wal_bytes (::bigint) and retained_wal_pretty; sort by retained_wal_bytes DESC',
             'SELECT slot_name,',
             '       slot_type,',
             '       active,',
             '       restart_lsn',
-            '       -- TODO: add retained_wal_bytes (::bigint) and retained_wal_pretty',
             'FROM cluster_replication_slots',
-            'ORDER BY retained_wal_bytes DESC, slot_name ASC;'
+            'ORDER BY slot_name ASC;'
           ].join('\n'),
           solutionCode: [
             'SELECT slot_name,',
@@ -1338,14 +1329,13 @@
           setupSql: '',
           probeSql: '',
           starterCode: [
-            '-- Measure both decoding restart retention and downstream confirmed_flush_lsn lag',
+            '-- TODO: Add retained_wal_mb, flush_lag_mb, and catalog_xmin; sort by flush_lag_mb DESC',
             'SELECT slot_name,',
             '       plugin,',
             '       active',
-            '       -- TODO: add retained_wal_mb, flush_lag_mb, and catalog_xmin',
             'FROM cluster_replication_slots',
             'WHERE slot_type = \'logical\'',
-            'ORDER BY flush_lag_mb DESC, slot_name ASC;'
+            'ORDER BY slot_name ASC;'
           ].join('\n'),
           solutionCode: [
             'SELECT slot_name,',

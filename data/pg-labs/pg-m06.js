@@ -1068,12 +1068,12 @@
           ].join('\n'),
           probeSql: '',
           starterCode: [
-            '-- Aggregate order_line_stream joined to products via Nested Loop (+ Memoize on products_pkey)',
-            'SELECT p.category_id,',
+            '-- TODO: Join order_line_stream s to products p, project SUM(s.qty * p.price_cents)::bigint AS gross_cents, GROUP BY p.category_id',
+            'SELECT s.product_id,',
             '       COUNT(*)::int AS line_count',
-            '       -- TODO: add SUM(s.qty * p.price_cents)::bigint AS gross_cents',
             'FROM order_line_stream s',
-            '-- TODO: JOIN products p ON ... GROUP BY p.category_id ORDER BY p.category_id ASC;'
+            'GROUP BY s.product_id',
+            'ORDER BY s.product_id ASC;'
           ].join('\n'),
           solutionCode: [
             'SELECT p.category_id,',
@@ -1107,12 +1107,12 @@
           setupSql: 'ANALYZE customers; ANALYZE orders; SET LOCAL enable_nestloop = off; SET LOCAL enable_mergejoin = off;',
           probeSql: '',
           starterCode: [
-            '-- Roll up completed order count and revenue by customer tier via Hash Join',
+            '-- TODO: Join customers c to orders o (status = \'completed\'), project SUM(o.total_cents)::bigint AS tier_revenue_cents, GROUP BY c.tier',
             'SELECT c.tier,',
-            '       COUNT(*)::int AS completed_orders',
-            '       -- TODO: SUM(o.total_cents)::bigint AS tier_revenue_cents',
+            '       COUNT(*)::int AS customer_count',
             'FROM customers c',
-            '-- TODO: JOIN orders o, filter completed, GROUP BY c.tier, ORDER BY tier_revenue_cents DESC, c.tier ASC;'
+            'GROUP BY c.tier',
+            'ORDER BY c.tier ASC;'
           ].join('\n'),
           solutionCode: [
             'SELECT c.tier,',

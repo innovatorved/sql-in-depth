@@ -286,7 +286,8 @@
           setupSql: '',
           probeSql: '',
           starterCode: [
-            '-- Fix the execution-order bug: WHERE runs BEFORE SELECT, so line_cents is unknown in WHERE!',
+            '-- TODO: Also filter for computed line_cents >= 60000.',
+            '-- Remember WHERE runs BEFORE SELECT, so repeat quantity * unit_price_cents >= 60000 (or use a CTE)!',
             'SELECT order_item_id,',
             '       order_id,',
             '       product_id,',
@@ -294,7 +295,6 @@
             '       quantity * unit_price_cents AS line_cents',
             'FROM order_items',
             'WHERE quantity <> 1',
-            '  AND line_cents >= 60000 -- BUG: column "line_cents" does not exist in WHERE!',
             'ORDER BY line_cents DESC, order_item_id ASC;'
           ].join('\n'),
           solutionCode: [
@@ -873,12 +873,14 @@
           setupSql: 'INSERT INTO projects (project_id, code, title, lead_emp_id, budget_usd) VALUES (40, \'PRJ-LAB\', \'Zero-Budget SIMD Spike\', 7, 0);',
           probeSql: '',
           starterCode: [
-            '-- Guard against budget_usd = 0 on project_id = 40 using NULLIF + COALESCE!',
+            '-- TODO: Remove WHERE budget_usd > 0 so project_id = 40 (budget_usd = 0) is included,',
+            '-- and guard against division by zero using NULLIF(budget_usd, 0) + COALESCE(..., 0.00)!',
             'SELECT project_id,',
             '       code,',
             '       budget_usd,',
-            '       ROUND((120000::numeric / budget_usd) * 100, 2) AS grant_coverage_pct -- CRASHES on 0!',
+            '       ROUND((120000::numeric / budget_usd) * 100, 2) AS grant_coverage_pct',
             'FROM projects',
+            'WHERE budget_usd > 0',
             'ORDER BY project_id ASC;'
           ].join('\n'),
           solutionCode: [
