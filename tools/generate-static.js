@@ -837,33 +837,18 @@ function renderStaticPostgresHub(pgCur) {
     </details>`;
   }).join('\n');
 
-  const firstSearch = '?mode=postgres-labs&lab=select-projection-arithmetic';
   return `<div class="view-canvas postgres-view chal-page" data-ssg-hub="postgres">
-    <header class="view-header pg-view-header">
-      <div class="view-header__top">
-        <div class="view-header__content">
-          <h1 class="view-title">PostgreSQL 18 Mastery</h1>
-          <p class="view-subtitle">80 hands-on labs and 240 live SQL missions across 10 tracks — from <code>SELECT</code>, <code>JOIN</code>, and window frames to <code>JSONB</code>, MVCC storage, <code>pg_catalog</code>, and DBRE clinics.</p>
-        </div>
-        <div class="view-tabs" role="tablist" aria-label="PostgreSQL mastery views">
-          <button type="button" class="view-tab active" data-pg-tab="tracks" role="tab" aria-selected="true">Curriculum Tracks</button>
-          <button type="button" class="view-tab" data-pg-tab="labs" role="tab" aria-selected="false">All 80 Labs</button>
-          <button type="button" class="view-tab" data-pg-tab="clinics" role="tab" aria-selected="false">DBRE Clinics</button>
-        </div>
-      </div>
-      <div class="pg-header-bar">
-        <ol class="chal-steps" aria-label="How PostgreSQL labs work">
-          <li><span>1</span>Read the scenario &amp; internals guide</li>
-          <li><span>2</span>Write PostgreSQL 18 SQL in Studio</li>
-          <li><span>3</span>Verify all 3 steps</li>
-        </ol>
-        <div class="pg-header-actions">
-          <div class="chal-progress" role="group" aria-label="Your PostgreSQL progress">
-            <div class="chal-progress__text"><strong>0 of ${allTopics.length}</strong> labs · <strong>0 of ${allTopics.length * 3}</strong> steps</div>
-            <div class="chal-progress__track"><span style="width:0%"></span></div>
-          </div>
-          <a href="/sandbox/${escapeAttr(firstSearch)}" class="eco-btn eco-btn--sm eco-btn--primary" data-nav="sandbox" data-search="${escapeAttr(firstSearch)}">Start Lab 01 →</a>
-        </div>
+    <header class="chal-hero">
+      <h1 class="view-title">PostgreSQL 18 Mastery</h1>
+      <p class="view-subtitle">80 hands-on labs and 240 live SQL missions across 10 tracks — from <code>SELECT</code>, <code>JOIN</code>, and window frames to <code>JSONB</code>, MVCC storage, <code>pg_catalog</code>, and DBRE clinics.</p>
+      <ol class="chal-steps" aria-label="How PostgreSQL labs work">
+        <li><span>1</span>Read the scenario &amp; internals guide</li>
+        <li><span>2</span>Write PostgreSQL 18 SQL in Studio</li>
+        <li><span>3</span>Verify all 3 steps</li>
+      </ol>
+      <div class="chal-progress" role="group" aria-label="Your PostgreSQL progress">
+        <div class="chal-progress__text"><strong>0 of ${allTopics.length}</strong> labs · <strong>0 of ${allTopics.length * 3}</strong> steps</div>
+        <div class="chal-progress__track"><span style="width:0%"></span></div>
       </div>
     </header>
     <div class="chal-controls">

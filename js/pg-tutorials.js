@@ -716,7 +716,6 @@
      ========================================================================== */
 
   var _hubState = {
-    tab: 'tracks',
     search: '',
     difficulty: 'all',
     status: 'all',
@@ -749,24 +748,11 @@
       }
     }
 
-    var resumeTopic = summary.resumeTopic || cur.topics[0] || null;
-    var resumeSlug = resumeTopic ? resumeTopic.slug : 'select-projection-arithmetic';
-    var resumeSearch = getStudioLabSearch(resumeSlug);
-    var resumeNum = resumeTopic ? String(resumeTopic.globalOrder || 1).padStart(2, '0') : '01';
-    var resumeLabel = summary.completedStepsCount > 0
-      ? ('Continue Lab ' + resumeNum + ' →')
-      : 'Start Lab 01 →';
-
-    var activeTab = _hubState.tab || 'tracks';
-    var baseTopics = activeTab === 'clinics'
-      ? cur.topics.filter(function (t) { return t.moduleId === 'pg-m09' || t.moduleId === 'pg-m10'; })
-      : cur.topics;
-
     var levels = ['all', 'Beginner', 'Intermediate', 'Advanced', 'Staff'];
     var filterButtonsHtml = levels.map(function (lvl) {
       var count = lvl === 'all'
-        ? baseTopics.length
-        : baseTopics.filter(function (t) { return t.difficulty === lvl; }).length;
+        ? cur.topics.length
+        : cur.topics.filter(function (t) { return t.difficulty === lvl; }).length;
       if (lvl !== 'all' && count === 0) return '';
       var active = _hubState.difficulty === lvl;
       var label = lvl === 'all' ? 'All' : lvl;
@@ -777,31 +763,17 @@
 
     rootEl.innerHTML = [
       '<div class="view-canvas postgres-view chal-page">',
-      '  <header class="view-header pg-view-header">',
-      '    <div class="view-header__top">',
-      '      <div class="view-header__content">',
-      '        <h1 class="view-title">PostgreSQL 18 Mastery</h1>',
-      '        <p class="view-subtitle">80 hands-on labs and 240 live SQL missions across 10 tracks — from <code>SELECT</code>, <code>JOIN</code>, and window frames to <code>JSONB</code>, MVCC storage, <code>pg_catalog</code>, and DBRE clinics.</p>',
-      '      </div>',
-      '      <div class="view-tabs" role="tablist" aria-label="PostgreSQL mastery views">',
-      '        <button type="button" class="view-tab' + (activeTab === 'tracks' ? ' active' : '') + '" data-pg-tab="tracks" role="tab" aria-selected="' + (activeTab === 'tracks' ? 'true' : 'false') + '">Curriculum Tracks</button>',
-      '        <button type="button" class="view-tab' + (activeTab === 'labs' ? ' active' : '') + '" data-pg-tab="labs" role="tab" aria-selected="' + (activeTab === 'labs' ? 'true' : 'false') + '">All 80 Labs</button>',
-      '        <button type="button" class="view-tab' + (activeTab === 'clinics' ? ' active' : '') + '" data-pg-tab="clinics" role="tab" aria-selected="' + (activeTab === 'clinics' ? 'true' : 'false') + '">DBRE Clinics</button>',
-      '      </div>',
-      '    </div>',
-      '    <div class="pg-header-bar">',
-      '      <ol class="chal-steps" aria-label="How PostgreSQL labs work">',
-      '        <li><span>1</span>Read the scenario &amp; internals guide</li>',
-      '        <li><span>2</span>Write PostgreSQL 18 SQL in Studio</li>',
-      '        <li><span>3</span>Verify all 3 steps</li>',
-      '      </ol>',
-      '      <div class="pg-header-actions">',
-      '        <div class="chal-progress" role="group" aria-label="Your PostgreSQL progress">',
-      '          <div class="chal-progress__text"><strong>' + summary.completedTopicsCount + ' of ' + summary.totalTopics + '</strong> labs · <strong>' + summary.completedStepsCount + ' of ' + summary.totalSteps + '</strong> steps</div>',
-      '          <div class="chal-progress__track"><span style="width:' + summary.pctSteps + '%"></span></div>',
-      '        </div>',
-      '        <a href="/sandbox/' + escapeHtml(resumeSearch) + '" class="eco-btn eco-btn--sm eco-btn--primary" data-nav="sandbox" data-search="' + escapeHtml(resumeSearch) + '">' + escapeHtml(resumeLabel) + '</a>',
-      '      </div>',
+      '  <header class="chal-hero">',
+      '    <h1 class="view-title">PostgreSQL 18 Mastery</h1>',
+      '    <p class="view-subtitle">80 hands-on labs and 240 live SQL missions across 10 tracks — from <code>SELECT</code>, <code>JOIN</code>, and window frames to <code>JSONB</code>, MVCC storage, <code>pg_catalog</code>, and DBRE clinics.</p>',
+      '    <ol class="chal-steps" aria-label="How PostgreSQL labs work">',
+      '      <li><span>1</span>Read the scenario &amp; internals guide</li>',
+      '      <li><span>2</span>Write PostgreSQL 18 SQL in Studio</li>',
+      '      <li><span>3</span>Verify all 3 steps</li>',
+      '    </ol>',
+      '    <div class="chal-progress" role="group" aria-label="Your PostgreSQL progress">',
+      '      <div class="chal-progress__text"><strong>' + summary.completedTopicsCount + ' of ' + summary.totalTopics + '</strong> labs · <strong>' + summary.completedStepsCount + ' of ' + summary.totalSteps + '</strong> steps</div>',
+      '      <div class="chal-progress__track"><span style="width:' + summary.pctSteps + '%"></span></div>',
       '    </div>',
       '  </header>',
       '',
@@ -884,37 +856,9 @@
     var st = loadProgress();
     var q = String(_hubState.search || '').trim().toLowerCase();
     var diff = _hubState.difficulty || 'all';
-    var activeTab = _hubState.tab || 'tracks';
     var hasActiveFilter = Boolean(q || diff !== 'all');
 
-    // Flat "All 80 Labs" view (identical scannable list to /challenges/)
-    if (activeTab === 'labs') {
-      var modLookup = cur.moduleById || {};
-      var flatMatches = cur.topics.filter(function (t) {
-        return topicMatchesFilter(t, q, diff);
-      });
-      if (flatMatches.length === 0) {
-        listEl.innerHTML = renderEmptyFilterState();
-        bindEmptyReset(rootEl, listEl);
-        return;
-      }
-      var flatRows = flatMatches.map(function (t) {
-        var mod = modLookup[t.moduleId] || {};
-        var enriched = Object.assign({}, t, {
-          moduleNum: mod.num || '',
-          moduleShortTitle: mod.shortTitle || mod.title || ''
-        });
-        return renderLabRow(enriched, st, true);
-      }).join('\n');
-      listEl.innerHTML = '<ol class="chal-list">' + flatRows + '</ol>';
-      return;
-    }
-
-    // Track-grouped view ("Curriculum Tracks" or "DBRE Clinics")
-    var modulesToRender = activeTab === 'clinics'
-      ? cur.modules.filter(function (m) { return m.id === 'pg-m09' || m.id === 'pg-m10'; })
-      : cur.modules;
-
+    var modulesToRender = cur.modules;
     var totalMatched = 0;
     var accordionsHtml = modulesToRender.map(function (mod) {
       var matchedTopics = mod.topics.filter(function (t) {
@@ -933,7 +877,7 @@
       var modTotalSteps = mod.topics.length * 3;
       var modPct = modTotalSteps > 0 ? Math.round((modCompletedSteps / modTotalSteps) * 100) : 0;
 
-      var isOpen = activeTab === 'clinics' || hasActiveFilter || Boolean(_hubState.openTracks && _hubState.openTracks[mod.id]);
+      var isOpen = hasActiveFilter || Boolean(_hubState.openTracks && _hubState.openTracks[mod.id]);
       var rowsHtml = matchedTopics.map(function (topic) {
         return renderLabRow(topic, st, false);
       }).join('\n');
@@ -968,35 +912,17 @@
       return;
     }
 
-    var topMetaHtml = '';
-    if (activeTab === 'tracks') {
-      topMetaHtml = [
-        '<div class="pg-tracks-bar">',
-        '  <span class="pg-tracks-meta">10 tracks · PostgreSQL 18.6 WASM · <code>pg_trgm</code>, <code>btree_gist</code>, <code>ltree</code>, <code>pageinspect</code>, <code>pg_buffercache</code>, <code>pg_visibility</code>, <code>pg_freespacemap</code></span>',
-        '  <button type="button" class="pg-toggle-all-btn" id="pg-hub-toggle-all" aria-expanded="false">',
-        '    <span class="pg-toggle-all__expand">Expand all tracks</span>',
-        '    <span class="pg-toggle-all__collapse" hidden>Collapse all tracks</span>',
-        '  </button>',
-        '</div>'
-      ].join('\n');
-    }
+    var topMetaHtml = [
+      '<div class="pg-tracks-bar">',
+      '  <span class="pg-tracks-meta">10 tracks · PostgreSQL 18.6 WASM · <code>pg_trgm</code>, <code>btree_gist</code>, <code>ltree</code>, <code>pageinspect</code>, <code>pg_buffercache</code>, <code>pg_visibility</code>, <code>pg_freespacemap</code></span>',
+      '  <button type="button" class="pg-toggle-all-btn" id="pg-hub-toggle-all" aria-expanded="false">',
+      '    <span class="pg-toggle-all__expand">Expand all tracks</span>',
+      '    <span class="pg-toggle-all__collapse" hidden>Collapse all tracks</span>',
+      '  </button>',
+      '</div>'
+    ].join('\n');
 
-    var clinicsCalloutHtml = '';
-    if (activeTab === 'clinics') {
-      clinicsCalloutHtml = [
-        '<article class="eco-card pg-clinics-callout">',
-        '  <div class="pg-clinics-callout__row">',
-        '    <div>',
-        '      <h2 class="eco-card__title">Ready for unguided incident debugging?</h2>',
-        '      <p class="eco-card__desc">Put your <code>pg_locks</code>, XID wraparound, cardinality skew, and GIN pending-list skills to the test in 8 PostgreSQL 18 production incident challenges.</p>',
-        '    </div>',
-        '    <a href="/challenges/" class="eco-btn eco-btn--primary" data-nav="challenges">Open Challenges →</a>',
-        '  </div>',
-        '</article>'
-      ].join('\n');
-    }
-
-    listEl.innerHTML = topMetaHtml + '<div class="pg-tracks-stack">' + accordionsHtml + '</div>' + clinicsCalloutHtml;
+    listEl.innerHTML = topMetaHtml + '<div class="pg-tracks-stack">' + accordionsHtml + '</div>';
     syncToggleAllButton(rootEl);
 
     var toggleBtn = listEl.querySelector('#pg-hub-toggle-all');
@@ -1016,7 +942,7 @@
     Array.prototype.forEach.call(listEl.querySelectorAll('details.pg-track-accordion'), function (det) {
       det.addEventListener('toggle', function () {
         var mId = det.getAttribute('data-module-id');
-        if (mId && _hubState.openTracks && !hasActiveFilter && activeTab === 'tracks') {
+        if (mId && _hubState.openTracks && !hasActiveFilter) {
           _hubState.openTracks[mId] = det.open;
         }
         syncToggleAllButton(rootEl);
@@ -1060,15 +986,6 @@
           b.setAttribute('aria-pressed', isAct ? 'true' : 'false');
         });
         renderHubBody(rootEl);
-      });
-    });
-
-    Array.prototype.forEach.call(rootEl.querySelectorAll('[data-pg-tab]'), function (tabBtn) {
-      tabBtn.addEventListener('click', function () {
-        var nextTab = tabBtn.getAttribute('data-pg-tab') || 'tracks';
-        if (_hubState.tab === nextTab) return;
-        _hubState.tab = nextTab;
-        renderPostgresHub(rootEl);
       });
     });
   }
