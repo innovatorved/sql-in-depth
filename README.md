@@ -11,7 +11,7 @@ Open-source interactive curriculum for relational databases, SQL query execution
 - **Clause-by-Clause Relational Table Visualizer**: Step through logical SQL evaluation order (FROM, JOIN, WHERE three-valued logic, GROUP BY, HAVING, WINDOW, SELECT, DISTINCT, ORDER BY, LIMIT) and inspect intermediate tuples at every stage.
 - **Dual WebAssembly SQL Engines**: Execute queries against 5 pre-seeded relational schemas (26 tables) inside a Web Worker backed by SQLite 3 (`sql.js`) for sub-100ms cold boot and on-demand PostgreSQL 18 (`@electric-sql/pglite`).
 - **36 Interactive Storage & Concurrency Simulators**: Explore 8 KB slotted pages, B+Tree splits, System R join cost estimation, MVCC `xmin`/`xmax` tuple visibility, two-phase locking deadlocks, and ARIES write-ahead log recovery.
-- **180 Guided SQL Labs & 18 Capstone Builds**: Progressive 3-step SQL exercises with coaching hints and automated result-set verification on every topic, paired with optional reference storage-engine implementations powered by [`@innovatorved/code-lab`](https://github.com/innovatorved/code-lab).
+- **180 Guided SQL Labs & 18 Capstone Builds**: Progressive 3-step SQL exercises with coaching hints and automated result-set verification on every topic, paired with interactive reference storage-engine implementations.
 - **12 Incident Diagnostics**: Practice fixing production query regressions — NULL anti-join traps, join fan-out double counting, recursive CTE cycles, non-SARGable filters, and lock-ordering deadlocks.
 
 ---

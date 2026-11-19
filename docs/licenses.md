@@ -12,9 +12,8 @@ Every library, font, runtime, and media asset shipped by SQL In Depth uses a per
 | **@electric-sql/pglite** | `^0.5.12` | Apache-2.0 (PostgreSQL License) | Copyright (c) ElectricDB Limited & PostgreSQL Global Development Group | On-demand in-browser PostgreSQL 18 WebAssembly engine |
 | **@codemirror/*** | `^6.x` | MIT | Copyright (c) Marijn Haverbeke and contributors | Accessible SQL editor, schema-aware autocomplete, and inline diagnostics |
 | **@lezer/highlight** | `^1.x` | MIT | Copyright (c) Marijn Haverbeke and contributors | Syntax highlighting tags for light and dark themes |
-| **KaTeX** | `0.16.11` | MIT | Copyright (c) Khan Academy and contributors | Self-hosted relational algebra and cost-model math typesetting |
+| **KaTeX** | `0.19.1` | MIT | Copyright (c) Khan Academy and contributors | Self-hosted relational algebra and cost-model math typesetting |
 | **Mermaid** | `10.9.8` | MIT | Copyright (c) Knut Sveidqvist and contributors | On-demand architecture diagram renderer |
-| **@innovatorved/code-lab** | `0.4.0` | MIT | Copyright (c) 2026 Ved Gupta | Browser-native IDE for reference storage-engine implementations |
 
 ---
 

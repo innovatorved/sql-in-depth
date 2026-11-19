@@ -53,7 +53,7 @@ SQL In Depth is a static-first, progressive-enhancement web application that run
    - Emits standalone `index.html` directories for all 180 `/topic/<slug>/` units, 18 `/build/<id>/` capstones, 12 `/challenges/<id>/` rooms, and 6 hub routes (`/roadmap/`, `/challenges/`, `/sandbox/`, `/dashboard/`, `/glossary/`, `/projects/`), avoiding SPA rewrite redirect loops on static hosts.
 2. **Idle-Scheduled Client Hydration (`js/bootstrap.js`, `js/lazy.js`)**:
    - Initial paint requires only self-hosted stylesheets, Geist `.woff2` fonts, `js/init.js` (theme restoration before paint), and `js/manifest.js`.
-   - Route-heavy bundles (SQL WASM engines, CodeMirror 6, simulators, guided lab specs, and `@innovatorved/code-lab`) load lazily via `IntersectionObserver` or route activation using content-addressed `?v=<hash>` URLs.
+   - Route-heavy bundles (SQL WASM engines, CodeMirror 6, simulators, and guided lab specs) load lazily via `IntersectionObserver` or route activation using content-addressed `?v=<hash>` URLs.
 
 ---
 

@@ -21,7 +21,7 @@ This project incorporates, links to, or interfaces with the following permissive
 - **Copyright:** (c) 2018–2026 Marijn Haverbeke and contributors
 - **Usage:** Accessible SQL editor, schema-aware autocomplete, syntax highlighting, and error diagnostics.
 
-### KaTeX (v0.16.11)
+### KaTeX (v0.19.1)
 - **License:** MIT License
 - **Copyright:** (c) 2013–2026 Khan Academy and contributors
 - **Usage:** Self-hosted relational algebra and query-cost math rendering.
@@ -31,9 +31,9 @@ This project incorporates, links to, or interfaces with the following permissive
 - **Copyright:** (c) 2023 Vercel, Inc.
 - **Usage:** Self-hosted webfonts for reading prose and tabular data grids.
 
-### Mermaid.js & @innovatorved/code-lab (v0.4.0)
+### Mermaid.js
 - **License:** MIT License
-- **Usage:** On-demand architecture diagrams and reference storage-engine IDE workbench.
+- **Usage:** On-demand architecture diagrams.
 
 ---
 

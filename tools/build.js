@@ -20,7 +20,6 @@ const PUBLIC_ITEMS = [
   'sitemap.xml',
   'llms.txt',
   'favicon.svg',
-  'preview-sw.js',
   'CNAME',
   '.well-known',
   'assets',
